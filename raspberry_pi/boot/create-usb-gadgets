@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# Script to create USB Gadgets on a Pi
+# A USB Audio gadget is created and a USB MIDI gadget
+#
+
+# USB Audio configuration:
+# 8 channels at 4 kHz, 16 bit.
+# eventually this will be multiple audio cards with 24 or 32 channels...
+AUDIO_CHANNEL_MASK=255
+AUDIO_SAMPLE_RATES=4000
+AUDIO_SAMPLE_SIZE=2
+
+# USB MIDI configuration
+MIDI_ID="Zoxnoxious-MIDI"
+
+# Load libcomposite
+modprobe libcomposite
+ 
+# Create a gadget called usb-gadgets
+cd /sys/kernel/config/usb_gadget/
+mkdir -p usb-gadgets
+cd usb-gadgets
+ 
+# Configure our gadget details
+echo 0x1d6b > idVendor # Linux Foundation
+echo 0x0104 > idProduct # Multifunction Composite Gadget
+echo 0x0100 > bcdDevice # v1.0.0
+echo 0x0200 > bcdUSB # USB2
+mkdir -p strings/0x409
+echo "023456789abcdef1" > strings/0x409/serialnumber
+echo "Zoxnoxious Engineering" > strings/0x409/manufacturer
+echo "Zoxnoxious MIDI and Audio" > strings/0x409/product
+
+mkdir -p configs/c.1/strings/0x409
+ 
+# UAC2 (audio) gadget
+# attributes from: https://www.kernel.org/doc/Documentation/ABI/testing/configfs-usb-gadget-uac2
+for i in 0
+do
+    mkdir -p functions/uac2.usb${i}
+    echo $AUDIO_CHANNEL_MASK > functions/uac2.usb${i}/c_chmask
+    echo $AUDIO_SAMPLE_RATES > functions/uac2.usb${i}/c_srate
+    echo $AUDIO_SAMPLE_SIZE > functions/uac2.usb${i}/c_ssize
+    echo $AUDIO_CHANNEL_MASK > functions/uac2.usb${i}/p_chmask
+    echo $AUDIO_SAMPLE_RATES > functions/uac2.usb${i}/p_srate
+    echo $AUDIO_SAMPLE_SIZE > functions/uac2.usb${i}/p_ssize
+    ln -s functions/uac2.usb${i} configs/c.1/
+done
+
+
+# MIDI gadget
+# attributes from: https://www.kernel.org/doc/Documentation/ABI/testing/configfs-usb-gadget-midi
+mkdir -p functions/midi.usb0
+echo MIDI_ID > functions/midi.usb0/id
+ln -s functions/midi.usb0 configs/c.1/
+
+# End functions
+udevadm settle -t 5
+ls /sys/class/udc > UDC
