@@ -1,0 +1,570 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr B 17000 11000
+encoding utf-8
+Sheet 4 4
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Wire Wire Line
+	10750 5000 10100 5000
+Wire Wire Line
+	11100 3200 11700 3200
+$Comp
+L Device:R R?
+U 1 1 626F5A61
+P 11700 4350
+AR Path="/61E1D4AE/626F5A61" Ref="R?"  Part="1" 
+AR Path="/626F5A61" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5A61" Ref="R10"  Part="1" 
+F 0 "R10" V 11907 4350 50  0000 C CNN
+F 1 "10k" V 11816 4350 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 11630 4350 50  0001 C CNN
+F 3 "~" H 11700 4350 50  0001 C CNN
+F 4 "C25804" H 11700 4350 50  0001 C CNN "LCSC Part"
+	1    11700 4350
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	12000 3600 12100 3600
+Wire Wire Line
+	11700 3200 11700 3400
+Wire Wire Line
+	10750 5100 10750 5000
+$Comp
+L Device:R R?
+U 1 1 626F5A6B
+P 12250 3600
+AR Path="/61E1D4AE/626F5A6B" Ref="R?"  Part="1" 
+AR Path="/626F5A6B" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5A6B" Ref="R9"  Part="1" 
+F 0 "R9" V 12457 3600 50  0000 C CNN
+F 1 "27k" V 12366 3600 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 12180 3600 50  0001 C CNN
+F 3 "~" H 12250 3600 50  0001 C CNN
+F 4 "C22967" H 12250 3600 50  0001 C CNN "LCSC Part"
+	1    12250 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 626F5A73
+P 12250 6050
+AR Path="/61E1D4AE/626F5A73" Ref="R?"  Part="1" 
+AR Path="/626F5A73" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5A73" Ref="R12"  Part="1" 
+F 0 "R12" V 12457 6050 50  0000 C CNN
+F 1 "20k" V 12366 6050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 12180 6050 50  0001 C CNN
+F 3 "~" H 12250 6050 50  0001 C CNN
+F 4 "C4184" H 12250 6050 50  0001 C CNN "LCSC Part"
+	1    12250 6050
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	12100 6050 12000 6050
+Wire Wire Line
+	11350 6350 11700 6350
+Wire Wire Line
+	11800 6950 11150 6950
+Wire Wire Line
+	11800 7700 11050 7700
+$Comp
+L Device:R R?
+U 1 1 626F5A82
+P 12350 7250
+AR Path="/61E1D4AE/626F5A82" Ref="R?"  Part="1" 
+AR Path="/626F5A82" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5A82" Ref="R13"  Part="1" 
+F 0 "R13" V 12557 7250 50  0000 C CNN
+F 1 "27k" V 12466 7250 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 12280 7250 50  0001 C CNN
+F 3 "~" H 12350 7250 50  0001 C CNN
+F 4 "C22967" H 12350 7250 50  0001 C CNN "LCSC Part"
+	1    12350 7250
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Analog_Switch:DG441xJ U?
+U 1 1 626F5A88
+P 11800 7250
+AR Path="/626F5A88" Ref="U?"  Part="1" 
+AR Path="/6269DD41/626F5A88" Ref="U8"  Part="1" 
+F 0 "U8" H 11800 7425 50  0000 C CNN
+F 1 "DG442CY+" H 11800 7516 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 11800 7150 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 11800 7250 50  0001 C CNN
+F 4 "DG442CY+-ND" H 11800 7250 50  0001 C CNN "Digikey"
+	1    11800 7250
+	-1   0    0    1   
+$EndComp
+$Comp
+L Analog_Switch:DG441xJ U?
+U 3 1 626F5A8E
+P 11800 8000
+AR Path="/626F5A8E" Ref="U?"  Part="3" 
+AR Path="/6269DD41/626F5A8E" Ref="U8"  Part="3" 
+F 0 "U8" H 11800 8175 50  0000 C CNN
+F 1 "DG442CY+" H 11800 8266 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 11800 7900 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 11800 8000 50  0001 C CNN
+F 4 "DG442CY+-ND" H 11800 8000 50  0001 C CNN "Digikey"
+	3    11800 8000
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	11800 7800 11800 7700
+Wire Wire Line
+	11800 7050 11800 6950
+Wire Wire Line
+	12200 7250 12100 7250
+Wire Wire Line
+	12650 3600 12400 3600
+Wire Wire Line
+	11850 4350 12650 4350
+Wire Wire Line
+	12650 3600 12650 4350
+Connection ~ 12650 4350
+Wire Wire Line
+	12400 6050 12650 6050
+$Comp
+L Amplifier_Operational:TL074 U?
+U 3 1 626F5A9F
+P 13750 4600
+AR Path="/61E1D4AE/626F5A9F" Ref="U?"  Part="2" 
+AR Path="/626F5A9F" Ref="U?"  Part="4" 
+AR Path="/6269DD41/626F5A9F" Ref="U1"  Part="3" 
+F 0 "U1" H 13800 4400 50  0000 C CNN
+F 1 "TL074" H 13700 4600 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 13700 4700 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/tl071.pdf" H 13800 4800 50  0001 C CNN
+F 4 "C12594" H 13750 4600 50  0001 C CNN "LCSC Part"
+	3    13750 4600
+	1    0    0    1   
+$EndComp
+$Comp
+L Amplifier_Operational:TL074 U?
+U 4 1 626F5AAD
+P 5350 4750
+AR Path="/61E1D4AE/626F5AAD" Ref="U?"  Part="2" 
+AR Path="/626F5AAD" Ref="U?"  Part="3" 
+AR Path="/6269DD41/626F5AAD" Ref="U1"  Part="4" 
+F 0 "U1" H 5400 4550 50  0000 C CNN
+F 1 "TL074" H 5300 4750 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 5300 4850 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/tl071.pdf" H 5400 4950 50  0001 C CNN
+F 4 "C12594" H 5350 4750 50  0001 C CNN "LCSC Part"
+	4    5350 4750
+	1    0    0    1   
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 626F5AB4
+P 11950 5300
+AR Path="/61E1D4AE/626F5AB4" Ref="R?"  Part="1" 
+AR Path="/626F5AB4" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5AB4" Ref="R6"  Part="1" 
+F 0 "R6" V 12050 5250 50  0000 C CNN
+F 1 "47k" V 11950 5300 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 11880 5300 50  0001 C CNN
+F 3 "~" H 11950 5300 50  0001 C CNN
+F 4 "C25819" H 11950 5300 50  0001 C CNN "LCSC Part"
+	1    11950 5300
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	12500 7250 12600 7250
+Text Notes 12450 3250 0    50   ~ 0
+TODO: check levels… this may be a bit odd
+$Comp
+L Analog_Switch:DG441xJ U?
+U 4 1 626F5AC3
+P 11700 3600
+AR Path="/626F5AC3" Ref="U?"  Part="4" 
+AR Path="/6269DD41/626F5AC3" Ref="U5"  Part="4" 
+F 0 "U5" H 11700 3775 50  0000 C CNN
+F 1 "DG442CY+" H 11700 3866 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 11700 3500 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 11700 3600 50  0001 C CNN
+F 4 "DG442CY+-ND" H 11700 3600 50  0001 C CNN "Digikey"
+	4    11700 3600
+	-1   0    0    1   
+$EndComp
+$Comp
+L Analog_Switch:DG441xJ U?
+U 2 1 626F5AC9
+P 10750 5300
+AR Path="/626F5AC9" Ref="U?"  Part="1" 
+AR Path="/6269DD41/626F5AC9" Ref="U5"  Part="2" 
+F 0 "U5" H 10750 5475 50  0000 C CNN
+F 1 "DG442CY+" H 10750 5566 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 10750 5200 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 10750 5300 50  0001 C CNN
+F 4 "DG442CY+-ND" H 10750 5300 50  0001 C CNN "Digikey"
+	2    10750 5300
+	-1   0    0    1   
+$EndComp
+$Comp
+L Analog_Switch:DG441xJ U?
+U 3 1 626F5ACF
+P 11700 6050
+AR Path="/626F5ACF" Ref="U?"  Part="3" 
+AR Path="/6269DD41/626F5ACF" Ref="U5"  Part="3" 
+F 0 "U5" H 11700 6225 50  0000 C CNN
+F 1 "DG442CY+" H 11700 6316 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 11700 5950 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 11700 6050 50  0001 C CNN
+F 4 "DG442CY+-ND" H 11700 6050 50  0001 C CNN "Digikey"
+	3    11700 6050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Analog_Switch:DG441xJ U?
+U 1 1 626F5AD5
+P 11700 5000
+AR Path="/626F5AD5" Ref="U?"  Part="1" 
+AR Path="/6269DD41/626F5AD5" Ref="U5"  Part="1" 
+F 0 "U5" H 11850 4850 50  0000 C CNN
+F 1 "DG442CY+" H 11500 4850 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 11700 4900 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 11700 5000 50  0001 C CNN
+F 4 "DG442CY+-ND" H 11700 5000 50  0001 C CNN "Digikey"
+	1    11700 5000
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 626F5ADC
+P 14350 7250
+AR Path="/61E1D4AE/626F5ADC" Ref="R?"  Part="1" 
+AR Path="/626F5ADC" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5ADC" Ref="R65"  Part="1" 
+F 0 "R65" V 14557 7250 50  0000 C CNN
+F 1 "1k" V 14466 7250 50  0000 C CNN
+F 2 "Resistor_SMD:R_1206_3216Metric" V 14280 7250 50  0001 C CNN
+F 3 "~" H 14350 7250 50  0001 C CNN
+F 4 "C4410" H 14350 7250 50  0001 C CNN "LCSC Part"
+	1    14350 7250
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	14500 7250 14750 7250
+$Comp
+L Audio:AS3360 U?
+U 1 1 626F5AE3
+P 3950 5000
+AR Path="/627C7865/626F5AE3" Ref="U?"  Part="1" 
+AR Path="/627EC897/626F5AE3" Ref="U?"  Part="1" 
+AR Path="/63514083/626F5AE3" Ref="U?"  Part="2" 
+AR Path="/626F5AE3" Ref="U?"  Part="1" 
+AR Path="/6269DD41/626F5AE3" Ref="U6"  Part="1" 
+F 0 "U6" H 3950 5300 50  0000 C CNN
+F 1 "AS3360" H 3950 4600 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 4650 4300 50  0001 C CNN
+F 3 "http://www.alfarzpp.lv/eng/sc/AS3360.pdf" H 4600 4350 50  0001 C CNN
+	1    3950 5000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 626F5AE9
+P 4350 5050
+AR Path="/627C7865/626F5AE9" Ref="R?"  Part="1" 
+AR Path="/627EC897/626F5AE9" Ref="R?"  Part="1" 
+AR Path="/63514083/626F5AE9" Ref="R?"  Part="1" 
+AR Path="/626F5AE9" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5AE9" Ref="R8"  Part="1" 
+F 0 "R8" V 4250 5050 50  0000 C CNN
+F 1 "51k" V 4450 5050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 4280 5050 50  0001 C CNN
+F 3 "~" H 4350 5050 50  0001 C CNN
+F 4 "C23196" H 4350 5050 50  0001 C CNN "LCSC Part"
+	1    4350 5050
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4350 5200 4350 5300
+$Comp
+L power:GND #PWR?
+U 1 1 626F5AF0
+P 4350 5300
+AR Path="/627C7865/626F5AF0" Ref="#PWR?"  Part="1" 
+AR Path="/627EC897/626F5AF0" Ref="#PWR?"  Part="1" 
+AR Path="/63514083/626F5AF0" Ref="#PWR?"  Part="1" 
+AR Path="/626F5AF0" Ref="#PWR?"  Part="1" 
+AR Path="/6269DD41/626F5AF0" Ref="#PWR030"  Part="1" 
+F 0 "#PWR030" H 4350 5050 50  0001 C CNN
+F 1 "GND" H 4355 5127 50  0000 C CNN
+F 2 "" H 4350 5300 50  0001 C CNN
+F 3 "" H 4350 5300 50  0001 C CNN
+	1    4350 5300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Amplifier_Operational:TL074 U?
+U 1 1 626F5AF6
+P 13650 7250
+AR Path="/627C7865/626F5AF6" Ref="U?"  Part="2" 
+AR Path="/627EC897/626F5AF6" Ref="U?"  Part="1" 
+AR Path="/63514083/626F5AF6" Ref="U?"  Part="2" 
+AR Path="/626F5AF6" Ref="U?"  Part="1" 
+AR Path="/6269DD41/626F5AF6" Ref="U1"  Part="1" 
+F 0 "U1" H 13650 7450 50  0000 C CNN
+F 1 "TL074" H 13600 7250 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 13650 7250 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/tl071.pdf" H 13650 7250 50  0001 C CNN
+F 4 "C12594" H 13650 7250 50  0001 C CNN "LCSC Part"
+	1    13650 7250
+	1    0    0    1   
+$EndComp
+Wire Wire Line
+	4200 4850 4350 4850
+Wire Wire Line
+	4350 4900 4350 4850
+Connection ~ 4350 4850
+Wire Wire Line
+	3700 4950 3650 4950
+Wire Wire Line
+	3650 4950 3650 4850
+Wire Wire Line
+	3650 4850 3700 4850
+$Comp
+L Device:R R?
+U 1 1 626F5B03
+P 12200 5000
+AR Path="/61E1D4AE/626F5B03" Ref="R?"  Part="1" 
+AR Path="/626F5B03" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5B03" Ref="R7"  Part="1" 
+F 0 "R7" V 12300 4950 50  0000 C CNN
+F 1 "20k" V 12200 5000 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 12130 5000 50  0001 C CNN
+F 3 "~" H 12200 5000 50  0001 C CNN
+F 4 "C4184" H 12200 5000 50  0001 C CNN "LCSC Part"
+	1    12200 5000
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2900 5050 3700 5050
+Wire Wire Line
+	13350 7150 13250 7150
+Wire Wire Line
+	12600 8000 12600 7350
+Wire Wire Line
+	12600 7350 13350 7350
+Wire Wire Line
+	12600 7250 12600 7350
+Connection ~ 12600 7350
+Text Label 4750 4850 2    50   ~ 0
+VCA_TRI
+Text Label 10750 8000 0    50   ~ 0
+SAW
+Wire Wire Line
+	10750 8000 11500 8000
+Wire Wire Line
+	9850 5300 10450 5300
+Wire Wire Line
+	10800 7250 11500 7250
+Wire Wire Line
+	11400 6050 10900 6050
+Wire Wire Line
+	11400 3600 10800 3600
+Wire Notes Line
+	1700 3950 1700 7250
+Wire Notes Line
+	6750 7250 6750 3950
+Wire Notes Line
+	6750 3950 1700 3950
+Wire Notes Line
+	1700 7250 6750 7250
+Text Notes 2850 4500 0    50   ~ 0
+Output level / scaling - Pulse and Saw
+Wire Notes Line
+	8600 2900 8600 8350
+Wire Notes Line
+	15700 8400 15700 2950
+Wire Notes Line
+	15700 2950 8600 2900
+Wire Notes Line
+	8600 8350 15700 8400
+Text Notes 10950 3050 0    50   ~ 0
+Output Mixing
+Wire Wire Line
+	3500 5200 3700 5200
+$Comp
+L Device:R R?
+U 1 1 626F5B60
+P 14350 4600
+AR Path="/61E1D4AE/626F5B60" Ref="R?"  Part="1" 
+AR Path="/626F5B60" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5B60" Ref="R66"  Part="1" 
+F 0 "R66" V 14557 4600 50  0000 C CNN
+F 1 "1k" V 14466 4600 50  0000 C CNN
+F 2 "Resistor_SMD:R_1206_3216Metric" V 14280 4600 50  0001 C CNN
+F 3 "~" H 14350 4600 50  0001 C CNN
+F 4 "C4410" H 14350 4600 50  0001 C CNN "LCSC Part"
+	1    14350 4600
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	13400 4250 13400 4500
+Wire Wire Line
+	13400 4500 13450 4500
+Wire Wire Line
+	14100 4250 14100 4600
+Wire Wire Line
+	14100 4600 14050 4600
+Wire Wire Line
+	14100 4600 14200 4600
+Connection ~ 14100 4600
+Wire Wire Line
+	14500 4600 14600 4600
+Wire Wire Line
+	10250 4650 11700 4650
+Wire Wire Line
+	12000 5000 12050 5000
+$Comp
+L Device:R R?
+U 1 1 626F5B96
+P 3350 5200
+AR Path="/61E1D4AE/626F5B96" Ref="R?"  Part="1" 
+AR Path="/626F5B96" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5B96" Ref="R5"  Part="1" 
+F 0 "R5" V 3450 5200 50  0000 C CNN
+F 1 "47k" V 3250 5200 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 3280 5200 50  0001 C CNN
+F 3 "~" H 3350 5200 50  0001 C CNN
+F 4 "C25819" H 3350 5200 50  0001 C CNN "LCSC Part"
+	1    3350 5200
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2900 5200 3200 5200
+Text Label 10800 4350 0    50   ~ 0
+SCALED_TRI
+Text HLabel 2900 5050 0    50   Input ~ 0
+TRI_VC_AMOUNT_DAC
+Text HLabel 10800 3600 0    50   Input ~ 0
+VCO_PULSE
+Text HLabel 9850 5300 0    50   Input ~ 0
+VCO_SAW
+Text HLabel 10250 4650 0    50   Input ~ 0
+SAW_LEVEL_CTRL
+Text HLabel 2900 5200 0    50   Input ~ 0
+VCO_TRI
+Text HLabel 10900 6050 0    50   Input ~ 0
+VCO_COMP
+Text HLabel 11100 3200 0    50   Input ~ 0
+MIX1_PULSE_CTRL
+Text HLabel 10100 5000 0    50   Input ~ 0
+MIX1_SAW_CTRL
+Text HLabel 11350 6350 0    50   Input ~ 0
+MIX1_COMP_OSC2_CTRL
+Text HLabel 11150 6950 0    50   Input ~ 0
+MIX2_PULSE_CTRL
+Text HLabel 11050 7700 0    50   Input ~ 0
+MIX2_SAW_CTRL
+Text HLabel 14750 7250 2    50   Output ~ 0
+OSC1_MIX2
+Text HLabel 14600 4600 2    50   Output ~ 0
+OSC1_MIX1
+Wire Wire Line
+	4350 4850 5050 4850
+Wire Wire Line
+	5050 4650 4900 4650
+Wire Wire Line
+	4900 4650 4900 4350
+Wire Wire Line
+	4900 4350 5750 4350
+Wire Wire Line
+	5750 4350 5750 4750
+Wire Wire Line
+	5750 4750 5650 4750
+Text Label 6400 4750 2    50   ~ 0
+SCALED_TRI
+Wire Wire Line
+	6400 4750 5750 4750
+Connection ~ 5750 4750
+Wire Wire Line
+	10800 4350 11550 4350
+Wire Wire Line
+	12650 4350 12650 4700
+Wire Wire Line
+	13400 4250 14100 4250
+Wire Wire Line
+	12650 4700 13450 4700
+Connection ~ 12650 4700
+Wire Wire Line
+	13950 7250 14050 7250
+Wire Wire Line
+	13250 7150 13250 6900
+Wire Wire Line
+	13250 6900 14050 6900
+Wire Wire Line
+	14050 6900 14050 7250
+Connection ~ 14050 7250
+Wire Wire Line
+	14050 7250 14200 7250
+Text Label 12750 4700 0    50   ~ 0
+MIX1_SUM
+Text Label 10000 5300 0    50   ~ 0
+SAW
+$Comp
+L Device:R R?
+U 1 1 62A5E4CD
+P 12350 8000
+AR Path="/61E1D4AE/62A5E4CD" Ref="R?"  Part="1" 
+AR Path="/62A5E4CD" Ref="R?"  Part="1" 
+AR Path="/6269DD41/62A5E4CD" Ref="R14"  Part="1" 
+F 0 "R14" V 12557 8000 50  0000 C CNN
+F 1 "20k" V 12466 8000 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 12280 8000 50  0001 C CNN
+F 3 "~" H 12350 8000 50  0001 C CNN
+F 4 "C4184" H 12350 8000 50  0001 C CNN "LCSC Part"
+	1    12350 8000
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	12200 8000 12100 8000
+Wire Wire Line
+	12500 8000 12600 8000
+Wire Wire Line
+	12650 4700 12650 5150
+Wire Wire Line
+	11050 5300 11300 5300
+Wire Wire Line
+	11700 4650 11700 4800
+Wire Wire Line
+	11300 5300 11300 5000
+Wire Wire Line
+	11300 5000 11400 5000
+Connection ~ 11300 5300
+Wire Wire Line
+	11300 5300 11800 5300
+Wire Wire Line
+	12100 5300 12400 5300
+Wire Wire Line
+	12400 5150 12650 5150
+Wire Wire Line
+	12400 5150 12400 5300
+Connection ~ 12650 5150
+Wire Wire Line
+	12650 5150 12650 6050
+Wire Wire Line
+	12350 5000 12400 5000
+Wire Wire Line
+	12400 5000 12400 5150
+Connection ~ 12400 5150
+Wire Wire Line
+	11700 6350 11700 6250
+Text Label 10900 3600 0    50   ~ 0
+PULSE
+Text Label 10800 7250 0    50   ~ 0
+PULSE
+$EndSCHEMATC
