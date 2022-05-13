@@ -1,0 +1,26 @@
+{
+  "slug": "Zoxnoxious-HWInterface",
+  "name": "Zoxnoxious Hardware Interface",
+  "version": "2.0.0",
+  "license": "Apache-2.0",
+  "brand": "Zoxnoxious",
+  "author": "Zoxnoxious",
+  "authorEmail": "zoxnoxious@patentinvestor.com",
+  "authorUrl": "",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "Zoxnoxious3340",
+      "name": "Zoxnoxious3340",
+      "description": "Hardware 3340",
+      "tags": [
+        "VCO",
+        "Hardware"
+      ]
+    }
+  ]
+}
