@@ -13,6 +13,9 @@ struct AudioPort : audio::Port {
     dsp::DoubleRingBuffer<dsp::Frame<num_audio_outputs>, 32768> engineOutputBuffer;
     dsp::SampleRateConverter<num_audio_inputs> inputSrc;
     dsp::SampleRateConverter<num_audio_inputs> outputSrc;
+    // Port variable caches
+    int deviceNumInputs = 0;
+    int deviceNumOutputs = 0;
     float deviceSampleRate = 0.f;
     int requestedEngineFrames = 0;
 
@@ -43,8 +46,8 @@ struct AudioPort : audio::Port {
 
 
     void processInput(const float* input, int inputStride, int frames) override {
-        int deviceNumInputs = std::min(getNumInputs(), num_audio_outputs);
-        int deviceNumOutputs = std::min(getNumOutputs(), num_audio_inputs);
+        deviceNumInputs = std::min(getNumInputs(), num_audio_outputs);
+        deviceNumOutputs = std::min(getNumOutputs(), num_audio_inputs);
         deviceSampleRate = getSampleRate();
 
         if (!APP->engine->getMasterModule()) {
@@ -67,7 +70,7 @@ struct AudioPort : audio::Port {
         }
 
 
-        if (deviceNumOutputs > 0) {
+        if (deviceNumInputs > 0) {
             if (isMasterCached) {
                 engineOutputBuffer.clear();
             }
@@ -75,28 +78,18 @@ struct AudioPort : audio::Port {
             outputSrc.setRates(deviceSampleRate, engineSampleRate);
             outputSrc.setChannels(deviceNumInputs);
             // Convert audio input -> engine output
-            dsp::Frame<num_audio_outputs> audioInputBuffer[frames];
-            std::memset(audioInputBuffer, 0, sizeof(audioInputBuffer));
-            for (int i = 0; i < frames; i++) {
-                for (int j = 0; j < deviceNumInputs; j++) {
-                    float v = input[i * inputStride + j];
-                    audioInputBuffer[i].samples[j] = v;
-                }
-            }
-
-            int audioInputFrames = frames;
+            int inputFrames = frames;
             int outputFrames = engineOutputBuffer.capacity();
-            outputSrc.process(input, inputStride, &audioInputFrames, (float*) engineOutputBuffer.endData(), num_audio_outputs, &outputFrames);
+            outputSrc.process(input, inputStride, &inputFrames, (float*) engineOutputBuffer.endData(), num_audio_outputs, &outputFrames);
             engineOutputBuffer.endIncr(outputFrames);
             // Request exactly as many frames as we have in the engine output buffer.
             requestedEngineFrames = engineOutputBuffer.size();
         }
         else {
+            // Upper bound on number of frames so that `audioOutputFrames >= frames` when processOutput() is called.
             requestedEngineFrames = std::max((int) std::ceil(frames * sampleRateRatio) - (int) engineInputBuffer.size(), 0);
         }
-
     }
-
 
     void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) override {
         // Step engine
@@ -104,11 +97,11 @@ struct AudioPort : audio::Port {
             // DEBUG("%p: %d block, stepping %d", this, frames, requestedEngineFrames);
             APP->engine->stepBlock(requestedEngineFrames);
         }
+
     }
 
 
     void processOutput(float* output, int outputStride, int frames) override {
-        int deviceNumOutputs = std::min(getNumOutputs(), num_audio_inputs);
         float engineSampleRate = APP->engine->getSampleRate();
         float sampleRateRatio = engineSampleRate / deviceSampleRate;
 
@@ -116,16 +109,14 @@ struct AudioPort : audio::Port {
         if (deviceNumOutputs > 0) {
             inputSrc.setRates(engineSampleRate, deviceSampleRate);
             inputSrc.setChannels(num_audio_outputs);
-            // Convert engine input -> audio output
-            dsp::Frame<num_audio_outputs> audioOutputBuffer[frames];
+
             int inputFrames = engineInputBuffer.size();
             int outputFrames = frames;
-            //inputSrc.process((const float*) engineInputBuffer.startData(), num_audio_inputs, &inputFrames, output, outputStride, &outputFrames);
-            inputSrc.process(engineInputBuffer.startData(), &inputFrames, audioOutputBuffer, &outputFrames);
+            inputSrc.process((const float*) engineInputBuffer.startData(), num_audio_inputs, &inputFrames, output, outputStride, &outputFrames);
             engineInputBuffer.startIncr(inputFrames);
             // Clamp output samples
             for (int i = 0; i < outputFrames; i++) {
-                for (int j = 0; j < num_audio_outputs; j++) {
+                for (int j = 0; j < deviceNumOutputs; j++) {
                     float v = output[i * outputStride + j];
                     v = clamp(v, -1.f, 1.f);
                     output[i * outputStride + j] = v;
@@ -133,7 +124,7 @@ struct AudioPort : audio::Port {
             }
             // Fill the rest of the audio output buffer with zeros
             for (int i = outputFrames; i < frames; i++) {
-                for (int j = 0; j < num_audio_outputs; j++) {
+                for (int j = 0; j < deviceNumOutputs; j++) {
                     output[i * outputStride + j] = 0.f;
                 }
             }
@@ -156,6 +147,8 @@ struct AudioPort : audio::Port {
 
     void onStopStream() override {
         deviceSampleRate = 0.f;
+        deviceNumInputs = 0;
+        deviceNumOutputs = 0;
         engineInputBuffer.clear();
         engineOutputBuffer.clear();
         setMaster(false);
@@ -276,7 +269,7 @@ struct Zoxnoxious3340 : Module {
 
         // Push inputs to buffer
         dsp::Frame<num_audio_inputs> inputFrame = {};
-        switch (num_audio_inputs) {
+        switch (port.deviceNumOutputs) {
         default:
         case 6:
             // linear
