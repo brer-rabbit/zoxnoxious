@@ -242,7 +242,7 @@ struct Zoxnoxious3340 : Module {
         uint8_t midiProgram[3];
     };
 
-    struct buttonParamMidiProgram buttonParamToMidiProgramList[9] =
+    struct buttonParamMidiProgram buttonParamToMidiProgramList[10] =
         {
             { SYNC_ENABLE_BUTTON_PARAM, NAN, { 0, 1 } },
             { MIX1_PULSE_BUTTON_PARAM, NAN, { 2, 3 } },
@@ -252,7 +252,8 @@ struct Zoxnoxious3340 : Module {
             { EXT_MOD_PWM_BUTTON_PARAM, NAN, { 10, 11 } },
             { EXP_FM_BUTTON_PARAM, NAN, { 12, 13 } },
             { LINEAR_FM_BUTTON_PARAM, NAN, { 14, 15 } },
-            { MIX2_SAW_BUTTON_PARAM, NAN, { 16, 17 } }
+            { MIX2_SAW_BUTTON_PARAM, NAN, { 16, 17 } },
+            { MIX1_SAW_LEVEL_SELECTOR_PARAM, NAN, { 18, 19, 20 } }
         };
 
     Zoxnoxious3340() : port(this) {
@@ -334,6 +335,8 @@ struct Zoxnoxious3340 : Module {
             float newValue = params[ buttonParamToMidiProgramList[i].button ].getValue();
 
             if (buttonParamToMidiProgramList[i].previousValue != newValue) {
+                printf("button %d from %d to %d\n",
+                       i, (int)buttonParamToMidiProgramList[i].previousValue, (int)(newValue + 0.5f));
                 buttonParamToMidiProgramList[i].previousValue = newValue;
                 // midi program to send is index by the (integer)
                 midiOutput.sendProgramChange(buttonParamToMidiProgramList[i].midiProgram[ (int)(newValue + 0.5f) ]);
@@ -370,7 +373,7 @@ struct Zoxnoxious3340 : Module {
             case 2:
                 // sync phase: default to 0.5f if not connected
                 inputFrame.samples[1] = inputs[SYNC_PHASE_INPUT].isConnected() ?
-                    inputs[SYNC_PHASE_INPUT].isConnected() : 0.5f;
+                    inputs[SYNC_PHASE_INPUT].getVoltageSum() : 0.5f;
                 // fall through
             case 1:
                 // frequency
