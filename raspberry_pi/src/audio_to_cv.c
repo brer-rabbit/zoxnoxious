@@ -3,7 +3,7 @@
  * Compile:
  * gcc -Wall -o audio_to_cv audio_to_cv.c -lasound -lpigpio
  * Run:
- * sudo audio_to_cv hw:CARD=UAC2Gadget,DEV=0
+ * sudo audio_to_cv -d hw:CARD=UAC2Gadget,DEV=0
  *
  * a Makefile and additional functionality will be useful.
  * Right now this just listens for incoming audio and maps the first
@@ -43,6 +43,14 @@ struct alsa_pcm_state {
   int16_t previous_sample[32];
 };
 
+struct midi_state {
+  int next_byte_is_program; // horrid midi stream parser for now, only id program changes
+};
+
+struct i2c_gpio_state {
+  uint8_t output_state[2];
+};
+
 
 
 // map the incoming PCM channel to a DAC channel.  The DAC has 6 of 8
@@ -64,9 +72,15 @@ static int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state);
 static void help();
 static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err); 
 
-// global ref is intended for signal handling only.  don't use globals.  be somewhat civil.
-static struct alsa_pcm_state *global_pcm_state;
-static int spi_global_handle;
+static void alsa_midi_in_to_i2c(int i2c_handle, struct i2c_gpio_state *gpio_state, snd_rawmidi_t *midi_in, struct midi_state *midi_state);
+static void set_midi_program(int i2c_handle, struct i2c_gpio_state *gpio_state, uint8_t program);
+
+
+// global 'cause these handles are needed for signal handling
+static struct alsa_pcm_state pcm_state = { 0 };
+static snd_rawmidi_t *midi_in = NULL;
+static int spi_handle = 0;
+static int i2c_handle = 0;
 static volatile sig_atomic_t in_aborting = 0;
 
 // ok use globals here.  civility be damned.
@@ -80,23 +94,39 @@ static void signal_handler(int sig) {
   }
 
   in_aborting = 1;
-  if (global_pcm_state->pcm_handle) {
-    snd_pcm_abort(global_pcm_state->pcm_handle);
-    snd_pcm_close(global_pcm_state->pcm_handle);
+  if (pcm_state.pcm_handle) {
+    snd_pcm_abort(pcm_state.pcm_handle);
+    snd_pcm_close(pcm_state.pcm_handle);
   }
 
-  if (spi_global_handle) {
-    spiClose(spi_global_handle);
-    gpioTerminate();
+  printf("close pcm\n");
+
+  if (midi_in) {
+    snd_rawmidi_close(midi_in);
+    midi_in  = NULL;
   }
 
-  if (global_pcm_state->timerfd_sample_clock) {
-    close(global_pcm_state->timerfd_sample_clock);
+  printf("close midi\n");
+
+  if (spi_handle) {
+    spiClose(spi_handle);
+  }
+
+  if (i2c_handle) {
+    i2cClose(i2c_handle);
+  }
+
+  printf("closed i2c\n");
+
+  gpioTerminate();
+
+  if (pcm_state.timerfd_sample_clock) {
+    close(pcm_state.timerfd_sample_clock);
   }
 
   if (sig == SIGABRT) {
     /* do not call snd_pcm_close() and abort immediately */
-    global_pcm_state->pcm_handle = NULL;
+    pcm_state.pcm_handle = NULL;
     exit(EXIT_FAILURE);
   }
 
@@ -108,7 +138,28 @@ static void signal_handler(int sig) {
 
 
 int main (int argc, char *argv[]) {
-  struct alsa_pcm_state pcm_state = {
+  struct midi_state midi_state = { 0 };
+  char *midi_device = "hw:1,0";
+  int err;
+  char *device = "plughw:0,0";
+  const int spi_rate = 20000000;
+  struct i2c_gpio_state gpio_state = { .output_state = { 0x00, 0x20 } };
+
+  struct option long_option[] = {
+    {"help", no_argument, NULL, 'h'},
+    {"device", required_argument, NULL, 'd'},
+    {"rate", required_argument, NULL, 'r'},
+    {"channels", required_argument, NULL, 'c'},
+    {"buffer", required_argument, NULL, 'b'},
+    {"period", required_argument, NULL, 'p'},
+    {"mididevice", required_argument, NULL, 'm'},
+    {"verbose", required_argument, NULL, 'v'},
+    {NULL, 0, NULL, 0},
+  };
+
+  char *opt_string = "hd:r:c:b:p:m:v";
+
+  pcm_state = (struct alsa_pcm_state const) {
     .sampling_rate = 4000,
     .period_size = 32,
     .buffer_size = 64,
@@ -119,34 +170,18 @@ int main (int argc, char *argv[]) {
     .itimerspec_sample_clock =
       {
         .it_interval.tv_sec = 0,
-        .it_interval.tv_nsec = 1000000000 / pcm_state.sampling_rate,
+        .it_interval.tv_nsec = 1000000000 / 4000,
         .it_value.tv_sec = 0,
-        .it_value.tv_nsec = 1000000000 / pcm_state.sampling_rate
+        .it_value.tv_nsec = 1000000000 / 4000
       },
     .timer_running = 0,
     .previous_sample = { 0 }
   };
-  int spi_handle;
-  int err;
-  char *device = "plughw:0,0";
-  const int spi_rate = 20000000;
-
-  struct option long_option[] = {
-    {"help", 0, NULL, 'h'},
-    {"device", 1, NULL, 'd'},
-    {"rate", 1, NULL, 'r'},
-    {"channels", 1, NULL, 'c'},
-    {"buffer", 1, NULL, 'b'},
-    {"period", 1, NULL, 'p'},
-    {"verbose", 1, NULL, 'v'},
-    {NULL, 0, NULL, 0},
-  };
-
 
 
   while (1) {
     int c;
-    if ((c = getopt_long(argc, argv, "hd:r:c:b:p:v", long_option, NULL)) < 0)
+    if ((c = getopt_long(argc, argv, opt_string, long_option, NULL)) < 0)
       break;
     switch (c) {
     case 'h':
@@ -175,6 +210,9 @@ int main (int argc, char *argv[]) {
       pcm_state.period_size = pcm_state.period_size < 2 ? 2 : pcm_state.period_size;
       pcm_state.period_size = pcm_state.period_size > 2048 ? 2048 : pcm_state.period_size;
       break;
+    case 'm':
+      midi_device = strdup(optarg);
+      break;
     case 'v':
       verbose = 1;
       break;
@@ -188,13 +226,19 @@ int main (int argc, char *argv[]) {
   signal(SIGABRT, signal_handler);
 
 
+  printf("device: %s mididevice: %s\n", device, midi_device);
 
 
-  // ALSA INITIALIZE - create handle
+  // ALSA AUDIO AND MIDI INITIALIZE - create handles
   err = alsa_init(&pcm_state, device);
-  global_pcm_state = &pcm_state;
   if (err != 0) {
     fprintf(stderr, "alsa init failed\n");
+    exit(err);
+  }
+
+  err = snd_rawmidi_open(&midi_in, NULL, midi_device, SND_RAWMIDI_NONBLOCK);
+  if (err != 0) {
+    fprintf(stderr, "alsa midi open failed\n");
     exit(err);
   }
 
@@ -211,7 +255,7 @@ int main (int argc, char *argv[]) {
   }
 
   spi_handle = spiOpen(0, spi_rate, 1);
-  spi_global_handle = spi_handle;
+  i2c_handle = i2cOpen(1, 0x20, 0); // hardcode to PCA9555 for now
 
   // END PIGPIO INIT
 
@@ -220,17 +264,12 @@ int main (int argc, char *argv[]) {
   //for (int i = 0; i < 400; ++i) {
   while (1) {
     alsa_pcm_read_spi_write(&pcm_state, spi_handle);
-    //printf("transferred %d byte\n",
+    alsa_midi_in_to_i2c(i2c_handle, &gpio_state, midi_in, &midi_state);
   }
 
 
-  snd_pcm_close(pcm_state.pcm_handle);
-  fprintf(stdout, "audio interface closed\n");
-
-  spiClose(spi_handle);
-  gpioTerminate();
-
-  printf("spi closed, gpio terminated\n");
+  // if we get this far exit via the same code as the signal handler
+  signal_handler(SIGTERM);
 
   return 0;
 }
@@ -369,7 +408,7 @@ static int alsa_pcm_read_spi_write(struct alsa_pcm_state *pcm_state, int spi_han
     frames = size;
     ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &mmap_area, &offset, &frames);
 
-    printf("req: size %ld frames %ld (full period %ld)\n", size, frames, pcm_state->period_size);
+    //printf("req: size %ld frames %ld (full period %ld)\n", size, frames, pcm_state->period_size);
 
     if (ret < 0) {
       ret = xrun_recovery(pcm_state, -ret);
@@ -557,4 +596,105 @@ static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err) {
     return 0;
   }
   return err;
+}
+
+
+static void alsa_midi_in_to_i2c(int i2c_handle, struct i2c_gpio_state *gpio_state, snd_rawmidi_t *midi_in, struct midi_state *midi_state) {
+  int status = 0;
+  uint8_t buffer[128];
+
+  status = snd_rawmidi_read(midi_in, buffer, sizeof(buffer));
+  if ((status < 0) && (status != -EBUSY) && (status != -EAGAIN)) {
+    printf("Problem reading MIDI input: %s", snd_strerror(status));
+    return;
+  }
+
+  for (int i = 0; i < status; ++i) {
+    if (midi_state->next_byte_is_program) {
+      midi_state->next_byte_is_program = 0;
+      if ( ! (buffer[i] & 0x80) ) {  // MSB should not be set on a program change
+        // this really doesn't't need to be so synchronous-- todo: queue it up and drain
+        set_midi_program(i2c_handle, gpio_state, buffer[i]);
+      }
+      else {
+        printf("midi: expected a program change and got 0x%X\n", buffer[i]);
+      }
+    }
+    else {
+      // look for a program change status on any channel
+      if (buffer[i] & 0xC0) {
+        midi_state->next_byte_is_program = 1;
+      }
+    }
+  }
+}
+
+
+
+// program to switching:
+// SYNC_ENABLE_BUTTON_PARAM, { 0, 1 } },
+// MIX1_PULSE_BUTTON_PARAM, { 2, 3 } },
+// EXT_MOD_SELECT_SWITCH_PARAM, { 4, 5 } },
+// MIX1_COMPARATOR_BUTTON_PARAM, { 6, 7 } },
+// MIX2_PULSE_BUTTON_PARAM, { 8, 9 } },
+// EXT_MOD_PWM_BUTTON_PARAM, { 10, 11 } },
+// EXP_FM_BUTTON_PARAM, { 12, 13 } },
+// LINEAR_FM_BUTTON_PARAM, { 14, 15 } },
+// MIX2_SAW_BUTTON_PARAM, { 16, 17 } },
+// { MIX1_SAW_LEVEL_SELECTOR_PARAM, { 18, 19, 20 } }
+
+// set or clear a bit based on the program
+struct program_to_gpio {
+  int set; // flag for set or clear? 1 set, 0 clear
+  int index; // register byte (0 or 1)?
+  uint8_t mask;
+};
+static const struct program_to_gpio program_to_gpio[] = {
+  { 0, 0, ~0x40 },  // 0
+  { 1, 0,  0x40 },
+  { 0, 1, ~0x02 },  // 2
+  { 1, 1,  0x02 },
+  { 0, 0, ~0x01 },  // 4
+  { 1, 0,  0x01 },
+  { 0, 1, ~0x01 },  // 6
+  { 1, 1,  0x01 },
+  { 0, 1, ~0x40 },  // 8
+  { 1, 1,  0x40 },
+  { 0, 0, ~0x20 },  // 10
+  { 1, 0,  0x20 },
+  { 0, 0, ~0x80 },  // 12
+  { 1, 0,  0x80 },
+  { 0, 0, ~0x20 },  // 14
+  { 1, 0,  0x20 },
+  { 0, 1, ~0x80 },  // 16
+  { 1, 1,  0x80 },
+  { 0, 1,  0b11110011 },  // 18: Saw
+  { 1, 1,  0b00000100 },
+  { 1, 1,  0b00001100 },
+};
+  
+
+static void set_midi_program(int i2c_handle, struct i2c_gpio_state *gpio_state, uint8_t program) {
+  int index;
+  int err;
+  
+  if (program < sizeof(program_to_gpio) / sizeof(program_to_gpio[0])) {
+    index = program_to_gpio[program].index;
+    if (program_to_gpio[program].set) {
+      gpio_state->output_state[index] |= program_to_gpio[program].mask;
+    }
+    else {
+      gpio_state->output_state[index] &= program_to_gpio[program].mask;
+    }
+
+    err = i2cWriteByteData(i2c_handle, index == 0 ? 0x02 : 0x03, gpio_state->output_state[index]);
+    //printf("wrote program 0x%X value 0x%X\n", program, gpio_state->output_state[index]);
+    if (err) {
+      printf("error writing i2c byte data %d\n", err);
+    }
+
+  }
+  else {
+    printf("program %d out of range to set\n", program);
+  }
 }
