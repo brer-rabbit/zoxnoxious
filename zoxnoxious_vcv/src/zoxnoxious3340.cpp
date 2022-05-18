@@ -30,7 +30,7 @@ const static int num_audio_inputs = 6;
 const static int num_audio_outputs = 6;
 
 // taken from Fundamental Audio.cpp and CV_MIDI.cpp
-struct ZoxAudioPort : audio::Port {
+struct ZoxnoxiousAudioPort : audio::Port {
 	Module* module;
 
 	dsp::DoubleRingBuffer<dsp::Frame<num_audio_inputs>, 32768> engineInputBuffer;
@@ -45,7 +45,7 @@ struct ZoxAudioPort : audio::Port {
 	float deviceSampleRate = 0.f;
 	int requestedEngineFrames = 0;
 
-	ZoxAudioPort(Module* module) {
+	ZoxnoxiousAudioPort(Module* module) {
 		this->module = module;
 		maxOutputs = num_audio_inputs;
 		maxInputs = num_audio_outputs;
@@ -229,31 +229,34 @@ struct Zoxnoxious3340 : Module {
     };
 
 
-    ZoxAudioPort port;
+    ZoxnoxiousAudioPort port;
     ZoxnoxiousMidiOutput midiOutput;
 
 
     // detect state changes so we can send a MIDI event.
-    // A midi program change to the midiProgramEnable  will enable the feature
-    // A midi program change to the midiProgramDisable will disnable the feature
+    // Assume int_min is an invalid value.  On start, idea would be
+    // to send current state via midi to the board is in sync with
+    // the rack plugin.
+    // The big hack here: a midiProgram is sent, and the program value
+    // is indexed based on the button parameter value.
     struct buttonParamMidiProgram {
         enum ParamId button;
-        float previousValue;
+        int previousValue;
         uint8_t midiProgram[3];
     };
 
     struct buttonParamMidiProgram buttonParamToMidiProgramList[10] =
         {
-            { SYNC_ENABLE_BUTTON_PARAM, NAN, { 0, 1 } },
-            { MIX1_PULSE_BUTTON_PARAM, NAN, { 2, 3 } },
-            { EXT_MOD_SELECT_SWITCH_PARAM, NAN, { 4, 5 } },
-            { MIX1_COMPARATOR_BUTTON_PARAM, NAN, { 6, 7 } },
-            { MIX2_PULSE_BUTTON_PARAM, NAN, { 8, 9 } },
-            { EXT_MOD_PWM_BUTTON_PARAM, NAN, { 10, 11 } },
-            { EXP_FM_BUTTON_PARAM, NAN, { 12, 13 } },
-            { LINEAR_FM_BUTTON_PARAM, NAN, { 14, 15 } },
-            { MIX2_SAW_BUTTON_PARAM, NAN, { 16, 17 } },
-            { MIX1_SAW_LEVEL_SELECTOR_PARAM, NAN, { 18, 19, 20 } }
+            { SYNC_ENABLE_BUTTON_PARAM, INT_MIN, { 0, 1 } },
+            { MIX1_PULSE_BUTTON_PARAM, INT_MIN, { 2, 3 } },
+            { EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 4, 5 } },
+            { MIX1_COMPARATOR_BUTTON_PARAM, INT_MIN, { 6, 7 } },
+            { MIX2_PULSE_BUTTON_PARAM, INT_MIN, { 8, 9 } },
+            { EXT_MOD_PWM_BUTTON_PARAM, INT_MIN, { 10, 11 } },
+            { EXP_FM_BUTTON_PARAM, INT_MIN, { 12, 13 } },
+            { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 14, 15 } },
+            { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 16, 17 } },
+            { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20 } }
         };
 
     Zoxnoxious3340() : port(this) {
@@ -332,14 +335,12 @@ struct Zoxnoxious3340 : Module {
 
         // Any buttons params pushed need to send midi events
         for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
-            float newValue = params[ buttonParamToMidiProgramList[i].button ].getValue();
+            int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
 
             if (buttonParamToMidiProgramList[i].previousValue != newValue) {
-                printf("button %d from %d to %d\n",
-                       i, (int)buttonParamToMidiProgramList[i].previousValue, (int)(newValue + 0.5f));
                 buttonParamToMidiProgramList[i].previousValue = newValue;
                 // midi program to send is index by the (integer)
-                midiOutput.sendProgramChange(buttonParamToMidiProgramList[i].midiProgram[ (int)(newValue + 0.5f) ]);
+                midiOutput.sendProgramChange(buttonParamToMidiProgramList[i].midiProgram[newValue]);
             }
         }
 
@@ -373,7 +374,7 @@ struct Zoxnoxious3340 : Module {
             case 2:
                 // sync phase: default to 0.5f if not connected
                 inputFrame.samples[1] = inputs[SYNC_PHASE_INPUT].isConnected() ?
-                    inputs[SYNC_PHASE_INPUT].getVoltageSum() : 0.5f;
+                    inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f : 0.5f;
                 // fall through
             case 1:
                 // frequency
