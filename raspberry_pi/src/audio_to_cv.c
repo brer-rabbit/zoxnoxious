@@ -3,11 +3,12 @@
  * Compile:
  * gcc -Wall -o audio_to_cv audio_to_cv.c -lasound -lpigpio
  * Run:
- * sudo audio_to_cv -d hw:CARD=UAC2Gadget,DEV=0
+ * sudo audio_to_cv -d hw:CARD=UAC2Gadget,DEV=0 -m hw:1,0
  *
  * a Makefile and additional functionality will be useful.
  * Right now this just listens for incoming audio and maps the first
- * six channels to board-specific DAC channels via SPI
+ * six channels to board-specific DAC channels via SPI along with
+ * mapping midi program changes to I2C commands.
  *
  *  Portions may be copyright (c) by Jaroslav Kysela <perex@perex.cz>
  *  lifted from aplay.c
@@ -383,11 +384,7 @@ static int alsa_pcm_read_spi_write(struct alsa_pcm_state *pcm_state, int spi_han
   int channels_times_bytes = pcm_state->channels * (snd_pcm_format_width(pcm_state->format) / 8);
   char sample_to_dac[2];
   uint64_t expirations;
-  // what has fewer channels, PCM stream or the DAC?
-  int min_channels =
-    pcm_state->channels < sizeof(pcm_channel_to_dac_channel_map) / sizeof(pcm_channel_to_dac_channel_map[0]) ?
-    pcm_state->channels :
-    sizeof(pcm_channel_to_dac_channel_map) / sizeof(pcm_channel_to_dac_channel_map[0]);
+
 
   ret = alsa_pcm_ensure_ready(pcm_state);
   if (ret != 0) {
@@ -422,7 +419,7 @@ static int alsa_pcm_read_spi_write(struct alsa_pcm_state *pcm_state, int spi_han
 
     // calculate the base address for each channelnum and step size
     // the step size ought to be cacheable?  anyway...
-    for (int channelnum = 0; channelnum < min_channels; ++channelnum) {
+    for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
       steps[channelnum] = mmap_area[channelnum].step / 8;
       samples[channelnum] =
         (( mmap_area[channelnum].addr) + (mmap_area[channelnum].first / 8)) +
@@ -442,20 +439,24 @@ static int alsa_pcm_read_spi_write(struct alsa_pcm_state *pcm_state, int spi_han
         expirations--;
         frameno += expirations;
         size -= expirations;
-        for (int channelnum = 0; channelnum < min_channels; ++channelnum) {
+        for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
           samples[channelnum] += (expirations * steps[channelnum]);
         }
         timerfd_settime(pcm_state->timerfd_sample_clock, 0, &pcm_state->itimerspec_sample_clock, 0);
         continue;
       }
 
-      for (int channelnum = 0; channelnum < min_channels; ++channelnum) {
+
+      for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
         int dac_channel = pcm_channel_to_dac_channel_map[channelnum];
-        //printf(" 0x%04hX", *((int16_t*)samples[channelnum]));
+
+        // note that samples are 16 bit signed value.  Treat
+        // them as unsigned for manipulation here- need to right
+        // shift logical and do not want arithmetic behavior.
         if (*((int16_t*)samples[channelnum]) != pcm_state->previous_sample[channelnum]) {
           sample_to_dac[0] = (dac_channel << 4) |
-            (*((int16_t*)samples[channelnum]) >> 11);
-          sample_to_dac[1] = *((int16_t*)samples[channelnum]) >> 3;
+            (*((uint16_t*)samples[channelnum]) >> 11);
+          sample_to_dac[1] = *((uint16_t*)samples[channelnum]) >> 3;
           spiWrite(spi_handle, sample_to_dac, 2);
           pcm_state->previous_sample[channelnum] = *((int16_t*)samples[channelnum]);
         }
@@ -612,11 +613,13 @@ static void alsa_midi_in_to_i2c(int i2c_handle, struct i2c_gpio_state *gpio_stat
   for (int i = 0; i < status; ++i) {
     if (midi_state->next_byte_is_program) {
       midi_state->next_byte_is_program = 0;
-      if ( ! (buffer[i] & 0x80) ) {  // MSB should not be set on a program change
-        // this really doesn't't need to be so synchronous-- todo: queue it up and drain
+      if ( ! (buffer[i] & 0x80) ) {
+        // TODO: this really doesn't need to be so synchronous:
+        // queue this up and handle later TODO TODO TODO
         set_midi_program(i2c_handle, gpio_state, buffer[i]);
       }
       else {
+        // MSB should not be set on a program change.
         printf("midi: expected a program change and got 0x%X\n", buffer[i]);
       }
     }
@@ -631,7 +634,7 @@ static void alsa_midi_in_to_i2c(int i2c_handle, struct i2c_gpio_state *gpio_stat
 
 
 
-// program to switching:
+// midi program to switching logic:
 // SYNC_ENABLE_BUTTON_PARAM, { 0, 1 } },
 // MIX1_PULSE_BUTTON_PARAM, { 2, 3 } },
 // EXT_MOD_SELECT_SWITCH_PARAM, { 4, 5 } },
@@ -641,36 +644,37 @@ static void alsa_midi_in_to_i2c(int i2c_handle, struct i2c_gpio_state *gpio_stat
 // EXP_FM_BUTTON_PARAM, { 12, 13 } },
 // LINEAR_FM_BUTTON_PARAM, { 14, 15 } },
 // MIX2_SAW_BUTTON_PARAM, { 16, 17 } },
-// { MIX1_SAW_LEVEL_SELECTOR_PARAM, { 18, 19, 20 } }
+// MIX1_SAW_LEVEL_SELECTOR_PARAM, { 18, 19, 20 } }
 
-// set or clear a bit based on the program
+// This is a hack of an attempt here:
+// set or clear a bit based on the program change.
 struct program_to_gpio {
   int set; // flag for set or clear? 1 set, 0 clear
-  int index; // register byte (0 or 1)?
+  int index; // gpio register index (0 or 1)?
   uint8_t mask;
 };
 static const struct program_to_gpio program_to_gpio[] = {
-  { 0, 0, ~0x40 },  // 0
-  { 1, 0,  0x40 },
-  { 0, 1, ~0x02 },  // 2
-  { 1, 1,  0x02 },
-  { 0, 0, ~0x01 },  // 4
-  { 1, 0,  0x01 },
-  { 0, 1, ~0x01 },  // 6
-  { 1, 1,  0x01 },
-  { 0, 1, ~0x40 },  // 8
-  { 1, 1,  0x40 },
-  { 0, 0, ~0x20 },  // 10
-  { 1, 0,  0x20 },
-  { 0, 0, ~0x80 },  // 12
-  { 1, 0,  0x80 },
-  { 0, 0, ~0x20 },  // 14
-  { 1, 0,  0x20 },
-  { 0, 1, ~0x80 },  // 16
-  { 1, 1,  0x80 },
-  { 0, 1,  0b11110011 },  // 18: Saw
-  { 1, 1,  0b00000100 },
-  { 1, 1,  0b00001100 },
+  { 0, 0, 0b10111111 },  // 0
+  { 1, 0, 0b01000000 },
+  { 0, 1, 0b11111101 },  // 2
+  { 1, 1, 0b00000010 },
+  { 0, 0, 0b11111110 },  // 4
+  { 1, 0, 0b00000001 },
+  { 0, 1, 0b11111110 },  // 6
+  { 1, 1, 0b00000001 },
+  { 0, 1, 0b10111111 },  // 8
+  { 1, 1, 0b01000000 },
+  { 0, 0, 0b11111101 },  // 10
+  { 1, 0, 0b00000010 },
+  { 0, 0, 0b01111111 },  // 12
+  { 1, 0, 0b10000000 },
+  { 0, 0, 0b11011111 },  // 14
+  { 1, 0, 0b00100000 },
+  { 0, 1, 0b01111111 },  // 16
+  { 1, 1, 0b10000000 },
+  { 0, 1, 0b11110011 },  // 18: Saw
+  { 1, 1, 0b00000100 },
+  { 1, 1, 0b00001100 },
 };
   
 
@@ -688,7 +692,10 @@ static void set_midi_program(int i2c_handle, struct i2c_gpio_state *gpio_state, 
     }
 
     err = i2cWriteByteData(i2c_handle, index == 0 ? 0x02 : 0x03, gpio_state->output_state[index]);
-    //printf("wrote program 0x%X value 0x%X\n", program, gpio_state->output_state[index]);
+
+    printf("wrote program 0x%X: 0x%x 0x%X\n", program,
+           index == 0 ? 0x02 : 0x03, gpio_state->output_state[index]);
+
     if (err) {
       printf("error writing i2c byte data %d\n", err);
     }
