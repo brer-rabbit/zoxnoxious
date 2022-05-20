@@ -241,12 +241,12 @@ struct Zoxnoxious3340 : Module {
     ZoxnoxiousMidiOutput midiOutput;
 
     dsp::ClockDivider lightDivider;
-    float freq_clip_timer;
-    float pulse_width_clip_timer;
-    float linear_clip_timer;
-    float mix1_triangle_vca_clip_timer;
-    float sync_phase_clip_timer;
-    float ext_mod_amount_clip_timer;
+    float freqClipTimer;
+    float pulseWidthClipTimer;
+    float linearClipTimer;
+    float mix1TriangleVcaClipTimer;
+    float syncPhaseClipTimer;
+    float extModAmountClipTimer;
 
     // detect state changes so we can send a MIDI event.
     // Assume int_min is an invalid value.  On start, idea would be
@@ -279,7 +279,7 @@ struct Zoxnoxious3340 : Module {
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
         configParam(PULSE_WIDTH_KNOB_PARAM, 0.f, 1.f, 0.5f, "Pulse Width", "%", 0.f, 100.f);
-        configParam(LINEAR_KNOB_PARAM, -1.f, 1.f, 0.f, "Linear Mod", " V", 0.f, 5.f);
+        configParam(LINEAR_KNOB_PARAM, 0.f, 1.f, 0.5f, "Linear Mod", " V", 0.f, 10.f, -5.f);
 
         configSwitch(MIX1_PULSE_BUTTON_PARAM, 0.f, 1.f, 0.f, "Pulse", {"Off", "On"});
         configParam(MIX1_TRIANGLE_KNOB_PARAM, 0.f, 1.f, 0.f, "Mix1 Triangle Level", "%", 0.f, 100.f);
@@ -374,8 +374,12 @@ struct Zoxnoxious3340 : Module {
             case 6:
                 // linear
                 v = params[LINEAR_INPUT].getValue() + inputs[LINEAR_KNOB_PARAM].getVoltageSum() / 10.f;
-                if (v < 0.f || v > 1.f) {
-                    linear_clip_timer = clipTime;
+                if (v < 0.f) {
+                    linearClipTimer = clipTime;
+                    v = 0.f;
+                }
+                else if (v > 1.f) {
+                    linearClipTimer = clipTime;
                 }
                 inputFrame.samples[5] = v;
                     
@@ -384,7 +388,7 @@ struct Zoxnoxious3340 : Module {
                 // external mod amount
                 v = params[EXT_MOD_AMOUNT_INPUT].getValue() + inputs[EXT_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
                 if (v < 0.f || v > 1.f) {
-                    ext_mod_amount_clip_timer = clipTime;
+                    extModAmountClipTimer = clipTime;
                 }
                 inputFrame.samples[4] = v;
 
@@ -393,7 +397,7 @@ struct Zoxnoxious3340 : Module {
                 // mix1 triangle
                 v = params[MIX1_TRIANGLE_VCA_INPUT].getValue() + inputs[MIX1_TRIANGLE_KNOB_PARAM].getVoltageSum() / 10.f;
                 if (v < 0.f || v > 1.f) {
-                    mix1_triangle_vca_clip_timer = clipTime;
+                    mix1TriangleVcaClipTimer = clipTime;
                 }
                 inputFrame.samples[3] = v;
                     
@@ -402,7 +406,7 @@ struct Zoxnoxious3340 : Module {
                 // pulse width
                 v = params[PULSE_WIDTH_INPUT].getValue() + inputs[PULSE_WIDTH_KNOB_PARAM].getVoltageSum() / 10.f;
                 if (v < 0.f || v > 1.f) {
-                    pulse_width_clip_timer = clipTime;
+                    pulseWidthClipTimer = clipTime;
                 }
                 inputFrame.samples[2] = v;
                 // fall through
@@ -411,7 +415,7 @@ struct Zoxnoxious3340 : Module {
                 if (inputs[SYNC_PHASE_INPUT].isConnected()) {
                     v = inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f;
                     if (v < 0.f || v > 1.f) {
-                        sync_phase_clip_timer = clipTime;
+                        syncPhaseClipTimer = clipTime;
                     }
                 }
                 else {
@@ -424,7 +428,7 @@ struct Zoxnoxious3340 : Module {
                 // frequency
                 v = params[FREQ_INPUT].getValue() + inputs[FREQ_KNOB_PARAM].getVoltageSum() / 10.f;
                 if (v < 0.f || v > 1.f) {
-                    freq_clip_timer = clipTime;
+                    freqClipTimer = clipTime;
                 }
                 inputFrame.samples[0] = v;
                 // fall through
@@ -436,6 +440,29 @@ struct Zoxnoxious3340 : Module {
             if (!port.engineInputBuffer.full()) {
                 port.engineInputBuffer.push(inputFrame);
             }
+        }
+
+        if (lightDivider.process()) {
+            const float lightTime = args.sampleTime * lightDivider.getDivision();
+            const float brightnessDeltaTime = 1 / lightTime;
+
+            freqClipTimer -= lightTime;
+            lights[FREQ_CLIP_LIGHT].setBrightnessSmooth(freqClipTimer > 0.f, brightnessDeltaTime);
+
+            pulseWidthClipTimer -= lightTime;
+            lights[PULSE_WIDTH_CLIP_LIGHT].setBrightnessSmooth(pulseWidthClipTimer > 0.f, brightnessDeltaTime);
+
+            linearClipTimer -= lightTime;
+            lights[LINEAR_CLIP_LIGHT].setBrightnessSmooth(linearClipTimer > 0.f, brightnessDeltaTime);
+
+            mix1TriangleVcaClipTimer -= lightTime;
+            lights[MIX1_TRIANGLE_VCA_CLIP_LIGHT].setBrightnessSmooth(mix1TriangleVcaClipTimer > 0.f, brightnessDeltaTime);
+
+            syncPhaseClipTimer -= lightTime;
+            lights[SYNC_PHASE_CLIP_LIGHT].setBrightnessSmooth(syncPhaseClipTimer > 0.f, brightnessDeltaTime);
+
+            extModAmountClipTimer -= lightTime;
+            lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
         }
     }
 };
