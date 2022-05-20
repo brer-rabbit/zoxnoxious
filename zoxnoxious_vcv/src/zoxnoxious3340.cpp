@@ -442,22 +442,6 @@ struct Zoxnoxious3340 : Module {
 
 
 
-struct Audio2Display : LedDisplay {
-    AudioDeviceMenuChoice* deviceChoice;
-
-    void setAudioPort(audio::Port* port) {
-        math::Vec pos;
-
-        deviceChoice = createWidget<AudioDeviceMenuChoice>(math::Vec());
-        deviceChoice->box.size.x = box.size.x;
-        deviceChoice->port = port;
-        addChild(deviceChoice);
-        pos = deviceChoice->box.getBottomLeft();
-    }
-
-};
-
-
 
 
 struct Zoxnoxious3340Widget : ModuleWidget {
@@ -471,9 +455,9 @@ struct Zoxnoxious3340Widget : ModuleWidget {
         addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(8.732, 25.21)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.481, 25.21)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(41.381, 25.21)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(8.732, 31.0)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.481, 31.0)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(41.381, 31.0)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
 
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.699, 27.744)), module, Zoxnoxious3340::MIX1_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX1_PULSE_BUTTON_LIGHT));
 
@@ -495,45 +479,36 @@ struct Zoxnoxious3340Widget : ModuleWidget {
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(40.019, 118.567)), module, Zoxnoxious3340::LINEAR_FM_BUTTON_PARAM, Zoxnoxious3340::LINEAR_FM_BUTTON_LIGHT));
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.943, 117.049)), module, Zoxnoxious3340::MIX2_SAW_BUTTON_PARAM, Zoxnoxious3340::MIX2_SAW_BUTTON_LIGHT));
 
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.732, 34.658)), module, Zoxnoxious3340::FREQ_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.481, 34.658)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(41.381, 34.658)), module, Zoxnoxious3340::LINEAR_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.732, 42.0)), module, Zoxnoxious3340::FREQ_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.481, 42.0)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(41.381, 42.0)), module, Zoxnoxious3340::LINEAR_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.943, 53.383)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.949, 77.141)), module, Zoxnoxious3340::SYNC_PHASE_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(22.15, 96.855)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_INPUT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(8.732, 43.861)), module, Zoxnoxious3340::FREQ_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(25.481, 43.861)), module, Zoxnoxious3340::PULSE_WIDTH_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(41.381, 43.861)), module, Zoxnoxious3340::LINEAR_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(52.101, 52.163)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(32.471, 77.185)), module, Zoxnoxious3340::SYNC_PHASE_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(15.704, 102.294)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_CLIP_LIGHT));
-
-
-        MidiDisplay *midiDisplay = createWidget<MidiDisplay>(mm2px(Vec(72.0, 20.0)));
-        midiDisplay->box.size = mm2px(Vec(30.0, 25.0));
-        midiDisplay->setMidiPort(module ? &module->midiOutput : NULL);
-        addChild(midiDisplay);
-
-
-        Audio2Display *audioDisplay = createWidget<Audio2Display>(mm2px(Vec(72.0, 65.0)));
-        audioDisplay->box.size = mm2px(Vec(30.0, 10.0));
-        audioDisplay->setAudioPort(module ? &module->port : NULL);
-        addChild(audioDisplay);
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(8.732, 22.2)), module, Zoxnoxious3340::FREQ_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(25.481, 22.2)), module, Zoxnoxious3340::PULSE_WIDTH_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(41.381, 22.2)), module, Zoxnoxious3340::LINEAR_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(52.101, 52.163)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(32.471, 77.185)), module, Zoxnoxious3340::SYNC_PHASE_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(15.704, 102.294)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_CLIP_LIGHT));
 
     }
 
-/*
     void appendContextMenu(Menu *menu) override {
         Zoxnoxious3340 *module = dynamic_cast<Zoxnoxious3340*>(this->module);
+
         menu->addChild(new MenuSeparator);
-
-        menu->addChild(createSubMenuItem("AudioDevice", "",
-            [=](Menu* menu) {
-                menu->addChild(createMenuItem(
+        menu->addChild(createSubmenuItem("MIDI Device", "",
+                                         [=](Menu* menu) {
+                                             appendMidiMenu(menu, &module->midiOutput);
+                                         }));
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createSubmenuItem("Audio Device", "",
+                                         [=](Menu* menu) {
+                                             appendAudioMenu(menu, &module->port);
+                                         }));
     }
-*/
-
 
 };
 
