@@ -32,6 +32,13 @@ const static int num_audio_outputs = 6;
 // taken from Fundamental Audio.cpp and CV_MIDI.cpp
 // this ought to be chopped in half since it only really
 // uses the inputs.  Outputs could be removed.
+
+// NOTE: THIS DOES NOT CLAMP: USER OF THIS AUDIO PORT SHOULD CLAMP ALL INPUTS
+// Maybe I'll change that later... the unmeasurable effieciency gained
+// is perhaps the wrong optimization.  The inputs may have varying ranges
+// depending on the hardware and the particular signal, so it makes sense the
+// hardware module writer implementor better know the clamping
+// requirements for each signal.
 struct ZoxnoxiousAudioPort : audio::Port {
 	Module* module;
 
@@ -145,7 +152,11 @@ struct ZoxnoxiousAudioPort : audio::Port {
 			for (int i = 0; i < outputFrames; i++) {
 				for (int j = 0; j < deviceNumOutputs; j++) {
 					float v = output[i * outputStride + j];
-					v = clamp(v, -1.f, 1.f);
+                                        // strictly speaking the clamp isn't necessary
+                                        // if the user of this audioport does the
+                                        // clamping (and it does below).
+                                        // Uncomment to get belt & suspenders approach.
+					//v = clamp(v, -1.f, 1.f);
 					output[i * outputStride + j] = v;
 				}
 			}
@@ -363,7 +374,10 @@ struct Zoxnoxious3340 : Module {
         }
 
 
-        // Push inputs to buffer
+        // Push inputs to buffer.  Clamping is done here: the individual
+        // signals may in some future cases have different clamping requirements
+        // depending on DAC and all that.  Also, by clamping here it's easy
+        // to identify clipping and signal that on the panel.
         if (port.deviceNumOutputs > 0) {
             dsp::Frame<num_audio_inputs> inputFrame = {};
             float v;
@@ -374,63 +388,62 @@ struct Zoxnoxious3340 : Module {
             case 6:
                 // linear
                 v = params[LINEAR_INPUT].getValue() + inputs[LINEAR_KNOB_PARAM].getVoltageSum() / 10.f;
-                if (v < 0.f) {
-                    linearClipTimer = clipTime;
-                    v = 0.f;
-                }
-                else if (v > 1.f) {
+                inputFrame.samples[5] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[5] != v) {
                     linearClipTimer = clipTime;
                 }
-                inputFrame.samples[5] = v;
                     
                 // fall through
             case 5:
                 // external mod amount
                 v = params[EXT_MOD_AMOUNT_INPUT].getValue() + inputs[EXT_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
-                if (v < 0.f || v > 1.f) {
+                inputFrame.samples[4] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[4] != v) {
                     extModAmountClipTimer = clipTime;
                 }
-                inputFrame.samples[4] = v;
 
                 // fall through
             case 4:
                 // mix1 triangle
                 v = params[MIX1_TRIANGLE_VCA_INPUT].getValue() + inputs[MIX1_TRIANGLE_KNOB_PARAM].getVoltageSum() / 10.f;
-                if (v < 0.f || v > 1.f) {
+                inputFrame.samples[3] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[3] != v) {
                     mix1TriangleVcaClipTimer = clipTime;
                 }
-                inputFrame.samples[3] = v;
                     
                 // fall through
             case 3:
                 // pulse width
                 v = params[PULSE_WIDTH_INPUT].getValue() + inputs[PULSE_WIDTH_KNOB_PARAM].getVoltageSum() / 10.f;
-                if (v < 0.f || v > 1.f) {
+                inputFrame.samples[2] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[2] != v) {
                     pulseWidthClipTimer = clipTime;
                 }
-                inputFrame.samples[2] = v;
+
                 // fall through
             case 2:
                 // sync phase: default to 0.5f if not connected
                 if (inputs[SYNC_PHASE_INPUT].isConnected()) {
                     v = inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f;
-                    if (v < 0.f || v > 1.f) {
+                    inputFrame.samples[1] = clamp(v, 0.f, 1.f);
+                    if (inputFrame.samples[1] != v) {
                         syncPhaseClipTimer = clipTime;
                     }
                 }
                 else {
                     v = 0.5f;
+                    inputFrame.samples[1] = v;
                 }
-                inputFrame.samples[1] = v;
                      
                 // fall through
             case 1:
                 // frequency
                 v = params[FREQ_INPUT].getValue() + inputs[FREQ_KNOB_PARAM].getVoltageSum() / 10.f;
-                if (v < 0.f || v > 1.f) {
+                inputFrame.samples[0] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[0] != v) {
                     freqClipTimer = clipTime;
                 }
-                inputFrame.samples[0] = v;
+
                 // fall through
             case 0:
                 break;
