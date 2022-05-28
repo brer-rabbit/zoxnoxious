@@ -4,10 +4,10 @@ EELAYER END
 $Descr B 17000 11000
 encoding utf-8
 Sheet 1 4
-Title "Raspberry Pi HAT"
+Title "Zoxnoxious 3340 Oscillator: Top Level"
 Date ""
-Rev "A"
-Comp ""
+Rev "0.3"
+Comp "Zoxnoxious Engineering"
 Comment1 ""
 Comment2 ""
 Comment3 ""
@@ -28,11 +28,11 @@ F8 "SCALED_EXT_MOD" I L 6400 6200 50
 F9 "LINEAR_FM_DAC" I L 6400 5700 50 
 F10 "EXP_FM_EXT_CTRL" I L 6400 5000 50 
 F11 "LINEAR_FM_EXT_CTRL" I L 6400 5100 50 
-F12 "HARD_SYNC_CTRL" I L 6400 5200 50 
+F12 "SYNC_NEG_CTRL" I L 6400 5300 50 
 F13 "FREQ_CV" I L 6400 5600 50 
-F14 "EXT_FREQ_CV" I L 6400 5450 50 
-F15 "EXT_MOD_PW_CTRL" I L 6400 5300 50 
-F16 "VCO_COMP" O R 8350 5650 50 
+F14 "EXT_MOD_PW_CTRL" I L 6400 5400 50 
+F15 "VCO_COMP" O R 8350 5650 50 
+F16 "SYNC_POS_CTRL" I L 6400 5200 50 
 $EndSheet
 Text Notes 7100 6450 0    197  ~ 0
 AS3340
@@ -167,11 +167,11 @@ $EndComp
 Text Notes 900  8500 0    50   ~ 0
 Decoupling with associated caps to be physically close to respsective chips
 Text Label 850  5500 0    50   ~ 0
-SPI0_MOSI
+SPI_MOSI
 Wire Wire Line
 	1300 5500 850  5500
 Text Label 850  5350 0    50   ~ 0
-SPI0_SCLK
+SPI_CLK
 Wire Wire Line
 	1300 5350 850  5350
 $Sheet
@@ -191,10 +191,6 @@ F10 "TRI_VCA_AMOUNT_DAC" O R 3100 6300 50
 $EndSheet
 Text Notes 1700 5950 0    197  ~ 0
 DAC
-Wire Wire Line
-	4800 5150 4300 5150
-Text Label 13900 1100 0    50   ~ 0
-OSC2_CV
 Text Label 3400 5600 0    50   ~ 0
 OSC1_CV_DAC
 Text Label 3400 5700 0    50   ~ 0
@@ -207,18 +203,6 @@ Text Label 3850 6550 0    50   ~ 0
 EXT_OSC_MOD
 Wire Wire Line
 	3100 5900 6400 5900
-$Comp
-L Analog_Switch:DG441xJ U8
-U 4 1 62D30AAB
-P 5100 5150
-F 0 "U8" H 4900 5300 50  0000 C CNN
-F 1 "DG442CY+" H 5250 5300 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 5100 5050 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 5100 5150 50  0001 C CNN
-F 4 "DG442CY+-ND" H 5100 5150 50  0001 C CNN "Digikey"
-	4    5100 5150
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	3100 5600 6400 5600
 Wire Wire Line
@@ -230,9 +214,7 @@ PWM_DAC
 Text Label 3450 5900 0    50   ~ 0
 SYNC_LEVEL_DAC
 Wire Wire Line
-	5400 5450 6400 5450
-Wire Wire Line
-	6400 5200 5600 5200
+	6400 5300 5600 5300
 Wire Wire Line
 	6400 5100 5600 5100
 Wire Wire Line
@@ -241,12 +223,12 @@ Text Label 5600 5000 0    50   ~ 0
 EXP_FM_EXT_CTRL
 Text Label 5600 5100 0    50   ~ 0
 LINEAR_FM_EXT_CTRL
-Text Label 5600 5200 0    50   ~ 0
-HARD_SYNC_CTRL
 Text Label 5600 5300 0    50   ~ 0
+SYNC_NEG_CTRL
+Text Label 5600 5400 0    50   ~ 0
 EXT_MOD_PW_CTRL
 Wire Wire Line
-	5600 5300 6400 5300
+	5600 5400 6400 5400
 $Comp
 L Device:R R?
 U 1 1 635A9B52
@@ -271,21 +253,9 @@ EXT_OSC_MOD
 Text Notes 10000 850  0    50   ~ 0
 External Input Mod Select
 Text Label 10350 1200 2    50   ~ 0
-OSC2_MIX2
+CARD1_OUT2
 Text Label 10350 1300 2    50   ~ 0
-OSC2_MIX1
-Text Notes 12550 950  0    50   ~ 0
-Hardwired as Osc1: the connections below should be\nrewired to use this as Osc2.\nMaking a switchable Osc1/Osc2 isn’t in scope
-Text Label 12550 1600 0    50   ~ 0
-OSC1_CV_DAC
-Text Label 14600 1500 0    50   ~ 0
-OSC1_CV
-Text Label 4300 5150 0    50   ~ 0
-EXT_CV
-Wire Wire Line
-	13900 1100 12400 1100
-Text Label 12400 1100 0    50   ~ 0
-EXT_CV
+CARD2_OUT2
 Text Notes 1250 4200 0    50   ~ 0
 Interface: As Osc1, this module will drive:\nOSC1_MIX1, OSC1_MIX2, and OSC1_CV\nThe GPIO_PI_DRIVER is used as a chip select.\nThe GPIO_MODULE_DRIVEN output is ours as well,\nintended to be used for VCO tuning, if I get to it.\nA module can tap into other lines for pulling signals in, but should not drive any other lines.
 Wire Notes Line
@@ -306,8 +276,6 @@ Wire Notes Line
 	9300 750  9300 4000
 Wire Notes Line
 	5900 750  9300 750 
-Text Label 8050 3250 0    50   ~ 0
-EXT_FREQ_CV_CTRL
 Wire Wire Line
 	8000 3150 8050 3150
 Text Label 8050 1850 0    50   ~ 0
@@ -322,8 +290,8 @@ Text Label 8050 2550 0    50   ~ 0
 EXP_FM_EXT_CTRL
 Text Label 8050 2350 0    50   ~ 0
 LINEAR_FM_EXT_CTRL
-Text Label 8050 2450 0    50   ~ 0
-HARD_SYNC_CTRL
+Text Label 8050 2250 0    50   ~ 0
+SYNC_POS_CTRL
 Wire Wire Line
 	8000 2350 8050 2350
 Wire Wire Line
@@ -416,246 +384,13 @@ Wire Wire Line
 	7000 3350 6550 3350
 Text Label 6550 3350 0    50   ~ 0
 I2C_ADDR1
-$Comp
-L power:+12V #PWR015
-U 1 1 63BA30C5
-P 1900 1900
-F 0 "#PWR015" H 1900 1750 50  0001 C CNN
-F 1 "+12V" H 1915 2073 50  0000 C CNN
-F 2 "" H 1900 1900 50  0001 C CNN
-F 3 "" H 1900 1900 50  0001 C CNN
-	1    1900 1900
-	1    0    0    -1  
-$EndComp
+Text Label 850  5650 0    50   ~ 0
+SPI_CS
 Wire Wire Line
-	3550 1800 4400 1800
-Wire Wire Line
-	3550 2000 4400 2000
-Wire Wire Line
-	4400 2000 4400 2600
-Connection ~ 4400 2600
-Wire Wire Line
-	3550 2600 4400 2600
-Wire Wire Line
-	4400 2600 4400 2900
-Wire Wire Line
-	4400 2900 4400 3400
-Connection ~ 4400 2900
-Wire Wire Line
-	3550 2900 4400 2900
-Connection ~ 4400 2000
-Wire Wire Line
-	4400 1800 4400 1900
-Wire Wire Line
-	2250 2800 2250 3350
-Wire Wire Line
-	3050 2800 2250 2800
-Connection ~ 2250 2800
-Wire Wire Line
-	2250 2500 2250 2800
-Wire Wire Line
-	3050 2500 2250 2500
-Connection ~ 2250 2500
-Wire Wire Line
-	2250 2300 2250 2500
-Wire Wire Line
-	3050 2300 2250 2300
-Connection ~ 2250 2300
-Wire Wire Line
-	2250 2100 2250 2300
-Wire Wire Line
-	3050 2100 2250 2100
-Wire Wire Line
-	3050 2000 2050 2000
-Connection ~ 2250 2100
-Text Label 2450 1600 0    50   ~ 0
-SCL1
-Text Label 3650 1700 0    50   ~ 0
-I2C_ADDR2
-Wire Wire Line
-	3550 1400 4150 1400
-Wire Wire Line
-	3050 2200 2450 2200
-Text Label 2550 2200 0    50   ~ 0
-OSC1_MIX2
-Wire Wire Line
-	2450 1400 3050 1400
-$Comp
-L power:+5V #PWR04
-U 1 1 63BA30F1
-P 2050 1800
-F 0 "#PWR04" H 2050 1650 50  0001 C CNN
-F 1 "+5V" H 2065 1973 50  0000 C CNN
-F 2 "" H 2050 1800 50  0001 C CNN
-F 3 "" H 2050 1800 50  0001 C CNN
-	1    2050 1800
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:-12V #PWR05
-U 1 1 63BA30F7
-P 2050 2000
-F 0 "#PWR05" H 2050 2100 50  0001 C CNN
-F 1 "-12V" H 2065 2173 50  0000 C CNN
-F 2 "" H 2050 2000 50  0001 C CNN
-F 3 "" H 2050 2000 50  0001 C CNN
-	1    2050 2000
-	-1   0    0    1   
-$EndComp
-$Comp
-L power:GND #PWR?
-U 1 1 63BA30FD
-P 2250 3400
-AR Path="/62386EF6/63BA30FD" Ref="#PWR?"  Part="1" 
-AR Path="/62391307/63BA30FD" Ref="#PWR?"  Part="1" 
-AR Path="/63BA30FD" Ref="#PWR08"  Part="1" 
-F 0 "#PWR08" H 2250 3150 50  0001 C CNN
-F 1 "GND" H 2255 3227 50  0000 C CNN
-F 2 "" H 2250 3400 50  0001 C CNN
-F 3 "" H 2250 3400 50  0001 C CNN
-	1    2250 3400
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	3050 2400 2450 2400
-Text Label 2550 2400 0    50   ~ 0
-OSC2_MIX2
-Wire Wire Line
-	3050 2600 2450 2600
-Text Label 2950 2600 2    50   ~ 0
-FILT1_OUT2
-Text Label 3650 1600 0    50   ~ 0
-I2C_ADDR0
-Wire Wire Line
-	3050 2700 2450 2700
-Text Label 2950 2700 2    50   ~ 0
-FILT2_OUT1
-Wire Wire Line
-	3050 2900 2450 2900
-Text Label 2900 2900 2    50   ~ 0
-VCA2_OUT
-Wire Wire Line
-	3050 3000 2450 3000
-Text Label 2550 3000 0    50   ~ 0
-VCA3_OUT
-Text Label 4050 2100 2    50   ~ 0
-OSC1_MIX1
-Wire Wire Line
-	4150 2100 3550 2100
-Text Label 3650 2300 0    50   ~ 0
-OSC2_MIX1
-Wire Wire Line
-	3550 1300 4150 1300
-$Comp
-L power:GND #PWR?
-U 1 1 63BA3112
-P 4400 3400
-AR Path="/62386EF6/63BA3112" Ref="#PWR?"  Part="1" 
-AR Path="/62391307/63BA3112" Ref="#PWR?"  Part="1" 
-AR Path="/63BA3112" Ref="#PWR014"  Part="1" 
-F 0 "#PWR014" H 4400 3150 50  0001 C CNN
-F 1 "GND" H 4405 3227 50  0000 C CNN
-F 2 "" H 4400 3400 50  0001 C CNN
-F 3 "" H 4400 3400 50  0001 C CNN
-	1    4400 3400
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	4150 2300 3550 2300
-Wire Wire Line
-	3550 2200 4150 2200
-Text Label 3650 2200 0    50   ~ 0
-OSC1_CV
-Wire Wire Line
-	3550 2400 4150 2400
-Text Label 3650 2400 0    50   ~ 0
-OSC2_CV
-Wire Wire Line
-	3550 2500 4150 2500
-Text Label 3650 2500 0    50   ~ 0
-FILT1_OUT1
-Text Label 2450 1700 0    50   ~ 0
-I2C_ADDR1
-Wire Wire Line
-	3550 2700 4150 2700
-Text Label 3650 2700 0    50   ~ 0
-FILT2_OUT2
-Wire Wire Line
-	3550 2800 4150 2800
-Text Label 3650 2800 0    50   ~ 0
-VCA1_OUT
-Wire Wire Line
-	3550 3000 4150 3000
-Text Label 3650 3000 0    50   ~ 0
-FX1
-Wire Wire Line
-	3550 3100 4150 3100
-Text Label 3650 3100 0    50   ~ 0
-FX2
-Text Label 3650 1400 0    50   ~ 0
+	850  5650 1300 5650
+Text Label 14700 8350 2    50   ~ 0
 GPIO_MODULE_DRIVEN
-Wire Wire Line
-	3550 1700 4150 1700
-Text Label 2450 1300 0    50   ~ 0
-SPI0_MOSI
-Text Label 3650 1300 0    50   ~ 0
-SPI0_SCLK
-Text Label 2450 1400 0    50   ~ 0
-GPIO_PI_DRIVEN
-Wire Wire Line
-	3550 1600 4150 1600
-Wire Wire Line
-	2450 1600 3050 1600
-Wire Wire Line
-	2450 1300 3050 1300
-Wire Wire Line
-	2450 1700 3050 1700
-Text Label 3650 1500 0    50   ~ 0
-SDA1
-$Comp
-L power:PWR_FLAG #FLG03
-U 1 1 63BBAD56
-P 2250 3350
-F 0 "#FLG03" H 2250 3425 50  0001 C CNN
-F 1 "PWR_FLAG" V 2250 3477 50  0000 L CNN
-F 2 "" H 2250 3350 50  0001 C CNN
-F 3 "~" H 2250 3350 50  0001 C CNN
-	1    2250 3350
-	0    -1   -1   0   
-$EndComp
-Connection ~ 2250 3350
-Wire Wire Line
-	2250 3350 2250 3400
-$Comp
-L power:PWR_FLAG #FLG04
-U 1 1 63BBB2F3
-P 1750 1900
-F 0 "#FLG04" H 1750 1975 50  0001 C CNN
-F 1 "PWR_FLAG" V 1750 2027 50  0000 L CNN
-F 2 "" H 1750 1900 50  0001 C CNN
-F 3 "~" H 1750 1900 50  0001 C CNN
-	1    1750 1900
-	0    -1   -1   0   
-$EndComp
-NoConn ~ 2450 2600
-NoConn ~ 2450 2700
-NoConn ~ 2450 2900
-NoConn ~ 2450 3000
-NoConn ~ 3050 3100
-NoConn ~ 3050 3200
-NoConn ~ 3550 3200
-NoConn ~ 4150 3100
-NoConn ~ 4150 3000
-NoConn ~ 4150 2800
-NoConn ~ 4150 2700
-NoConn ~ 4150 2500
-Text Label 650  5650 0    50   ~ 0
-GPIO_PI_DRIVEN
-Wire Wire Line
-	650  5650 1300 5650
-Text Label 13950 8600 0    50   ~ 0
-GPIO_MODULE_DRIVEN
-Text Notes 11150 7950 0    50   ~ 0
+Text Notes 11100 7750 0    50   ~ 10
 Tune Control: send pulse back to Pi for freq count
 $Comp
 L power:GND #PWR0101
@@ -760,33 +495,6 @@ Wire Wire Line
 	8000 3250 8050 3250
 Text Label 8050 3050 0    50   ~ 0
 SAW_LEVEL_CTRL
-$Comp
-L Amplifier_Operational:TL074 U?
-U 2 1 6500B008
-P 12600 8600
-AR Path="/627C7865/6500B008" Ref="U?"  Part="2" 
-AR Path="/627EC897/6500B008" Ref="U?"  Part="1" 
-AR Path="/63514083/6500B008" Ref="U?"  Part="2" 
-AR Path="/6500B008" Ref="U1"  Part="2" 
-F 0 "U1" H 12600 8800 50  0000 C CNN
-F 1 "TL074" H 12550 8600 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 12600 8600 50  0001 C CNN
-F 3 "http://www.ti.com/lit/ds/symlink/tl071.pdf" H 12600 8600 50  0001 C CNN
-F 4 "C12594" H 12600 8600 50  0001 C CNN "LCSC Part"
-	2    12600 8600
-	1    0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_02x20_Odd_Even J1
-U 1 1 651C8850
-P 3250 2200
-F 0 "J1" H 3300 3317 50  0000 C CNN
-F 1 "Conn_02x20_Odd_Even" H 3300 3226 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical" H 3250 2200 50  0001 C CNN
-F 3 "~" H 3250 2200 50  0001 C CNN
-	1    3250 2200
-	1    0    0    -1  
-$EndComp
 Wire Notes Line
 	900  10350 900  8400
 Wire Notes Line
@@ -794,82 +502,23 @@ Wire Notes Line
 Wire Notes Line
 	16500 7800 16500 9200
 Wire Wire Line
-	12300 8700 12250 8700
+	12200 8250 12200 8000
 Wire Wire Line
-	12250 8700 12250 8750
-$Comp
-L power:GND #PWR011
-U 1 1 654F6942
-P 12250 8750
-F 0 "#PWR011" H 12250 8500 50  0001 C CNN
-F 1 "GND" H 12255 8577 50  0000 C CNN
-F 2 "" H 12250 8750 50  0001 C CNN
-F 3 "" H 12250 8750 50  0001 C CNN
-	1    12250 8750
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:R R?
-U 1 1 655136D7
-P 12000 8500
-AR Path="/61E1D4AE/655136D7" Ref="R?"  Part="1" 
-AR Path="/655136D7" Ref="R2"  Part="1" 
-F 0 "R2" V 12207 8500 50  0000 C CNN
-F 1 "47k" V 12116 8500 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 11930 8500 50  0001 C CNN
-F 3 "~" H 12000 8500 50  0001 C CNN
-F 4 "C25819" H 12000 8500 50  0001 C CNN "LCSC Part"
-	1    12000 8500
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	12150 8500 12200 8500
-$Comp
-L Device:R R?
-U 1 1 655AB803
-P 12550 8250
-AR Path="/61E1D4AE/655AB803" Ref="R?"  Part="1" 
-AR Path="/655AB803" Ref="R3"  Part="1" 
-F 0 "R3" V 12757 8250 50  0000 C CNN
-F 1 "100k" V 12666 8250 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 12480 8250 50  0001 C CNN
-F 3 "~" H 12550 8250 50  0001 C CNN
-F 4 "C25803" H 12550 8250 50  0001 C CNN "LCSC Part"
-	1    12550 8250
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	12200 8500 12200 8250
-Wire Wire Line
-	12200 8250 12400 8250
-Connection ~ 12200 8500
-Wire Wire Line
-	12200 8500 12300 8500
-Wire Wire Line
-	12700 8250 13050 8250
-Wire Wire Line
-	13050 8250 13050 8600
+	12200 8250 12300 8250
 $Comp
 L Device:R R?
 U 1 1 655E9A01
-P 13500 8600
+P 13200 8350
 AR Path="/61E1D4AE/655E9A01" Ref="R?"  Part="1" 
 AR Path="/655E9A01" Ref="R4"  Part="1" 
-F 0 "R4" V 13707 8600 50  0000 C CNN
-F 1 "1k" V 13616 8600 50  0000 C CNN
-F 2 "Resistor_SMD:R_1206_3216Metric" V 13430 8600 50  0001 C CNN
-F 3 "~" H 13500 8600 50  0001 C CNN
-F 4 "C4410" H 13500 8600 50  0001 C CNN "LCSC Part"
-	1    13500 8600
+F 0 "R4" V 13407 8350 50  0000 C CNN
+F 1 "5k1" V 13316 8350 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 13130 8350 50  0001 C CNN
+F 3 "~" H 13200 8350 50  0001 C CNN
+F 4 "" H 13200 8350 50  0001 C CNN "LCSC Part"
+	1    13200 8350
 	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	12900 8600 13050 8600
-Connection ~ 13050 8600
-Wire Wire Line
-	13050 8600 13350 8600
-Wire Wire Line
-	13650 8600 13800 8600
 Wire Notes Line
 	900  10350 10750 10350
 Wire Notes Line
@@ -987,42 +636,22 @@ F 5 "C14663" H 3450 9400 50  0001 C CNN "LCSC Part"
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4350 9650 4350 9850
-Connection ~ 4350 9650
-Wire Wire Line
-	4750 9650 4350 9650
-Wire Wire Line
-	4750 9400 4750 9650
-Wire Wire Line
-	4350 9500 4350 9650
-$Comp
-L power:GND #PWR078
-U 1 1 645CBCEA
-P 4350 9850
-F 0 "#PWR078" H 4350 9600 50  0001 C CNN
-F 1 "GND" H 4355 9677 50  0000 C CNN
-F 2 "" H 4350 9850 50  0001 C CNN
-F 3 "" H 4350 9850 50  0001 C CNN
-	1    4350 9850
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
 	4350 8750 4350 8700
 Connection ~ 4350 8750
 Wire Wire Line
-	4750 8750 4350 8750
+	4650 8750 4350 8750
 Wire Wire Line
-	4750 9100 4750 8750
+	4650 8800 4650 8750
 $Comp
 L Device:C C32
 U 1 1 645CBCDC
-P 4750 9250
-F 0 "C32" H 4865 9296 50  0000 L CNN
-F 1 "0.1u" H 4865 9205 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 4788 9100 50  0001 C CNN
-F 3 "~" H 4750 9250 50  0001 C CNN
-F 4 "C14663" H 4750 9250 50  0001 C CNN "LCSC Part"
-	1    4750 9250
+P 4650 8950
+F 0 "C32" H 4765 8996 50  0000 L CNN
+F 1 "0.1u" H 4765 8905 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 4688 8800 50  0001 C CNN
+F 3 "~" H 4650 8950 50  0001 C CNN
+F 4 "C14663" H 4650 8950 50  0001 C CNN "LCSC Part"
+	1    4650 8950
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -1044,7 +673,7 @@ U 3 1 645CBCC7
 P 4450 9200
 AR Path="/61E1D4AE/645CBCC7" Ref="U?"  Part="3" 
 AR Path="/645CBCC7" Ref="U11"  Part="3" 
-F 0 "U11" H 4500 9400 50  0000 C CNN
+F 0 "U11" H 4500 9350 50  0000 C CNN
 F 1 "LM393" H 4400 9200 50  0000 C CNN
 F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 4450 9200 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/lm393.pdf" H 4450 9200 50  0001 C CNN
@@ -1633,108 +1262,7 @@ Wire Wire Line
 	8000 3350 8050 3350
 Wire Wire Line
 	8000 3450 8050 3450
-Wire Wire Line
-	2250 1500 3050 1500
-Wire Wire Line
-	3550 1500 4150 1500
-$Comp
-L power:PWR_FLAG #FLG02
-U 1 1 63BBAAEA
-P 1750 2000
-F 0 "#FLG02" H 1750 2075 50  0001 C CNN
-F 1 "PWR_FLAG" V 1750 2127 50  0000 L CNN
-F 2 "" H 1750 2000 50  0001 C CNN
-F 3 "~" H 1750 2000 50  0001 C CNN
-	1    1750 2000
-	0    -1   -1   0   
-$EndComp
-$Comp
-L power:PWR_FLAG #FLG01
-U 1 1 63BBA567
-P 1750 1800
-F 0 "#FLG01" H 1750 1875 50  0001 C CNN
-F 1 "PWR_FLAG" V 1750 1927 50  0000 L CNN
-F 2 "" H 1750 1800 50  0001 C CNN
-F 3 "~" H 1750 1800 50  0001 C CNN
-	1    1750 1800
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	2250 1500 2250 2100
-Wire Wire Line
-	3050 1900 1900 1900
-Wire Wire Line
-	1900 1900 1750 1900
-Connection ~ 1900 1900
-Wire Wire Line
-	1750 1800 2050 1800
-Connection ~ 2050 1800
-Wire Wire Line
-	2050 1800 3050 1800
-Wire Wire Line
-	1750 2000 2050 2000
-Connection ~ 2050 2000
-Wire Wire Line
-	4400 1900 3550 1900
-Connection ~ 4400 1900
-Wire Wire Line
-	4400 1900 4400 2000
-$Comp
-L Amplifier_Operational:TL074 U?
-U 4 1 62201A33
-P 13700 1500
-AR Path="/627C7865/62201A33" Ref="U?"  Part="2" 
-AR Path="/627EC897/62201A33" Ref="U?"  Part="1" 
-AR Path="/63514083/62201A33" Ref="U?"  Part="2" 
-AR Path="/62201A33" Ref="U12"  Part="4" 
-F 0 "U12" H 13700 1700 50  0000 C CNN
-F 1 "TL074" H 13650 1500 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 13700 1500 50  0001 C CNN
-F 3 "http://www.ti.com/lit/ds/symlink/tl071.pdf" H 13700 1500 50  0001 C CNN
-F 4 "C12594" H 13700 1500 50  0001 C CNN "LCSC Part"
-	4    13700 1500
-	1    0    0    1   
-$EndComp
-Text Label 4150 5400 0    50   ~ 0
-EXT_FREQ_CV_CTRL
-Wire Wire Line
-	5100 5350 5100 5400
-Wire Wire Line
-	5100 5400 4150 5400
-Wire Wire Line
-	5400 5150 5400 5450
 NoConn ~ 8050 2050
-Wire Wire Line
-	13400 1600 12550 1600
-Wire Wire Line
-	13400 1400 13200 1400
-Wire Wire Line
-	13200 1400 13200 1200
-Wire Wire Line
-	13200 1200 14100 1200
-Wire Wire Line
-	14100 1200 14100 1500
-Wire Wire Line
-	14100 1500 14000 1500
-Wire Wire Line
-	14100 1500 14200 1500
-Connection ~ 14100 1500
-$Comp
-L Device:R R?
-U 1 1 6240BB70
-P 14350 1500
-AR Path="/61E1D4AE/6240BB70" Ref="R?"  Part="1" 
-AR Path="/6240BB70" Ref="R11"  Part="1" 
-F 0 "R11" V 14557 1500 50  0000 C CNN
-F 1 "1k" V 14466 1500 50  0000 C CNN
-F 2 "Resistor_SMD:R_1206_3216Metric" V 14280 1500 50  0001 C CNN
-F 3 "~" H 14350 1500 50  0001 C CNN
-F 4 "C4410" H 14350 1500 50  0001 C CNN "LCSC Part"
-	1    14350 1500
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	14500 1500 14600 1500
 $Comp
 L Amplifier_Operational:TL074 U?
 U 5 1 62184EFD
@@ -1805,28 +1333,26 @@ Wire Wire Line
 $Comp
 L Analog_Switch:DG441xY U?
 U 2 1 627734EB
-P 15900 8250
+P 15700 8750
 AR Path="/61E1D4AE/627734EB" Ref="U?"  Part="2" 
 AR Path="/627734EB" Ref="U8"  Part="2" 
-F 0 "U8" H 15800 8100 50  0000 C CNN
-F 1 "DG442CY+" H 16150 8100 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 15900 8150 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 15900 8250 50  0001 C CNN
-F 4 "DG442CY+-ND" H 15900 8250 50  0001 C CNN "Digikey"
-	2    15900 8250
+F 0 "U8" H 15600 8600 50  0000 C CNN
+F 1 "DG442CY+" H 15950 8600 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 15700 8650 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 15700 8750 50  0001 C CNN
+F 4 "DG442CY+-ND" H 15700 8750 50  0001 C CNN "Digikey"
+	2    15700 8750
 	-1   0    0    1   
 $EndComp
-NoConn ~ 15600 8250
-NoConn ~ 15900 8050
-NoConn ~ 16200 8250
+NoConn ~ 15400 8750
+NoConn ~ 15700 8550
+NoConn ~ 16000 8750
 Wire Notes Line
 	14950 7800 14950 9200
 Wire Notes Line
 	14950 9200 16500 9200
 Text Notes 900  900  0    50   ~ 0
 2x20 connection interface
-Wire Wire Line
-	11650 8500 11850 8500
 Wire Notes Line
 	9400 750  12000 750 
 Wire Notes Line
@@ -1857,7 +1383,7 @@ Text Label 8850 5450 2    50   ~ 0
 VCO_SAW
 Wire Wire Line
 	8850 5250 8350 5250
-Text Label 11650 8500 2    50   ~ 0
+Text Label 11900 8450 2    50   ~ 0
 VCO_PULSE
 $Comp
 L Mechanical:MountingHole H1
@@ -1865,7 +1391,7 @@ U 1 1 640C16D6
 P 15300 950
 F 0 "H1" H 15400 996 50  0000 L CNN
 F 1 "MountingHole" H 15400 905 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3_Pad" H 15300 950 50  0001 C CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 15300 950 50  0001 C CNN
 F 3 "~" H 15300 950 50  0001 C CNN
 	1    15300 950 
 	1    0    0    -1  
@@ -1876,7 +1402,7 @@ U 1 1 640C1F92
 P 15850 950
 F 0 "H3" H 15950 996 50  0000 L CNN
 F 1 "MountingHole" H 15950 905 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3_Pad" H 15850 950 50  0001 C CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 15850 950 50  0001 C CNN
 F 3 "~" H 15850 950 50  0001 C CNN
 	1    15850 950 
 	1    0    0    -1  
@@ -1887,7 +1413,7 @@ U 1 1 640C239A
 P 15850 1300
 F 0 "H4" H 15950 1346 50  0000 L CNN
 F 1 "MountingHole" H 15950 1255 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3_Pad" H 15850 1300 50  0001 C CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 15850 1300 50  0001 C CNN
 F 3 "~" H 15850 1300 50  0001 C CNN
 	1    15850 1300
 	1    0    0    -1  
@@ -1898,21 +1424,11 @@ U 1 1 640C295F
 P 15300 1300
 F 0 "H2" H 15400 1346 50  0000 L CNN
 F 1 "MountingHole" H 15400 1255 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3_Pad" H 15300 1300 50  0001 C CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 15300 1300 50  0001 C CNN
 F 3 "~" H 15300 1300 50  0001 C CNN
 	1    15300 1300
 	1    0    0    -1  
 $EndComp
-Wire Notes Line
-	12150 600  14950 600 
-Wire Notes Line
-	14950 600  14950 1750
-Wire Notes Line
-	14950 1750 12150 1750
-Wire Notes Line
-	12150 1750 12150 600 
-Text Notes 12150 700  0    50   ~ 0
-Osc CVs
 Wire Notes Line
 	15100 600  16500 600 
 Wire Notes Line
@@ -1946,46 +1462,31 @@ Wire Wire Line
 	8000 2950 8050 2950
 Wire Wire Line
 	8000 3050 8050 3050
-Wire Notes Line
-	14800 7800 11050 7800
-Wire Notes Line
-	11050 7800 11050 9050
-Wire Notes Line
-	11050 9050 14800 9050
-Wire Notes Line
-	14800 9050 14800 7800
 $Comp
 L Diode:1N4148W D3
 U 1 1 6232E4FD
-P 13800 8350
-F 0 "D3" V 13754 8430 50  0000 L CNN
-F 1 "1N4148W" V 13845 8430 50  0000 L CNN
-F 2 "Diode_SMD:D_SOD-123" H 13800 8175 50  0001 C CNN
-F 3 "https://www.vishay.com/docs/85748/1n4148w.pdf" H 13800 8350 50  0001 C CNN
-F 4 "C81598" H 13800 8350 50  0001 C CNN "LCSC Part"
-	1    13800 8350
+P 13450 8000
+F 0 "D3" V 13404 8080 50  0000 L CNN
+F 1 "1N4148W" V 13495 8080 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-123" H 13450 7825 50  0001 C CNN
+F 3 "https://www.vishay.com/docs/85748/1n4148w.pdf" H 13450 8000 50  0001 C CNN
+F 4 "C81598" H 13450 8000 50  0001 C CNN "LCSC Part"
+	1    13450 8000
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	13800 8600 13800 8500
-Connection ~ 13800 8600
-Wire Wire Line
-	13800 8600 13950 8600
 $Comp
 L power:+5V #PWR037
 U 1 1 623682BA
-P 13800 8100
-F 0 "#PWR037" H 13800 7950 50  0001 C CNN
-F 1 "+5V" H 13815 8273 50  0000 C CNN
-F 2 "" H 13800 8100 50  0001 C CNN
-F 3 "" H 13800 8100 50  0001 C CNN
-	1    13800 8100
+P 13450 7800
+F 0 "#PWR037" H 13450 7650 50  0001 C CNN
+F 1 "+5V" H 13465 7973 50  0000 C CNN
+F 2 "" H 13450 7800 50  0001 C CNN
+F 3 "" H 13450 7800 50  0001 C CNN
+	1    13450 7800
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	13800 8100 13800 8200
-Text Notes 13500 8800 0    50   ~ 0
-TODO: REVIEW OVERVOLTAGE
+	13450 7800 13450 7850
 $Sheet
 S 10900 4800 2750 2150
 U 6269DD41
@@ -2052,34 +1553,16 @@ VCO_COMP
 Wire Wire Line
 	10100 6700 10900 6700
 Text Label 14050 5350 0    50   ~ 0
-OSC1_MIX1
+THIS_OUT1
 Wire Wire Line
 	14050 5350 13650 5350
 Text Label 14050 5550 0    50   ~ 0
-OSC1_MIX2
+THIS_OUT2
 Wire Wire Line
 	14050 5550 13650 5550
-$Comp
-L Analog_Switch:DG441xJ U9
-U 1 1 62A6656F
-P 15450 8750
-AR Path="/62A6656F" Ref="U9"  Part="1" 
-AR Path="/6269DD41/62A6656F" Ref="U?"  Part="1" 
-F 0 "U9" H 15450 8925 50  0000 C CNN
-F 1 "DG442CY+" H 15450 9016 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 15450 8650 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 15450 8750 50  0001 C CNN
-F 4 "DG442CY+-ND" H 15450 8750 50  0001 C CNN "Digikey"
-	1    15450 8750
-	-1   0    0    1   
-$EndComp
-NoConn ~ 15150 8750
-NoConn ~ 15450 8550
-NoConn ~ 15750 8750
 NoConn ~ 8050 3150
 Text Notes 6600 10350 0    50   ~ 0
 DG442: Ensure model is spec’d for +/- 12V. LE is not.
-NoConn ~ 8050 2250
 $Comp
 L Device:R R?
 U 1 1 62E9AEE7
@@ -2126,4 +1609,471 @@ Wire Wire Line
 	8000 2150 8750 2150
 Text Label 8100 2150 0    50   ~ 0
 LED_CTRL
+Text Label 8050 2450 0    50   ~ 0
+SYNC_NEG_CTRL
+Wire Wire Line
+	6400 5200 5600 5200
+Text Label 5600 5200 0    50   ~ 0
+SYNC_POS_CTRL
+$Comp
+L power:-5V #PWR0115
+U 1 1 6346F1C0
+P 4350 9850
+F 0 "#PWR0115" H 4350 9950 50  0001 C CNN
+F 1 "-5V" H 4365 10023 50  0000 C CNN
+F 2 "" H 4350 9850 50  0001 C CNN
+F 3 "" H 4350 9850 50  0001 C CNN
+	1    4350 9850
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4350 9500 4350 9750
+$Comp
+L power:GND #PWR0116
+U 1 1 63685780
+P 4850 9250
+F 0 "#PWR0116" H 4850 9000 50  0001 C CNN
+F 1 "GND" H 4855 9077 50  0000 C CNN
+F 2 "" H 4850 9250 50  0001 C CNN
+F 3 "" H 4850 9250 50  0001 C CNN
+	1    4850 9250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C34
+U 1 1 636A7F54
+P 4650 9600
+F 0 "C34" H 4765 9646 50  0000 L CNN
+F 1 "0.1u" H 4765 9555 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 4688 9450 50  0001 C CNN
+F 3 "~" H 4650 9600 50  0001 C CNN
+F 4 "C14663" H 4650 9600 50  0001 C CNN "LCSC Part"
+	1    4650 9600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4350 9750 4650 9750
+Connection ~ 4350 9750
+Wire Wire Line
+	4350 9750 4350 9850
+Wire Wire Line
+	4650 9100 4650 9200
+Wire Wire Line
+	4850 9250 4850 9200
+Wire Wire Line
+	4850 9200 4650 9200
+Connection ~ 4650 9200
+Wire Wire Line
+	4650 9200 4650 9450
+Wire Wire Line
+	12200 8000 12950 8000
+Wire Wire Line
+	13350 8350 13450 8350
+$Comp
+L Device:R R?
+U 1 1 6305E977
+P 13750 8350
+AR Path="/61E1D4AE/6305E977" Ref="R?"  Part="1" 
+AR Path="/6305E977" Ref="R26"  Part="1" 
+F 0 "R26" V 13957 8350 50  0000 C CNN
+F 1 "510" V 13866 8350 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 13680 8350 50  0001 C CNN
+F 3 "~" H 13750 8350 50  0001 C CNN
+F 4 "C23193" H 13750 8350 50  0001 C CNN "LCSC Part"
+	1    13750 8350
+	0    -1   -1   0   
+$EndComp
+Connection ~ 13450 8350
+Wire Wire Line
+	13450 8350 13600 8350
+Wire Wire Line
+	13450 8150 13450 8350
+Wire Wire Line
+	12900 8350 12950 8350
+Wire Wire Line
+	12950 8000 12950 8350
+Connection ~ 12950 8350
+Wire Wire Line
+	12950 8350 13050 8350
+Wire Wire Line
+	13900 8350 14700 8350
+Wire Notes Line
+	11050 7550 14800 7550
+Wire Notes Line
+	11050 7550 11050 9150
+Wire Notes Line
+	14800 7550 14800 9150
+Wire Notes Line
+	11050 9150 14800 9150
+$Comp
+L Analog_Switch:DG441xY U?
+U 4 1 62C8A651
+P 15700 8200
+AR Path="/61E1D4AE/62C8A651" Ref="U?"  Part="2" 
+AR Path="/62C8A651" Ref="U8"  Part="4" 
+F 0 "U8" H 15600 8050 50  0000 C CNN
+F 1 "DG442CY+" H 15950 8050 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 15700 8100 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 15700 8200 50  0001 C CNN
+F 4 "DG442CY+-ND" H 15700 8200 50  0001 C CNN "Digikey"
+	4    15700 8200
+	-1   0    0    1   
+$EndComp
+NoConn ~ 15400 8200
+NoConn ~ 15700 8000
+NoConn ~ 16000 8200
+$Comp
+L Connector_Generic:Conn_02x20_Odd_Even J?
+U 1 1 6238DC2A
+P 2950 2150
+AR Path="/62386EF6/6238DC2A" Ref="J?"  Part="1" 
+AR Path="/62391307/6238DC2A" Ref="J?"  Part="1" 
+AR Path="/62521C18/6238DC2A" Ref="J?"  Part="1" 
+AR Path="/62525DAC/6238DC2A" Ref="J?"  Part="1" 
+AR Path="/62525DC6/6238DC2A" Ref="J3"  Part="1" 
+AR Path="/6252A02B/6238DC2A" Ref="J4"  Part="1" 
+AR Path="/6252A045/6238DC2A" Ref="J5"  Part="1" 
+AR Path="/625442EF/6238DC2A" Ref="J6"  Part="1" 
+AR Path="/62544309/6238DC2A" Ref="J7"  Part="1" 
+AR Path="/62544323/6238DC2A" Ref="J8"  Part="1" 
+AR Path="/6238DC2A" Ref="J3"  Part="1" 
+F 0 "J3" H 3000 3267 50  0000 C CNN
+F 1 "Conn_02x20_Odd_Even" H 3000 3176 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_Vertical" H 2950 2150 50  0001 C CNN
+F 3 "~" H 2950 2150 50  0001 C CNN
+	1    2950 2150
+	1    0    0    -1  
+$EndComp
+Text Label 2250 1850 0    50   ~ 0
+SDA1
+Wire Wire Line
+	2150 1450 2750 1450
+Wire Wire Line
+	2750 1850 2150 1850
+Wire Wire Line
+	2150 1250 2750 1250
+Wire Wire Line
+	3250 1350 3850 1350
+Text Label 2250 1450 0    50   ~ 0
+SPI_CS
+Text Label 3350 1350 0    50   ~ 0
+SPI_CLK
+Text Label 2250 1250 0    50   ~ 0
+SPI_MOSI
+Wire Wire Line
+	3250 1550 4150 1550
+Text Label 3300 1550 0    50   ~ 0
+GPIO_MODULE_DRIVEN
+Wire Wire Line
+	2750 2850 2150 2850
+Wire Wire Line
+	2750 2750 2150 2750
+Text Label 3300 2850 0    50   ~ 0
+CARD6_OUT1
+Wire Wire Line
+	3250 2850 3850 2850
+Text Label 3300 2650 0    50   ~ 0
+CARD4_OUT2
+Wire Wire Line
+	3250 2650 3850 2650
+Text Label 2250 1750 0    50   ~ 0
+I2C_ADDR1
+Text Label 3300 2450 0    50   ~ 0
+CARD3_OUT1
+Wire Wire Line
+	3250 2450 3850 2450
+Wire Wire Line
+	2150 2350 2750 2350
+Wire Wire Line
+	2750 1650 2150 1650
+Text Label 2650 2350 2    50   ~ 0
+CARD2_OUT1
+Wire Wire Line
+	2150 2250 2750 2250
+Text Label 2650 2250 2    50   ~ 0
+CARD1_OUT1
+Text Label 2650 2950 2    50   ~ 0
+CARD6_OUT2
+Wire Wire Line
+	2750 2950 2150 2950
+Wire Wire Line
+	2750 2650 2150 2650
+Text Label 2650 1650 2    50   ~ 0
+I2C_ADDR0
+Wire Wire Line
+	2750 2550 2150 2550
+Wire Wire Line
+	2750 2450 2150 2450
+Wire Wire Line
+	3850 1850 3250 1850
+Wire Wire Line
+	2150 1750 2750 1750
+Text Label 3300 2250 0    50   ~ 0
+CARD1_OUT2
+Wire Wire Line
+	3250 2250 3850 2250
+Wire Wire Line
+	3250 1750 3850 1750
+Text Label 3350 1750 0    50   ~ 0
+I2C_ADDR2
+Text Label 3750 1850 2    50   ~ 0
+SCL1
+Wire Wire Line
+	2150 1350 2750 1350
+Text Label 2250 1350 0    50   ~ 0
+SPI_MISO
+Text Label 2650 2550 2    50   ~ 0
+CARD3_OUT2
+Wire Wire Line
+	2750 1550 2150 1550
+Text Label 2250 1550 0    50   ~ 0
+ID_CS
+Text Label 2650 2450 2    50   ~ 0
+CARD2_OUT2
+Text Label 2650 2650 2    50   ~ 0
+CARD4_OUT1
+Text Label 2650 2750 2    50   ~ 0
+CARD5_OUT1
+Text Label 2650 2850 2    50   ~ 0
+CARD5_OUT2
+Wire Wire Line
+	2150 3150 2750 3150
+Text Label 2200 3150 0    50   ~ 0
+THIS_OUT1
+Wire Wire Line
+	3850 3150 3250 3150
+Text Label 3300 3150 0    50   ~ 0
+THIS_OUT2
+NoConn ~ 2750 3050
+$Comp
+L Amplifier_Operational:TL074 U?
+U 2 1 6500B008
+P 12600 8350
+AR Path="/627C7865/6500B008" Ref="U?"  Part="2" 
+AR Path="/627EC897/6500B008" Ref="U?"  Part="1" 
+AR Path="/63514083/6500B008" Ref="U?"  Part="2" 
+AR Path="/6500B008" Ref="U1"  Part="2" 
+F 0 "U1" H 12600 8550 50  0000 C CNN
+F 1 "TL074" H 12550 8350 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 12600 8350 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/tl071.pdf" H 12600 8350 50  0001 C CNN
+F 4 "C12594" H 12600 8350 50  0001 C CNN "LCSC Part"
+	2    12600 8350
+	1    0    0    1   
+$EndComp
+Wire Wire Line
+	11900 8450 12300 8450
+$Comp
+L power:PWR_FLAG #FLG0103
+U 1 1 62B12082
+P 1700 2150
+F 0 "#FLG0103" H 1700 2225 50  0001 C CNN
+F 1 "PWR_FLAG" H 1700 2323 50  0000 C CNN
+F 2 "" H 1700 2150 50  0001 C CNN
+F 3 "~" H 1700 2150 50  0001 C CNN
+	1    1700 2150
+	-1   0    0    1   
+$EndComp
+Connection ~ 1350 2050
+$Comp
+L power:PWR_FLAG #FLG0102
+U 1 1 62B11A83
+P 1350 2050
+F 0 "#FLG0102" H 1350 2125 50  0001 C CNN
+F 1 "PWR_FLAG" V 1350 2177 50  0000 L CNN
+F 2 "" H 1350 2050 50  0001 C CNN
+F 3 "~" H 1350 2050 50  0001 C CNN
+	1    1350 2050
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	1900 1950 1550 1950
+Connection ~ 1900 1950
+$Comp
+L power:PWR_FLAG #FLG0101
+U 1 1 62AB7F59
+P 1900 1950
+F 0 "#FLG0101" H 1900 2025 50  0001 C CNN
+F 1 "PWR_FLAG" H 1900 2123 50  0000 C CNN
+F 2 "" H 1900 1950 50  0001 C CNN
+F 3 "~" H 1900 1950 50  0001 C CNN
+	1    1900 1950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2750 1950 1900 1950
+$Comp
+L power:+5V #PWR?
+U 1 1 6239AEC2
+P 1550 1950
+AR Path="/62386EF6/6239AEC2" Ref="#PWR?"  Part="1" 
+AR Path="/62521C18/6239AEC2" Ref="#PWR?"  Part="1" 
+AR Path="/62525DAC/6239AEC2" Ref="#PWR?"  Part="1" 
+AR Path="/62525DC6/6239AEC2" Ref="#PWR0105"  Part="1" 
+AR Path="/6252A02B/6239AEC2" Ref="#PWR0109"  Part="1" 
+AR Path="/6252A045/6239AEC2" Ref="#PWR0113"  Part="1" 
+AR Path="/625442EF/6239AEC2" Ref="#PWR0117"  Part="1" 
+AR Path="/62544309/6239AEC2" Ref="#PWR0121"  Part="1" 
+AR Path="/62544323/6239AEC2" Ref="#PWR0125"  Part="1" 
+AR Path="/6239AEC2" Ref="#PWR0120"  Part="1" 
+F 0 "#PWR0120" H 1550 1800 50  0001 C CNN
+F 1 "+5V" H 1565 2123 50  0000 C CNN
+F 2 "" H 1550 1950 50  0001 C CNN
+F 3 "" H 1550 1950 50  0001 C CNN
+	1    1550 1950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2750 2150 1700 2150
+$Comp
+L power:-12V #PWR?
+U 1 1 6239FF9D
+P 1350 2150
+AR Path="/62386EF6/6239FF9D" Ref="#PWR?"  Part="1" 
+AR Path="/62521C18/6239FF9D" Ref="#PWR?"  Part="1" 
+AR Path="/62525DAC/6239FF9D" Ref="#PWR?"  Part="1" 
+AR Path="/62525DC6/6239FF9D" Ref="#PWR0104"  Part="1" 
+AR Path="/6252A02B/6239FF9D" Ref="#PWR0108"  Part="1" 
+AR Path="/6252A045/6239FF9D" Ref="#PWR0112"  Part="1" 
+AR Path="/625442EF/6239FF9D" Ref="#PWR0116"  Part="1" 
+AR Path="/62544309/6239FF9D" Ref="#PWR0120"  Part="1" 
+AR Path="/62544323/6239FF9D" Ref="#PWR0124"  Part="1" 
+AR Path="/6239FF9D" Ref="#PWR0119"  Part="1" 
+F 0 "#PWR0119" H 1350 2250 50  0001 C CNN
+F 1 "-12V" H 1365 2323 50  0000 C CNN
+F 2 "" H 1350 2150 50  0001 C CNN
+F 3 "" H 1350 2150 50  0001 C CNN
+	1    1350 2150
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2750 2050 1350 2050
+$Comp
+L power:+12V #PWR?
+U 1 1 6239E3E2
+P 1350 2050
+AR Path="/62386EF6/6239E3E2" Ref="#PWR?"  Part="1" 
+AR Path="/62521C18/6239E3E2" Ref="#PWR?"  Part="1" 
+AR Path="/62525DAC/6239E3E2" Ref="#PWR?"  Part="1" 
+AR Path="/62525DC6/6239E3E2" Ref="#PWR0102"  Part="1" 
+AR Path="/6252A02B/6239E3E2" Ref="#PWR0106"  Part="1" 
+AR Path="/6252A045/6239E3E2" Ref="#PWR0110"  Part="1" 
+AR Path="/625442EF/6239E3E2" Ref="#PWR0114"  Part="1" 
+AR Path="/62544309/6239E3E2" Ref="#PWR0118"  Part="1" 
+AR Path="/62544323/6239E3E2" Ref="#PWR0122"  Part="1" 
+AR Path="/6239E3E2" Ref="#PWR0117"  Part="1" 
+F 0 "#PWR0117" H 1350 1900 50  0001 C CNN
+F 1 "+12V" H 1365 2223 50  0000 C CNN
+F 2 "" H 1350 2050 50  0001 C CNN
+F 3 "" H 1350 2050 50  0001 C CNN
+	1    1350 2050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3250 2950 4300 2950
+Connection ~ 4300 2950
+Wire Wire Line
+	4300 2750 4300 2950
+Wire Wire Line
+	4300 2950 4300 3050
+Wire Wire Line
+	4300 3050 4300 3200
+Connection ~ 4300 3050
+Wire Wire Line
+	3250 3050 4300 3050
+Wire Wire Line
+	4300 2550 4300 2750
+Wire Wire Line
+	4300 2350 4300 2550
+Connection ~ 4300 2750
+Connection ~ 4300 2550
+Connection ~ 4300 2350
+Wire Wire Line
+	4300 2150 4300 2350
+Wire Wire Line
+	4300 1950 4300 2050
+Connection ~ 4300 1950
+Wire Wire Line
+	4300 1650 4300 1950
+Wire Wire Line
+	3250 2750 4300 2750
+Wire Wire Line
+	3250 2550 4300 2550
+Wire Wire Line
+	3250 2350 4300 2350
+Connection ~ 4300 2150
+Wire Wire Line
+	3250 2150 4300 2150
+Connection ~ 4300 1650
+Wire Wire Line
+	3250 1650 4300 1650
+Connection ~ 4300 1450
+Wire Wire Line
+	4300 1250 4300 1450
+Wire Wire Line
+	4300 1450 4300 1650
+Wire Wire Line
+	3250 1450 4300 1450
+Wire Wire Line
+	3250 1950 4300 1950
+Wire Wire Line
+	4300 2050 4300 2150
+Connection ~ 4300 2050
+Wire Wire Line
+	3250 2050 4300 2050
+Wire Wire Line
+	3250 1250 4300 1250
+$Comp
+L power:GND #PWR?
+U 1 1 6238DC37
+P 4300 3350
+AR Path="/62386EF6/6238DC37" Ref="#PWR?"  Part="1" 
+AR Path="/62391307/6238DC37" Ref="#PWR?"  Part="1" 
+AR Path="/62521C18/6238DC37" Ref="#PWR?"  Part="1" 
+AR Path="/62525DAC/6238DC37" Ref="#PWR?"  Part="1" 
+AR Path="/62525DC6/6238DC37" Ref="#PWR0103"  Part="1" 
+AR Path="/6252A02B/6238DC37" Ref="#PWR0107"  Part="1" 
+AR Path="/6252A045/6238DC37" Ref="#PWR0111"  Part="1" 
+AR Path="/625442EF/6238DC37" Ref="#PWR0115"  Part="1" 
+AR Path="/62544309/6238DC37" Ref="#PWR0119"  Part="1" 
+AR Path="/62544323/6238DC37" Ref="#PWR0123"  Part="1" 
+AR Path="/6238DC37" Ref="#PWR0118"  Part="1" 
+F 0 "#PWR0118" H 4300 3100 50  0001 C CNN
+F 1 "GND" H 4305 3177 50  0000 C CNN
+F 2 "" H 4300 3350 50  0001 C CNN
+F 3 "" H 4300 3350 50  0001 C CNN
+	1    4300 3350
+	1    0    0    -1  
+$EndComp
+Connection ~ 1700 2150
+Wire Wire Line
+	1700 2150 1350 2150
+NoConn ~ 2150 2250
+NoConn ~ 2150 2350
+NoConn ~ 2150 2550
+NoConn ~ 2150 2650
+NoConn ~ 2150 2750
+NoConn ~ 2150 2850
+NoConn ~ 2150 2950
+NoConn ~ 3850 2850
+NoConn ~ 3850 2650
+NoConn ~ 3850 2450
+NoConn ~ 8050 3250
+$Comp
+L power:PWR_FLAG #FLG0104
+U 1 1 62C72C0A
+P 4300 3200
+F 0 "#FLG0104" H 4300 3275 50  0001 C CNN
+F 1 "PWR_FLAG" V 4300 3328 50  0000 L CNN
+F 2 "" H 4300 3200 50  0001 C CNN
+F 3 "~" H 4300 3200 50  0001 C CNN
+	1    4300 3200
+	0    1    1    0   
+$EndComp
+Connection ~ 4300 3200
+Wire Wire Line
+	4300 3200 4300 3350
+NoConn ~ 2150 1550
+NoConn ~ 2150 1350
+NoConn ~ 3700 800 
 $EndSCHEMATC

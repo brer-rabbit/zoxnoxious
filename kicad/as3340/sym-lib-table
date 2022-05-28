@@ -1,4 +1,3 @@
 (sym_lib_table
   (lib (name raspberrypi_hat)(type Legacy)(uri ${KIPRJMOD}/project_components/raspberrypi_hat.lib)(options "")(descr ""))
-  (lib (name as3340-rescue)(type Legacy)(uri ${KIPRJMOD}/as3340-rescue.lib)(options "")(descr ""))
 )
