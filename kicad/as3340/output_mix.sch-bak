@@ -107,16 +107,16 @@ F 4 "DG442CY+-ND" H 9200 6750 50  0001 C CNN "Digikey"
 $EndComp
 $Comp
 L Analog_Switch:DG441xJ U?
-U 3 1 626F5A8E
+U 4 1 626F5A8E
 P 9200 7500
 AR Path="/626F5A8E" Ref="U?"  Part="3" 
-AR Path="/6269DD41/626F5A8E" Ref="U8"  Part="3" 
+AR Path="/6269DD41/626F5A8E" Ref="U8"  Part="4" 
 F 0 "U8" H 9200 7675 50  0000 C CNN
 F 1 "DG442CY+" H 9200 7766 50  0000 C CNN
 F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9200 7400 50  0001 C CNN
 F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9200 7500 50  0001 C CNN
 F 4 "DG442CY+-ND" H 9200 7500 50  0001 C CNN "Digikey"
-	3    9200 7500
+	4    9200 7500
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
