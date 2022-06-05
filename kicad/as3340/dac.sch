@@ -183,8 +183,6 @@ Text Label 4950 3100 0    50   ~ 0
 LINEAR_FM_FROM_DAC
 Text Label 5800 2500 2    50   ~ 0
 SYNC_LEVEL_FROM_DAC
-Wire Wire Line
-	4850 3100 4950 3100
 Text Label 4950 2900 0    50   ~ 0
 OSC_EXT_VCA_FROM_DAC
 Wire Wire Line
@@ -543,7 +541,6 @@ Connection ~ 4150 3500
 Wire Wire Line
 	4150 3500 4150 3600
 Connection ~ 4150 2000
-NoConn ~ 4850 3000
 NoConn ~ 4850 2600
 NoConn ~ 4850 3300
 Wire Wire Line
@@ -830,4 +827,22 @@ F 3 "~" H 12650 2100 50  0001 C CNN
 	1    12650 2100
 	0    1    1    0   
 $EndComp
+$Comp
+L Connector:TestPoint TP3
+U 1 1 62D121B0
+P 6050 3000
+F 0 "TP3" H 6108 3118 50  0000 L CNN
+F 1 "TestPoint" H 6108 3027 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 6250 3000 50  0001 C CNN
+F 3 "~" H 6250 3000 50  0001 C CNN
+F 4 "952-2664-6-ND" H 6050 3000 50  0001 C CNN "Digikey"
+	1    6050 3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4950 3100 4850 3100
+Wire Wire Line
+	4850 3000 6050 3000
+Text Label 4950 3000 0    50   ~ 0
+DAC_TEST
 $EndSCHEMATC

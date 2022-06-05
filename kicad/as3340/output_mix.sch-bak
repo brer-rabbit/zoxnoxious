@@ -14,7 +14,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 Wire Wire Line
-	8150 4500 7500 4500
+	8150 4550 7650 4550
 Wire Wire Line
 	8500 2450 9100 2450
 $Comp
@@ -37,7 +37,7 @@ Wire Wire Line
 Wire Wire Line
 	9100 2450 9100 2650
 Wire Wire Line
-	8150 4600 8150 4500
+	8150 4600 8150 4550
 $Comp
 L Device:R R?
 U 1 1 626F5A6B
@@ -211,15 +211,15 @@ $EndComp
 $Comp
 L Analog_Switch:DG441xJ U?
 U 1 1 626F5AD5
-P 9100 4500
+P 8150 4350
 AR Path="/626F5AD5" Ref="U?"  Part="1" 
 AR Path="/6269DD41/626F5AD5" Ref="U5"  Part="1" 
-F 0 "U5" H 9250 4350 50  0000 C CNN
-F 1 "DG442CY+" H 8900 4350 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9100 4400 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9100 4500 50  0001 C CNN
-F 4 "DG442CY+-ND" H 9100 4500 50  0001 C CNN "Digikey"
-	1    9100 4500
+F 0 "U5" H 8300 4200 50  0000 C CNN
+F 1 "DG442CY+" H 7950 4200 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 8150 4250 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 8150 4350 50  0001 C CNN
+F 4 "DG442CY+-ND" H 8150 4350 50  0001 C CNN "Digikey"
+	1    8150 4350
 	-1   0    0    1   
 $EndComp
 $Comp
@@ -259,16 +259,16 @@ $EndComp
 $Comp
 L Device:R R?
 U 1 1 626F5B03
-P 9600 4500
+P 9350 4350
 AR Path="/61E1D4AE/626F5B03" Ref="R?"  Part="1" 
 AR Path="/626F5B03" Ref="R?"  Part="1" 
 AR Path="/6269DD41/626F5B03" Ref="R7"  Part="1" 
-F 0 "R7" V 9700 4450 50  0000 C CNN
-F 1 "20k" V 9600 4500 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 9530 4500 50  0001 C CNN
-F 3 "~" H 9600 4500 50  0001 C CNN
-F 4 "C4184" H 9600 4500 50  0001 C CNN "LCSC Part"
-	1    9600 4500
+F 0 "R7" V 9450 4300 50  0000 C CNN
+F 1 "20k" V 9350 4350 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 9280 4350 50  0001 C CNN
+F 3 "~" H 9350 4350 50  0001 C CNN
+F 4 "C4184" H 9350 4350 50  0001 C CNN "LCSC Part"
+	1    9350 4350
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
@@ -285,7 +285,7 @@ SAW
 Wire Wire Line
 	8150 7500 8900 7500
 Wire Wire Line
-	7250 4800 7850 4800
+	6550 4800 6750 4800
 Wire Wire Line
 	8200 6750 8900 6750
 Wire Wire Line
@@ -312,21 +312,19 @@ $EndComp
 Wire Wire Line
 	11900 4300 12000 4300
 Wire Wire Line
-	7650 4150 9100 4150
+	7650 4100 8150 4100
 Wire Wire Line
-	9400 4500 9450 4500
+	8450 4350 9200 4350
 Text HLabel 8200 2850 0    50   Input ~ 0
 VCO_PULSE
-Text HLabel 7250 4800 0    50   Input ~ 0
+Text HLabel 6550 4800 0    50   Input ~ 0
 VCO_SAW
-Text HLabel 7650 4150 0    50   Input ~ 0
+Text HLabel 7650 4100 0    50   Input ~ 0
 SAW_LEVEL_CTRL
 Text HLabel 8300 5550 0    50   Input ~ 0
 VCO_COMP
 Text HLabel 8500 2450 0    50   Input ~ 0
 MIX1_PULSE_CTRL
-Text HLabel 7500 4500 0    50   Input ~ 0
-MIX1_SAW_CTRL
 Text HLabel 8750 5850 0    50   Input ~ 0
 MIX1_COMP_OSC2_CTRL
 Text HLabel 8550 6450 0    50   Input ~ 0
@@ -381,16 +379,7 @@ Wire Wire Line
 Wire Wire Line
 	10050 4200 10050 4650
 Wire Wire Line
-	8450 4800 8700 4800
-Wire Wire Line
-	9100 4150 9100 4300
-Wire Wire Line
-	8700 4800 8700 4500
-Wire Wire Line
-	8700 4500 8800 4500
-Connection ~ 8700 4800
-Wire Wire Line
-	8700 4800 9200 4800
+	8150 4100 8150 4150
 Wire Wire Line
 	9500 4800 9800 4800
 Wire Wire Line
@@ -401,9 +390,9 @@ Connection ~ 10050 4650
 Wire Wire Line
 	10050 4650 10050 5550
 Wire Wire Line
-	9750 4500 9800 4500
+	9500 4350 9800 4350
 Wire Wire Line
-	9800 4500 9800 4650
+	9800 4350 9800 4650
 Connection ~ 9800 4650
 Wire Wire Line
 	9100 5850 9100 5750
@@ -674,4 +663,17 @@ Wire Wire Line
 Connection ~ 7650 3850
 Text Notes 7400 2050 0    50   ~ 0
 Passive mixing of various output waveforms\n
+Wire Wire Line
+	8450 4800 9200 4800
+Text HLabel 7650 4550 0    50   Input ~ 0
+MIX1_SAW_CTRL
+Wire Wire Line
+	6750 4800 6750 4350
+Wire Wire Line
+	6750 4350 7850 4350
+Connection ~ 6750 4800
+Wire Wire Line
+	6750 4800 7850 4800
+Text Notes 10250 3650 0    50   Italic 10
+TODO: REVIEW PRO-ONE AS AN EXAMPLE MIX
 $EndSCHEMATC
