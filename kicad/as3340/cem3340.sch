@@ -884,10 +884,8 @@ Wire Wire Line
 Wire Wire Line
 	2100 8100 2200 8100
 Wire Wire Line
-	2650 7850 2750 7850
-Wire Wire Line
 	2850 8200 2800 8200
-Text Label 2750 7350 0    50   ~ 0
+Text Label 2850 8200 0    50   ~ 0
 INV_SHIFTED_EXT_MOD
 Wire Wire Line
 	2100 8400 2100 8300
@@ -1179,9 +1177,6 @@ Wire Wire Line
 	3250 9050 3000 9050
 Wire Wire Line
 	4350 7950 4500 7950
-Connection ~ 2750 7850
-Wire Wire Line
-	2750 7850 2850 7850
 Wire Wire Line
 	3850 7600 3700 7600
 Wire Wire Line
@@ -1198,8 +1193,6 @@ Wire Wire Line
 	4500 7200 4500 7250
 Wire Notes Line
 	750  9800 750  6650
-Wire Wire Line
-	2750 7350 2750 7450
 Wire Wire Line
 	14300 6800 14300 6500
 Wire Wire Line
@@ -1363,18 +1356,15 @@ Wire Wire Line
 $Comp
 L Connector:TestPoint TP4
 U 1 1 631E8ACB
-P 2750 7450
-F 0 "TP4" H 2808 7568 50  0000 L CNN
-F 1 "TestPoint" H 2808 7477 50  0000 L CNN
-F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 2950 7450 50  0001 C CNN
-F 3 "~" H 2950 7450 50  0001 C CNN
-F 4 "952-2664-6-ND" H 2750 7450 50  0001 C CNN "Digikey"
-	1    2750 7450
-	0    -1   -1   0   
+P 5050 1050
+F 0 "TP4" H 5108 1168 50  0000 L CNN
+F 1 "TestPoint" H 5108 1077 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 5250 1050 50  0001 C CNN
+F 3 "~" H 5250 1050 50  0001 C CNN
+F 4 "952-2664-6-ND" H 5050 1050 50  0001 C CNN "Digikey"
+	1    5050 1050
+	1    0    0    -1  
 $EndComp
-Connection ~ 2750 7450
-Wire Wire Line
-	2750 7450 2750 7850
 $Comp
 L Device:C C33
 U 1 1 6326A9AC
@@ -1641,4 +1631,7 @@ Wire Wire Line
 Connection ~ 6200 8850
 Wire Wire Line
 	6200 8850 6350 8850
+Wire Wire Line
+	2650 7850 2850 7850
+Connection ~ 5050 1050
 $EndSCHEMATC

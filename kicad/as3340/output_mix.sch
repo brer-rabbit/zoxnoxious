@@ -14,49 +14,28 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 Wire Wire Line
-	9150 4750 8650 4750
+	9700 4750 9200 4750
 Wire Wire Line
-	8750 3500 9350 3500
-Wire Wire Line
-	9650 3900 9750 3900
-Wire Wire Line
-	9350 3500 9350 3700
-Wire Wire Line
-	9150 4800 9150 4750
+	9700 4800 9700 4750
 $Comp
 L Device:R R?
 U 1 1 626F5A6B
-P 9900 3900
+P 9250 3900
 AR Path="/61E1D4AE/626F5A6B" Ref="R?"  Part="1" 
 AR Path="/626F5A6B" Ref="R?"  Part="1" 
 AR Path="/6269DD41/626F5A6B" Ref="R9"  Part="1" 
-F 0 "R9" V 10000 3900 50  0000 C CNN
-F 1 "200k" V 9800 3900 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 9830 3900 50  0001 C CNN
-F 3 "~" H 9900 3900 50  0001 C CNN
-F 4 "" H 9900 3900 50  0001 C CNN "LCSC Part"
-	1    9900 3900
-	0    -1   -1   0   
-$EndComp
-$Comp
-L Device:R R?
-U 1 1 626F5A73
-P 9700 3000
-AR Path="/61E1D4AE/626F5A73" Ref="R?"  Part="1" 
-AR Path="/626F5A73" Ref="R?"  Part="1" 
-AR Path="/6269DD41/626F5A73" Ref="R12"  Part="1" 
-F 0 "R12" V 9907 3000 50  0000 C CNN
-F 1 "100k" V 9816 3000 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 9630 3000 50  0001 C CNN
-F 3 "~" H 9700 3000 50  0001 C CNN
-F 4 "\\" H 9700 3000 50  0001 C CNN "LCSC Part"
-	1    9700 3000
+F 0 "R9" V 9350 3900 50  0000 C CNN
+F 1 "200k" V 9150 3900 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 9180 3900 50  0001 C CNN
+F 3 "~" H 9250 3900 50  0001 C CNN
+F 4 "" H 9250 3900 50  0001 C CNN "LCSC Part"
+	1    9250 3900
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	9550 3000 9450 3000
+	10300 3000 10200 3000
 Wire Wire Line
-	8800 3300 9150 3300
+	9550 3300 9900 3300
 Wire Wire Line
 	9200 6450 8550 6450
 Wire Wire Line
@@ -128,16 +107,16 @@ $EndComp
 $Comp
 L Device:R R?
 U 1 1 626F5AB4
-P 9900 5000
+P 9050 5000
 AR Path="/61E1D4AE/626F5AB4" Ref="R?"  Part="1" 
 AR Path="/626F5AB4" Ref="R?"  Part="1" 
 AR Path="/6269DD41/626F5AB4" Ref="R6"  Part="1" 
-F 0 "R6" V 10000 5000 50  0000 C CNN
-F 1 "100k" V 9800 5000 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 9830 5000 50  0001 C CNN
-F 3 "~" H 9900 5000 50  0001 C CNN
-F 4 "" H 9900 5000 50  0001 C CNN "LCSC Part"
-	1    9900 5000
+F 0 "R6" V 9150 5000 50  0000 C CNN
+F 1 "100k" V 8950 5000 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 8980 5000 50  0001 C CNN
+F 3 "~" H 9050 5000 50  0001 C CNN
+F 4 "" H 9050 5000 50  0001 C CNN "LCSC Part"
+	1    9050 5000
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
@@ -145,57 +124,57 @@ Wire Wire Line
 $Comp
 L Analog_Switch:DG441xJ U?
 U 4 1 626F5AC3
-P 9350 3900
+P 9900 3900
 AR Path="/626F5AC3" Ref="U?"  Part="4" 
 AR Path="/6269DD41/626F5AC3" Ref="U5"  Part="4" 
-F 0 "U5" H 9350 4075 50  0000 C CNN
-F 1 "DG442CY+" H 9350 4166 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9350 3800 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9350 3900 50  0001 C CNN
-F 4 "DG442CY+-ND" H 9350 3900 50  0001 C CNN "Digikey"
-	4    9350 3900
+F 0 "U5" H 9900 4075 50  0000 C CNN
+F 1 "DG442CY+" H 9900 4166 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9900 3800 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9900 3900 50  0001 C CNN
+F 4 "DG442CY+-ND" H 9900 3900 50  0001 C CNN "Digikey"
+	4    9900 3900
 	-1   0    0    1   
 $EndComp
 $Comp
 L Analog_Switch:DG441xJ U?
 U 2 1 626F5AC9
-P 9150 5000
+P 9700 5000
 AR Path="/626F5AC9" Ref="U?"  Part="1" 
 AR Path="/6269DD41/626F5AC9" Ref="U5"  Part="2" 
-F 0 "U5" H 9150 5175 50  0000 C CNN
-F 1 "DG442CY+" H 9150 5266 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9150 4900 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9150 5000 50  0001 C CNN
-F 4 "DG442CY+-ND" H 9150 5000 50  0001 C CNN "Digikey"
-	2    9150 5000
+F 0 "U5" H 9700 5175 50  0000 C CNN
+F 1 "DG442CY+" H 9700 5266 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9700 4900 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9700 5000 50  0001 C CNN
+F 4 "DG442CY+-ND" H 9700 5000 50  0001 C CNN "Digikey"
+	2    9700 5000
 	-1   0    0    1   
 $EndComp
 $Comp
 L Analog_Switch:DG441xJ U?
 U 3 1 626F5ACF
-P 9150 3000
+P 9900 3000
 AR Path="/626F5ACF" Ref="U?"  Part="3" 
 AR Path="/6269DD41/626F5ACF" Ref="U5"  Part="3" 
-F 0 "U5" H 9150 3175 50  0000 C CNN
-F 1 "DG442CY+" H 9150 3266 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9150 2900 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9150 3000 50  0001 C CNN
-F 4 "DG442CY+-ND" H 9150 3000 50  0001 C CNN "Digikey"
-	3    9150 3000
+F 0 "U5" H 9900 3175 50  0000 C CNN
+F 1 "DG442CY+" H 9900 3266 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9900 2900 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9900 3000 50  0001 C CNN
+F 4 "DG442CY+-ND" H 9900 3000 50  0001 C CNN "Digikey"
+	3    9900 3000
 	1    0    0    -1  
 $EndComp
 $Comp
 L Analog_Switch:DG441xJ U?
 U 1 1 626F5AD5
-P 9150 4550
+P 9700 4550
 AR Path="/626F5AD5" Ref="U?"  Part="1" 
 AR Path="/6269DD41/626F5AD5" Ref="U5"  Part="1" 
-F 0 "U5" H 9300 4400 50  0000 C CNN
-F 1 "DG442CY+" H 8950 4400 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9150 4450 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9150 4550 50  0001 C CNN
-F 4 "DG442CY+-ND" H 9150 4550 50  0001 C CNN "Digikey"
-	1    9150 4550
+F 0 "U5" H 9850 4400 50  0000 C CNN
+F 1 "DG442CY+" H 9500 4400 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 9700 4450 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 9700 4550 50  0001 C CNN
+F 4 "DG442CY+-ND" H 9700 4550 50  0001 C CNN "Digikey"
+	1    9700 4550
 	-1   0    0    1   
 $EndComp
 $Comp
@@ -235,16 +214,16 @@ $EndComp
 $Comp
 L Device:R R?
 U 1 1 626F5B03
-P 9900 4550
+P 9050 4550
 AR Path="/61E1D4AE/626F5B03" Ref="R?"  Part="1" 
 AR Path="/626F5B03" Ref="R?"  Part="1" 
 AR Path="/6269DD41/626F5B03" Ref="R7"  Part="1" 
-F 0 "R7" V 10000 4550 50  0000 C CNN
-F 1 "50k" V 9800 4550 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 9830 4550 50  0001 C CNN
-F 3 "~" H 9900 4550 50  0001 C CNN
-F 4 "" H 9900 4550 50  0001 C CNN "LCSC Part"
-	1    9900 4550
+F 0 "R7" V 9150 4550 50  0000 C CNN
+F 1 "50k" V 8950 4550 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 8980 4550 50  0001 C CNN
+F 3 "~" H 9050 4550 50  0001 C CNN
+F 4 "" H 9050 4550 50  0001 C CNN "LCSC Part"
+	1    9050 4550
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
@@ -261,13 +240,13 @@ SAW
 Wire Wire Line
 	8150 7500 8900 7500
 Wire Wire Line
-	7550 5000 7750 5000
+	8100 5000 8300 5000
 Wire Wire Line
 	8200 6750 8900 6750
 Wire Wire Line
-	8850 3000 8350 3000
+	9600 3000 9400 3000
 Wire Wire Line
-	9050 3900 8450 3900
+	9600 3900 9400 3900
 $Comp
 L Device:R R?
 U 1 1 626F5B60
@@ -286,20 +265,20 @@ $EndComp
 Wire Wire Line
 	12300 3700 12400 3700
 Wire Wire Line
-	8650 4300 9150 4300
+	9200 4300 9700 4300
 Wire Wire Line
-	9450 4550 9750 4550
-Text HLabel 8450 3900 0    50   Input ~ 0
+	10000 4550 10300 4550
+Text HLabel 8600 3900 0    50   Input ~ 0
 VCO_PULSE
-Text HLabel 7550 5000 0    50   Input ~ 0
+Text HLabel 8100 5000 0    50   Input ~ 0
 VCO_SAW
-Text HLabel 8650 4300 0    50   Input ~ 0
+Text HLabel 9200 4300 0    50   Input ~ 0
 SAW_LEVEL_CTRL
-Text HLabel 8350 3000 0    50   Input ~ 0
+Text HLabel 8550 3000 0    50   Input ~ 0
 VCO_COMP
-Text HLabel 8750 3500 0    50   Input ~ 0
+Text HLabel 9550 3600 0    50   Input ~ 0
 MIX1_PULSE_CTRL
-Text HLabel 8800 3300 0    50   Input ~ 0
+Text HLabel 9550 3300 0    50   Input ~ 0
 MIX1_COMP_OSC2_CTRL
 Text HLabel 8550 6450 0    50   Input ~ 0
 MIX2_PULSE_CTRL
@@ -324,7 +303,7 @@ Wire Wire Line
 	11450 6750 11600 6750
 Text Label 10400 3800 0    50   ~ 0
 MIX1_NONINV
-Text Label 8400 5000 0    50   ~ 0
+Text Label 8350 5000 0    50   ~ 0
 SAW
 $Comp
 L Device:R R?
@@ -346,10 +325,10 @@ Wire Wire Line
 Wire Wire Line
 	9900 7500 10000 7500
 Wire Wire Line
-	9150 4300 9150 4350
+	9700 4300 9700 4350
 Wire Wire Line
-	9150 3300 9150 3200
-Text Label 8550 3900 0    50   ~ 0
+	9900 3300 9900 3200
+Text Label 8750 3900 0    50   ~ 0
 PULSE
 Text Label 8200 6750 0    50   ~ 0
 PULSE
@@ -491,30 +470,15 @@ F 4 "C12594" H 9300 1300 50  0001 C CNN "LCSC Part"
 	1    0    0    1   
 $EndComp
 Wire Wire Line
-	9450 5000 9750 5000
-Text HLabel 8650 4750 0    50   Input ~ 0
+	10000 5000 10300 5000
+Text HLabel 9200 4750 0    50   Input ~ 0
 MIX1_SAW_CTRL
 Wire Wire Line
-	7750 5000 7750 4550
-Wire Wire Line
-	7750 4550 8850 4550
-Connection ~ 7750 5000
-Wire Wire Line
-	7750 5000 8850 5000
+	8300 5000 8300 4550
 Text Notes 11250 2550 0    50   Italic 10
-TODO: REVIEW PRO-ONE AS AN EXAMPLE MIX
+TODO: REVIEW PRO-ONE AS AN EXAMPLE MIX\nTODO: REVERT OUTPUT AMPLIFICATION TO V0.2 LEVEL
 Wire Wire Line
 	10300 3800 10300 3900
-Wire Wire Line
-	10050 4550 10300 4550
-Connection ~ 10300 4550
-Wire Wire Line
-	10300 4550 10300 5000
-Wire Wire Line
-	10050 5000 10300 5000
-Connection ~ 10300 5000
-Wire Wire Line
-	10300 5000 10300 5150
 Wire Wire Line
 	9700 2350 9700 2400
 $Comp
@@ -580,11 +544,7 @@ Wire Wire Line
 Wire Wire Line
 	11700 3700 11850 3700
 Connection ~ 11850 3700
-Wire Wire Line
-	10050 3900 10300 3900
 Connection ~ 10300 3900
-Wire Wire Line
-	10300 3900 10300 4550
 $Comp
 L Device:R R?
 U 1 1 62A68F31
@@ -601,13 +561,8 @@ F 4 "" H 10050 1950 50  0001 C CNN "LCSC Part"
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	10300 3000 10300 3600
-Wire Wire Line
 	10300 3600 10900 3600
-Wire Wire Line
-	9850 3000 10300 3000
 Connection ~ 10900 3600
-Connection ~ 10300 3000
 $Comp
 L power:GND #PWR?
 U 1 1 62A7E6CB
@@ -648,8 +603,6 @@ Wire Wire Line
 Connection ~ 9700 1950
 Wire Wire Line
 	10200 1950 10300 1950
-Wire Wire Line
-	10300 1950 10300 3000
 $Comp
 L Device:R R?
 U 1 1 62AA5398
@@ -712,4 +665,51 @@ Wire Wire Line
 Connection ~ 10300 1950
 Text Label 10400 3600 0    50   ~ 0
 MIX1_INV
+$Comp
+L Device:R R?
+U 1 1 626F5A73
+P 9250 3000
+AR Path="/61E1D4AE/626F5A73" Ref="R?"  Part="1" 
+AR Path="/626F5A73" Ref="R?"  Part="1" 
+AR Path="/6269DD41/626F5A73" Ref="R12"  Part="1" 
+F 0 "R12" V 9457 3000 50  0000 C CNN
+F 1 "100k" V 9366 3000 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 9180 3000 50  0001 C CNN
+F 3 "~" H 9250 3000 50  0001 C CNN
+F 4 "\\" H 9250 3000 50  0001 C CNN "LCSC Part"
+	1    9250 3000
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	10300 1950 10300 3000
+Connection ~ 10300 3000
+Wire Wire Line
+	10300 3000 10300 3600
+Wire Wire Line
+	9100 3000 8550 3000
+Wire Wire Line
+	10200 3900 10300 3900
+Wire Wire Line
+	9900 3600 9900 3700
+Wire Wire Line
+	9550 3600 9900 3600
+Wire Wire Line
+	8600 3900 9100 3900
+Wire Wire Line
+	10300 3900 10300 4550
+Connection ~ 10300 4550
+Wire Wire Line
+	10300 4550 10300 5000
+Connection ~ 10300 5000
+Wire Wire Line
+	10300 5000 10300 5150
+Wire Wire Line
+	8300 4550 8900 4550
+Wire Wire Line
+	9200 4550 9400 4550
+Wire Wire Line
+	9400 5000 9200 5000
+Wire Wire Line
+	8900 5000 8300 5000
+Connection ~ 8300 5000
 $EndSCHEMATC
