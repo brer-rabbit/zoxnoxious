@@ -1576,8 +1576,8 @@ Wire Wire Line
 	2950 4450 2950 4400
 Wire Wire Line
 	2550 4450 2950 4450
-Text Notes 2850 3750 0    50   ~ 0
-TODO: check modulation signal R value
+Text Notes 2850 3750 0    50   Italic 10
+TODO: check modulation signal R value\nTODO: should scaled_mod be re-inverted?
 Text Notes 1450 6400 0    50   ~ 0
 TODO: AC Couple external signal
 $Comp
