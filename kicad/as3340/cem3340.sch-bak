@@ -70,7 +70,7 @@ F 4 "" H 5950 8850 50  0001 C CNN "LCSC Part"
 	1    5950 8850
 	0    1    1    0   
 $EndComp
-Text HLabel 3000 9050 0    50   Input ~ 0
+Text HLabel 3000 9000 0    50   Input ~ 0
 SYNC_LEVEL_CV_DAC
 Text Label 6950 8350 0    50   ~ 0
 HARD_SYNC
@@ -181,31 +181,19 @@ $EndComp
 $Comp
 L Device:R R20
 U 1 1 6211CB96
-P 3400 9050
-F 0 "R20" V 3193 9050 50  0000 C CNN
-F 1 "10k" V 3284 9050 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 3330 9050 50  0001 C CNN
-F 3 "~" H 3400 9050 50  0001 C CNN
-F 4 "C25804" H 3400 9050 50  0001 C CNN "LCSC Part"
-	1    3400 9050
+P 3400 9000
+F 0 "R20" V 3193 9000 50  0000 C CNN
+F 1 "10k" V 3284 9000 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 3330 9000 50  0001 C CNN
+F 3 "~" H 3400 9000 50  0001 C CNN
+F 4 "C25804" H 3400 9000 50  0001 C CNN "LCSC Part"
+	1    3400 9000
 	0    1    1    0   
 $EndComp
-Text Notes 1000 7100 0    50   ~ 0
-Hard Sync Selection and Control\nOSC_EXTERNAL: +/- 5V; invert to 0-5V for comparator;\nphase inversion ought to be ok, right-o?
+Text Notes 900  7100 0    50   ~ 0
+Hard Sync Selection and Control\nOSC_EXTERNAL: assume somewhere around +/- 5V but it could well be outside that;\nattenuate/invert external to 0-5V for both 393 comparators;\nkeep external signal inside -5 : +12
 Text HLabel 3000 5100 0    50   Input ~ 0
 PWM_MOD_CV_DAC
-$Comp
-L Device:R R18
-U 1 1 621AF2E7
-P 3650 4350
-F 0 "R18" V 3450 4250 50  0000 L CNN
-F 1 "82k" V 3550 4250 50  0000 L CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 3580 4350 50  0001 C CNN
-F 3 "~" H 3650 4350 50  0001 C CNN
-F 4 "" H 3650 4350 50  0001 C CNN "LCSC Part"
-	1    3650 4350
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	4350 4900 4250 4900
 Wire Wire Line
@@ -247,8 +235,8 @@ F 4 "C23184" H 4550 4350 50  0001 C CNN "LCSC Part"
 	1    4550 4350
 	0    1    1    0   
 $EndComp
-Text Notes 2250 3550 0    50   ~ 0
-PWM Control
+Text Notes 850  3500 0    50   ~ 0
+PWM Control: external signal biased by DAC since it’s an inversion mess
 Wire Wire Line
 	10550 7200 9800 7200
 Text Label 9800 7200 0    50   ~ 0
@@ -315,18 +303,6 @@ F 5 "C57112" H 14350 3050 50  0001 C CNN "LCSC Part"
 $EndComp
 Wire Wire Line
 	14350 2600 14350 2400
-$Comp
-L Device:R R42
-U 1 1 62212A8F
-P 13950 2400
-F 0 "R42" V 13743 2400 50  0000 C CNN
-F 1 "300k" V 13834 2400 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 13880 2400 50  0001 C CNN
-F 3 "~" H 13950 2400 50  0001 C CNN
-F 4 "C23024" H 13950 2400 50  0001 C CNN "LCSC Part"
-	1    13950 2400
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	14350 2000 14750 2000
 Connection ~ 14750 2000
@@ -452,8 +428,6 @@ Wire Wire Line
 	10450 7500 10550 7500
 Wire Wire Line
 	10450 8050 10450 8000
-Text Label 11800 7600 0    50   ~ 0
-RAW_TRI
 $Comp
 L Device:R R36
 U 1 1 6238A5D7
@@ -467,7 +441,7 @@ F 4 "C23196" H 12550 6200 50  0001 C CNN "LCSC Part"
 	1    0    0    -1  
 $EndComp
 Text Notes 8250 5400 0    50   ~ 0
-3340; Pulse pulldown per AS spec (51k); not CEM (10k)\nPulse: 0 : approx 10.5V\nSaw: 0 : 8V\nTri: 0 : 4V\nComparator: 0 : 5V
+3340; Pulse pulldown per AS spec (51k); not CEM (10k)\nPulse: -5 : approx 10.5V\nSaw: 0 : 8V\nTri: 0 : 4V\nComparator: -5 : 5V
 $Comp
 L Device:R R24
 U 1 1 624CCAC6
@@ -575,11 +549,9 @@ Wire Wire Line
 Wire Wire Line
 	5750 4400 5750 4200
 Text Label 5650 4200 0    50   ~ 0
-RAW_PULSE
+PULSE
 Wire Wire Line
 	11550 6800 12200 6800
-Text Label 11750 6800 0    50   ~ 0
-RAW_PULSE
 Wire Wire Line
 	5750 4200 5650 4200
 $Comp
@@ -631,17 +603,6 @@ $EndComp
 Connection ~ 10150 8050
 Wire Wire Line
 	10150 8050 10450 8050
-$Comp
-L power:GND #PWR055
-U 1 1 61ED8B5F
-P 12550 6350
-F 0 "#PWR055" H 12550 6100 50  0001 C CNN
-F 1 "GND" H 12555 6177 50  0000 C CNN
-F 2 "" H 12550 6350 50  0001 C CNN
-F 3 "" H 12550 6350 50  0001 C CNN
-	1    12550 6350
-	1    0    0    -1  
-$EndComp
 $Comp
 L power:GND #PWR053
 U 1 1 61ED8FB3
@@ -885,7 +846,7 @@ Wire Wire Line
 	2100 8100 2200 8100
 Wire Wire Line
 	2850 8200 2800 8200
-Text Label 2850 8200 0    50   ~ 0
+Text Label 2850 7500 0    50   ~ 0
 INV_SHIFTED_EXT_MOD
 Wire Wire Line
 	2100 8400 2100 8300
@@ -938,22 +899,6 @@ F 4 "C22935" H 8850 1950 50  0001 C CNN "LCSC Part"
 	1    8850 1950
 	0    1    1    0   
 $EndComp
-$Comp
-L Analog_Switch:DG441xY U9
-U 4 1 62BA59D6
-P 13450 2400
-F 0 "U9" H 13450 2667 50  0000 C CNN
-F 1 "DG442CY+" H 13450 2576 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 13450 2300 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 13450 2400 50  0001 C CNN
-F 4 "DG442CY+-ND" H 13450 2400 50  0001 C CNN "Digikey"
-	4    13450 2400
-	-1   0    0    1   
-$EndComp
-Wire Wire Line
-	13750 2400 13800 2400
-Wire Wire Line
-	12450 2100 13450 2100
 Text HLabel 12450 2100 0    50   Input ~ 0
 EXP_FM_EXT_CTRL
 Wire Wire Line
@@ -1006,7 +951,7 @@ Wire Wire Line
 Wire Wire Line
 	3600 8050 3750 8050
 Connection ~ 4500 7950
-Text HLabel 2550 4450 0    50   Input ~ 0
+Text HLabel 2550 4600 0    50   Input ~ 0
 EXT_MOD_PW_CTRL
 Wire Wire Line
 	11550 7200 11800 7200
@@ -1017,22 +962,20 @@ Wire Wire Line
 $Comp
 L Device:R R21
 U 1 1 62F76B73
-P 3100 7850
-F 0 "R21" V 2893 7850 50  0000 C CNN
-F 1 "10k" V 2984 7850 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 3030 7850 50  0001 C CNN
-F 3 "~" H 3100 7850 50  0001 C CNN
-F 4 "C25804" H 3100 7850 50  0001 C CNN "LCSC Part"
-	1    3100 7850
+P 3350 7850
+F 0 "R21" V 3143 7850 50  0000 C CNN
+F 1 "10k" V 3234 7850 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 3280 7850 50  0001 C CNN
+F 3 "~" H 3350 7850 50  0001 C CNN
+F 4 "C25804" H 3350 7850 50  0001 C CNN "LCSC Part"
+	1    3350 7850
 	0    1    1    0   
 $EndComp
 Wire Wire Line
 	3750 7850 3700 7850
-Wire Wire Line
-	2850 8200 2850 7850
 Connection ~ 2850 7850
 Wire Wire Line
-	2850 7850 2950 7850
+	2850 7850 3200 7850
 Wire Wire Line
 	1800 8550 1800 8500
 Wire Wire Line
@@ -1170,11 +1113,11 @@ Connection ~ 12650 7000
 Wire Wire Line
 	12650 7000 13200 7000
 Wire Wire Line
-	3600 8050 3600 9050
+	3600 8050 3600 9000
 Wire Wire Line
-	3600 9050 3550 9050
+	3600 9000 3550 9000
 Wire Wire Line
-	3250 9050 3000 9050
+	3250 9000 3000 9000
 Wire Wire Line
 	4350 7950 4500 7950
 Wire Wire Line
@@ -1270,8 +1213,6 @@ F 4 "C12594" H 4650 1450 50  0001 C CNN "LCSC Part"
 $EndComp
 Wire Wire Line
 	4250 1550 4350 1550
-Text Label 12100 2400 0    50   ~ 0
-SCALED_MOD_BUFFERED
 Text Label 6800 1500 0    50   ~ 0
 SCALED_MOD_BUFFERED
 $Comp
@@ -1295,18 +1236,10 @@ Wire Wire Line
 Wire Wire Line
 	3300 4700 3500 4700
 Wire Wire Line
-	3250 4200 3400 4200
-Wire Wire Line
-	3400 4200 3400 4350
-Wire Wire Line
-	3400 4350 3500 4350
-Wire Wire Line
 	3800 4700 4000 4700
 Wire Wire Line
 	4000 4700 4000 4350
 Connection ~ 4000 4350
-Wire Wire Line
-	4000 4350 3800 4350
 Wire Notes Line
 	750  5500 750  3400
 Wire Notes Line
@@ -1470,12 +1403,6 @@ Wire Wire Line
 Wire Wire Line
 	5800 7950 5750 7950
 Wire Wire Line
-	13450 2100 13450 2200
-Wire Wire Line
-	14100 2400 14350 2400
-Wire Wire Line
-	3250 7850 3700 7850
-Wire Wire Line
 	13650 6800 14300 6800
 $Comp
 L Device:C C35
@@ -1551,35 +1478,23 @@ Wire Notes Line
 	6150 2100 3450 2100
 Wire Notes Line
 	3450 2100 3450 800 
-Text Label 1600 4200 0    50   ~ 0
+Text Label 1300 4350 0    50   ~ 0
 SCALED_MOD_BUFFERED
-Wire Wire Line
-	13150 2400 12100 2400
-Wire Wire Line
-	1600 4200 2650 4200
 Connection ~ 14350 2400
 $Comp
 L Analog_Switch:DG441xY U8
 U 3 1 62A7C9BE
-P 2950 4200
+P 3150 4350
 AR Path="/61E1D4AE/62A7C9BE" Ref="U8"  Part="3" 
 AR Path="/62A7C9BE" Ref="U?"  Part="2" 
-F 0 "U8" H 2750 4400 50  0000 C CNN
-F 1 "DG442CY+" H 3150 4400 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 2950 4100 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 2950 4200 50  0001 C CNN
-F 4 "DG442CY+-ND" H 2950 4200 50  0001 C CNN "Digikey"
-	3    2950 4200
+F 0 "U8" H 2950 4550 50  0000 C CNN
+F 1 "DG442CY+" H 3350 4550 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 3150 4250 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 3150 4350 50  0001 C CNN
+F 4 "DG442CY+-ND" H 3150 4350 50  0001 C CNN "Digikey"
+	3    3150 4350
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	2950 4450 2950 4400
-Wire Wire Line
-	2550 4450 2950 4450
-Text Notes 2850 3750 0    50   Italic 10
-TODO: check modulation signal R value\nTODO: should scaled_mod be re-inverted?
-Text Notes 1450 6400 0    50   ~ 0
-TODO: AC Couple external signal
 $Comp
 L power:-5V #PWR04
 U 1 1 63267563
@@ -1634,4 +1549,94 @@ Wire Wire Line
 Wire Wire Line
 	2650 7850 2850 7850
 Connection ~ 5050 1050
+Wire Wire Line
+	2850 8200 2850 7850
+Wire Wire Line
+	2850 7850 2850 7500
+Wire Wire Line
+	3500 7850 3700 7850
+$Comp
+L Connector:TestPoint TP5
+U 1 1 63043B6C
+P 2850 8200
+F 0 "TP5" H 2908 8318 50  0000 L CNN
+F 1 "TestPoint" H 2908 8227 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 3050 8200 50  0001 C CNN
+F 3 "~" H 3050 8200 50  0001 C CNN
+F 4 "952-2664-6-ND" H 2850 8200 50  0001 C CNN "Digikey"
+	1    2850 8200
+	0    1    1    0   
+$EndComp
+Connection ~ 2850 8200
+Text Label 12200 5900 0    50   ~ 0
+PULSE
+Wire Wire Line
+	2550 4600 3150 4600
+Wire Wire Line
+	3150 4600 3150 4550
+$Comp
+L Device:R R18
+U 1 1 621AF2E7
+P 2500 4350
+F 0 "R18" V 2300 4250 50  0000 L CNN
+F 1 "82k" V 2400 4250 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 2430 4350 50  0001 C CNN
+F 3 "~" H 2500 4350 50  0001 C CNN
+F 4 "" H 2500 4350 50  0001 C CNN "LCSC Part"
+	1    2500 4350
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	1300 4350 2350 4350
+Wire Wire Line
+	2650 4350 2850 4350
+Wire Wire Line
+	3450 4350 4000 4350
+Text Label 12100 2400 0    50   ~ 0
+SCALED_MOD_BUFFERED
+$Comp
+L power:-5V #PWR015
+U 1 1 637034E0
+P 12550 6350
+F 0 "#PWR015" H 12550 6450 50  0001 C CNN
+F 1 "-5V" H 12565 6523 50  0000 C CNN
+F 2 "" H 12550 6350 50  0001 C CNN
+F 3 "" H 12550 6350 50  0001 C CNN
+	1    12550 6350
+	1    0    0    1   
+$EndComp
+Wire Wire Line
+	14100 2400 14350 2400
+Wire Wire Line
+	13150 2400 12100 2400
+$Comp
+L Analog_Switch:DG441xY U9
+U 4 1 62BA59D6
+P 13450 2400
+F 0 "U9" H 13450 2667 50  0000 C CNN
+F 1 "DG442CY+" H 13450 2576 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 13450 2300 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 13450 2400 50  0001 C CNN
+F 4 "DG442CY+-ND" H 13450 2400 50  0001 C CNN "Digikey"
+	4    13450 2400
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	13750 2400 13800 2400
+Wire Wire Line
+	12450 2100 13450 2100
+Wire Wire Line
+	13450 2100 13450 2200
+$Comp
+L Device:R R42
+U 1 1 62212A8F
+P 13950 2400
+F 0 "R42" V 13743 2400 50  0000 C CNN
+F 1 "300k" V 13834 2400 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 13880 2400 50  0001 C CNN
+F 3 "~" H 13950 2400 50  0001 C CNN
+F 4 "C23024" H 13950 2400 50  0001 C CNN "LCSC Part"
+	1    13950 2400
+	0    1    1    0   
+$EndComp
 $EndSCHEMATC

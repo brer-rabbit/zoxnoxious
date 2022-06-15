@@ -156,12 +156,12 @@ $EndComp
 $Comp
 L power:GND #PWR019
 U 1 1 61EA96D1
-P 5500 10050
-F 0 "#PWR019" H 5500 9800 50  0001 C CNN
-F 1 "GND" H 5505 9877 50  0000 C CNN
-F 2 "" H 5500 10050 50  0001 C CNN
-F 3 "" H 5500 10050 50  0001 C CNN
-	1    5500 10050
+P 5600 10050
+F 0 "#PWR019" H 5600 9800 50  0001 C CNN
+F 1 "GND" H 5605 9877 50  0000 C CNN
+F 2 "" H 5600 10050 50  0001 C CNN
+F 3 "" H 5600 10050 50  0001 C CNN
+	1    5600 10050
 	1    0    0    -1  
 $EndComp
 Text Notes 600  8550 0    50   ~ 0
@@ -386,7 +386,7 @@ Wire Wire Line
 	850  5650 1300 5650
 Text Label 14500 8250 2    50   ~ 0
 GPIO_MODULE_DRIVEN
-Text Notes 10900 7650 0    50   ~ 10
+Text Notes 10900 7550 0    50   ~ 10
 Tune Control: send pulse back to Pi for freq count
 $Comp
 L power:GND #PWR0101
@@ -490,15 +490,9 @@ Wire Wire Line
 Wire Wire Line
 	7800 3250 7850 3250
 Wire Notes Line
-	600  10400 600  8450
-Wire Notes Line
 	14950 7100 16500 7100
 Wire Notes Line
 	16500 7100 16500 9200
-Wire Wire Line
-	12000 8150 12000 7900
-Wire Wire Line
-	12000 8150 12100 8150
 $Comp
 L Device:R R?
 U 1 1 655E9A01
@@ -514,11 +508,9 @@ F 4 "" H 13000 8250 50  0001 C CNN "LCSC Part"
 	0    -1   -1   0   
 $EndComp
 Wire Notes Line
-	600  10400 9400 10400
+	600  10450 9400 10450
 Wire Notes Line
 	600  8450 9400 8450
-Wire Notes Line
-	9400 8450 9400 10400
 $Comp
 L power:GND #PWR0114
 U 1 1 656C7BE5
@@ -857,18 +849,6 @@ $EndComp
 Wire Wire Line
 	6700 9900 6700 9800
 $Comp
-L Analog_Switch:DG441xJ U5
-U 5 1 6220D436
-P 5500 9300
-F 0 "U5" H 5500 9350 50  0000 L CNN
-F 1 "DG442CY+" H 5400 9250 50  0000 L CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 5500 9200 50  0001 C CNN
-F 3 "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" H 5500 9300 50  0001 C CNN
-F 4 "DG442CY+-ND" H 5500 9300 50  0001 C CNN "Digikey"
-	5    5500 9300
-	1    0    0    -1  
-$EndComp
-$Comp
 L power:GND #PWR017
 U 1 1 6393A1F0
 P 5200 9200
@@ -883,7 +863,7 @@ Wire Wire Line
 	5050 9200 5050 9350
 Connection ~ 5050 9200
 Wire Wire Line
-	5500 9800 5500 10050
+	5600 9800 5600 10050
 $Comp
 L power:GND #PWR025
 U 1 1 638B1DB7
@@ -1017,9 +997,7 @@ F 3 "http://www.alfarzpp.lv/eng/sc/AS3360.pdf" H 9200 8650 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	5050 9200 5200 9200
-Connection ~ 5600 9900
-Wire Wire Line
-	5050 9900 5600 9900
+Connection ~ 5500 9900
 Wire Wire Line
 	5050 9650 5050 9900
 Connection ~ 5500 8750
@@ -1078,14 +1056,14 @@ $EndComp
 $Comp
 L power:-12V #PWR?
 U 1 1 61F6A66B
-P 5600 9900
+P 5500 9900
 AR Path="/61FF2290/61F6A66B" Ref="#PWR?"  Part="1" 
 AR Path="/61F6A66B" Ref="#PWR020"  Part="1" 
-F 0 "#PWR020" H 5600 10000 50  0001 C CNN
-F 1 "-12V" H 5615 10073 50  0000 C CNN
-F 2 "" H 5600 9900 50  0001 C CNN
-F 3 "" H 5600 9900 50  0001 C CNN
-	1    5600 9900
+F 0 "#PWR020" H 5500 10000 50  0001 C CNN
+F 1 "-12V" H 5515 10073 50  0000 C CNN
+F 2 "" H 5500 9900 50  0001 C CNN
+F 3 "" H 5500 9900 50  0001 C CNN
+	1    5500 9900
 	-1   0    0    1   
 $EndComp
 $Comp
@@ -1130,7 +1108,7 @@ F 3 "" H 10900 1150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5600 9900 5600 9800
+	5500 9900 5500 9800
 $Comp
 L Device:C C?
 U 1 1 65A2CB21
@@ -1293,7 +1271,7 @@ Text Label 8850 5450 2    50   ~ 0
 VCO_SAW
 Wire Wire Line
 	8850 5250 8350 5250
-Text Label 11700 8350 2    50   ~ 0
+Text Label 11850 8350 2    50   ~ 0
 VCO_PULSE
 $Comp
 L Mechanical:MountingHole H1
@@ -1377,10 +1355,10 @@ L Diode:1N4148W D3
 U 1 1 6232E4FD
 P 13250 7900
 F 0 "D3" V 13204 7980 50  0000 L CNN
-F 1 "1N4148W" V 13295 7980 50  0000 L CNN
-F 2 "Diode_SMD:D_SOD-123" H 13250 7725 50  0001 C CNN
-F 3 "https://www.vishay.com/docs/85748/1n4148w.pdf" H 13250 7900 50  0001 C CNN
-F 4 "C81598" H 13250 7900 50  0001 C CNN "LCSC Part"
+F 1 "1N5819WS" V 13295 7980 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-323" H 13250 7725 50  0001 C CNN
+F 3 "" H 13250 7900 50  0001 C CNN
+F 4 "C191023" H 13250 7900 50  0001 C CNN "LCSC Part"
 	1    13250 7900
 	0    1    1    0   
 $EndComp
@@ -1451,8 +1429,8 @@ Text Label 14050 5550 0    50   ~ 0
 THIS_OUT2
 Wire Wire Line
 	14050 5550 13650 5550
-Text Notes 5100 10400 0    50   ~ 0
-DG442: Ensure model is spec’d for +/- 12V. LE is not.
+Text Notes 5100 10450 0    50   ~ 0
+DG442: Ensure model is spec’d for +/- 12V. LE is not\nMAX333A: MAX333AEWP+ or MAX333ACWP+
 Text Label 7900 2150 0    50   ~ 0
 LED_CTRL
 Text Label 7850 2250 0    50   ~ 0
@@ -1512,8 +1490,6 @@ Connection ~ 4350 9250
 Wire Wire Line
 	4350 9250 4350 9500
 Wire Wire Line
-	12000 7900 12750 7900
-Wire Wire Line
 	13150 8250 13250 8250
 $Comp
 L Device:R R?
@@ -1534,13 +1510,6 @@ Wire Wire Line
 	13250 8250 13400 8250
 Wire Wire Line
 	13250 8050 13250 8250
-Wire Wire Line
-	12700 8250 12750 8250
-Wire Wire Line
-	12750 7900 12750 8250
-Connection ~ 12750 8250
-Wire Wire Line
-	12750 8250 12850 8250
 Wire Wire Line
 	13700 8250 14500 8250
 Wire Notes Line
@@ -1691,24 +1660,6 @@ Wire Wire Line
 Text Label 3300 3150 0    50   ~ 0
 THIS_OUT2
 NoConn ~ 2750 3050
-$Comp
-L Amplifier_Operational:TL074 U?
-U 2 1 6500B008
-P 12400 8250
-AR Path="/627C7865/6500B008" Ref="U?"  Part="2" 
-AR Path="/627EC897/6500B008" Ref="U?"  Part="1" 
-AR Path="/63514083/6500B008" Ref="U?"  Part="2" 
-AR Path="/6500B008" Ref="U1"  Part="2" 
-F 0 "U1" H 12400 8450 50  0000 C CNN
-F 1 "TL074" H 12350 8250 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 12400 8250 50  0001 C CNN
-F 3 "http://www.ti.com/lit/ds/symlink/tl071.pdf" H 12400 8250 50  0001 C CNN
-F 4 "C12594" H 12400 8250 50  0001 C CNN "LCSC Part"
-	2    12400 8250
-	1    0    0    1   
-$EndComp
-Wire Wire Line
-	11700 8350 12100 8350
 $Comp
 L power:PWR_FLAG #FLG0103
 U 1 1 62B12082
@@ -2275,48 +2226,23 @@ Wire Wire Line
 Wire Wire Line
 	10550 2450 10550 2300
 NoConn ~ 7850 3250
-Wire Wire Line
-	16050 7550 16150 7550
-Wire Wire Line
-	16150 7550 16150 7800
-Wire Wire Line
-	15450 7450 15250 7450
-Wire Wire Line
-	15250 7450 15250 7600
-$Comp
-L power:GND #PWR0121
-U 1 1 62B39ECF
-P 15250 7600
-F 0 "#PWR0121" H 15250 7350 50  0001 C CNN
-F 1 "GND" H 15255 7427 50  0000 C CNN
-F 2 "" H 15250 7600 50  0001 C CNN
-F 3 "" H 15250 7600 50  0001 C CNN
-	1    15250 7600
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	15400 7650 15450 7650
-Wire Wire Line
-	15400 7800 15400 7650
-Wire Wire Line
-	16150 7800 15400 7800
 $Comp
 L Amplifier_Operational:TL074 U?
 U 2 1 629F9E1F
-P 15750 7550
+P 12400 8250
 AR Path="/61E1D4AE/629F9E1F" Ref="U?"  Part="1" 
 AR Path="/629F9E1F" Ref="U2"  Part="2" 
-F 0 "U2" H 15850 7400 50  0000 C CNN
-F 1 "TL074" H 15700 7550 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 15700 7650 50  0001 C CNN
-F 3 "http://www.ti.com/lit/ds/symlink/tl071.pdf" H 15800 7750 50  0001 C CNN
-F 4 "C12594" H 15750 7550 50  0001 C CNN "LCSC Part"
-	2    15750 7550
-	1    0    0    -1  
+F 0 "U2" H 12500 8100 50  0000 C CNN
+F 1 "TL074" H 12350 8250 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 12350 8350 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/tl071.pdf" H 12450 8450 50  0001 C CNN
+F 4 "C12594" H 12400 8250 50  0001 C CNN "LCSC Part"
+	2    12400 8250
+	1    0    0    1   
 $EndComp
-Text Label 7850 3050 0    50   ~ 0
-MIX1_SAW_LEVEL_CTRL2
 Text Label 7850 2950 0    50   ~ 0
+MIX1_SAW_LEVEL_CTRL2
+Text Label 7850 3050 0    50   ~ 0
 MIX1_SAW_LEVEL_CTRL1
 $Sheet
 S 10900 4800 2750 2150
@@ -2337,4 +2263,63 @@ F12 "MIX2_SAW_CTRL" I L 10900 5500 50
 F13 "OSC1_MIX2" O R 13650 5550 50 
 F14 "OSC1_MIX1" O R 13650 5350 50 
 $EndSheet
+$Comp
+L Analog_Switch:MAX333A U5
+U 5 1 630BCD26
+P 5500 9300
+F 0 "U5" H 5780 9346 50  0000 L CNN
+F 1 "MAX333A" H 5780 9255 50  0000 L CNN
+F 2 "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm" H 5500 9300 50  0001 C CNN
+F 3 "https://datasheets.maximintegrated.com/en/ds/MAX333A.pdf" H 5500 9300 50  0001 C CNN
+	5    5500 9300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5050 9900 5500 9900
+Wire Notes Line
+	9400 8450 9400 10450
+Wire Notes Line
+	600  8450 600  10450
+$Comp
+L Diode:1N4148W D5
+U 1 1 6355B1F4
+P 13250 8550
+F 0 "D5" V 13204 8630 50  0000 L CNN
+F 1 "1N5819WS" V 13295 8630 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-323" H 13250 8375 50  0001 C CNN
+F 3 "" H 13250 8550 50  0001 C CNN
+F 4 "C191023" H 13250 8550 50  0001 C CNN "LCSC Part"
+	1    13250 8550
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	13250 8400 13250 8250
+$Comp
+L power:GND #PWR08
+U 1 1 63570873
+P 13250 8800
+F 0 "#PWR08" H 13250 8550 50  0001 C CNN
+F 1 "GND" H 13255 8627 50  0000 C CNN
+F 2 "" H 13250 8800 50  0001 C CNN
+F 3 "" H 13250 8800 50  0001 C CNN
+	1    13250 8800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	13250 8800 13250 8700
+Wire Wire Line
+	11850 8350 12100 8350
+Wire Wire Line
+	12000 8150 12100 8150
+Wire Wire Line
+	12700 8250 12750 8250
+Wire Wire Line
+	12750 8250 12750 7800
+Wire Wire Line
+	12750 7800 12000 7800
+Wire Wire Line
+	12000 7800 12000 8150
+Connection ~ 12750 8250
+Wire Wire Line
+	12750 8250 12850 8250
 $EndSCHEMATC
