@@ -23,10 +23,10 @@ AR Path="/61E1D4AE/626F5A6B" Ref="R?"  Part="1"
 AR Path="/626F5A6B" Ref="R?"  Part="1" 
 AR Path="/6269DD41/626F5A6B" Ref="R9"  Part="1" 
 F 0 "R9" V 9150 1150 50  0000 C CNN
-F 1 "150k" V 8950 1150 50  0000 C CNN
+F 1 "91k" V 8950 1150 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 8980 1150 50  0001 C CNN
 F 3 "~" H 9050 1150 50  0001 C CNN
-F 4 "" H 9050 1150 50  0001 C CNN "LCSC Part"
+F 4 "C23265" H 9050 1150 50  0001 C CNN "LCSC Part"
 	1    9050 1150
 	0    -1   -1   0   
 $EndComp
@@ -47,7 +47,7 @@ F 0 "R13" V 9407 7550 50  0000 C CNN
 F 1 "150k" V 9316 7550 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 9130 7550 50  0001 C CNN
 F 3 "~" H 9200 7550 50  0001 C CNN
-F 4 "" H 9200 7550 50  0001 C CNN "LCSC Part"
+F 4 "C22807" H 9200 7550 50  0001 C CNN "LCSC Part"
 	1    9200 7550
 	0    -1   -1   0   
 $EndComp
@@ -111,7 +111,7 @@ F 0 "R6" V 8700 3050 50  0000 C CNN
 F 1 "62k" V 8500 3050 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 8530 3050 50  0001 C CNN
 F 3 "~" H 8600 3050 50  0001 C CNN
-F 4 "" H 8600 3050 50  0001 C CNN "LCSC Part"
+F 4 "C23221" H 8600 3050 50  0001 C CNN "LCSC Part"
 	1    8600 3050
 	0    -1   -1   0   
 $EndComp
@@ -128,7 +128,7 @@ F 0 "R65" V 13107 7750 50  0000 C CNN
 F 1 "1k" V 13016 7750 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 12830 7750 50  0001 C CNN
 F 3 "~" H 12900 7750 50  0001 C CNN
-F 4 "" H 12900 7750 50  0001 C CNN "LCSC Part"
+F 4 "C21190" H 12900 7750 50  0001 C CNN "LCSC Part"
 	1    12900 7750
 	0    -1   -1   0   
 $EndComp
@@ -194,7 +194,7 @@ F 0 "R14" V 9407 8300 50  0000 C CNN
 F 1 "100k" V 9316 8300 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 9130 8300 50  0001 C CNN
 F 3 "~" H 9200 8300 50  0001 C CNN
-F 4 "" H 9200 8300 50  0001 C CNN "LCSC Part"
+F 4 "C25803" H 9200 8300 50  0001 C CNN "LCSC Part"
 	1    9200 8300
 	0    -1   -1   0   
 $EndComp
@@ -217,7 +217,7 @@ F 0 "R11" V 9657 8600 50  0000 C CNN
 F 1 "100k" V 9566 8600 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 9380 8600 50  0001 C CNN
 F 3 "~" H 9450 8600 50  0001 C CNN
-F 4 "" H 9450 8600 50  0001 C CNN "LCSC Part"
+F 4 "C25803" H 9450 8600 50  0001 C CNN "LCSC Part"
 	1    9450 8600
 	1    0    0    -1  
 $EndComp
@@ -259,7 +259,7 @@ F 0 "R5" V 8750 5500 50  0000 C CNN
 F 1 "47k" V 8550 5500 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 8580 5500 50  0001 C CNN
 F 3 "~" H 8650 5500 50  0001 C CNN
-F 4 "" H 8650 5500 50  0001 C CNN "LCSC Part"
+F 4 "C25819" H 8650 5500 50  0001 C CNN "LCSC Part"
 	1    8650 5500
 	0    -1   -1   0   
 $EndComp
@@ -306,7 +306,7 @@ F 0 "R8" V 9450 5400 50  0000 C CNN
 F 1 "47k" V 9650 5400 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 9480 5400 50  0001 C CNN
 F 3 "~" H 9550 5400 50  0001 C CNN
-F 4 "" H 9550 5400 50  0001 C CNN "LCSC Part"
+F 4 "C25819" H 9550 5400 50  0001 C CNN "LCSC Part"
 	1    9550 5400
 	-1   0    0    1   
 $EndComp
@@ -341,7 +341,7 @@ F 0 "R70" V 11650 4200 50  0000 C CNN
 F 1 "47k" V 11450 4200 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 11480 4200 50  0001 C CNN
 F 3 "~" H 11550 4200 50  0001 C CNN
-F 4 "" H 11550 4200 50  0001 C CNN "LCSC Part"
+F 4 "C25819" H 11550 4200 50  0001 C CNN "LCSC Part"
 	1    11550 4200
 	0    -1   -1   0   
 $EndComp
@@ -355,21 +355,6 @@ Wire Wire Line
 	11700 4200 12050 4200
 Wire Wire Line
 	12050 4200 12050 4700
-$Comp
-L Device:R R?
-U 1 1 62A68F31
-P 9900 5150
-AR Path="/61E1D4AE/62A68F31" Ref="R?"  Part="1" 
-AR Path="/62A68F31" Ref="R?"  Part="1" 
-AR Path="/6269DD41/62A68F31" Ref="R39"  Part="1" 
-F 0 "R39" V 10000 5150 50  0000 C CNN
-F 1 "47k" V 9800 5150 50  0000 C CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 9830 5150 50  0001 C CNN
-F 3 "~" H 9900 5150 50  0001 C CNN
-F 4 "" H 9900 5150 50  0001 C CNN "LCSC Part"
-	1    9900 5150
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	10500 4600 11100 4600
 Connection ~ 11100 4600
@@ -404,12 +389,10 @@ F 0 "R3" V 13300 4350 50  0000 C CNN
 F 1 "47k" V 13100 4350 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 13130 4350 50  0001 C CNN
 F 3 "~" H 13200 4350 50  0001 C CNN
-F 4 "" H 13200 4350 50  0001 C CNN "LCSC Part"
+F 4 "C25819" H 13200 4350 50  0001 C CNN "LCSC Part"
 	1    13200 4350
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	9550 5150 9750 5150
 Connection ~ 9550 5150
 $Comp
 L Device:R R?
@@ -422,7 +405,7 @@ F 0 "R2" V 12500 4700 50  0000 C CNN
 F 1 "47k" V 12300 4700 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 12330 4700 50  0001 C CNN
 F 3 "~" H 12400 4700 50  0001 C CNN
-F 4 "" H 12400 4700 50  0001 C CNN "LCSC Part"
+F 4 "C25819" H 12400 4700 50  0001 C CNN "LCSC Part"
 	1    12400 4700
 	0    1    1    0   
 $EndComp
@@ -443,7 +426,7 @@ F 0 "R10" V 14107 4800 50  0000 C CNN
 F 1 "1k" V 14016 4800 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 13830 4800 50  0001 C CNN
 F 3 "~" H 13900 4800 50  0001 C CNN
-F 4 "" H 13900 4800 50  0001 C CNN "LCSC Part"
+F 4 "C21190" H 13900 4800 50  0001 C CNN "LCSC Part"
 	1    13900 4800
 	0    -1   -1   0   
 $EndComp
@@ -465,7 +448,7 @@ F 0 "R12" V 9407 3850 50  0000 C CNN
 F 1 "120k" V 9316 3850 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 9130 3850 50  0001 C CNN
 F 3 "~" H 9200 3850 50  0001 C CNN
-F 4 "\\" H 9200 3850 50  0001 C CNN "LCSC Part"
+F 4 "C25808" H 9200 3850 50  0001 C CNN "LCSC Part"
 	1    9200 3850
 	0    -1   -1   0   
 $EndComp
@@ -500,7 +483,7 @@ F 0 "C38" V 11298 3850 50  0000 C CNN
 F 1 "22p" V 11389 3850 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric" H 11588 3700 50  0001 C CNN
 F 3 "~" H 11550 3850 50  0001 C CNN
-F 4 "" V 11550 3850 50  0001 C CNN "LCSC Part"
+F 4 "C1653" V 11550 3850 50  0001 C CNN "LCSC Part"
 	1    11550 3850
 	0    1    1    0   
 $EndComp
@@ -552,7 +535,7 @@ F 0 "R66" V 10600 7150 50  0000 C CNN
 F 1 "47k" V 10400 7150 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 10430 7150 50  0001 C CNN
 F 3 "~" H 10500 7150 50  0001 C CNN
-F 4 "" H 10500 7150 50  0001 C CNN "LCSC Part"
+F 4 "C25819" H 10500 7150 50  0001 C CNN "LCSC Part"
 	1    10500 7150
 	0    -1   -1   0   
 $EndComp
@@ -600,7 +583,7 @@ F 0 "R73" V 12300 7300 50  0000 C CNN
 F 1 "47k" V 12100 7300 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 12130 7300 50  0001 C CNN
 F 3 "~" H 12200 7300 50  0001 C CNN
-F 4 "" H 12200 7300 50  0001 C CNN "LCSC Part"
+F 4 "C25819" H 12200 7300 50  0001 C CNN "LCSC Part"
 	1    12200 7300
 	0    1    1    0   
 $EndComp
@@ -615,7 +598,7 @@ F 0 "R71" V 11450 7650 50  0000 C CNN
 F 1 "47k" V 11250 7650 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 11280 7650 50  0001 C CNN
 F 3 "~" H 11350 7650 50  0001 C CNN
-F 4 "" H 11350 7650 50  0001 C CNN "LCSC Part"
+F 4 "C25819" H 11350 7650 50  0001 C CNN "LCSC Part"
 	1    11350 7650
 	0    1    1    0   
 $EndComp
@@ -650,7 +633,7 @@ F 0 "C40" V 10248 6800 50  0000 C CNN
 F 1 "22p" V 10339 6800 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric" H 10538 6650 50  0001 C CNN
 F 3 "~" H 10500 6800 50  0001 C CNN
-F 4 "" V 10500 6800 50  0001 C CNN "LCSC Part"
+F 4 "C1653" V 10500 6800 50  0001 C CNN "LCSC Part"
 	1    10500 6800
 	0    1    1    0   
 $EndComp
@@ -684,7 +667,7 @@ F 0 "R59" V 10000 4600 50  0000 C CNN
 F 1 "24k" V 9800 4600 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 9830 4600 50  0001 C CNN
 F 3 "~" H 9900 4600 50  0001 C CNN
-F 4 "" H 9900 4600 50  0001 C CNN "LCSC Part"
+F 4 "C23352" H 9900 4600 50  0001 C CNN "LCSC Part"
 	1    9900 4600
 	0    1    1    0   
 $EndComp
@@ -778,10 +761,10 @@ AR Path="/61E1D4AE/6319A98E" Ref="R?"  Part="1"
 AR Path="/6319A98E" Ref="R?"  Part="1" 
 AR Path="/6269DD41/6319A98E" Ref="R74"  Part="1" 
 F 0 "R74" V 9150 700 50  0000 C CNN
-F 1 "560k" V 8950 700 50  0000 C CNN
+F 1 "220k" V 8950 700 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 8980 700 50  0001 C CNN
 F 3 "~" H 9050 700 50  0001 C CNN
-F 4 "" H 9050 700 50  0001 C CNN "LCSC Part"
+F 4 "C22961" H 9050 700 50  0001 C CNN "LCSC Part"
 	1    9050 700 
 	0    -1   -1   0   
 $EndComp
@@ -848,7 +831,7 @@ F 0 "R75" V 9150 1800 50  0000 C CNN
 F 1 "360k" V 8950 1800 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 8980 1800 50  0001 C CNN
 F 3 "~" H 9050 1800 50  0001 C CNN
-F 4 "" H 9050 1800 50  0001 C CNN "LCSC Part"
+F 4 "C23146" H 9050 1800 50  0001 C CNN "LCSC Part"
 	1    9050 1800
 	0    -1   -1   0   
 $EndComp
@@ -906,7 +889,7 @@ F 0 "R72" V 9300 2750 50  0000 C CNN
 F 1 "180k" V 9100 2750 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 9130 2750 50  0001 C CNN
 F 3 "~" H 9200 2750 50  0001 C CNN
-F 4 "" H 9200 2750 50  0001 C CNN "LCSC Part"
+F 4 "C22827" H 9200 2750 50  0001 C CNN "LCSC Part"
 	1    9200 2750
 	0    -1   -1   0   
 $EndComp
@@ -948,8 +931,6 @@ F 3 "" H 10300 3750 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	10150 3750 10300 3750
-Wire Wire Line
-	10050 5150 10400 5150
 Wire Wire Line
 	10150 3950 10500 3950
 Wire Wire Line
@@ -1001,7 +982,7 @@ F 3 "" H 8900 2750 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 Text Notes 12000 2000 0    50   ~ 0
-Mix1\nSignal          Input Level    Output:  Offset     Low   High       Peak-to-Peak\nPulse           -3 : 10.5                      -1          -2      2.3        4.3\nSaw1             0 : 8                         -1.5        -1.5    1.5         3\nSaw2             0 : 8                         -3         -3       3         6\nTriangle         0 : 4                         -4          -4       4            8\nComparator      -5 : 5                     0           -2       2            4\n\nand how do I get a fixed width font?
+Mix1\nSignal          Input Level    Output:  Offset     Low   High       Peak-to-Peak\nPulse           0 : 10.5                   -2.5         -2.5      2.5        5\nSaw1             0 : 8                      -1.5        -1.5    1.5         3\nSaw2             0 : 8                      -3         -3       3         6\nTriangle         0 : 4                      -4          -4       4            8\nComparator      -5 : 5                  0           -2       2            4\n\nand how do I get a fixed width font?
 Wire Notes Line
 	11900 1200 15600 1200
 Wire Notes Line
@@ -1012,6 +993,6 @@ Wire Notes Line
 	11900 2050 11900 1200
 Wire Wire Line
 	10400 4800 11300 4800
-Text Notes 9850 5350 0    50   Italic 0
-I don’t think R39 is required…
+Wire Wire Line
+	9550 5150 10400 5150
 $EndSCHEMATC
