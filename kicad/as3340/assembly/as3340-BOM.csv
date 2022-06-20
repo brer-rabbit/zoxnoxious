@@ -1,5 +1,5 @@
 Comment,Designator,Footprint,LCSC Part #
-0.1u Unpolarized capacitor,"C1,C2,C3,C4,C6,C7,C8,C9,C11,C12,C13,C16,C22,C25,C26,C27,C28,C29,C30,C31,C32,C34,C35,C36,C37,C39",C_0603_1608Metric,C14663
+0.1u Unpolarized capacitor,"C1,C2,C3,C4,C6,C7,C8,C9,C11,C12,C13,C16,C22,C25,C26,C27,C28,C29,C30,C31,C32,C34,C35,C37,C39",C_0603_1608Metric,C14663
 4.7u Unpolarized capacitor,"C5,C24",C_0805_2012Metric,C1779
 4.7n Unpolarized capacitor,C10,C_0603_1608Metric,C53987
 1u Unpolarized capacitor,"C14,C15",C_1206_3216Metric,C1848
@@ -14,13 +14,13 @@ LED Light emitting diode,D4,LED_0603_1608Metric,C2286
 120k Resistor,"R7,R12",R_0603_1608Metric,C25808
 91k Resistor,R9,R_0603_1608Metric,C23265
 1k Resistor,"R10,R65",R_0603_1608Metric,C21190
-100k Resistor,"R11,R14,R48,R51,R60",R_0603_1608Metric,C25803
+100k Resistor,"R11,R14,R48,R51",R_0603_1608Metric,C25803
 150k Resistor,R13,R_0603_1608Metric,C22807
 68k Resistor,"R15,R16",R_0603_1608Metric,C23231
 56k Resistor,"R17,R22",R_0603_1608Metric,C23206
 82k Resistor,R18,R_0603_1608Metric,C23254
 33k Resistor,"R19,R54,R55",R_0603_1608Metric,C4216
-10k Resistor,"R20,R21,R24,R28,R40,R41,R57,R61,R68",R_0603_1608Metric,C25804
+10k Resistor,"R21,R24,R28,R41,R57,R61,R68",R_0603_1608Metric,C25804
 1M Resistor,"R23,R27,R29,R30,R37,R43",R_0603_1608Metric,C22935
 5k6 Resistor,"R25,R34",R_0603_1608Metric,C23189
 510 Resistor,R26,R_0603_1608Metric,C23193
@@ -47,4 +47,4 @@ LED Light emitting diode,D4,LED_0603_1608Metric,C2286
 "TL074 Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14","U1,U2,U12",SOIC-14_3.9x8.7mm_P1.27mm,C12594
 "PCA9555D IO expander 16 GPIO, I2C 400kHz, Interrupt, 2.3 - 5.5V, SOIC-24",U7,TSSOP-24_4.4x7.8mm_P0.65mm,C83265
 "LM393 Low-Power, Low-Offset Voltage, Dual Comparators, DIP-8/SOIC-8/TO-99-8",U11,SOIC-8_3.9x4.9mm_P1.27mm,C7955
-"74HC165 Shift Register, 8-bit, Parallel Load",U15,SOIC-16_3.9x9.9mm_P1.27mm,C5613
+"M24C02-WMN 2Kb (256x8) I2C Serial EEPROM, 2.5-5.5V, SOIC-8",U15,SOIC-8_3.9x4.9mm_P1.27mm,C7562
