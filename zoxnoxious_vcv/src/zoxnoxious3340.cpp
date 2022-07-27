@@ -30,6 +30,15 @@ const static int num_audio_inputs = 6;
 const static int num_audio_outputs = 6;
 
 // taken from Fundamental Audio.cpp and CV_MIDI.cpp
+// this ought to be chopped in half since it only really
+// uses the inputs.  Outputs could be removed.
+
+// NOTE: THIS DOES NOT CLAMP: USER OF THIS AUDIO PORT SHOULD CLAMP ALL INPUTS
+// Maybe I'll change that later... the unmeasurable effieciency gained
+// is perhaps the wrong optimization.  The inputs may have varying ranges
+// depending on the hardware and the particular signal, so it makes sense the
+// hardware module writer implementor better know the clamping
+// requirements for each signal.
 struct ZoxnoxiousAudioPort : audio::Port {
 	Module* module;
 
@@ -143,7 +152,11 @@ struct ZoxnoxiousAudioPort : audio::Port {
 			for (int i = 0; i < outputFrames; i++) {
 				for (int j = 0; j < deviceNumOutputs; j++) {
 					float v = output[i * outputStride + j];
-					v = clamp(v, -1.f, 1.f);
+                                        // strictly speaking the clamp isn't necessary
+                                        // if the user of this audioport does the
+                                        // clamping (and it does below).
+                                        // Uncomment to get belt & suspenders approach.
+					//v = clamp(v, -1.f, 1.f);
 					output[i * outputStride + j] = v;
 				}
 			}
@@ -225,6 +238,12 @@ struct Zoxnoxious3340 : Module {
         MIX2_PULSE_BUTTON_LIGHT,
         MIX2_SAW_BUTTON_LIGHT,
         SYNC_ENABLE_LIGHT,
+	FREQ_CLIP_LIGHT,
+	PULSE_WIDTH_CLIP_LIGHT,
+	LINEAR_CLIP_LIGHT,
+	MIX1_TRIANGLE_VCA_CLIP_LIGHT,
+	SYNC_PHASE_CLIP_LIGHT,
+	EXT_MOD_AMOUNT_CLIP_LIGHT,
         LIGHTS_LEN
     };
 
@@ -232,6 +251,13 @@ struct Zoxnoxious3340 : Module {
     ZoxnoxiousAudioPort port;
     ZoxnoxiousMidiOutput midiOutput;
 
+    dsp::ClockDivider lightDivider;
+    float freqClipTimer;
+    float pulseWidthClipTimer;
+    float linearClipTimer;
+    float mix1TriangleVcaClipTimer;
+    float syncPhaseClipTimer;
+    float extModAmountClipTimer;
 
     // detect state changes so we can send a MIDI event.
     // Assume int_min is an invalid value.  On start, idea would be
@@ -264,7 +290,7 @@ struct Zoxnoxious3340 : Module {
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
         configParam(PULSE_WIDTH_KNOB_PARAM, 0.f, 1.f, 0.5f, "Pulse Width", "%", 0.f, 100.f);
-        configParam(LINEAR_KNOB_PARAM, -1.f, 1.f, 0.f, "Linear Mod", " V", 0.f, 5.f);
+        configParam(LINEAR_KNOB_PARAM, 0.f, 1.f, 0.5f, "Linear Mod", " V", 0.f, 10.f, -5.f);
 
         configSwitch(MIX1_PULSE_BUTTON_PARAM, 0.f, 1.f, 0.f, "Pulse", {"Off", "On"});
         configParam(MIX1_TRIANGLE_KNOB_PARAM, 0.f, 1.f, 0.f, "Mix1 Triangle Level", "%", 0.f, 100.f);
@@ -288,6 +314,9 @@ struct Zoxnoxious3340 : Module {
         configInput(LINEAR_INPUT, "Linear FM");
         configInput(MIX1_TRIANGLE_VCA_INPUT, "Mix1 Triangle Level");
         configInput(EXT_MOD_AMOUNT_INPUT, "External Modulation Amount");
+
+        lightDivider.setDivision(512);
+        onReset();
     }
 
 
@@ -345,41 +374,76 @@ struct Zoxnoxious3340 : Module {
         }
 
 
-        // Push inputs to buffer
+        // Push inputs to buffer.  Clamping is done here: the individual
+        // signals may in some future cases have different clamping requirements
+        // depending on DAC and all that.  Also, by clamping here it's easy
+        // to identify clipping and signal that on the panel.
         if (port.deviceNumOutputs > 0) {
             dsp::Frame<num_audio_inputs> inputFrame = {};
+            float v;
+            const float clipTime = 0.25f;
 
             switch (port.deviceNumOutputs) {
             default:
             case 6:
                 // linear
-                inputFrame.samples[5] =
-                    params[LINEAR_INPUT].getValue() + inputs[LINEAR_KNOB_PARAM].getVoltageSum() / 10.f;
+                v = params[LINEAR_INPUT].getValue() + inputs[LINEAR_KNOB_PARAM].getVoltageSum() / 10.f;
+                inputFrame.samples[5] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[5] != v) {
+                    linearClipTimer = clipTime;
+                }
+                    
                 // fall through
             case 5:
                 // external mod amount
-                inputFrame.samples[4] =
-                    params[EXT_MOD_AMOUNT_INPUT].getValue() + inputs[EXT_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
+                v = params[EXT_MOD_AMOUNT_INPUT].getValue() + inputs[EXT_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
+                inputFrame.samples[4] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[4] != v) {
+                    extModAmountClipTimer = clipTime;
+                }
+
                 // fall through
             case 4:
                 // mix1 triangle
-                inputFrame.samples[3] =
-                    params[MIX1_TRIANGLE_VCA_INPUT].getValue() + inputs[MIX1_TRIANGLE_KNOB_PARAM].getVoltageSum() / 10.f;
+                v = params[MIX1_TRIANGLE_VCA_INPUT].getValue() + inputs[MIX1_TRIANGLE_KNOB_PARAM].getVoltageSum() / 10.f;
+                inputFrame.samples[3] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[3] != v) {
+                    mix1TriangleVcaClipTimer = clipTime;
+                }
+                    
                 // fall through
             case 3:
                 // pulse width
-                inputFrame.samples[2] =
-                    params[PULSE_WIDTH_INPUT].getValue() + inputs[PULSE_WIDTH_KNOB_PARAM].getVoltageSum() / 10.f;
+                v = params[PULSE_WIDTH_INPUT].getValue() + inputs[PULSE_WIDTH_KNOB_PARAM].getVoltageSum() / 10.f;
+                inputFrame.samples[2] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[2] != v) {
+                    pulseWidthClipTimer = clipTime;
+                }
+
                 // fall through
             case 2:
                 // sync phase: default to 0.5f if not connected
-                inputFrame.samples[1] = inputs[SYNC_PHASE_INPUT].isConnected() ?
-                    inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f : 0.5f;
+                if (inputs[SYNC_PHASE_INPUT].isConnected()) {
+                    v = inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f;
+                    inputFrame.samples[1] = clamp(v, 0.f, 1.f);
+                    if (inputFrame.samples[1] != v) {
+                        syncPhaseClipTimer = clipTime;
+                    }
+                }
+                else {
+                    v = 0.5f;
+                    inputFrame.samples[1] = v;
+                }
+                     
                 // fall through
             case 1:
                 // frequency
-                inputFrame.samples[0] =
-                    params[FREQ_INPUT].getValue() + inputs[FREQ_KNOB_PARAM].getVoltageSum() / 10.f;
+                v = params[FREQ_INPUT].getValue() + inputs[FREQ_KNOB_PARAM].getVoltageSum() / 10.f;
+                inputFrame.samples[0] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[0] != v) {
+                    freqClipTimer = clipTime;
+                }
+
                 // fall through
             case 0:
                 break;
@@ -389,30 +453,33 @@ struct Zoxnoxious3340 : Module {
             if (!port.engineInputBuffer.full()) {
                 port.engineInputBuffer.push(inputFrame);
             }
+        }
 
+        if (lightDivider.process()) {
+            const float lightTime = args.sampleTime * lightDivider.getDivision();
+            const float brightnessDeltaTime = 1 / lightTime;
+
+            freqClipTimer -= lightTime;
+            lights[FREQ_CLIP_LIGHT].setBrightnessSmooth(freqClipTimer > 0.f, brightnessDeltaTime);
+
+            pulseWidthClipTimer -= lightTime;
+            lights[PULSE_WIDTH_CLIP_LIGHT].setBrightnessSmooth(pulseWidthClipTimer > 0.f, brightnessDeltaTime);
+
+            linearClipTimer -= lightTime;
+            lights[LINEAR_CLIP_LIGHT].setBrightnessSmooth(linearClipTimer > 0.f, brightnessDeltaTime);
+
+            mix1TriangleVcaClipTimer -= lightTime;
+            lights[MIX1_TRIANGLE_VCA_CLIP_LIGHT].setBrightnessSmooth(mix1TriangleVcaClipTimer > 0.f, brightnessDeltaTime);
+
+            syncPhaseClipTimer -= lightTime;
+            lights[SYNC_PHASE_CLIP_LIGHT].setBrightnessSmooth(syncPhaseClipTimer > 0.f, brightnessDeltaTime);
+
+            extModAmountClipTimer -= lightTime;
+            lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
         }
     }
-
-
-
 };
 
-
-
-struct Audio2Display : LedDisplay {
-    AudioDeviceMenuChoice* deviceChoice;
-
-    void setAudioPort(audio::Port* port) {
-        math::Vec pos;
-
-        deviceChoice = createWidget<AudioDeviceMenuChoice>(math::Vec());
-        deviceChoice->box.size.x = box.size.x;
-        deviceChoice->port = port;
-        addChild(deviceChoice);
-        pos = deviceChoice->box.getBottomLeft();
-    }
-
-};
 
 
 
@@ -428,9 +495,9 @@ struct Zoxnoxious3340Widget : ModuleWidget {
         addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(8.732, 26.944)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.481, 26.944)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(41.381, 26.944)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(8.732, 31.0)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.481, 31.0)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(41.381, 31.0)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
 
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.699, 27.744)), module, Zoxnoxious3340::MIX1_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX1_PULSE_BUTTON_LIGHT));
 
@@ -440,35 +507,49 @@ struct Zoxnoxious3340Widget : ModuleWidget {
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(39.949, 62.463)), module, Zoxnoxious3340::SYNC_ENABLE_BUTTON_PARAM, Zoxnoxious3340::SYNC_ENABLE_LIGHT));
 
 
-        addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(58.742, 64.968)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
+        addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(59.943, 64.968)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
 
-        addParam(createParamCentered<CKSS>(mm2px(Vec(7.9, 68.8)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_PARAM));
+        addParam(createParamCentered<CKSS>(mm2px(Vec(8.156, 68.505)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_PARAM));
 
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.699, 83.967)), module, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_PARAM, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.943, 83.967)), module, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_PARAM, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_LIGHT));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(9.257, 96.855)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.533, 104.804)), module, Zoxnoxious3340::MIX2_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX2_PULSE_BUTTON_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(9.871, 116.388)), module, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_PARAM, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(25.969, 116.388)), module, Zoxnoxious3340::EXP_FM_BUTTON_PARAM, Zoxnoxious3340::EXP_FM_BUTTON_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(41.381, 116.388)), module, Zoxnoxious3340::LINEAR_FM_BUTTON_PARAM, Zoxnoxious3340::LINEAR_FM_BUTTON_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.533, 117.049)), module, Zoxnoxious3340::MIX2_SAW_BUTTON_PARAM, Zoxnoxious3340::MIX2_SAW_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.943, 104.804)), module, Zoxnoxious3340::MIX2_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX2_PULSE_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(8.509, 118.567)), module, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_PARAM, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(24.607, 118.567)), module, Zoxnoxious3340::EXP_FM_BUTTON_PARAM, Zoxnoxious3340::EXP_FM_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(40.019, 118.567)), module, Zoxnoxious3340::LINEAR_FM_BUTTON_PARAM, Zoxnoxious3340::LINEAR_FM_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.943, 117.049)), module, Zoxnoxious3340::MIX2_SAW_BUTTON_PARAM, Zoxnoxious3340::MIX2_SAW_BUTTON_LIGHT));
 
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.732, 37.548)), module, Zoxnoxious3340::FREQ_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.481, 37.548)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(41.381, 38.138)), module, Zoxnoxious3340::LINEAR_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.732, 42.0)), module, Zoxnoxious3340::FREQ_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.481, 42.0)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(41.381, 42.0)), module, Zoxnoxious3340::LINEAR_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.943, 53.383)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.949, 77.141)), module, Zoxnoxious3340::SYNC_PHASE_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(22.15, 96.855)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_INPUT));
 
-        Audio2Display *audioDisplay = createWidget<Audio2Display>(mm2px(Vec(50.0, 10.0)));
-        audioDisplay->box.size = mm2px(Vec(25.0, 10.0));
-        audioDisplay->setAudioPort(module ? &module->port : NULL);
-        addChild(audioDisplay);
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(8.732, 22.2)), module, Zoxnoxious3340::FREQ_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(25.481, 22.2)), module, Zoxnoxious3340::PULSE_WIDTH_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(41.381, 22.2)), module, Zoxnoxious3340::LINEAR_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(52.101, 52.163)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(32.471, 77.185)), module, Zoxnoxious3340::SYNC_PHASE_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(15.704, 102.294)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_CLIP_LIGHT));
 
-        MidiDisplay *midiDisplay = createWidget<MidiDisplay>(mm2px(Vec(10.0, 10.0)));
-        midiDisplay->box.size = mm2px(Vec(40.64, 29.021));
-        midiDisplay->setMidiPort(module ? &module->midiOutput : NULL);
-        addChild(midiDisplay);
     }
+
+    void appendContextMenu(Menu *menu) override {
+        Zoxnoxious3340 *module = dynamic_cast<Zoxnoxious3340*>(this->module);
+
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createSubmenuItem("MIDI Device", "",
+                                         [=](Menu* menu) {
+                                             appendMidiMenu(menu, &module->midiOutput);
+                                         }));
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createSubmenuItem("Audio Device", "",
+                                         [=](Menu* menu) {
+                                             appendAudioMenu(menu, &module->port);
+                                         }));
+    }
+
 };
 
 
