@@ -1,6 +1,6 @@
 #include "plugin.hpp"
 
-
+#include <iostream>
 
 struct ZoxnoxiousMidiOutput : midi::Output {
     static const uint8_t programChangeStatus = 0xC;
@@ -28,6 +28,8 @@ struct ZoxnoxiousMidiOutput : midi::Output {
 
 const static int num_audio_inputs = 6;
 const static int num_audio_outputs = 6;
+
+
 
 // taken from Fundamental Audio.cpp and CV_MIDI.cpp
 // this ought to be chopped in half since it only really
@@ -199,13 +201,17 @@ struct ZoxnoxiousAudioPort : audio::Port {
 
 
 struct Zoxnoxious3340 : Module {
+    // the ParamId ordering *is* relevant.
+    // this order should reflect the channel mapping (WHY?)
+    // TODO: fix this, ordering of params shouldn't map to channels
     enum ParamId {
         FREQ_KNOB_PARAM,
-        SYNC_ENABLE_BUTTON_PARAM,
+        SYNC_PHASE_KNOB_PARAM,
         PULSE_WIDTH_KNOB_PARAM,
         MIX1_TRIANGLE_KNOB_PARAM,
         EXT_MOD_AMOUNT_KNOB_PARAM,
         LINEAR_KNOB_PARAM,
+        SYNC_POS_BUTTON_PARAM,
         MIX1_PULSE_BUTTON_PARAM,
         MIX1_SAW_LEVEL_SELECTOR_PARAM,
         EXT_MOD_SELECT_SWITCH_PARAM,
@@ -215,6 +221,7 @@ struct Zoxnoxious3340 : Module {
         EXP_FM_BUTTON_PARAM,
         LINEAR_FM_BUTTON_PARAM,
         MIX2_SAW_BUTTON_PARAM,
+        SYNC_NEG_BUTTON_PARAM,
         PARAMS_LEN
     };
     enum InputId {
@@ -237,13 +244,14 @@ struct Zoxnoxious3340 : Module {
         LINEAR_FM_BUTTON_LIGHT,
         MIX2_PULSE_BUTTON_LIGHT,
         MIX2_SAW_BUTTON_LIGHT,
-        SYNC_ENABLE_LIGHT,
+        SYNC_NEG_ENABLE_LIGHT,
 	FREQ_CLIP_LIGHT,
 	PULSE_WIDTH_CLIP_LIGHT,
 	LINEAR_CLIP_LIGHT,
 	MIX1_TRIANGLE_VCA_CLIP_LIGHT,
 	SYNC_PHASE_CLIP_LIGHT,
 	EXT_MOD_AMOUNT_CLIP_LIGHT,
+        SYNC_POS_ENABLE_LIGHT,
         LIGHTS_LEN
     };
 
@@ -271,9 +279,9 @@ struct Zoxnoxious3340 : Module {
         uint8_t midiProgram[3];
     };
 
-    struct buttonParamMidiProgram buttonParamToMidiProgramList[10] =
+    struct buttonParamMidiProgram buttonParamToMidiProgramList[11] =
         {
-            { SYNC_ENABLE_BUTTON_PARAM, INT_MIN, { 0, 1 } },
+            { SYNC_NEG_BUTTON_PARAM, INT_MIN, { 0, 1 } },
             { MIX1_PULSE_BUTTON_PARAM, INT_MIN, { 2, 3 } },
             { EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 4, 5 } },
             { MIX1_COMPARATOR_BUTTON_PARAM, INT_MIN, { 6, 7 } },
@@ -282,7 +290,8 @@ struct Zoxnoxious3340 : Module {
             { EXP_FM_BUTTON_PARAM, INT_MIN, { 12, 13 } },
             { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 14, 15 } },
             { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 16, 17 } },
-            { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20 } }
+            { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20 } },
+            { SYNC_POS_BUTTON_PARAM, INT_MIN, { 22, 23 } }
         };
 
     Zoxnoxious3340() : port(this) {
@@ -294,7 +303,7 @@ struct Zoxnoxious3340 : Module {
 
         configSwitch(MIX1_PULSE_BUTTON_PARAM, 0.f, 1.f, 0.f, "Pulse", {"Off", "On"});
         configParam(MIX1_TRIANGLE_KNOB_PARAM, 0.f, 1.f, 0.f, "Mix1 Triangle Level", "%", 0.f, 100.f);
-        configSwitch(MIX1_SAW_LEVEL_SELECTOR_PARAM, 0.f, 2.f, 0.f, "Level", {"Off", "Low", "High"});
+        configSwitch(MIX1_SAW_LEVEL_SELECTOR_PARAM, 0.f, 2.f, 0.f, "Level", {"Off", "Low", "Med"});
         configSwitch(MIX1_COMPARATOR_BUTTON_PARAM, 0.f, 1.f, 0.f, "Mix1 Comparator", {"Off", "On"});
 
         configSwitch(MIX2_PULSE_BUTTON_PARAM, 0.f, 1.f, 0.f, "Mix2 Pulse", {"Off", "On"});
@@ -306,7 +315,9 @@ struct Zoxnoxious3340 : Module {
         configSwitch(EXP_FM_BUTTON_PARAM, 0.f, 1.f, 0.f, "Ext Mod to Exp FM", {"Off", "On"});
         configSwitch(LINEAR_FM_BUTTON_PARAM, 0.f, 1.f, 0.f, "Ext Mod to Linear FM", {"Off", "On"});
 
-        configSwitch(SYNC_ENABLE_BUTTON_PARAM, 0.f, 1.f, 0.f, "Sync", {"Off", "On"});
+        configParam(SYNC_PHASE_KNOB_PARAM, 0.f, 1.f, 0.5f, "Sync Phase", "%", 0.f, 100.f);
+        configSwitch(SYNC_NEG_BUTTON_PARAM, 0.f, 1.f, 0.f, "Neg", {"Off", "On"});
+        configSwitch(SYNC_POS_BUTTON_PARAM, 0.f, 1.f, 0.f, "Pos", {"Off", "On"});
 
         configInput(SYNC_PHASE_INPUT, "Sync Phase");
         configInput(FREQ_INPUT, "Pitch CV");
@@ -337,8 +348,11 @@ struct Zoxnoxious3340 : Module {
 
 
     void process(const ProcessArgs& args) override {
-        bool sync = params[SYNC_ENABLE_BUTTON_PARAM].getValue() > 0.f;
-        lights[SYNC_ENABLE_LIGHT].setBrightness(sync);
+        bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
+        lights[SYNC_NEG_ENABLE_LIGHT].setBrightness(sync_neg);
+
+        bool sync_pos = params[SYNC_POS_BUTTON_PARAM].getValue() > 0.f;
+        lights[SYNC_POS_ENABLE_LIGHT].setBrightness(sync_pos);
 
         bool mix1_pulse = params[MIX1_PULSE_BUTTON_PARAM].getValue() > 0.f;
         lights[MIX1_PULSE_BUTTON_LIGHT].setBrightness(mix1_pulse);
@@ -378,10 +392,15 @@ struct Zoxnoxious3340 : Module {
         // signals may in some future cases have different clamping requirements
         // depending on DAC and all that.  Also, by clamping here it's easy
         // to identify clipping and signal that on the panel.
+        if (port.deviceNumOutputs != 6) {
+            std::cout << "deviceNumOutputs == " << port.deviceNumOutputs << std::endl;
+        }
+
         if (port.deviceNumOutputs > 0) {
             dsp::Frame<num_audio_inputs> inputFrame = {};
             float v;
             const float clipTime = 0.25f;
+
 
             switch (port.deviceNumOutputs) {
             default:
@@ -422,19 +441,13 @@ struct Zoxnoxious3340 : Module {
 
                 // fall through
             case 2:
-                // sync phase: default to 0.5f if not connected
-                if (inputs[SYNC_PHASE_INPUT].isConnected()) {
-                    v = inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f;
-                    inputFrame.samples[1] = clamp(v, 0.f, 1.f);
-                    if (inputFrame.samples[1] != v) {
-                        syncPhaseClipTimer = clipTime;
-                    }
+                // sync phase
+                v = params[SYNC_PHASE_INPUT].getValue() + inputs[SYNC_PHASE_KNOB_PARAM].getVoltageSum() / 10.f;
+                inputFrame.samples[1] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[1] != v) {
+                    syncPhaseClipTimer = clipTime;
                 }
-                else {
-                    v = 0.5f;
-                    inputFrame.samples[1] = v;
-                }
-                     
+
                 // fall through
             case 1:
                 // frequency
@@ -499,20 +512,22 @@ struct Zoxnoxious3340Widget : ModuleWidget {
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.481, 31.0)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(41.381, 31.0)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
 
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.699, 27.744)), module, Zoxnoxious3340::MIX1_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX1_PULSE_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.943, 27.744)), module, Zoxnoxious3340::MIX1_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX1_PULSE_BUTTON_LIGHT));
 
 
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(59.777, 43.567)), module, Zoxnoxious3340::MIX1_TRIANGLE_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(59.943, 43.567)), module, Zoxnoxious3340::MIX1_TRIANGLE_KNOB_PARAM));
 
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(39.949, 62.463)), module, Zoxnoxious3340::SYNC_ENABLE_BUTTON_PARAM, Zoxnoxious3340::SYNC_ENABLE_LIGHT));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(37.66, 93.07)), module, Zoxnoxious3340::SYNC_PHASE_KNOB_PARAM));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(31.71, 68.61)), module, Zoxnoxious3340::SYNC_POS_BUTTON_PARAM, Zoxnoxious3340::SYNC_POS_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.25, 68.61)), module, Zoxnoxious3340::SYNC_NEG_BUTTON_PARAM, Zoxnoxious3340::SYNC_NEG_ENABLE_LIGHT));
 
 
-        addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(59.943, 64.968)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
+        addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(59.943, 69.61)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
 
-        addParam(createParamCentered<CKSS>(mm2px(Vec(8.156, 68.505)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_PARAM));
+        addParam(createParamCentered<CKSS>(mm2px(Vec(6.65, 67.2)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_PARAM));
 
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.943, 83.967)), module, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_PARAM, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_LIGHT));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(9.257, 96.855)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.943, 87.07)), module, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_PARAM, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_LIGHT));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.76, 93.07)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.943, 104.804)), module, Zoxnoxious3340::MIX2_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX2_PULSE_BUTTON_LIGHT));
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(8.509, 118.567)), module, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_PARAM, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_LIGHT));
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(24.607, 118.567)), module, Zoxnoxious3340::EXP_FM_BUTTON_PARAM, Zoxnoxious3340::EXP_FM_BUTTON_LIGHT));
@@ -523,15 +538,15 @@ struct Zoxnoxious3340Widget : ModuleWidget {
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.481, 42.0)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(41.381, 42.0)), module, Zoxnoxious3340::LINEAR_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.943, 53.383)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.949, 77.141)), module, Zoxnoxious3340::SYNC_PHASE_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(22.15, 96.855)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(37.66, 102.70)), module, Zoxnoxious3340::SYNC_PHASE_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.76, 102.70)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_INPUT));
 
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(8.732, 22.2)), module, Zoxnoxious3340::FREQ_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(25.481, 22.2)), module, Zoxnoxious3340::PULSE_WIDTH_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(41.381, 22.2)), module, Zoxnoxious3340::LINEAR_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(52.101, 52.163)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(32.471, 77.185)), module, Zoxnoxious3340::SYNC_PHASE_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(15.704, 102.294)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(52.59, 39.52)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(37.61, 84.09)), module, Zoxnoxious3340::SYNC_PHASE_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(10.76, 84.09)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_CLIP_LIGHT));
 
     }
 
