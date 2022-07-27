@@ -635,16 +635,19 @@ static void alsa_midi_in_to_i2c(int i2c_handle, struct i2c_gpio_state *gpio_stat
 
 
 // midi program to switching logic:
-// SYNC_ENABLE_BUTTON_PARAM, { 0, 1 } },
-// MIX1_PULSE_BUTTON_PARAM, { 2, 3 } },
-// EXT_MOD_SELECT_SWITCH_PARAM, { 4, 5 } },
-// MIX1_COMPARATOR_BUTTON_PARAM, { 6, 7 } },
-// MIX2_PULSE_BUTTON_PARAM, { 8, 9 } },
-// EXT_MOD_PWM_BUTTON_PARAM, { 10, 11 } },
-// EXP_FM_BUTTON_PARAM, { 12, 13 } },
-// LINEAR_FM_BUTTON_PARAM, { 14, 15 } },
-// MIX2_SAW_BUTTON_PARAM, { 16, 17 } },
-// MIX1_SAW_LEVEL_SELECTOR_PARAM, { 18, 19, 20 } }
+//   { SYNC_NEG_BUTTON_PARAM, INT_MIN, { 0, 1 } },
+//   { MIX1_PULSE_BUTTON_PARAM, INT_MIN, { 2, 3 } },
+//   { EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 4, 5 } },
+//   { MIX1_COMPARATOR_BUTTON_PARAM, INT_MIN, { 6, 7 } },
+//   { MIX2_PULSE_BUTTON_PARAM, INT_MIN, { 8, 9 } },
+//   { EXT_MOD_PWM_BUTTON_PARAM, INT_MIN, { 10, 11 } },
+//   { EXP_FM_BUTTON_PARAM, INT_MIN, { 12, 13 } },
+//   { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 14, 15 } },
+//   { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 16, 17 } },
+//   { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20, 21 } },
+//   { SYNC_POS_BUTTON_PARAM, INT_MIN, { 22, 23 } }
+
+
 
 // This is a hack of an attempt here:
 // set or clear a bit based on the program change.
@@ -654,27 +657,30 @@ struct program_to_gpio {
   uint8_t mask;
 };
 static const struct program_to_gpio program_to_gpio[] = {
-  { 0, 0, 0b10111111 },  // 0
-  { 1, 0, 0b01000000 },
-  { 0, 1, 0b11111101 },  // 2
+  { 0, 0, 0b11101111 },  // 0 - sync neg
+  { 1, 0, 0b00010000 },
+  { 0, 1, 0b11111101 },  // 2 - mix 1 pulse
   { 1, 1, 0b00000010 },
-  { 0, 0, 0b11111110 },  // 4
-  { 1, 0, 0b00000001 },
-  { 0, 1, 0b11111110 },  // 6
+  { 0, 0, 0b11111000 },  // 4 - ext mod select TODO
+  { 1, 0, 0b00000100 },
+  { 0, 1, 0b11111110 },  // 6 - mix 1 comparator
   { 1, 1, 0b00000001 },
-  { 0, 1, 0b10111111 },  // 8
+  { 0, 1, 0b10111111 },  // 8 - mix2 pulse
   { 1, 1, 0b01000000 },
-  { 0, 0, 0b11111101 },  // 10
-  { 1, 0, 0b00000010 },
-  { 0, 0, 0b01111111 },  // 12
-  { 1, 0, 0b10000000 },
-  { 0, 0, 0b11011111 },  // 14
-  { 1, 0, 0b00100000 },
-  { 0, 1, 0b01111111 },  // 16
+  { 0, 1, 0b01111111 },  // 10 - ext pwm
   { 1, 1, 0b10000000 },
-  { 0, 1, 0b11110011 },  // 18: Saw
+  { 0, 0, 0b11011111 },  // 12 - ext exp fm
+  { 1, 0, 0b00100000 },
+  { 0, 0, 0b01111111 },  // 14 - linear FM
+  { 1, 0, 0b10000000 },
+  { 0, 1, 0b11101111 },  // 16 - mix 2 saw
+  { 1, 1, 0b00010000 },
+  { 0, 1, 0b11110011 },  // 18 - 21: Saw level
   { 1, 1, 0b00000100 },
+  { 1, 1, 0b00001000 },  // TODO: this won't work
   { 1, 1, 0b00001100 },
+  { 0, 0, 0b10111111 },  // 22 - sync pos
+  { 1, 0, 0b01000000 }
 };
   
 
