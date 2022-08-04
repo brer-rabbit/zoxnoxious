@@ -1,0 +1,444 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr B 17000 11000
+encoding utf-8
+Sheet 7 9
+Title "Level Shifting"
+Date ""
+Rev "0.1"
+Comp "Zoxnoxious Engineering"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text HLabel 2050 2700 0    50   Input ~ 0
+SPI_CLK_3V
+Text HLabel 2050 2600 0    50   Input ~ 0
+SPI_MOSI_3V
+Wire Wire Line
+	2050 2600 2250 2600
+Wire Wire Line
+	2050 2700 2250 2700
+Text HLabel 3500 2700 2    50   Output ~ 0
+SPI_CLK_5V
+Text HLabel 3500 2600 2    50   Output ~ 0
+SPI_MOSI_5V
+Wire Wire Line
+	3250 2700 3500 2700
+Wire Wire Line
+	3250 2600 3500 2600
+Wire Wire Line
+	2750 2300 2750 2200
+$Comp
+L power:+5V #PWR0126
+U 1 1 625680DD
+P 2750 2100
+F 0 "#PWR0126" H 2750 1950 50  0001 C CNN
+F 1 "+5V" H 2765 2273 50  0000 C CNN
+F 2 "" H 2750 2100 50  0001 C CNN
+F 3 "" H 2750 2100 50  0001 C CNN
+	1    2750 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C2
+U 1 1 625686E2
+P 3050 2200
+F 0 "C2" V 2798 2200 50  0000 C CNN
+F 1 "0.1u" V 2889 2200 50  0000 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 3088 2050 50  0001 C CNN
+F 3 "~" H 3050 2200 50  0001 C CNN
+F 4 "C14663" H 3050 2200 50  0001 C CNN "LCSC Part"
+	1    3050 2200
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR0127
+U 1 1 6256924E
+P 2750 4000
+F 0 "#PWR0127" H 2750 3750 50  0001 C CNN
+F 1 "GND" H 2755 3827 50  0000 C CNN
+F 2 "" H 2750 4000 50  0001 C CNN
+F 3 "" H 2750 4000 50  0001 C CNN
+	1    2750 4000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2750 2200 2900 2200
+Wire Wire Line
+	2750 2200 2750 2100
+Connection ~ 2750 2200
+Wire Wire Line
+	3200 2200 3300 2200
+Wire Wire Line
+	3300 2200 3300 2250
+$Comp
+L power:GND #PWR0128
+U 1 1 62569B50
+P 3300 2250
+F 0 "#PWR0128" H 3300 2000 50  0001 C CNN
+F 1 "GND" H 3305 2077 50  0000 C CNN
+F 2 "" H 3300 2250 50  0001 C CNN
+F 3 "" H 3300 2250 50  0001 C CNN
+	1    3300 2250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Transistor_FET:BSS138 Q3
+U 1 1 6257D706
+P 11950 2700
+F 0 "Q3" V 12199 2700 50  0000 C CNN
+F 1 "BSS138" V 12290 2700 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 12150 2625 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/BSS138-D.PDF" H 11950 2700 50  0001 L CNN
+F 4 "C82045" V 11950 2700 50  0001 C CNN "LCSC Part"
+	1    11950 2700
+	0    1    1    0   
+$EndComp
+Wire Notes Line
+	1150 1650 4650 1650
+Wire Notes Line
+	4650 1650 4650 4400
+Wire Notes Line
+	4650 4400 1150 4400
+Wire Notes Line
+	1150 4400 1150 1650
+Text Notes 1250 1800 0    50   ~ 0
+SPI Level Shifting: Pi Out to Modules
+Text HLabel 11300 2800 0    50   Input ~ 0
+SDA_3V
+Text HLabel 11300 3200 0    50   Input ~ 0
+SCL_3V
+Text HLabel 13400 2800 2    50   Output ~ 0
+SDA_5V
+Text HLabel 13400 3200 2    50   Output ~ 0
+SCL_5V
+Text Notes 11900 2000 2    50   ~ 0
+I2C Level Shifting: Pi Out
+$Comp
+L Transistor_FET:BSS138 Q4
+U 1 1 62582A17
+P 12350 3100
+F 0 "Q4" V 12599 3100 50  0000 C CNN
+F 1 "BSS138" V 12690 3100 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 12550 3025 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/BSS138-D.PDF" H 12350 3100 50  0001 L CNN
+F 4 "C82045" V 12350 3100 50  0001 C CNN "LCSC Part"
+	1    12350 3100
+	0    1    1    0   
+$EndComp
+$Comp
+L 74xx:74HC245 U2
+U 1 1 62586BB7
+P 2750 3100
+F 0 "U2" H 2500 3750 50  0000 C CNN
+F 1 "74HCT245" H 3000 2450 50  0000 C CNN
+F 2 "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm" H 2750 3100 50  0001 C CNN
+F 3 "https://www.ti.com/lit/ds/scls233p/scls233p.pdf" H 2750 3100 50  0001 C CNN
+F 4 "C5980" H 2750 3100 50  0001 C CNN "LCSC Part"
+	1    2750 3100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2750 3900 2750 4000
+$Comp
+L power:GND #PWR0129
+U 1 1 6258FE9D
+P 2200 3650
+F 0 "#PWR0129" H 2200 3400 50  0001 C CNN
+F 1 "GND" H 2205 3477 50  0000 C CNN
+F 2 "" H 2200 3650 50  0001 C CNN
+F 3 "" H 2200 3650 50  0001 C CNN
+	1    2200 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2200 3650 2200 3600
+Wire Wire Line
+	2200 3600 2250 3600
+$Comp
+L power:+3.3V #PWR0130
+U 1 1 62590CE6
+P 12100 2300
+F 0 "#PWR0130" H 12100 2150 50  0001 C CNN
+F 1 "+3.3V" H 12115 2473 50  0000 C CNN
+F 2 "" H 12100 2300 50  0001 C CNN
+F 3 "" H 12100 2300 50  0001 C CNN
+	1    12100 2300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0131
+U 1 1 62591524
+P 12850 2300
+F 0 "#PWR0131" H 12850 2150 50  0001 C CNN
+F 1 "+5V" H 12865 2473 50  0000 C CNN
+F 2 "" H 12850 2300 50  0001 C CNN
+F 3 "" H 12850 2300 50  0001 C CNN
+	1    12850 2300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11950 2500 11950 2350
+Text Notes 10850 3750 0    50   ~ 0
+3.3V pullups are already on pi; not needed here\nPullups to 5V to be placed near BSS138
+Wire Wire Line
+	11300 2800 11750 2800
+Wire Wire Line
+	11300 3200 12150 3200
+Wire Wire Line
+	12350 2900 12350 2350
+Wire Wire Line
+	12350 2350 12100 2350
+$Comp
+L Device:R R1
+U 1 1 6259792F
+P 12600 2550
+F 0 "R1" H 12670 2596 50  0000 L CNN
+F 1 "3k3" H 12670 2505 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 12530 2550 50  0001 C CNN
+F 3 "~" H 12600 2550 50  0001 C CNN
+F 4 "C22978" H 12600 2550 50  0001 C CNN "LCSC Part"
+	1    12600 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R2
+U 1 1 62597BE7
+P 13050 2550
+F 0 "R2" H 13120 2596 50  0000 L CNN
+F 1 "3k3" H 13120 2505 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 12980 2550 50  0001 C CNN
+F 3 "~" H 13050 2550 50  0001 C CNN
+F 4 "C22978" H 13050 2550 50  0001 C CNN "LCSC Part"
+	1    13050 2550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	12150 2800 12600 2800
+Wire Wire Line
+	13050 2700 13050 3200
+Connection ~ 13050 3200
+Wire Wire Line
+	13050 3200 13400 3200
+Wire Wire Line
+	12600 2400 12600 2350
+Wire Wire Line
+	12600 2350 12850 2350
+Wire Wire Line
+	12850 2350 12850 2300
+Wire Wire Line
+	12850 2350 13050 2350
+Wire Wire Line
+	13050 2350 13050 2400
+Connection ~ 12850 2350
+Wire Wire Line
+	12100 2300 12100 2350
+Connection ~ 12100 2350
+Wire Wire Line
+	12100 2350 11950 2350
+Wire Notes Line
+	10700 1850 13900 1850
+Wire Notes Line
+	13900 1850 13900 3850
+Wire Notes Line
+	13900 3850 10700 3850
+Wire Notes Line
+	10700 3850 10700 1850
+Text HLabel 8600 3250 2    50   Input ~ 0
+SPI_MISO_5V
+Text HLabel 7050 3250 0    50   Output ~ 0
+SPI_MISO_3V
+$Comp
+L power:+5V #PWR0132
+U 1 1 625BDB2D
+P 1600 3500
+F 0 "#PWR0132" H 1600 3350 50  0001 C CNN
+F 1 "+5V" H 1615 3673 50  0000 C CNN
+F 2 "" H 1600 3500 50  0001 C CNN
+F 3 "" H 1600 3500 50  0001 C CNN
+	1    1600 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1600 3500 2250 3500
+$Comp
+L 74xx:74HC245 U3
+U 1 1 625C0762
+P 7750 3050
+F 0 "U3" H 7550 3700 50  0000 C CNN
+F 1 "74LVC245" H 8000 2400 50  0000 C CNN
+F 2 "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm" H 7750 3050 50  0001 C CNN
+F 3 "https://www.ti.com/lit/ds/scas218x/scas218x.pdf" H 7750 3050 50  0001 C CNN
+F 4 "C6082" H 7750 3050 50  0001 C CNN "LCSC Part"
+	1    7750 3050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7750 2250 7750 2150
+$Comp
+L Device:C C3
+U 1 1 625C4F11
+P 8050 2150
+F 0 "C3" V 7798 2150 50  0000 C CNN
+F 1 "0.1u" V 7889 2150 50  0000 C CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 8088 2000 50  0001 C CNN
+F 3 "~" H 8050 2150 50  0001 C CNN
+F 4 "C14663" H 8050 2150 50  0001 C CNN "LCSC Part"
+	1    8050 2150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7750 2150 7900 2150
+Wire Wire Line
+	7750 2150 7750 2050
+Connection ~ 7750 2150
+Wire Wire Line
+	8200 2150 8300 2150
+Wire Wire Line
+	8300 2150 8300 2200
+$Comp
+L power:+3.3V #PWR0133
+U 1 1 625C6DD1
+P 7750 2050
+F 0 "#PWR0133" H 7750 1900 50  0001 C CNN
+F 1 "+3.3V" H 7765 2223 50  0000 C CNN
+F 2 "" H 7750 2050 50  0001 C CNN
+F 3 "" H 7750 2050 50  0001 C CNN
+	1    7750 2050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0134
+U 1 1 625C6E76
+P 8300 2200
+F 0 "#PWR0134" H 8300 1950 50  0001 C CNN
+F 1 "GND" H 8305 2027 50  0000 C CNN
+F 2 "" H 8300 2200 50  0001 C CNN
+F 3 "" H 8300 2200 50  0001 C CNN
+	1    8300 2200
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0135
+U 1 1 625C73B8
+P 7750 3900
+F 0 "#PWR0135" H 7750 3650 50  0001 C CNN
+F 1 "GND" H 7755 3727 50  0000 C CNN
+F 2 "" H 7750 3900 50  0001 C CNN
+F 3 "" H 7750 3900 50  0001 C CNN
+	1    7750 3900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7750 3900 7750 3850
+$Comp
+L power:GND #PWR0137
+U 1 1 625C9312
+P 7200 3600
+F 0 "#PWR0137" H 7200 3350 50  0001 C CNN
+F 1 "GND" H 7205 3427 50  0000 C CNN
+F 2 "" H 7200 3600 50  0001 C CNN
+F 3 "" H 7200 3600 50  0001 C CNN
+	1    7200 3600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7200 3600 7200 3550
+Wire Wire Line
+	7200 3550 7250 3550
+Wire Wire Line
+	7050 3250 7250 3250
+Wire Wire Line
+	8250 3250 8600 3250
+Wire Wire Line
+	7250 2650 7050 2650
+Text HLabel 8600 2650 2    50   Input ~ 0
+MODULE_A_5V
+Wire Wire Line
+	8250 2650 8600 2650
+Text HLabel 7050 2650 0    50   Output ~ 0
+MODULE_A_3V
+Wire Wire Line
+	7250 2750 7050 2750
+Text HLabel 8600 2750 2    50   Input ~ 0
+MODULE_B_5V
+Wire Wire Line
+	7250 2850 7050 2850
+Text HLabel 8600 2850 2    50   Input ~ 0
+MODULE_C_5V
+Wire Wire Line
+	7250 2950 7050 2950
+Text HLabel 8600 2950 2    50   Input ~ 0
+MODULE_D_5V
+Wire Wire Line
+	7250 3050 7050 3050
+Text HLabel 8600 3050 2    50   Input ~ 0
+MODULE_E_5V
+Wire Wire Line
+	7250 3150 7050 3150
+Text HLabel 8600 3150 2    50   Input ~ 0
+MODULE_F_5V
+Wire Wire Line
+	8250 2750 8600 2750
+Text HLabel 7050 2750 0    50   Output ~ 0
+MODULE_B_3V
+Wire Wire Line
+	8250 2850 8600 2850
+Text HLabel 7050 2850 0    50   Output ~ 0
+MODULE_C_3V
+Wire Wire Line
+	8250 2950 8600 2950
+Text HLabel 7050 3150 0    50   Output ~ 0
+MODULE_F_3V
+Wire Wire Line
+	8250 3050 8600 3050
+Text HLabel 7050 2950 0    50   Output ~ 0
+MODULE_D_3V
+Wire Wire Line
+	8250 3150 8600 3150
+Text HLabel 7050 3050 0    50   Output ~ 0
+MODULE_E_3V
+Wire Notes Line
+	6100 1650 9400 1650
+Wire Notes Line
+	9400 1650 9400 4400
+Wire Notes Line
+	9400 4400 6100 4400
+Wire Notes Line
+	6100 4400 6100 1650
+Text Notes 6150 1750 0    50   ~ 0
+Module to Pi: Level shift to 3.3V
+NoConn ~ 2250 2800
+NoConn ~ 2250 2900
+NoConn ~ 2250 3000
+NoConn ~ 2250 3100
+NoConn ~ 2250 3200
+NoConn ~ 2250 3300
+NoConn ~ 3250 3300
+NoConn ~ 3250 3200
+NoConn ~ 3250 3100
+NoConn ~ 3250 3000
+NoConn ~ 3250 2900
+NoConn ~ 3250 2800
+Wire Wire Line
+	7250 3450 7200 3450
+Wire Wire Line
+	7200 3450 7200 3550
+Connection ~ 7200 3550
+Wire Wire Line
+	12550 3200 13050 3200
+Wire Wire Line
+	12600 2700 12600 2800
+Connection ~ 12600 2800
+Wire Wire Line
+	12600 2800 13400 2800
+Text Notes 6150 4350 0    50   ~ 0
+Signal flow is right to left; Set from B—>A for layout alignment\nNote: use LVC part
+NoConn ~ 8250 2550
+NoConn ~ 7250 2550
+Text Notes 1350 4350 0    50   ~ 0
+Spec for HCT component; must level shift
+$EndSCHEMATC
