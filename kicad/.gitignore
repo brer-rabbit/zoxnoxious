@@ -1,0 +1,5 @@
+# Allow Kicad Libraries
+!*.lib
+
+# but not the backup files
+*-bak
