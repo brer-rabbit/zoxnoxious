@@ -166,6 +166,7 @@ F 0 "J2" H 5700 10317 50  0000 C CNN
 F 1 "Eurorack Power" H 5700 10226 50  0000 C CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_ShroudedKey" H 5650 9800 50  0001 C CNN
 F 3 "~" H 5650 9800 50  0001 C CNN
+F 4 "S9171-ND" H 5650 9800 50  0001 C CNN "Digikey"
 	1    5650 9800
 	1    0    0    -1  
 $EndComp
@@ -1968,6 +1969,7 @@ F 0 "J1" H 2350 3100 50  0000 C CNN
 F 1 "Conn_02x20_Odd_Even" H 2350 950 50  0000 C CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical" H 2300 2300 50  0001 C CNN
 F 3 "" H 1600 2100 50  0000 C CNN
+F 4 "S9200-ND" H 2300 2100 50  0001 C CNN "Digikey"
 	1    2300 2100
 	1    0    0    -1  
 $EndComp
@@ -2211,6 +2213,7 @@ F 0 "TP8" H 6658 7268 50  0000 L CNN
 F 1 "TestPoint" H 6658 7177 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 6800 7150 50  0001 C CNN
 F 3 "~" H 6800 7150 50  0001 C CNN
+F 4 "952-2664-2-ND" H 6600 7150 50  0001 C CNN "Digikey"
 	1    6600 7150
 	1    0    0    -1  
 $EndComp
@@ -2222,6 +2225,7 @@ F 0 "TP9" H 6658 7368 50  0000 L CNN
 F 1 "TestPoint" H 6658 7277 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 6800 7250 50  0001 C CNN
 F 3 "~" H 6800 7250 50  0001 C CNN
+F 4 "952-2664-2-ND" H 6600 7250 50  0001 C CNN "Digikey"
 	1    6600 7250
 	0    1    1    0   
 $EndComp
@@ -2237,6 +2241,7 @@ F 0 "TP10" H 8858 7268 50  0000 L CNN
 F 1 "TestPoint" H 8858 7177 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 9000 7150 50  0001 C CNN
 F 3 "~" H 9000 7150 50  0001 C CNN
+F 4 "952-2664-2-ND" H 8800 7150 50  0001 C CNN "Digikey"
 	1    8800 7150
 	1    0    0    -1  
 $EndComp
@@ -2248,6 +2253,7 @@ F 0 "TP11" H 8858 7768 50  0000 L CNN
 F 1 "TestPoint" H 8858 7677 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 9000 7650 50  0001 C CNN
 F 3 "~" H 9000 7650 50  0001 C CNN
+F 4 "952-2664-2-ND" H 8800 7650 50  0001 C CNN "Digikey"
 	1    8800 7650
 	1    0    0    -1  
 $EndComp
@@ -2263,6 +2269,7 @@ F 0 "TP1" V 3554 6788 50  0000 L CNN
 F 1 "TestPoint" V 3645 6788 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 3800 6600 50  0001 C CNN
 F 3 "~" H 3800 6600 50  0001 C CNN
+F 4 "952-2664-2-ND" H 3600 6600 50  0001 C CNN "Digikey"
 	1    3600 6600
 	0    1    1    0   
 $EndComp
@@ -2274,6 +2281,7 @@ F 0 "TP2" V 3554 6888 50  0000 L CNN
 F 1 "TestPoint" V 3645 6888 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 3800 6700 50  0001 C CNN
 F 3 "~" H 3800 6700 50  0001 C CNN
+F 4 "952-2664-2-ND" H 3600 6700 50  0001 C CNN "Digikey"
 	1    3600 6700
 	0    1    1    0   
 $EndComp
@@ -2287,6 +2295,7 @@ F 0 "TP3" V 3554 7038 50  0000 L CNN
 F 1 "TestPoint" V 3645 7038 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 3800 6850 50  0001 C CNN
 F 3 "~" H 3800 6850 50  0001 C CNN
+F 4 "952-2664-2-ND" H 3600 6850 50  0001 C CNN "Digikey"
 	1    3600 6850
 	0    1    1    0   
 $EndComp
@@ -2298,6 +2307,7 @@ F 0 "TP4" V 3554 7138 50  0000 L CNN
 F 1 "TestPoint" V 3645 7138 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 3800 6950 50  0001 C CNN
 F 3 "~" H 3800 6950 50  0001 C CNN
+F 4 "952-2664-2-ND" H 3600 6950 50  0001 C CNN "Digikey"
 	1    3600 6950
 	0    1    1    0   
 $EndComp
@@ -2309,6 +2319,7 @@ F 0 "TP5" V 3554 7288 50  0000 L CNN
 F 1 "TestPoint" V 3645 7288 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 3800 7100 50  0001 C CNN
 F 3 "~" H 3800 7100 50  0001 C CNN
+F 4 "952-2664-2-ND" H 3600 7100 50  0001 C CNN "Digikey"
 	1    3600 7100
 	0    1    1    0   
 $EndComp
@@ -2320,6 +2331,7 @@ F 0 "TP6" V 1054 7438 50  0000 L CNN
 F 1 "TestPoint" V 1145 7438 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 1300 7250 50  0001 C CNN
 F 3 "~" H 1300 7250 50  0001 C CNN
+F 4 "952-2664-2-ND" H 1100 7250 50  0001 C CNN "Digikey"
 	1    1100 7250
 	0    -1   -1   0   
 $EndComp
@@ -2331,6 +2343,7 @@ F 0 "TP7" H 3858 1368 50  0000 L CNN
 F 1 "TestPoint" H 3858 1277 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 4000 1250 50  0001 C CNN
 F 3 "~" H 4000 1250 50  0001 C CNN
+F 4 "952-2664-2-ND" H 3800 1250 50  0001 C CNN "Digikey"
 	1    3800 1250
 	1    0    0    -1  
 $EndComp

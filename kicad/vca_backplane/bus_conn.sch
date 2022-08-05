@@ -31,6 +31,7 @@ F 0 "J7" H 2800 3017 50  0000 C CNN
 F 1 "Conn_02x20_Odd_Even" H 2800 2926 50  0000 C CNN
 F 2 "Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_SullinsPolarized" H 2750 1900 50  0001 C CNN
 F 3 "~" H 2750 1900 50  0001 C CNN
+F 4 "S9200-ND" H 2750 1900 50  0001 C CNN "Digikey"
 	1    2750 1900
 	1    0    0    -1  
 $EndComp

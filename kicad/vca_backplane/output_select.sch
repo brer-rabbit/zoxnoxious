@@ -1566,6 +1566,7 @@ F 0 "J9" H 15100 4500 50  0000 L CNN
 F 1 "AudioJack3DPDT" H 14900 3550 50  0000 L CNN
 F 2 "Connector_Audio:Jack_6.35mm_CUI_SJ_63043F" H 15250 4100 50  0001 C CNN
 F 3 "https://www.cuidevices.com/product/resource/sj-6304.pdf" H 15250 4100 50  0001 C CNN
+F 4 "2223-SJ-63043F-ND" H 15250 4250 50  0001 C CNN "Digikey"
 	1    15250 4250
 	1    0    0    -1  
 $EndComp
@@ -1577,6 +1578,7 @@ F 0 "J10" H 15250 7050 50  0000 L CNN
 F 1 "AudioJack3DPDT" H 14900 6050 50  0000 L CNN
 F 2 "Connector_Audio:Jack_6.35mm_CUI_SJ_63043F" H 15250 6600 50  0001 C CNN
 F 3 "https://www.cuidevices.com/product/resource/sj-6304.pdf" H 15250 6600 50  0001 C CNN
+F 4 "2223-SJ-63043F-ND" H 15250 6750 50  0001 C CNN "Digikey"
 	1    15250 6750
 	1    0    0    -1  
 $EndComp
@@ -2078,6 +2080,7 @@ F 0 "TP14" H 6392 2726 50  0000 R CNN
 F 1 "TestPoint" H 6392 2817 50  0000 R CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 6650 2700 50  0001 C CNN
 F 3 "~" H 6650 2700 50  0001 C CNN
+F 4 "952-2664-2-ND" H 6450 2700 50  0001 C CNN "Digikey"
 	1    6450 2700
 	-1   0    0    1   
 $EndComp
@@ -2092,6 +2095,7 @@ F 0 "TP13" H 6508 2018 50  0000 L CNN
 F 1 "TestPoint" H 6508 1927 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 6650 1900 50  0001 C CNN
 F 3 "~" H 6650 1900 50  0001 C CNN
+F 4 "952-2664-2-ND" H 6450 1900 50  0001 C CNN "Digikey"
 	1    6450 1900
 	1    0    0    -1  
 $EndComp
@@ -2106,6 +2110,7 @@ F 0 "TP12" V 1145 6022 50  0000 C CNN
 F 1 "TestPoint" V 1054 6022 50  0000 C CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 1150 5950 50  0001 C CNN
 F 3 "~" H 1150 5950 50  0001 C CNN
+F 4 "952-2664-2-ND" H 950 5950 50  0001 C CNN "Digikey"
 	1    950  5950
 	0    -1   -1   0   
 $EndComp
@@ -2119,6 +2124,7 @@ F 0 "TP15" H 11950 1500 50  0000 R CNN
 F 1 "TestPoint" H 12050 1600 50  0000 R CNN
 F 2 "TestPoint:TestPoint_Pad_2.0x2.0mm" H 12200 1350 50  0001 C CNN
 F 3 "~" H 12200 1350 50  0001 C CNN
+F 4 "952-2664-2-ND" H 12000 1350 50  0001 C CNN "Digikey"
 	1    12000 1350
 	-1   0    0    1   
 $EndComp
