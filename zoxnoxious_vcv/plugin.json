@@ -21,6 +21,14 @@
         "VCO",
         "Hardware"
       ]
+    },
+    {
+      "slug": "Output6",
+      "name": "Output6",
+      "description": "audio output for Zoxnoxious modules",
+      "tags": [
+        "Hardware"
+      ]
     }
   ]
 }
