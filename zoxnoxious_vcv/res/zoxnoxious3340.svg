@@ -24,7 +24,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -39,9 +39,9 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="0.97115325"
-     inkscape:cx="206.82172"
-     inkscape:cy="232.94633"
+     inkscape:zoom="3.884613"
+     inkscape:cx="31.603364"
+     inkscape:cy="205.12575"
      inkscape:window-width="1192"
      inkscape:window-height="787"
      inkscape:window-x="155"
@@ -765,10 +765,11 @@
          inkscape:connector-curvature="0" />
     </g>
     <g
-       id="g4320">
+       id="g4320"
+       transform="translate(3.2693089,-1.021659)">
       <path
          style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.222;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-         d="M 9.5976562,69.435547 9.625,69.65625 c 0.795739,-0.09744 1.322444,0.244756 1.705078,0.839844 0.382634,0.595088 0.600438,1.446632 0.712891,2.314453 0.224906,1.735641 0.03516,3.53125 0.03516,3.53125 l 0.220703,0.02344 c 0,0 0.192319,-1.813447 -0.03711,-3.583984 -0.114714,-0.885268 -0.332586,-1.761193 -0.746094,-2.404297 -0.413508,-0.643104 -1.044998,-1.048301 -1.9179688,-0.941406 z"
+         d="M 9.5976562,69.435547 9.625,69.65625 c 0.795739,-0.09744 1.322444,0.244756 1.705078,0.839844 0.382634,0.595088 0.600438,1.446632 0.712891,2.314453 0.224906,1.735641 0.03516,3.53125 0.03516,3.53125 l 0.220703,0.02344 c 0,0 0.192319,-1.813447 -0.03711,-3.583984 C 12.147008,71.895985 11.929136,71.02006 11.515628,70.376956 11.10212,69.733852 10.47063,69.328655 9.5976592,69.43555 Z"
          id="path11165-3"
          inkscape:connector-curvature="0" />
       <path
@@ -927,8 +928,7 @@
          id="path4602" />
     </g>
     <g
-       aria-label="PULSE
-WIDTH"
+       aria-label="PULSE WIDTH"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46943998px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        id="text92-2-3">
       <path

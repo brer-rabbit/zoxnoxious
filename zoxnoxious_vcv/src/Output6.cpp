@@ -50,24 +50,24 @@ struct Output6 : Module {
 	Output6() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configSwitch(CARD_A_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_A_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_B_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_B_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_C_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_C_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_D_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_D_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_E_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_E_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_F_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
-		configSwitch(CARD_F_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, { "Off", "On" });
+		configSwitch(CARD_A_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2", { "Off", "On" });
+		configSwitch(CARD_A_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1", { "Off", "On" });
+		configSwitch(CARD_B_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2", { "Off", "On" });
+		configSwitch(CARD_B_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1", { "Off", "On" });
+		configSwitch(CARD_C_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2", { "Off", "On" });
+		configSwitch(CARD_C_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1", { "Off", "On" });
+		configSwitch(CARD_D_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2", { "Off", "On" });
+		configSwitch(CARD_D_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1", { "Off", "On" });
+		configSwitch(CARD_E_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2", { "Off", "On" });
+		configSwitch(CARD_E_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1", { "Off", "On" });
+		configSwitch(CARD_F_MIX2_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2", { "Off", "On" });
+		configSwitch(CARD_F_MIX1_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1", { "Off", "On" });
 
-		configSwitch(MIX_LEFT_SELECT_PARAM, 0.f, 1.f, 0.f, { "Out1", "Out2" });
+		configSwitch(MIX_LEFT_SELECT_PARAM, 0.f, 1.f, 0.f, "Left Output", { "Out 1", "Out2" });
 		configParam(LEFT_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.f, "");
 		configInput(LEFT_LEVEL_INPUT_INPUT, "");
 
-		configSwitch(MIX_RIGHT_SELECT_PARAM, 0.f, 1.f, 0.f, { "Out1", "Out2" });
+		configSwitch(MIX_RIGHT_SELECT_PARAM, 0.f, 1.f, 0.f, "Right Output", { "Out1", "Out2" });
 		configParam(RIGHT_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.f, "");
 		configInput(RIGHT_LEVEL_INPUT_INPUT, "");
 	}

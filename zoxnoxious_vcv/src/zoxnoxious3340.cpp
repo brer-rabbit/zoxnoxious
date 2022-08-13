@@ -303,13 +303,13 @@ struct Zoxnoxious3340 : Module {
 
         configSwitch(MIX1_PULSE_BUTTON_PARAM, 0.f, 1.f, 0.f, "Pulse", {"Off", "On"});
         configParam(MIX1_TRIANGLE_KNOB_PARAM, 0.f, 1.f, 0.f, "Mix1 Triangle Level", "%", 0.f, 100.f);
-        configSwitch(MIX1_SAW_LEVEL_SELECTOR_PARAM, 0.f, 2.f, 0.f, "Level", {"Off", "Low", "Med"});
+        configSwitch(MIX1_SAW_LEVEL_SELECTOR_PARAM, 0.f, 3.f, 0.f, "Level", {"Off", "Low", "Med", "High" });
         configSwitch(MIX1_COMPARATOR_BUTTON_PARAM, 0.f, 1.f, 0.f, "Mix1 Comparator", {"Off", "On"});
 
         configSwitch(MIX2_PULSE_BUTTON_PARAM, 0.f, 1.f, 0.f, "Mix2 Pulse", {"Off", "On"});
         configSwitch(MIX2_SAW_BUTTON_PARAM, 0.f, 1.f, 0.f, "Mix2 Saw", {"Off", "On"});
 
-        configSwitch(EXT_MOD_SELECT_SWITCH_PARAM, 0.f, 1.f, 0.f, "Ext Signal", {"1", "2"});
+        configSwitch(EXT_MOD_SELECT_SWITCH_PARAM, 0.f, 7.f, 0.f, "Ext Signal", {"A1", "A2", "B1", "B2", "C1", "C2", "D1", "D2" });
         configParam(EXT_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 1.f, "External Mod Level", "%", 0.f, 100.f);
         configSwitch(EXT_MOD_PWM_BUTTON_PARAM, 0.f, 1.f, 0.f, "Ext Mod to PWM", {"Off", "On"});
         configSwitch(EXP_FM_BUTTON_PARAM, 0.f, 1.f, 0.f, "Ext Mod to Exp FM", {"Off", "On"});
@@ -522,9 +522,10 @@ struct Zoxnoxious3340Widget : ModuleWidget {
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.25, 68.61)), module, Zoxnoxious3340::SYNC_NEG_BUTTON_PARAM, Zoxnoxious3340::SYNC_NEG_ENABLE_LIGHT));
 
 
-        addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(59.943, 69.61)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
+        //addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(59.943, 69.61)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
+        addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(59.943, 69.61)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
 
-        addParam(createParamCentered<CKSS>(mm2px(Vec(6.65, 67.2)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_PARAM));
+        addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(6.65, 66.2)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_PARAM));
 
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.943, 87.07)), module, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_PARAM, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_LIGHT));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.76, 93.07)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
