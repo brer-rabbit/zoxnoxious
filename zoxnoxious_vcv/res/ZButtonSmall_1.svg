@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 25.2.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.0"
+   id="svg7595"
+   sodipodi:docname="ZButtonSmall_1.svg"
+   x="0px"
+   y="0px"
+   width="3.191mm"
+   height="3.191mm"
+   viewBox="0 0 12.060473 12.060473"
+   enable-background="new 0 0 17.9996 18"
+   xml:space="preserve"
+   inkscape:version="1.1.2 (b8e25be8, 2022-02-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs919" />
+<sodipodi:namedview
+   bordercolor="#666666"
+   borderopacity="1.0"
+   fit-margin-bottom="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-top="0"
+   id="base"
+   inkscape:current-layer="svg7595"
+   inkscape:cx="10.195094"
+   inkscape:cy="6.1544698"
+   inkscape:document-units="mm"
+   inkscape:pageopacity="0.0"
+   inkscape:pageshadow="2"
+   inkscape:window-height="983"
+   inkscape:window-maximized="0"
+   inkscape:window-width="1514"
+   inkscape:window-x="45"
+   inkscape:window-y="33"
+   inkscape:zoom="26.728541"
+   pagecolor="#ffffff"
+   showgrid="false"
+   units="mm"
+   inkscape:pagecheckerboard="0">
+	</sodipodi:namedview>
+<g
+   id="g5959-5_63_"
+   transform="matrix(0.67002626,0,0,0.67002626,202.30447,797.29838)">
+	<path
+   id="path5961-3_63_"
+   inkscape:connector-curvature="0"
+   d="m -283.93512,-1180.9504 c 0,4.9702 -4.03055,8.9993 -9.00067,8.9993 -4.96945,0 -8.99933,-4.0291 -8.99933,-8.9993 0,-4.9722 4.02988,-9.0007 8.99933,-9.0007 4.97012,10e-5 9.00067,4.0285 9.00067,9.0007" />
+</g>
+<g
+   id="g5959-5_62_"
+   transform="matrix(0.66993896,0,0,0.66993483,202.2789,797.19037)">
+	
+		<linearGradient
+   id="path5961-3_1_"
+   gradientUnits="userSpaceOnUse"
+   x1="-590.36511"
+   y1="-2201.4954"
+   x2="-574.14545"
+   y2="-2201.4954"
+   gradientTransform="rotate(90,-947.86719,-1546.5632)">
+		<stop
+   offset="0"
+   style="stop-color:#2B2B2B"
+   id="stop902" />
+		<stop
+   offset="1"
+   style="stop-color:#0D0C0C"
+   id="stop904" />
+	</linearGradient>
+	<path
+   id="path5961-3_62_"
+   inkscape:connector-curvature="0"
+   fill="url(#path5961-3_1_)"
+   d="m -301.04492,-1180.9517 c 0,-4.4785 3.6319,-8.1092 8.11041,-8.1092 4.47791,0 8.10922,3.6307 8.10919,8.1092 0,4.4804 -3.63129,8.1105 -8.10919,8.1105 -4.47851,0 -8.11041,-3.6301 -8.11041,-8.1105"
+   style="fill:url(#path5961-3_1_)" />
+</g>
+<g
+   id="g5959-5_61_"
+   transform="matrix(0.67017157,0,0,0.67017724,202.34704,797.47665)">
+	<path
+   id="path5961-3_61_"
+   inkscape:connector-curvature="0"
+   fill="#262626"
+   d="m -300.02133,-1180.9515 c 0,-3.9134 3.17349,-7.0857 7.08673,-7.0857 3.91272,0 7.08569,3.1723 7.08569,7.0857 0,3.9147 -3.17297,7.0866 -7.08569,7.0866 -3.91324,0 -7.08673,-3.1718 -7.08673,-7.0866" />
+</g>
+<g
+   id="g5959-5_60_"
+   transform="matrix(0.67017157,0,0,0.67017724,202.34704,797.47665)"
+   opacity="0.29">
+	
+		<linearGradient
+   id="path5961-3_2_"
+   gradientUnits="userSpaceOnUse"
+   x1="-437.42737"
+   y1="-1971.0745"
+   x2="-423.25491"
+   y2="-1971.0745"
+   gradientTransform="rotate(90,-756.70007,-1507.3097)">
+		<stop
+   offset="0"
+   style="stop-color:#666565"
+   id="stop911" />
+		<stop
+   offset="1"
+   style="stop-color:#0D0C0C"
+   id="stop913" />
+	</linearGradient>
+	<path
+   id="path5961-3_60_"
+   inkscape:connector-curvature="0"
+   fill="url(#path5961-3_2_)"
+   d="m -292.9346,-1188.0372 c 3.9133,0 7.08569,3.1734 7.08569,7.0866 0,3.9128 -3.17239,7.0857 -7.08569,7.0857 -3.91486,0 -7.08673,-3.1729 -7.08673,-7.0857 0,-3.9132 3.17184,-7.0866 7.08673,-7.0866"
+   style="fill:url(#path5961-3_2_)" />
+</g>
+</svg>
