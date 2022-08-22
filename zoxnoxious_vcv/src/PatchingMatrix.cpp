@@ -487,42 +487,152 @@ struct PatchingMatrixWidget : ModuleWidget {
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(147.6, 80.585)), module, PatchingMatrix::RIGHT_LEVEL_CLIP_LIGHT));
 
         // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 36.769))));
+        cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 36.769)));
+        cardAOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardAOutput1TextField->setText("CardA Out1");
+        addChild(cardAOutput1TextField);
+
         // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 41.46))));
+        cardAOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 41.46)));
+        cardAOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardAOutput2TextField->setText("CardA Out2");
+        addChild(cardAOutput2TextField);
+
+        // mm2px(Vec(27.171, 3.636))
+        cardBOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 49.83)));
+        cardBOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardBOutput1TextField->setText("CardB Out1");
+        addChild(cardBOutput1TextField);
+
+        // mm2px(Vec(27.171, 3.636))
+        cardBOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 55.017)));
+        cardBOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardBOutput2TextField->setText("CardB Out2");
+        addChild(cardBOutput2TextField);
+
+        // mm2px(Vec(27.171, 3.636))
+        cardCOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 62.892)));
+        cardCOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardCOutput1TextField->setText("CardC Out1");
+        addChild(cardCOutput1TextField);
+
+        // mm2px(Vec(27.171, 3.636))
+        cardCOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 68.078)));
+        cardCOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardCOutput2TextField->setText("CardC Out2");
+        addChild(cardCOutput2TextField);
+
+
+        // mm2px(Vec(27.171, 3.636))
+        cardDOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 75.953)));
+        cardDOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardDOutput1TextField->setText("CardD Out1");
+        addChild(cardDOutput1TextField);
+
+        // mm2px(Vec(27.171, 3.636))
+        cardDOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 81.14)));
+        cardDOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardDOutput2TextField->setText("CardD Out2");
+        addChild(cardDOutput2TextField);
+
+        // mm2px(Vec(27.171, 3.636))
+        cardEOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 89.015)));
+        cardEOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardEOutput1TextField->setText("CardE Out1");
+        addChild(cardEOutput1TextField);
+
+        // mm2px(Vec(27.171, 3.636))
+        cardEOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 94.201)));
+        cardEOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardEOutput2TextField->setText("CardE Out1");
+        addChild(cardEOutput2TextField);
+
+        // mm2px(Vec(27.171, 3.636))
+        cardFOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 102.076)));
+        cardFOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardFOutput1TextField->setText("CardF Out1");
+        addChild(cardFOutput1TextField);
+
+        // mm2px(Vec(27.171, 3.636))
+        cardFOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(4.17, 107.263)));
+        cardFOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        cardFOutput2TextField->setText("CardF Out2");
+        addChild(cardFOutput2TextField);
+
+
+
         // mm2px(Vec(14.42, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(5.417, 43.624))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 49.83))));
+        cardAInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(33.851, 25.977)));
+        cardAInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
+        cardAInputTextField->setText("CardA In");
+        cardAInputTextField->setRotation(-3.1416f / 4.f);
+        addChild(cardAInputTextField);
+
+
         // mm2px(Vec(14.42, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(14.326, 52.533))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 55.017))));
+        cardBInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(46.451, 25.977)));
+        cardBInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
+        cardBInputTextField->setText("CardB In");
+        cardBInputTextField->setRotation(-3.1416f / 4.f);
+        addChild(cardBInputTextField);
+
+
         // mm2px(Vec(14.42, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(23.235, 61.442))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 62.892))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 68.078))));
+        cardCInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(59.050, 25.977)));
+        cardCInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
+        cardCInputTextField->setText("CardC In");
+        cardCInputTextField->setRotation(-3.1416f / 4.f);
+        addChild(cardCInputTextField);
+
+
         // mm2px(Vec(14.42, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(32.144, 70.352))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 75.953))));
+        cardDInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(71.649, 25.977)));
+        cardDInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
+        cardDInputTextField->setText("CardD In");
+        cardDInputTextField->setRotation(-3.1416f / 4.f);
+        addChild(cardDInputTextField);
+
         // mm2px(Vec(14.42, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(41.053, 79.261))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 81.14))));
+        cardEInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(84.248, 25.977)));;
+        cardEInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
+        cardEInputTextField->setText("CardE In");
+        cardEInputTextField->setRotation(-3.1416f / 4.f);
+        addChild(cardEInputTextField);
+
         // mm2px(Vec(14.42, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(49.962, 88.17))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 89.015))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 94.201))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 102.076))));
-        // mm2px(Vec(27.171, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(4.17, 107.263))));
+        cardFInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(96.847, 25.977)));
+        cardFInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
+        cardFInputTextField->setText("CardF In");
+        cardFInputTextField->setRotation(-3.1416f / 4.f);
+        addChild(cardFInputTextField);
+
     }
+
+
+    CardTextDisplay *cardAInputTextField;
+    CardTextDisplay *cardAOutput1TextField;
+    CardTextDisplay *cardAOutput2TextField;
+
+    CardTextDisplay *cardBInputTextField;
+    CardTextDisplay *cardBOutput1TextField;
+    CardTextDisplay *cardBOutput2TextField;
+
+    CardTextDisplay *cardCInputTextField;
+    CardTextDisplay *cardCOutput1TextField;
+    CardTextDisplay *cardCOutput2TextField;
+
+    CardTextDisplay *cardDInputTextField;
+    CardTextDisplay *cardDOutput1TextField;
+    CardTextDisplay *cardDOutput2TextField;
+
+    CardTextDisplay *cardEInputTextField;
+    CardTextDisplay *cardEOutput1TextField;
+    CardTextDisplay *cardEOutput2TextField;
+
+    CardTextDisplay *cardFInputTextField;
+    CardTextDisplay *cardFOutput1TextField;
+    CardTextDisplay *cardFOutput2TextField;
+
 };
 
 

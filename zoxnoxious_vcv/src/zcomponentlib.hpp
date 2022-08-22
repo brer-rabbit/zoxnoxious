@@ -55,6 +55,12 @@ static const int cardTextLetterSpacing = 0;
 static const int cardTextLeftMargin = 2;
 
 struct CardTextDisplay : TransparentWidget {
+    std::string to_display;
+    float rotation;
+
+    CardTextDisplay() {
+        this->rotation = 0.f;
+    }
 
     void draw(const DrawArgs& args) override {
         const auto vg = args.vg;
@@ -64,7 +70,7 @@ struct CardTextDisplay : TransparentWidget {
 
         // Draw dark background
         nvgBeginPath(vg);
-        //nvgRotate(vg, -3.1416 / 4.0);
+        nvgRotate(vg, rotation);
         nvgRect(vg, 0, 0, box.size.x, box.size.y);
         nvgFillColor(vg, nvgRGBA(20, 20, 20, 255));
         nvgFill(vg);
@@ -73,10 +79,9 @@ struct CardTextDisplay : TransparentWidget {
         // Draw track names
         //
         if (1) {
-            std::string to_display("VCO 3340 (1)");
 
             // If the track name is not empty, then display it
-            if(to_display != "")  {
+            if (this->to_display != "")  {
                 // Set up font parameters
                 nvgFontSize(vg, cardTextFontSize);
                 nvgTextLetterSpacing(vg, cardTextLetterSpacing);
@@ -85,13 +90,21 @@ struct CardTextDisplay : TransparentWidget {
                 nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 
                 float bounds[4];
-                nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, to_display.c_str(), NULL, bounds);
+                nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, this->to_display.c_str(), NULL, bounds);
                 float textHeight = bounds[3];
-                nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, to_display.c_str(), NULL);
+                nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, this->to_display.c_str(), NULL);
             }
         }
 
         nvgRestore(vg);
     }
 
+
+    void setText(std::string newString) {
+        to_display = newString;
+    }
+
+    void setRotation(float newRotation) {
+        rotation = newRotation;
+    }
 };
