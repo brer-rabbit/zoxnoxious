@@ -23,15 +23,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.313779"
-     inkscape:cx="111.1298"
-     inkscape:cy="241.66925"
+     inkscape:zoom="1.4619819"
+     inkscape:cx="133.38058"
+     inkscape:cy="278.04722"
      inkscape:window-width="1491"
      inkscape:window-height="969"
-     inkscape:window-x="89"
+     inkscape:window-x="189"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer2" />
+     inkscape:current-layer="layer1" />
   <defs
      id="defs1196">
     <marker
@@ -113,15 +113,15 @@
        id="f9b09e17-fc78-4216-9b09-40d2874876ff"
        data-name="Screen"
        y="102.07636"
-       width="17.693895"
+       width="27.171406"
        height="3.636193"
-       x="3.1372218"
-       style="display:inline;fill:#ffff00;stroke-width:0.0707487"
+       x="1.5260934"
+       style="display:inline;fill:#ffff00;stroke-width:0.0876724"
        inkscape:label="CARD6_TEXT" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-7"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="26.952702"
+       cx="32.793041"
        cy="104.13852"
        r="1.3229166"
        style="display:inline;fill:#ff0000;stroke-width:0.264583"
@@ -154,15 +154,15 @@
        id="f9b09e17-fc78-4216-9b09-40d2874876ff-3"
        data-name="Screen"
        y="49.830379"
-       width="17.693895"
+       width="27.171406"
        height="3.636193"
-       x="3.1372218"
-       style="display:inline;fill:#ffff00;stroke-width:0.0707487"
+       x="1.5260934"
+       style="display:inline;fill:#ffff00;stroke-width:0.0876724"
        inkscape:label="CARD_B_TEXT" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-7-0"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="26.952702"
+       cx="32.793041"
        cy="51.892536"
        r="1.3229166"
        style="display:inline;fill:#ff0000;stroke-width:0.264583"
@@ -179,15 +179,15 @@
        id="f9b09e17-fc78-4216-9b09-40d2874876ff-09"
        data-name="Screen"
        y="75.953377"
-       width="17.693895"
+       width="27.171406"
        height="3.636193"
-       x="3.1372218"
-       style="display:inline;fill:#ffff00;stroke-width:0.0707487"
+       x="1.5260934"
+       style="display:inline;fill:#ffff00;stroke-width:0.0876724"
        inkscape:label="CARD_D_TEXT" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-7-37"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="26.952702"
+       cx="32.793041"
        cy="78.015533"
        r="1.3229166"
        style="display:inline;fill:#ff0000;stroke-width:0.264583"
@@ -204,15 +204,15 @@
        id="f9b09e17-fc78-4216-9b09-40d2874876ff-09-3"
        data-name="Screen"
        y="62.891876"
-       width="17.693895"
+       width="27.171406"
        height="3.636193"
-       x="3.1372218"
-       style="display:inline;fill:#ffff00;stroke-width:0.0707487"
+       x="1.5260934"
+       style="display:inline;fill:#ffff00;stroke-width:0.0876724"
        inkscape:label="CARD_C_TEXT" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-7-37-0"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="26.952702"
+       cx="32.793041"
        cy="64.954033"
        r="1.3229166"
        style="display:inline;fill:#ff0000;stroke-width:0.264583"
@@ -229,15 +229,15 @@
        id="f9b09e17-fc78-4216-9b09-40d2874876ff-2"
        data-name="Screen"
        y="89.01487"
-       width="17.693895"
+       width="27.171406"
        height="3.636193"
-       x="3.1372218"
-       style="display:inline;fill:#ffff00;stroke-width:0.0707487"
+       x="1.5260934"
+       style="display:inline;fill:#ffff00;stroke-width:0.0876724"
        inkscape:label="CARD_E_TEXT" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-7-9"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="26.952702"
+       cx="32.793041"
        cy="91.077026"
        r="1.3229166"
        style="display:inline;fill:#ff0000;stroke-width:0.264583"
@@ -254,15 +254,15 @@
        id="f9b09e17-fc78-4216-9b09-40d2874876ff-0"
        data-name="Screen"
        y="36.768883"
-       width="17.693895"
+       width="27.171406"
        height="3.636193"
-       x="3.1372218"
-       style="display:inline;fill:#ffff00;stroke-width:0.0707487"
+       x="1.5260934"
+       style="display:inline;fill:#ffff00;stroke-width:0.0876724"
        inkscape:label="CARD_A_TEXT" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-7-4"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="26.952702"
+       cx="32.793041"
        cy="38.831039"
        r="1.3229166"
        style="display:inline;fill:#ff0000;stroke-width:0.264583"
@@ -332,28 +332,28 @@
     <circle
        id="path1674"
        style="fill:#b1b1b1;stroke:#980000;stroke-width:0.264583"
-       cx="3.3245344"
+       cx="1.713406"
        cy="27.901876"
        r="0.055021018" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="2.9952841"
+       x="1.3841556"
        y="29.56999"
        id="text2294"><tspan
          sodipodi:role="line"
          id="tspan7097"
-         x="2.9952841"
+         x="1.3841556"
          y="29.56999">CARD</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="23.166544"
+       x="29.006884"
        y="29.545187"
        id="text2294-6"><tspan
          sodipodi:role="line"
          id="tspan7117"
-         x="23.166544"
+         x="29.006884"
          y="29.545187">OUT1</tspan></text>
     <text
        xml:space="preserve"
@@ -397,12 +397,12 @@
        sodipodi:nodetypes="ccc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
-       d="M 27.029026,34.609296 V 121.51541 H 54.503148"
+       d="M 32.843989,34.609296 V 121.51541 H 54.503148"
        id="path7426"
        sodipodi:nodetypes="ccc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
-       d="M 27.153719,24.974674 V 13.204509 h 27.349429"
+       d="M 32.994059,24.974674 V 13.204509 l 21.509089,0"
        id="path7428"
        sodipodi:nodetypes="ccc" />
     <path
@@ -452,7 +452,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.131248"
-       x="8.0211143"
+       x="24.303205"
        y="125.6888"
        id="text23912-2"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -460,7 +460,7 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan1194"
-         x="8.0211143"
+         x="24.303205"
          y="125.6888">BEYOND OBNOXIOUS</tspan></text>
   </g>
 </svg>

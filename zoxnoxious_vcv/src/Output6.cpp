@@ -92,6 +92,56 @@ struct Output6 : Module {
 };
 
 
+
+static const int cardTextFontSize = 8;
+static const int cardTextLetterSpacing = 0;
+static const int cardTextLeftMargin = 2;
+
+struct CardTextDisplay : TransparentWidget {
+
+    void draw(const DrawArgs& args) override {
+        const auto vg = args.vg;
+
+        // Save the drawing context to restore later
+        nvgSave(vg);
+
+        // Draw dark background
+        nvgBeginPath(vg);
+        //nvgRotate(vg, -3.1416 / 4.0);
+        nvgRect(vg, 0, 0, box.size.x, box.size.y);
+        nvgFillColor(vg, nvgRGBA(20, 20, 20, 255));
+        nvgFill(vg);
+
+        //
+        // Draw track names
+        //
+        if (1) {
+            std::string to_display("VCO 3340 (1)");
+
+            // If the track name is not empty, then display it
+            if(to_display != "")  {
+                // Set up font parameters
+                nvgFontSize(vg, cardTextFontSize);
+                nvgTextLetterSpacing(vg, cardTextLetterSpacing);
+
+                nvgFillColor(vg, nvgRGBA(255, 215, 20, 0xff));
+                nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+
+                float bounds[4];
+                nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, to_display.c_str(), NULL, bounds);
+                float textHeight = bounds[3];
+                nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, to_display.c_str(), NULL);
+            }
+        }
+
+        nvgRestore(vg);
+    }
+
+};
+
+
+
+
 struct Output6Widget : ModuleWidget {
     Output6Widget(Output6* module) {
         setModule(module);
@@ -129,8 +179,17 @@ struct Output6Widget : ModuleWidget {
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(66.928, 38.417)), module, Output6::LEFT_LEVEL_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(66.928, 80.585)), module, Output6::RIGHT_LEVEL_CLIP_LIGHT));
 
+
         // mm2px(Vec(17.694, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(5.294, 36.769))));
+        cardATextField = createWidget<CardTextDisplay>(mm2px(Vec(3.137, 36.769)));
+        cardATextField->box.size = mm2px(Vec(17.694, 3.636));
+        //cardATextField->setModule(module);
+        //cardATextField->setText("Hello World");
+        addChild(cardATextField);
+
+        //addChild(createWidget<Widget>(mm2px(Vec(5.294, 36.769))));
+
+
         // mm2px(Vec(17.694, 3.636))
         addChild(createWidget<Widget>(mm2px(Vec(5.294, 49.83))));
         // mm2px(Vec(17.694, 3.636))
@@ -142,6 +201,8 @@ struct Output6Widget : ModuleWidget {
         // mm2px(Vec(17.694, 3.636))
         addChild(createWidget<Widget>(mm2px(Vec(5.294, 102.076))));
     }
+
+    CardTextDisplay *cardATextField;
 };
 
 
