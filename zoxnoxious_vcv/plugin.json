@@ -23,11 +23,11 @@
       ]
     },
     {
-      "slug": "Output6",
-      "name": "Output6",
-      "description": "audio output for Zoxnoxious modules",
+      "slug": "PatchingMatrix",
+      "name": "Patching Matrix",
+      "description": "Patching matrix for Zonoxious components",
       "tags": [
-        "Hardware"
+        "hardware"
       ]
     }
   ]
