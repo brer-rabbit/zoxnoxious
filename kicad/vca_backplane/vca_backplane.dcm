@@ -1,0 +1,67 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP AudioJack3DPDT
+D 3 conductor, 2 isolated switches, DPDT
+K SJ-63043F
+F https://www.cuidevices.com/product/resource/sj-6304.pdf
+$ENDCMP
+#
+$CMP M24C01-FMN
+D 1Kb (128x8) I2C Serial EEPROM, 1.6-5.5V, SOIC-8
+K Nonvolatile Non-Volatile Memory ROM ST
+F http://www.st.com/content/ccc/resource/technical/document/datasheet/b0/d8/50/40/5a/85/49/6f/DM00071904.pdf/files/DM00071904.pdf/jcr:content/translations/en.DM00071904.pdf
+$ENDCMP
+#
+$CMP M24C01-RMN
+D 1Kb (128x8) I2C Serial EEPROM, 1.8-5.5V, SOIC-8
+K Nonvolatile Non-Volatile Memory ROM ST
+F http://www.st.com/content/ccc/resource/technical/document/datasheet/b0/d8/50/40/5a/85/49/6f/DM00071904.pdf/files/DM00071904.pdf/jcr:content/translations/en.DM00071904.pdf
+$ENDCMP
+#
+$CMP M24C01-WMN
+D 1Kb (128x8) I2C Serial EEPROM, 2.5-5.5V, SOIC-8
+K Nonvolatile Non-Volatile Memory ROM ST
+F http://www.st.com/content/ccc/resource/technical/document/datasheet/b0/d8/50/40/5a/85/49/6f/DM00071904.pdf/files/DM00071904.pdf/jcr:content/translations/en.DM00071904.pdf
+$ENDCMP
+#
+$CMP M24C02-FMN
+D 2Kb (256x8) I2C Serial EEPROM, 1.6-5.5V, SOIC-8
+K Nonvolatile Non-Volatile Memory ROM ST
+F http://www.st.com/content/ccc/resource/technical/document/datasheet/b0/d8/50/40/5a/85/49/6f/DM00071904.pdf/files/DM00071904.pdf/jcr:content/translations/en.DM00071904.pdf
+$ENDCMP
+#
+$CMP M24C02-RMN
+D 2Kb (256x8) I2C Serial EEPROM, 1.8-5.5V, SOIC-8
+K Nonvolatile Non-Volatile Memory ROM ST
+F http://www.st.com/content/ccc/resource/technical/document/datasheet/b0/d8/50/40/5a/85/49/6f/DM00071904.pdf/files/DM00071904.pdf/jcr:content/translations/en.DM00071904.pdf
+$ENDCMP
+#
+$CMP M24C02-WMN
+D 2Kb (256x8) I2C Serial EEPROM, 2.5-5.5V, SOIC-8
+K Nonvolatile Non-Volatile Memory ROM ST
+F http://www.st.com/content/ccc/resource/technical/document/datasheet/b0/d8/50/40/5a/85/49/6f/DM00071904.pdf/files/DM00071904.pdf/jcr:content/translations/en.DM00071904.pdf
+$ENDCMP
+#
+$CMP MCP4802
+D 2-Channel 8-Bit D/A Converters with SPI Interface and Internal Reference (2.048V)
+K 8-Bit DAC SPI Reference 2ch
+F http://ww1.microchip.com/downloads/en/DeviceDoc/20002249B.pdf
+$ENDCMP
+#
+$CMP MCP4812
+D 2-Channel 10-Bit D/A Converters with SPI Interface and Internal Reference (2.048V)
+K 10-Bit DAC SPI Reference 2ch
+F http://ww1.microchip.com/downloads/en/DeviceDoc/20002249B.pdf
+$ENDCMP
+#
+$CMP MCP4822
+D 2-Channel 12-Bit D/A Converters with SPI Interface and Internal Reference (2.048V)
+K 12-Bit DAC SPI Reference 2ch
+F http://ww1.microchip.com/downloads/en/DeviceDoc/20002249B.pdf
+$ENDCMP
+#
+$CMP PS508
+F https://www.diodes.com/assets/Datasheets/PS508-509.pdf
+$ENDCMP
+#
+#End Doc Library
