@@ -204,28 +204,28 @@ struct PatchingMatrix : Module {
 		configSwitch(CARD_A_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card D");
 		configSwitch(CARD_A_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card E");
 		configSwitch(CARD_A_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card F");
-		configSwitch(CARD_A_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Audio Out");
+
 		configSwitch(CARD_A_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card A");
 		configSwitch(CARD_A_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card B");
 		configSwitch(CARD_A_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card C");
 		configSwitch(CARD_A_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card D");
 		configSwitch(CARD_A_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card E");
 		configSwitch(CARD_A_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card F");
-		configSwitch(CARD_A_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+
 		configSwitch(CARD_B_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card A");
 		configSwitch(CARD_B_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card B");
 		configSwitch(CARD_B_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card C");
 		configSwitch(CARD_B_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card D");
 		configSwitch(CARD_B_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card E");
 		configSwitch(CARD_B_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card F");
-		configSwitch(CARD_B_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+
 		configSwitch(CARD_B_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card A");
 		configSwitch(CARD_B_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card B");
 		configSwitch(CARD_B_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card C");
 		configSwitch(CARD_B_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card D");
 		configSwitch(CARD_B_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card E");
 		configSwitch(CARD_B_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card F");
-		configSwitch(CARD_B_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+
 		configSwitch(CARD_C_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1 to Card A");
 		configSwitch(CARD_C_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1 to Card B");
 		configSwitch(CARD_C_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1 to Card C");
@@ -239,49 +239,60 @@ struct PatchingMatrix : Module {
 		configSwitch(CARD_C_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2 to Card D");
 		configSwitch(CARD_C_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2 to Card E");
 		configSwitch(CARD_C_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2 to Card F");
-		configSwitch(CARD_C_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+
 		configSwitch(CARD_D_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card A");
 		configSwitch(CARD_D_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card B");
 		configSwitch(CARD_D_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card C");
 		configSwitch(CARD_D_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card D");
 		configSwitch(CARD_D_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card E");
 		configSwitch(CARD_D_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card F");
-		configSwitch(CARD_D_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
 		configSwitch(CARD_D_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card A");
 		configSwitch(CARD_D_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card B");
 		configSwitch(CARD_D_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card C");
 		configSwitch(CARD_D_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card D");
 		configSwitch(CARD_D_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card E");
 		configSwitch(CARD_D_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card F");
-		configSwitch(CARD_D_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+
 		configSwitch(CARD_E_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card A");
 		configSwitch(CARD_E_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card B");
 		configSwitch(CARD_E_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card C");
 		configSwitch(CARD_E_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card D");
 		configSwitch(CARD_E_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card E");
 		configSwitch(CARD_E_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card F");
-		configSwitch(CARD_E_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
 		configSwitch(CARD_E_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card A");
 		configSwitch(CARD_E_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card B");
 		configSwitch(CARD_E_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card C");
 		configSwitch(CARD_E_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card D");
 		configSwitch(CARD_E_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card E");
 		configSwitch(CARD_E_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card F");
-		configSwitch(CARD_E_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+
 		configSwitch(CARD_F_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card A");
 		configSwitch(CARD_F_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card B");
 		configSwitch(CARD_F_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card C");
 		configSwitch(CARD_F_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card D");
 		configSwitch(CARD_F_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card E");
 		configSwitch(CARD_F_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card F");
-		configSwitch(CARD_F_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+
 		configSwitch(CARD_F_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card A");
 		configSwitch(CARD_F_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card B");
 		configSwitch(CARD_F_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card C");
 		configSwitch(CARD_F_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card D");
 		configSwitch(CARD_F_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card E");
 		configSwitch(CARD_F_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card F");
+
+
+		configSwitch(CARD_A_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Audio Out");
+		configSwitch(CARD_A_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+		configSwitch(CARD_B_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+		configSwitch(CARD_B_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+		configSwitch(CARD_C_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+		configSwitch(CARD_D_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+		configSwitch(CARD_D_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+		configSwitch(CARD_E_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+		configSwitch(CARD_E_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+		configSwitch(CARD_F_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
 		configSwitch(CARD_F_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
+
 
 		configInput(LEFT_LEVEL_INPUT_INPUT, "");
 		configInput(RIGHT_LEVEL_INPUT_INPUT, "");
@@ -470,8 +481,12 @@ struct PatchingMatrixWidget : ModuleWidget {
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.865, 109.081)), module, PatchingMatrix::CARD_F_MIX2_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_CARD_D_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.465, 109.081)), module, PatchingMatrix::CARD_F_MIX2_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_CARD_E_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(99.064, 109.081)), module, PatchingMatrix::CARD_F_MIX2_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_CARD_F_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 109.081)), module, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
 
+        //addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 109.081)), module, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
+        ParamWidget *cardFMix2Output = createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 109.081)), module, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT);
+        addChild(cardFMix2Output);
+        cardFMix2Output->setVisible(false);
+        
 
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(147.6, 47.501)), module, PatchingMatrix::LEFT_LEVEL_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(147.6, 89.669)), module, PatchingMatrix::RIGHT_LEVEL_KNOB_PARAM));

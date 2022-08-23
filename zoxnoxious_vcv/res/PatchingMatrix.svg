@@ -24,8 +24,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.95389228"
-     inkscape:cx="246.88322"
-     inkscape:cy="312.92842"
+     inkscape:cx="273.09163"
+     inkscape:cy="301.39672"
      inkscape:window-width="1608"
      inkscape:window-height="969"
      inkscape:window-x="33"
@@ -137,7 +137,7 @@
      inkscape:label="components"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:inline">
+     style="display:none">
     <rect
        id="f9b09e17-fc78-4216-9b09-40d2874876ff"
        data-name="Screen"

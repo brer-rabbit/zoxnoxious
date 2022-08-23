@@ -182,17 +182,6 @@ F 3 "" H 1950 3600 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	1950 3600 1950 3450
-$Comp
-L Audio:AS3360 U7
-U 1 1 627B73D0
-P 10300 5300
-F 0 "U7" H 10300 5717 50  0000 C CNN
-F 1 "AS3360" H 10300 5626 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 11000 4600 50  0001 C CNN
-F 3 "http://www.alfarzpp.lv/eng/sc/AS3360.pdf" H 10950 4650 50  0001 C CNN
-	1    10300 5300
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	10050 5150 10000 5150
 Wire Wire Line
@@ -211,34 +200,12 @@ Wire Wire Line
 	5700 2400 6000 2400
 Text Label 9250 5350 0    50   ~ 0
 DAC_CV_VCA_LEFT
-$Comp
-L Audio:AS3360 U7
-U 2 1 627B81A0
-P 10300 6850
-F 0 "U7" H 10300 7267 50  0000 C CNN
-F 1 "AS3360" H 10300 7176 50  0000 C CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 11000 6150 50  0001 C CNN
-F 3 "http://www.alfarzpp.lv/eng/sc/AS3360.pdf" H 10950 6200 50  0001 C CNN
-	2    10300 6850
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	9250 5350 10050 5350
 Text Label 9250 6900 0    50   ~ 0
 DAC_CV_VCA_RIGHT
 Wire Wire Line
 	9250 6900 10050 6900
-$Comp
-L Audio:AS3360 U7
-U 3 1 628010A3
-P 1500 9450
-F 0 "U7" H 1680 9446 50  0000 L CNN
-F 1 "AS3360" H 1680 9355 50  0000 L CNN
-F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 2200 8750 50  0001 C CNN
-F 3 "http://www.alfarzpp.lv/eng/sc/AS3360.pdf" H 2150 8800 50  0001 C CNN
-	3    1500 9450
-	1    0    0    -1  
-$EndComp
 $Comp
 L Device:C C7
 U 1 1 628032C4
@@ -514,20 +481,6 @@ Wire Wire Line
 	2600 5300 2600 5150
 Wire Wire Line
 	2200 5150 2250 5150
-$Comp
-L Analog_Switch:MAX308 U?
-U 1 1 62B48AB8
-P 2550 5950
-AR Path="/62B48AB8" Ref="U?"  Part="1" 
-AR Path="/624DD88E/62B48AB8" Ref="U9"  Part="1" 
-F 0 "U9" H 2550 5700 50  0000 C CNN
-F 1 "PS508" H 2550 5800 50  0000 C CNN
-F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 2550 5950 50  0001 C CNN
-F 3 "" H 2550 5950 50  0001 C CNN
-F 4 "PS508QEX" H 2550 5950 50  0001 C CNN "Digikey"
-	1    2550 5950
-	1    0    0    -1  
-$EndComp
 $Comp
 L power:+12V #PWR048
 U 1 1 62B48AAE
@@ -2227,4 +2180,51 @@ Wire Wire Line
 	11450 5900 11250 5900
 Wire Wire Line
 	11250 5900 11250 6250
+$Comp
+L vca_backplane:MAX308 U?
+U 1 1 62B48AB8
+P 2550 5950
+AR Path="/62B48AB8" Ref="U?"  Part="1" 
+AR Path="/624DD88E/62B48AB8" Ref="U9"  Part="1" 
+F 0 "U9" H 2550 5700 50  0000 C CNN
+F 1 "PS508" H 2550 5800 50  0000 C CNN
+F 2 "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" H 2550 5950 50  0001 C CNN
+F 3 "" H 2550 5950 50  0001 C CNN
+F 4 "PS508QEX" H 2550 5950 50  0001 C CNN "Digikey"
+	1    2550 5950
+	1    0    0    -1  
+$EndComp
+$Comp
+L vca_backplane:AS3360 U7
+U 1 1 627B73D0
+P 10300 5300
+F 0 "U7" H 10300 5717 50  0000 C CNN
+F 1 "AS3360" H 10300 5626 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 11000 4600 50  0001 C CNN
+F 3 "http://www.alfarzpp.lv/eng/sc/AS3360.pdf" H 10950 4650 50  0001 C CNN
+	1    10300 5300
+	1    0    0    -1  
+$EndComp
+$Comp
+L vca_backplane:AS3360 U7
+U 2 1 627B81A0
+P 10300 6850
+F 0 "U7" H 10300 7267 50  0000 C CNN
+F 1 "AS3360" H 10300 7176 50  0000 C CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 11000 6150 50  0001 C CNN
+F 3 "http://www.alfarzpp.lv/eng/sc/AS3360.pdf" H 10950 6200 50  0001 C CNN
+	2    10300 6850
+	1    0    0    -1  
+$EndComp
+$Comp
+L vca_backplane:AS3360 U7
+U 3 1 628010A3
+P 1500 9450
+F 0 "U7" H 1680 9446 50  0000 L CNN
+F 1 "AS3360" H 1680 9355 50  0000 L CNN
+F 2 "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm" H 2200 8750 50  0001 C CNN
+F 3 "http://www.alfarzpp.lv/eng/sc/AS3360.pdf" H 2150 8800 50  0001 C CNN
+	3    1500 9450
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

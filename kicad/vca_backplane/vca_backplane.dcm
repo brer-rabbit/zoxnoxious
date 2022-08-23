@@ -1,5 +1,11 @@
 EESchema-DOCLIB  Version 2.0
 #
+$CMP AS3360
+D Dual Voltage Controlled Amplifier (VCA), DIP-14/SOIC-14
+K VCA CEM3360 ALFA
+F http://www.alfarzpp.lv/eng/sc/AS3360.pdf
+$ENDCMP
+#
 $CMP AudioJack3DPDT
 D 3 conductor, 2 isolated switches, DPDT
 K SJ-63043F
