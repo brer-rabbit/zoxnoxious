@@ -1559,9 +1559,11 @@ LEFT
 Text Label 13200 6800 0    50   ~ 0
 RIGHT
 $Comp
-L Connector:AudioJack3DPDT J9
+L vca_backplane:AudioJack3DPDT J9
 U 1 1 641AA062
 P 15250 4250
+AR Path="/641AA062" Ref="J9"  Part="1" 
+AR Path="/624DD88E/641AA062" Ref="J9"  Part="1" 
 F 0 "J9" H 15100 4500 50  0000 L CNN
 F 1 "AudioJack3DPDT" H 14900 3550 50  0000 L CNN
 F 2 "Connector_Audio:Jack_6.35mm_CUI_SJ_63043F" H 15250 4100 50  0001 C CNN
@@ -1571,9 +1573,11 @@ F 4 "2223-SJ-63043F-ND" H 15250 4250 50  0001 C CNN "Digikey"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:AudioJack3DPDT J10
+L vca_backplane:AudioJack3DPDT J10
 U 1 1 641FBE2D
 P 15250 6750
+AR Path="/641FBE2D" Ref="J10"  Part="1" 
+AR Path="/624DD88E/641FBE2D" Ref="J10"  Part="1" 
 F 0 "J10" H 15250 7050 50  0000 L CNN
 F 1 "AudioJack3DPDT" H 14900 6050 50  0000 L CNN
 F 2 "Connector_Audio:Jack_6.35mm_CUI_SJ_63043F" H 15250 6600 50  0001 C CNN
