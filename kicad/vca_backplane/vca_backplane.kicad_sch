@@ -1401,7 +1401,6 @@
     )
   )
 
-
   (junction (at 67.31 132.08) (diameter 0) (color 0 0 0 0)
     (uuid 01878c72-dc61-496f-bc96-8d533801bd27)
   )
@@ -6687,7 +6686,7 @@
       (reference "R3") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-0000624dd88e/00000000-0000-0000-0000-00006528de73"
-      (reference "R4") (unit 1) (value "12k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R4") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-0000624dd88e/00000000-0000-0000-0000-0000639e3c64"
       (reference "R5") (unit 1) (value "47k") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -6705,7 +6704,7 @@
       (reference "R9") (unit 1) (value "47k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-0000624dd88e/00000000-0000-0000-0000-00006529d554"
-      (reference "R10") (unit 1) (value "12k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R10") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-0000624dd88e/00000000-0000-0000-0000-00006330ecd5"
       (reference "R11") (unit 1) (value "2k") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -6744,13 +6743,10 @@
       (reference "R22") (unit 1) (value "300") (footprint "Resistor_SMD:R_1206_3216Metric")
     )
     (path "/00000000-0000-0000-0000-0000624dd88e/21ddf592-18d2-4c67-9010-cc1e88e7460f"
-      (reference "R23") (unit 1) (value "2k") (footprint "Resistor_SMD:R_0603_1608Metric")
-    )
-    (path "/00000000-0000-0000-0000-0000624dd88e/00000000-0000-0000-0000-0000630ca2c6"
-      (reference "R24") (unit 1) (value "DNP") (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+      (reference "R23") (unit 1) (value "2k") (footprint "Resistor_SMD:R_1206_3216Metric")
     )
     (path "/00000000-0000-0000-0000-0000624dd88e/8f1645a9-4b88-4056-ad01-9ebdea298a4d"
-      (reference "R25") (unit 1) (value "2k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R25") (unit 1) (value "2k") (footprint "Resistor_SMD:R_1206_3216Metric")
     )
     (path "/00000000-0000-0000-0000-0000624dd88e/00000000-0000-0000-0000-00006523f143"
       (reference "RV1") (unit 1) (value "10k") (footprint "Potentiometer_THT:Potentiometer_Bourns_PDB_182_Dual_Horizontal_ReducedFootprint")
