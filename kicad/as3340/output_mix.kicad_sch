@@ -1367,7 +1367,7 @@
         )
       )
     )
-    (symbol "as3340-rescue:AS3360-Audio" (in_bom yes) (on_board yes)
+    (symbol "as3340:AS3360-Audio" (in_bom yes) (on_board yes)
       (property "Reference" "U" (id 0) (at -5.08 7.62 0)
         (effects (font (size 1.27 1.27)))
       )
@@ -2419,7 +2419,7 @@
     (pin "2" (uuid 396f334f-5cfc-4115-b060-a5948596f74b))
   )
 
-  (symbol (lib_id "as3340-rescue:AS3360-Audio") (at 232.41 134.62 0) (unit 1)
+  (symbol (lib_id "as3340:AS3360-Audio") (at 232.41 134.62 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 00000000-0000-0000-0000-0000626f5ae3)
     (property "Reference" "U6" (id 0) (at 232.41 127 0))

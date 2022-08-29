@@ -332,7 +332,7 @@
         )
       )
     )
-    (symbol "as3340-rescue:TLV5610IDW-Audio" (pin_names (offset 1.016)) (in_bom yes) (on_board yes)
+    (symbol "as3340:TLV5610IDW-Audio" (pin_names (offset 1.016)) (in_bom yes) (on_board yes)
       (property "Reference" "U" (id 0) (at -2.54 -12.7 0)
         (effects (font (size 1.27 1.27)))
       )
@@ -1362,7 +1362,7 @@
     (pin "2" (uuid 81e43017-18da-4605-8058-086697c42ea3))
   )
 
-  (symbol (lib_id "as3340-rescue:TLV5610IDW-Audio") (at 110.49 58.42 0) (unit 1)
+  (symbol (lib_id "as3340:TLV5610IDW-Audio") (at 110.49 58.42 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 00000000-0000-0000-0000-000062289c0b)
     (property "Reference" "U14" (id 0) (at 107.95 73.66 0))
