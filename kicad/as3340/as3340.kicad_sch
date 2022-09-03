@@ -3068,7 +3068,6 @@
     )
   )
 
-
   (junction (at 279.4 67.31) (diameter 0) (color 0 0 0 0)
     (uuid 014e94ea-ef70-4dea-999c-3a23653ba8ae)
   )
@@ -7399,9 +7398,6 @@
     (path "/00000000-0000-0000-0000-000062f67b87"
       (reference "#PWR0126") (unit 1) (value "+5V") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/2821d093-85a9-4931-9106-137954e8bcf0"
-      (reference "#PWR0127") (unit 1) (value "GND") (footprint "")
-    )
     (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-000062e91116"
       (reference "#PWR0131") (unit 1) (value "GND") (footprint "")
     )
@@ -7615,9 +7611,6 @@
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-0000621920fc"
       (reference "R19") (unit 1) (value "33k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/09831b44-f717-4959-8526-c9411b6bb554"
-      (reference "R20") (unit 1) (value "5k6") (footprint "Resistor_SMD:R_0603_1608Metric")
-    )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000062f76b73"
       (reference "R21") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
@@ -7671,9 +7664,6 @@
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000062244ccb"
       (reference "R38") (unit 1) (value "100k 0.1%") (footprint "Resistor_SMD:R_0603_1608Metric")
-    )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/9889619a-5645-4a31-8335-40767957192f"
-      (reference "R39") (unit 1) (value "22k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/876b3a87-8222-4beb-afeb-42852fd482ab"
       (reference "R40") (unit 1) (value "?") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -7780,14 +7770,8 @@
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-0000621fdf35"
       (reference "RV2") (unit 1) (value "20k") (footprint "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical")
     )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/94ed8560-5a7b-4918-b706-9b42f2ba1041"
-      (reference "RV3") (unit 1) (value "10K") (footprint "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical")
-    )
     (path "/00000000-0000-0000-0000-000061e1d4ae/f97abeb5-405d-4415-a573-6bd865e4f7ee"
       (reference "RV4") (unit 1) (value "500") (footprint "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical")
-    )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/7e91573c-cbec-489e-8188-5f637d129cad"
-      (reference "RV5") (unit 1) (value "100k") (footprint "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-00006327ef87"
       (reference "TP1") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
@@ -7803,12 +7787,6 @@
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000063043b6c"
       (reference "TP5") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
-    )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/18973fae-91e1-48ba-a5f4-7d927d4ecd6f"
-      (reference "TP6") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
-    )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/b4c853a8-0212-48c5-b690-5a872fa152de"
-      (reference "TP7") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/a57915be-60e8-4921-bdfc-72af83e9f594"
       (reference "TP8") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
