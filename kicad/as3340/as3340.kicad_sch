@@ -3068,6 +3068,7 @@
     )
   )
 
+
   (junction (at 279.4 67.31) (diameter 0) (color 0 0 0 0)
     (uuid 014e94ea-ef70-4dea-999c-3a23653ba8ae)
   )
@@ -4708,10 +4709,6 @@
   (label "EXP_FM_EXT_CTRL" (at 142.24 127 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 99011f91-505d-40ae-8eb1-ea3b0cfc42c6)
-  )
-  (label "P5V" (at 185.42 41.91 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 9edc65b4-1f4a-48d9-b3c0-519911356049)
   )
   (label "OSC1_CV_DAC" (at 86.36 142.24 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
@@ -7509,9 +7506,6 @@
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000063ae086a"
       (reference "C35") (unit 1) (value "0.1u") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/189398ff-63b1-4282-bb54-2a8cf987e2d3"
-      (reference "C36") (unit 1) (value "470p") (footprint "Capacitor_SMD:C_0603_1608Metric")
-    )
     (path "/00000000-0000-0000-0000-000062f683d8"
       (reference "C37") (unit 1) (value "0.1u") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
@@ -7648,13 +7642,13 @@
       (reference "R32") (unit 1) (value "470") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000061e21363"
-      (reference "R33") (unit 1) (value "13k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R33") (unit 1) (value "24k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000061e21d8e"
       (reference "R34") (unit 1) (value "5k6") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-0000622d56ff"
-      (reference "R35") (unit 1) (value "1k6") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R35") (unit 1) (value "1k8") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-00006238a5d7"
       (reference "R36") (unit 1) (value "51k") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -7720,7 +7714,7 @@
       (reference "R57") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000063265a0f"
-      (reference "R58") (unit 1) (value "200k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R58") (unit 1) (value "300k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-0000627bc7e2"
       (reference "R61") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -7770,9 +7764,6 @@
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-0000621fdf35"
       (reference "RV2") (unit 1) (value "20k") (footprint "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical")
     )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/f97abeb5-405d-4415-a573-6bd865e4f7ee"
-      (reference "RV4") (unit 1) (value "500") (footprint "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical")
-    )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-00006327ef87"
       (reference "TP1") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
     )
@@ -7788,8 +7779,8 @@
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000063043b6c"
       (reference "TP5") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
     )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/a57915be-60e8-4921-bdfc-72af83e9f594"
-      (reference "TP8") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
+    (path "/00000000-0000-0000-0000-000061e1d4ae/5d825c45-cbf0-4d8d-b60b-7a79573c2514"
+      (reference "TP6") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-000062f4c5c0"
       (reference "U1") (unit 1) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
