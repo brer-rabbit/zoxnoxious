@@ -2438,7 +2438,7 @@
     (pin "5" (uuid eabae622-8165-4f57-8b95-d1d326b70b60))
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL074") (at 294.64 119.38 0) (mirror x) (unit 3)
+  (symbol (lib_id "Amplifier_Operational:TL074") (at 294.64 119.38 0) (mirror x) (unit 2)
     (in_bom yes) (on_board yes)
     (uuid 00000000-0000-0000-0000-0000626f5a9f)
     (property "Reference" "U1" (id 0) (at 297.18 115.57 0))
@@ -2468,7 +2468,7 @@
     (pin "4" (uuid baae964b-00bf-4759-a500-2cb67dc03910))
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL074") (at 335.28 121.92 0) (mirror x) (unit 4)
+  (symbol (lib_id "Amplifier_Operational:TL074") (at 335.28 121.92 0) (mirror x) (unit 3)
     (in_bom yes) (on_board yes)
     (uuid 00000000-0000-0000-0000-0000626f5aad)
     (property "Reference" "U1" (id 0) (at 336.55 116.84 0))
@@ -2889,7 +2889,7 @@
     (pin "2" (uuid 04704be0-598e-4cc3-a6d9-e152a59fdd23))
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL074") (at 309.88 196.85 0) (mirror x) (unit 2)
+  (symbol (lib_id "Amplifier_Operational:TL074") (at 309.88 196.85 0) (mirror x) (unit 4)
     (in_bom yes) (on_board yes)
     (uuid 00000000-0000-0000-0000-000062f4c615)
     (property "Reference" "U1" (id 0) (at 311.15 191.77 0))

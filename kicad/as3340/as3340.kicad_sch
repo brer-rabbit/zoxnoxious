@@ -6491,9 +6491,6 @@
     (property "Datasheet" "http://www.ti.com/lit/ds/symlink/tl071.pdf" (id 3) (at 38.1 228.6 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC" "C504548" (id 4) (at 36.83 233.68 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
     (property "LCSC Part" "C12594" (id 5) (at 36.83 233.68 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -7785,13 +7782,13 @@
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-000062f4c5c0"
       (reference "U1") (unit 1) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-000062f4c615"
+    (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000626f5a9f"
       (reference "U1") (unit 2) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000626f5a9f"
+    (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000626f5aad"
       (reference "U1") (unit 3) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000626f5aad"
+    (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-000062f4c615"
       (reference "U1") (unit 4) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000064408a54"

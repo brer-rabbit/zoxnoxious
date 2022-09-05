@@ -6669,22 +6669,22 @@
       (reference "J2") (unit 1) (value "Eurorack Power") (footprint "Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_ShroudedKey")
     )
     (path "/00000000-0000-0000-0000-000062525dc6/00000000-0000-0000-0000-00006238dc2a"
-      (reference "J3") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_SullinsPolarized")
+      (reference "J3") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "project_footprints:PinSocket_2x20_P2.54mm_SullinsPolarized")
     )
     (path "/00000000-0000-0000-0000-00006252a02b/00000000-0000-0000-0000-00006238dc2a"
-      (reference "J4") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_SullinsPolarized")
+      (reference "J4") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "project_footprints:PinSocket_2x20_P2.54mm_SullinsPolarized")
     )
     (path "/00000000-0000-0000-0000-00006252a045/00000000-0000-0000-0000-00006238dc2a"
-      (reference "J5") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_SullinsPolarized")
+      (reference "J5") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "project_footprints:PinSocket_2x20_P2.54mm_SullinsPolarized")
     )
     (path "/00000000-0000-0000-0000-0000625442ef/00000000-0000-0000-0000-00006238dc2a"
-      (reference "J6") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_SullinsPolarized")
+      (reference "J6") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "project_footprints:PinSocket_2x20_P2.54mm_SullinsPolarized")
     )
     (path "/00000000-0000-0000-0000-000062544309/00000000-0000-0000-0000-00006238dc2a"
-      (reference "J7") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_SullinsPolarized")
+      (reference "J7") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "project_footprints:PinSocket_2x20_P2.54mm_SullinsPolarized")
     )
     (path "/00000000-0000-0000-0000-000062544323/00000000-0000-0000-0000-00006238dc2a"
-      (reference "J8") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_SullinsPolarized")
+      (reference "J8") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "project_footprints:PinSocket_2x20_P2.54mm_SullinsPolarized")
     )
     (path "/00000000-0000-0000-0000-0000624dd88e/00000000-0000-0000-0000-0000641aa062"
       (reference "J9") (unit 1) (value "AudioJack3DPDT") (footprint "Connector_Audio:Jack_6.35mm_CUI_SJ_63043F")
