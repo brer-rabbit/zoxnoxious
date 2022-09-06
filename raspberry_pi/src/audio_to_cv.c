@@ -256,7 +256,7 @@ int main (int argc, char *argv[]) {
   }
 
   spi_handle = spiOpen(0, spi_rate, 1);
-  i2c_handle = i2cOpen(1, 0x20, 0); // hardcode to PCA9555 for now
+  i2c_handle = i2cOpen(1, 0x25, 0); // hardcode to PCA9555 for now
 
   // END PIGPIO INIT
 
