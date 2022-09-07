@@ -86,7 +86,7 @@ static volatile sig_atomic_t in_aborting = 0;
 
 // ok use globals here.  civility be damned.
 static int xrun_recovery_count = 0;
-static int samples_dropped = 0;
+static int frames_dropped = 0;
 static int verbose = 0;
 
 static void signal_handler(int sig) {
@@ -131,7 +131,8 @@ static void signal_handler(int sig) {
     exit(EXIT_FAILURE);
   }
 
-  printf("xrun_recovery_count: %d\n", xrun_recovery_count);
+  printf("frames dropped: %d; xrun_recovery_count: %d\n",
+         frames_dropped, xrun_recovery_count);
   signal(sig, SIG_DFL);
   exit(1);
 }
@@ -439,6 +440,7 @@ static int alsa_pcm_read_spi_write(struct alsa_pcm_state *pcm_state, int spi_han
         expirations--;
         frameno += expirations;
         size -= expirations;
+        frames_dropped++;
         for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
           samples[channelnum] += (expirations * steps[channelnum]);
         }
