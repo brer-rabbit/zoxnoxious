@@ -5,8 +5,8 @@
   (paper "B")
 
   (title_block
-    (title "Zoxnoxious 3340 Oscillator: 3340 Primary")
-    (rev "0.3")
+    (title "Zoxnoxious 3340 Oscillator")
+    (rev "0.4")
     (company "Zoxnoxious Engineering")
   )
 
