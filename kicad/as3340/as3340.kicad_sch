@@ -3258,9 +3258,9 @@
   (no_connect (at 199.39 82.55) (uuid 80d7c156-0417-4876-93e1-192506ef1078))
   (no_connect (at 54.61 34.29) (uuid a1e40ed1-a8e9-4613-8b30-656e368bdf8c))
   (no_connect (at 69.85 72.39) (uuid b715cca9-1706-4699-ba15-9b1531a87336))
-  (no_connect (at 82.55 67.31) (uuid b715cca9-1706-4699-ba15-9b1531a87336))
-  (no_connect (at 69.85 64.77) (uuid b715cca9-1706-4699-ba15-9b1531a87336))
-  (no_connect (at 69.85 62.23) (uuid b715cca9-1706-4699-ba15-9b1531a87336))
+  (no_connect (at 82.55 67.31) (uuid b715cca9-1706-4699-ba15-9b1531a87337))
+  (no_connect (at 69.85 64.77) (uuid b715cca9-1706-4699-ba15-9b1531a87338))
+  (no_connect (at 69.85 62.23) (uuid b715cca9-1706-4699-ba15-9b1531a87339))
 
   (wire (pts (xy 24.13 234.95) (xy 24.13 237.49))
     (stroke (width 0) (type default) (color 0 0 0 0))
@@ -7380,11 +7380,8 @@
     (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-000062cd6ded"
       (reference "#PWR062") (unit 1) (value "+5V") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-000061edce12"
+    (path "/00000000-0000-0000-0000-000061ff2290/b11f854c-f54c-4583-b24f-b2c42c675ad4"
       (reference "#PWR063") (unit 1) (value "GND") (footprint "")
-    )
-    (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-000061edda4d"
-      (reference "#PWR064") (unit 1) (value "GND") (footprint "")
     )
     (path "/00000000-0000-0000-0000-00006517599a"
       (reference "#PWR065") (unit 1) (value "+12V") (footprint "")
@@ -7512,9 +7509,6 @@
     (path "/00000000-0000-0000-0000-000065a2cb21"
       (reference "C4") (unit 1) (value "0.1u") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
-    (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-000062306f07"
-      (reference "C5") (unit 1) (value "4.7u") (footprint "Capacitor_SMD:C_0805_2012Metric")
-    )
     (path "/00000000-0000-0000-0000-00006200ac6d"
       (reference "C6") (unit 1) (value "0.1u") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
@@ -7544,9 +7538,6 @@
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-00006253eef8"
       (reference "C15") (unit 1) (value "1u") (footprint "Capacitor_SMD:C_1206_3216Metric")
-    )
-    (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-000062306f13"
-      (reference "C16") (unit 1) (value "0.1u") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000061fb1402"
       (reference "C17") (unit 1) (value "10n") (footprint "Capacitor_SMD:C_0603_1608Metric")
@@ -8007,8 +7998,8 @@
     (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-000062cf8f99"
       (reference "U13") (unit 1) (value "LM4040AIM3-2.5") (footprint "Package_TO_SOT_SMD:SOT-23")
     )
-    (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-000062289c0b"
-      (reference "U14") (unit 1) (value "TLV5610IDW") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
+    (path "/00000000-0000-0000-0000-000061ff2290/83c7916e-9521-41d8-81de-2fc150d23c26"
+      (reference "U14") (unit 1) (value "AD5328") (footprint "Package_SO:TSSOP-16_4.4x5mm_P0.65mm")
     )
     (path "/00000000-0000-0000-0000-0000636c2e8e"
       (reference "U15") (unit 1) (value "M24C02-WMN") (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm")
