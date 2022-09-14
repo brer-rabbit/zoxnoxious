@@ -988,7 +988,7 @@
     (uuid 00000000-0000-0000-0000-00006238dc2a)
     (property "Reference" "J6" (id 0) (at 71.12 19.8882 0))
     (property "Value" "Conn_02x20_Odd_Even" (id 1) (at 71.12 22.1996 0))
-    (property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_SullinsPolarized" (id 2) (at 69.85 48.26 0)
+    (property "Footprint" "project_footprints:PinSocket_2x20_P2.54mm_SullinsPolarized" (id 2) (at 69.85 48.26 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 69.85 48.26 0)
