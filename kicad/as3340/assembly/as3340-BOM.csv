@@ -1,14 +1,16 @@
 Comment,Designator,Footprint,LCSC Part #
-0.1u Unpolarized capacitor,"C1,C2,C3,C4,C6,C7,C8,C9,C11,C12,C13,C16,C22,C25,C26,C27,C28,C29,C30,C31,C32,C34,C35,C37,C39",C_0603_1608Metric,C14663
-4.7u Unpolarized capacitor,"C5,C24",C_0805_2012Metric,C1779
+0.1u Unpolarized capacitor,"C1,C2,C3,C4,C6,C7,C8,C9,C11,C12,C13,C22,C25,C26,C27,C28,C29,C30,C31,C32,C34,C35,C37,C39",C_0603_1608Metric,C14663
 4.7n Unpolarized capacitor,C10,C_0603_1608Metric,C53987
 1u Unpolarized capacitor,"C14,C15",C_1206_3216Metric,C1848
 10n Unpolarized capacitor,"C17,C18,C19,C23,C33",C_0603_1608Metric,C57112
 100n Unpolarized capacitor,C20,C_0603_1608Metric,C14663
+1000p Unpolarized capacitor,C21,Nichicon QYX2A102KTP,
+4.7u Unpolarized capacitor,C24,C_0805_2012Metric,C1779
 22p Unpolarized capacitor,"C38,C40",C_0603_1608Metric,C1653
+2.2u Unpolarized capacitor,C41,C_1206_3216Metric,C50254
 "1N4148W 75V 0.15A Fast Switching Diode, SOD-123","D1,D2,D3",D_SOD-123,C81598
 LED Light emitting diode,D4,LED_0603_1608Metric,C2286
-47k Resistor,"R1,R2,R3,R5,R8,R66,R70,R71,R73",R_0603_1608Metric,C25819
+47k Resistor,"R1,R2,R3,R5,R8,R66,R70,R71,R73,R74",R_0603_1608Metric,C25819
 5k1 Resistor,R4,R_0603_1608Metric,C23186
 62k Resistor,R6,R_0603_1608Metric,C23221
 120k Resistor,"R7,R12",R_0603_1608Metric,C25808
@@ -20,17 +22,18 @@ LED Light emitting diode,D4,LED_0603_1608Metric,C2286
 56k Resistor,"R17,R22",R_0603_1608Metric,C23206
 82k Resistor,R18,R_0603_1608Metric,C23254
 33k Resistor,"R19,R54,R55",R_0603_1608Metric,C4216
-10k Resistor,"R21,R24,R28,R41,R57,R61,R68",R_0603_1608Metric,C25804
+10k Resistor,"R21,R24,R28,R41,R57,R61,R68,R69",R_0603_1608Metric,C25804
 1M Resistor,"R23,R27,R29,R30,R37,R43",R_0603_1608Metric,C22935
 5k6 Resistor,"R25,R34",R_0603_1608Metric,C23189
 510 Resistor,R26,R_0603_1608Metric,C23193
-1.5M Resistor,R31,R_0603_1608Metric,C4172
+1M5 Resistor,R31,R_0603_1608Metric,C4172
 470 Resistor,"R32,R46",R_0805_2012Metric,C17710
-20K Resistor,R33,R_0603_1608Metric,C4184
-1K82 Resistor,R35,R_0603_1608Metric,C4177
+24k Resistor,R33,R_0603_1608Metric,C23352
+1k8 Resistor,R35,R_0603_1608Metric,C4177
 51k Resistor,"R36,R62,R67",R_0603_1608Metric,C23196
 100k 0.1% Resistor,R38,R_0603_1608Metric,C25803
-300k Resistor,R42,R_0603_1608Metric,C23024
+39k Resistor,"R40,R72",R_0603_1608Metric,C23153
+200k Resistor,R42,R_0603_1608Metric,C25811
 18k Resistor,R44,R_0603_1608Metric,C25810
 13k Resistor,R45,R_0603_1608Metric,C22797
 4k7 Resistor,R47,R_1206_3216Metric,C17936
@@ -38,13 +41,15 @@ LED Light emitting diode,D4,LED_0603_1608Metric,C2286
 30k .1% Resistor,R50,R_0603_1608Metric,C22984
 8k2 Resistor,"R52,R53",R_0603_1608Metric,C25981
 2k Resistor,R56,R_0603_1608Metric,C22975
-220k Resistor,"R58,R74",R_0603_1608Metric,C22961
-24k Resistor,R59,R_0603_1608Metric,C23352
+300k Resistor,R58,R_0603_1608Metric,C23024
 15k Resistor,R64,R_0603_1608Metric,C22809
-30k Resistor,R69,R_0603_1608Metric,C22984
-180k Resistor,R72,R_0603_1608Metric,C22827
-360k Resistor,R75,R_0603_1608Metric,C23146
-"TL074 Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14","U1,U2,U12",SOIC-14_3.9x8.7mm_P1.27mm,C12594
-"PCA9555D IO expander 16 GPIO, I2C 400kHz, Interrupt, 2.3 - 5.5V, SOIC-24",U7,TSSOP-24_4.4x7.8mm_P0.65mm,C83265
+75k Resistor,R75,R_0603_1608Metric,C23242
+10K ,RV1,Potentiometer_Bourns_3296W_Vertical,
+20k ,RV2,Potentiometer_Bourns_3296W_Vertical,
+"TL074 Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14","U1,U2,U12",SOIC-14_3.9x8.7mm_P1.27mm,C6963
+"LM79L05 3-Terminal Negative Regulator, -5V, TO-92",U10,TO-92_Inline_Wide,
 "LM393 Low-Power, Low-Offset Voltage, Dual Comparators, DIP-8/SOIC-8/TO-99-8",U11,SOIC-8_3.9x4.9mm_P1.27mm,C7955
+"LM4040AIM3-2.5 4.096V Precision Micropower Shunt Voltage Reference, TO-92",U13,SOT-23,C131939
+AD5328 Octal Voltage Output DAC,U14,TSSOP-16_4.4x5mm_P0.65mm,C29162
 "M24C02-WMN 2Kb (256x8) I2C Serial EEPROM, 2.5-5.5V, SOIC-8",U15,SOIC-8_3.9x4.9mm_P1.27mm,C7562
+"LM4040CIM3-2.5 4.096V Precision Micropower Shunt Voltage Reference, TO-92",U16,SOT-23,C131939
