@@ -1,4 +1,3 @@
-
 #include "plugin.hpp"
 #include "ZoxnoxiousExpander.hpp"
 
@@ -135,6 +134,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
 
     void process(const ProcessArgs& args) override {
+        ZoxnoxiousModule::process(args);
+
         bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
         lights[SYNC_NEG_ENABLE_LIGHT].setBrightness(sync_neg);
 
@@ -257,21 +258,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         }
     }
 
-
-    void onExpanderChange (const ExpanderChangeEvent &e) override {
-        Expander expander = e.side? this->getRightExpander() : this->getLeftExpander();
-
-        if (expander.module) {
-            INFO("zoxnoxious3340: %s expander added on %s side",
-                 //expander.module->model == modelZoxnoxious3340 ? "z3340" : "unknown",
-                 dynamic_cast<Zoxnoxious3340*>(expander.module) == NULL ? "unknown" : "z3340",
-                 e.side ? "right" : "left");
-        }
-        else {
-            INFO("zoxnoxious3340: expander removed on %s side",
-                 e.side ? "right" : "left");
-        }
-    }
 
 };
 
