@@ -2,8 +2,7 @@
 
 #include "AudioMidi.hpp"
 #include "zcomponentlib.hpp"
-#include "ZoxnoxiousExpanderMessage.hpp"
-#include "ZoxnoxiousModule.hpp"
+#include "ZoxnoxiousExpander.hpp"
 
 struct PatchingMatrix : ZoxnoxiousModule {
     enum ParamId {

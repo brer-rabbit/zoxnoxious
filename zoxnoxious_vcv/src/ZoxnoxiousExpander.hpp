@@ -1,8 +1,7 @@
 #pragma once
-#include "plugin.hpp"
+#include <rack.hpp>
 
 const int maxChannels = 31;
-
 
 /** ZoxnoxiousControlVoltageBusMessage:
  * messages originating from hardware cards (expansion modules) are
@@ -18,7 +17,6 @@ public:
 
 
 /** ZoxnoxiousCommandBus 
-
  * messages originating from backplane card (the only required card)
  * are received from the right expansion.  The purpose is to define
  * channel ownership for signals on the ZoxnoxiousControlVoltageBusMessage.
@@ -32,4 +30,12 @@ struct ChannelAssignment {
 
 struct ZoxnoxiousCommandBus {
     struct ChannelAssignment channelAssignments[4];    
+};
+
+
+
+struct ZoxnoxiousModule : Module {
+
+
+
 };

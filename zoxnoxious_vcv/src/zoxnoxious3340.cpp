@@ -1,6 +1,6 @@
 
 #include "plugin.hpp"
-#include "ZoxnoxiousModule.hpp"
+#include "ZoxnoxiousExpander.hpp"
 
 const static int num_audio_inputs = 6;
 
