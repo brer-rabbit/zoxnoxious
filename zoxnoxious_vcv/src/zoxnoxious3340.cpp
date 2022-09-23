@@ -1,12 +1,11 @@
-#include <iostream>
 
 #include "plugin.hpp"
-
+#include "ZoxnoxiousModule.hpp"
 
 const static int num_audio_inputs = 6;
 
 
-struct Zoxnoxious3340 : Module {
+struct Zoxnoxious3340 : ZoxnoxiousModule {
     // the ParamId ordering *is* relevant.
     // this order should reflect the channel mapping (WHY?)
     // TODO: fix this, ordering of params shouldn't map to channels
@@ -185,8 +184,6 @@ struct Zoxnoxious3340 : Module {
         const float clipTime = 0.25f;
 
 
-        if (isExpanderModule(rightExpander.module)) {
-        }
 
         // linear
         v = params[LINEAR_INPUT].getValue() + inputs[LINEAR_KNOB_PARAM].getVoltageSum() / 10.f;
@@ -259,6 +256,23 @@ struct Zoxnoxious3340 : Module {
             lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
         }
     }
+
+
+    void onExpanderChange (const ExpanderChangeEvent &e) override {
+        Expander expander = e.side? this->getRightExpander() : this->getLeftExpander();
+
+        if (expander.module) {
+            INFO("zoxnoxious3340: %s expander added on %s side",
+                 //expander.module->model == modelZoxnoxious3340 ? "z3340" : "unknown",
+                 dynamic_cast<Zoxnoxious3340*>(expander.module) == NULL ? "unknown" : "z3340",
+                 e.side ? "right" : "left");
+        }
+        else {
+            INFO("zoxnoxious3340: expander removed on %s side",
+                 e.side ? "right" : "left");
+        }
+    }
+
 };
 
 

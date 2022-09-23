@@ -2,8 +2,10 @@
 
 #include "AudioMidi.hpp"
 #include "zcomponentlib.hpp"
+#include "ZoxnoxiousExpanderMessage.hpp"
+#include "ZoxnoxiousModule.hpp"
 
-struct PatchingMatrix : Module {
+struct PatchingMatrix : ZoxnoxiousModule {
     enum ParamId {
         MIX_LEFT_SELECT_PARAM,
         CARD_A_MIX1_CARD_A_BUTTON_PARAM,
@@ -201,10 +203,21 @@ struct PatchingMatrix : Module {
 
     ZoxnoxiousAudioPort audioPort;
     ZoxnoxiousMidiOutput midiOutput;
+    ZoxnoxiousCommandBus commandOutput_a;
+    ZoxnoxiousCommandBus commandOutput_b;
 
 
+    PatchingMatrix() : audioPort(this) {
 
-    PatchingMatrix()  : audioPort(this) {
+        commandOutput_a.channelAssignments[0] = { 0, false };
+        commandOutput_a.channelAssignments[1] = { 6, false };
+        commandOutput_a.channelAssignments[2] = { 12, false };
+        commandOutput_a.channelAssignments[3] = { 18, false };
+        commandOutput_b.channelAssignments[0] = { 0, false };
+        commandOutput_b.channelAssignments[1] = { 6, false };
+        commandOutput_b.channelAssignments[2] = { 12, false };
+        commandOutput_b.channelAssignments[3] = { 18, false };
+
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configSwitch(MIX_LEFT_SELECT_PARAM, 0.f, 1.f, 0.f, "Left Output", { "Out1", "Out2" });
@@ -307,7 +320,6 @@ struct PatchingMatrix : Module {
         configSwitch(CARD_E_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Audio Out");
         configSwitch(CARD_F_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Audio Out");
         configSwitch(CARD_F_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Audio Out");
-
 
         configInput(LEFT_LEVEL_INPUT_INPUT, "");
         configInput(RIGHT_LEVEL_INPUT_INPUT, "");
@@ -451,9 +463,28 @@ struct PatchingMatrix : Module {
                 audioPort.engineInputBuffer.push(inputFrame);
             }
         }
-
-
     }
+
+    void onExpanderChange (const ExpanderChangeEvent &e) override {
+        // if the expander change is on the right side,
+        // and it's a module we recognize,
+        // reset the channel assignments and send a new list
+        
+
+        Expander expander = e.side? this->getRightExpander() : this->getLeftExpander();
+
+        if (expander.module) {
+            INFO("zoxnoxious3340: %s expander added on %s side",
+                 //expander.module->model == modelZoxnoxious3340 ? "z3340" : "unknown",
+                 dynamic_cast<ZoxnoxiousModule*>(expander.module) == NULL ? "unknown" : "z3340",
+                 e.side ? "right" : "left");
+        }
+        else {
+            INFO("zoxnoxious3340: expander removed on %s side",
+                 e.side ? "right" : "left");
+        }
+    }
+
 };
 
 

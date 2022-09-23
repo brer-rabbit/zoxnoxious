@@ -15,3 +15,21 @@ public:
     float frame[maxChannels];
     // TODO: add MIDI event
 };
+
+
+/** ZoxnoxiousCommandBus 
+
+ * messages originating from backplane card (the only required card)
+ * are received from the right expansion.  The purpose is to define
+ * channel ownership for signals on the ZoxnoxiousControlVoltageBusMessage.
+ */
+
+struct ChannelAssignment {
+    //Model *model;
+    int channelOffset;
+    bool owned;
+};
+
+struct ZoxnoxiousCommandBus {
+    struct ChannelAssignment channelAssignments[4];    
+};
