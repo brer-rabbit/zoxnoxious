@@ -459,16 +459,20 @@ struct PatchingMatrix : ZoxnoxiousModule {
     void initCommandBus() override {
         zCommand_a.authoritativeSource = true;
         zCommand_a.test = 10;
-        zCommand_a.channelAssignments[0] = { 0, false };
-        zCommand_a.channelAssignments[1] = { 3, false };
-        zCommand_a.channelAssignments[2] = { 4, false };
-        zCommand_a.channelAssignments[3] = { 7, false };
-        zCommand_a.channelAssignments[4] = { 12, false };
-        zCommand_a.channelAssignments[5] = { 18, false };
-        zCommand_a.channelAssignments[6] = { 24, false };
-        zCommand_a.channelAssignments[7] = { 30, false };
+        // channelAssignment data:
+        // hardware cardId, channelOffset, assignmentOwned
+        // hardcoded for now, later this ought to be received
+        // via midi from the controlling board
+        zCommand_a.channelAssignments[0] = { 0x01, 0, false };
+        zCommand_a.channelAssignments[1] = { 0x02, 3, false };
+        zCommand_a.channelAssignments[2] = { 0x02, 9, false };
+        zCommand_a.channelAssignments[3] = { 0x00, -1, false };
+        zCommand_a.channelAssignments[4] = { 0x00, -1, false };
+        zCommand_a.channelAssignments[5] = { 0x00, -1, false };
+        zCommand_a.channelAssignments[6] = { 0x00, -1, false };
+        zCommand_a.channelAssignments[7] = { 0x00, -1, false };
         zCommand_b = zCommand_a;
-        INFO("PatchingMatrix: set command bus to authoritative");
+        INFO("PatchingMatrix: set command bus message to authoritative");
     }
 
 

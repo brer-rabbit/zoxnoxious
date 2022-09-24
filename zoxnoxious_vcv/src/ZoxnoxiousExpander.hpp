@@ -27,9 +27,9 @@ public:
 static const int maxCards = 8;
 
 struct ChannelAssignment {
-    //Model *model; // think about need here- should be int Id
-    int channelOffset;
-    bool channelsOwned;
+    unsigned char cardId; // physical card's identifier
+    int channelOffset;  // offset to write channel to the controlbus frame
+    bool assignmentOwned; // true if a card claimed this assignment
 };
 
 struct ZoxnoxiousCommandBus {
@@ -42,8 +42,8 @@ struct ZoxnoxiousCommandBus {
 static const ZoxnoxiousCommandBus commandEmpty =
   {
       // channelAssignmens
-      { { 0, false}, { 0, false}, { 0, false}, { 0, false},
-        { 0, false}, { 0, false}, { 0, false}, { 0, false}
+      { { 0, 0, false}, { 0, 0, false}, { 0, 0, false}, { 0, 0, false},
+        { 0, 0, false}, { 0, 0, false}, { 0, 0, false}, { 0, 0, false}
       },
       // authoritativeSource
       false,
@@ -166,8 +166,9 @@ protected:
             leftExpanderProducerMessage->test++;
             leftExpander.messageFlipRequested = true;
 
+
             if (APP->engine->getFrame() % 60000 == 0) {
-                INFO("Z Expander: frame %lld : module id %lld : requested message flip: authoritative: %d : zCommand_a int: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource, leftExpanderProducerMessage->test);
+                INFO("Z Expander: frame %ld : module id %ld : requested message flip: authoritative: %d : zCommand_a int: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource, leftExpanderProducerMessage->test);
             }
         }
 
