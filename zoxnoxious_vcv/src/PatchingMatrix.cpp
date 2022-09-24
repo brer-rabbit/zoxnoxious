@@ -468,6 +468,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         zCommand_a.channelAssignments[6] = { 24, false };
         zCommand_a.channelAssignments[7] = { 30, false };
         zCommand_b = zCommand_a;
+        INFO("PatchingMatrix: set command bus to authoritative");
     }
 
 

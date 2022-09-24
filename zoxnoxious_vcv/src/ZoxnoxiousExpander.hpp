@@ -98,12 +98,6 @@ public:
         if (e.side) {  // right
             expander = getRightExpander();
             validExpander = &validRightExpander;
-
-            // command bus changed (added or removed) on the right- reset/mark unauthoritative
-            // so this passes along to the left
-            initCommandBus();
-            leftExpander.producerMessage = &zCommand_a;
-            leftExpander.consumerMessage = &zCommand_b;
         }
         else {  // left
             expander = getLeftExpander();
@@ -126,6 +120,12 @@ public:
             INFO("Z Expander: invalid %s expander", e.side ? "right" : "left");
         }
 
+        // command bus changed (added or removed) on the right- reset/mark (un)authoritative
+        // so this passes along to the left 
+        initCommandBus();
+        // thinking this isn't necessary as it's already set:
+        //leftExpander.producerMessage = &zCommand_a;
+        //leftExpander.consumerMessage = &zCommand_b;
     }
 
 
@@ -155,7 +155,7 @@ protected:
             ZoxnoxiousCommandBus *leftExpanderProducerMessage =
                 leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
 
-            *leftExpanderProducerMessage = *rightConsumerMessage; // copy
+            *leftExpanderProducerMessage = *rightConsumerMessage; // copy / daisy chain
 
             // TODO: extract channel assignment, claim ownership.  Do
             // this by iterating over the leftExpanderProducerMessage,
@@ -166,7 +166,7 @@ protected:
             leftExpanderProducerMessage->test++;
             leftExpander.messageFlipRequested = true;
 
-            if (APP->engine->getFrame() % 40000 == 0) {
+            if (APP->engine->getFrame() % 60000 == 0) {
                 INFO("Z Expander: frame %lld : module id %lld : requested message flip: authoritative: %d : zCommand_a int: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource, leftExpanderProducerMessage->test);
             }
         }
