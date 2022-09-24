@@ -24,22 +24,40 @@ public:
  * channel ownership for signals on the ZoxnoxiousControlBus.
  */
 
+static const int maxCards = 8;
+
 struct ChannelAssignment {
     //Model *model; // think about need here- should be int Id
     int channelOffset;
-    bool owned;
+    bool channelsOwned;
 };
 
 struct ZoxnoxiousCommandBus {
-    struct ChannelAssignment channelAssignments[4];
-    bool commandReceived;
+    struct ChannelAssignment channelAssignments[maxCards];
+    bool authoritativeSource;
     int test;
 };
 
 
-// in constructor:
-// init/setup right & left / producer & consumer messages to memory
+static const ZoxnoxiousCommandBus commandEmpty =
+  {
+      // channelAssignmens
+      { { 0, false}, { 0, false}, { 0, false}, { 0, false},
+        { 0, false}, { 0, false}, { 0, false}, { 0, false}
+      },
+      // authoritativeSource
+      false,
+      // test int
+      1
+  };
+      
+    
 
+// What an expander can do:
+//
+// in constructor:
+// init/setup memory for right & left / producer & consumer messages
+//
 // outside of constructor:
 // can write to:
 // rightExpander.producerMessage
@@ -57,22 +75,14 @@ private:
     //ZoxnoxiousControlBus controlProducerLeft;
     //ZoxnoxiousControlBus controlConsumerLeft;
 
-    ZoxnoxiousCommandBus commandProducer_a;
-    ZoxnoxiousCommandBus commandProducer_b;
-
+ 
 public:
     ZoxnoxiousModule() : validRightExpander(false), validLeftExpander(false) {
-        leftExpander.producerMessage = &commandProducer_a;
-        leftExpander.consumerMessage = &commandProducer_b;
+        leftExpander.producerMessage = &zCommand_a;
+        leftExpander.consumerMessage = &zCommand_b;
 
-        // daisy chain the leftExpander received messages to
-        // rightExpander
-        commandProducer_a.channelAssignments[0] = { 0, false };
-        commandProducer_a.channelAssignments[1] = { 6, false };
-        commandProducer_a.channelAssignments[2] = { 12, false };
-        commandProducer_a.channelAssignments[3] = { 18, false };
-        commandProducer_a.commandReceived = false;
-        commandProducer_a.test = 1;
+        initCommandBus();
+
         //rightExpander.producerMessage = &controlProducerRight;
         //rightExpander.consumerMessage = &controlConsumerRight;
     }
@@ -85,16 +95,22 @@ public:
         Expander expander;
         bool *validExpander;
 
-        if (e.side) {
+        if (e.side) {  // right
             expander = getRightExpander();
             validExpander = &validRightExpander;
+
+            // command bus changed (added or removed) on the right- reset/mark unauthoritative
+            // so this passes along to the left
+            initCommandBus();
+            leftExpander.producerMessage = &zCommand_a;
+            leftExpander.consumerMessage = &zCommand_b;
         }
-        else {
+        else {  // left
             expander = getLeftExpander();
             validExpander = &validLeftExpander;
         }
 
-        // if we previously had a validExpander, it's been replaced and we should reset state
+        // if we previously had a validExpander, it's been replaced
         if (*validExpander) {
             INFO("Z Expander: replacing a valid %s expander", e.side ? "right" : "left");
         }
@@ -103,10 +119,6 @@ public:
             // hey, this module looks familiar
             *validExpander = true;
             INFO("Z Expander: valid %s expander", e.side ? "right" : "left");
-            // reset producer
-            commandProducer_a.commandReceived = false;
-            commandProducer_a.test = 1;
-
         }
         else {
             // I don't know you
@@ -118,40 +130,59 @@ public:
 
 
 protected:
+    ZoxnoxiousCommandBus zCommand_a;
+    ZoxnoxiousCommandBus zCommand_b;
+
     /** processExpander
      * to make use of the expander, this method ought to be
-     * called from the derived class's process().
+     * called from the derived class's process()
      */
     virtual void processExpander(const ProcessArgs &args) {
 
         Expander rightExpander = getRightExpander();
 
-        // The _only_ thing you can do with the Module pointer is
-        // write to its producerMessage or read
-        // from its consumerMessage and then set messageFlipRequested
+        // The _only_ thing you can do with the Module pointer is read
+        // from the consumerMessage.  Write back to it via the
+        // producerMessage on local Expander and call set messageFlipRequested.
         if (rightExpander.module != NULL && validRightExpander) {
             ZoxnoxiousCommandBus *rightConsumerMessage = static_cast<ZoxnoxiousCommandBus*>(rightExpander.module->leftExpander.consumerMessage);
-            ZoxnoxiousCommandBus *rightProducerMessage = static_cast<ZoxnoxiousCommandBus*>(rightExpander.module->leftExpander.producerMessage);
                 
-            // Do any reading of the rightConsumerMessage here
-            // Copy the producer message (which we may have altered)
-            // and daisy chain it to the left.
-            commandProducer_a = *rightConsumerMessage;
-            commandProducer_a.commandReceived = false;
-            commandProducer_a.test++;
+            // Do any reading of the rightConsumerMessage here Copy
+            // the right's consumer message to our left producer
+            // message, effectively daisy chaining it to the left.  To
+            // do the copy, determine which buffer is the
+            // ProducerMessage and write to it.
+            ZoxnoxiousCommandBus *leftExpanderProducerMessage =
+                leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
+
+            *leftExpanderProducerMessage = *rightConsumerMessage; // copy
+
+            // TODO: extract channel assignment, claim ownership.  Do
+            // this by iterating over the leftExpanderProducerMessage,
+            // finding if we own anything there.
 
 
-            leftExpander.producerMessage = &commandProducer_a;
+
+            leftExpanderProducerMessage->test++;
             leftExpander.messageFlipRequested = true;
 
-
-
             if (APP->engine->getFrame() % 40000 == 0) {
-                INFO("Z Expander: frame %ld : module id %ld : requested message flip: commandProducer_a int: %d", APP->engine->getFrame(), getId(), commandProducer_a.test);
+                INFO("Z Expander: frame %lld : module id %lld : requested message flip: authoritative: %d : zCommand_a int: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource, leftExpanderProducerMessage->test);
             }
         }
 
     }
 
+
+    /** initCommandBus
+     *
+     * set both zCommand_a and zCommand_b to an (identical) initial
+     * state.  Since the data is synthesized here, it gets marked as
+     * from a not-authoritative source.
+     */
+    virtual void initCommandBus() {
+        zCommand_a = commandEmpty;
+        zCommand_b = commandEmpty;
+    }
 
 };

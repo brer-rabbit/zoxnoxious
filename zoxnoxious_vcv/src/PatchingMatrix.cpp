@@ -452,6 +452,26 @@ struct PatchingMatrix : ZoxnoxiousModule {
     }
 
 
+
+    /** initCommandBus
+     * override and provide data basd on discovery
+     */
+    void initCommandBus() override {
+        zCommand_a.authoritativeSource = true;
+        zCommand_a.test = 10;
+        zCommand_a.channelAssignments[0] = { 0, false };
+        zCommand_a.channelAssignments[1] = { 3, false };
+        zCommand_a.channelAssignments[2] = { 4, false };
+        zCommand_a.channelAssignments[3] = { 7, false };
+        zCommand_a.channelAssignments[4] = { 12, false };
+        zCommand_a.channelAssignments[5] = { 18, false };
+        zCommand_a.channelAssignments[6] = { 24, false };
+        zCommand_a.channelAssignments[7] = { 30, false };
+        zCommand_b = zCommand_a;
+    }
+
+
+
 };
 
 
