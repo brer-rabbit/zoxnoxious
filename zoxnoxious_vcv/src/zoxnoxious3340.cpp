@@ -134,7 +134,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
 
     void process(const ProcessArgs& args) override {
-        ZoxnoxiousModule::process(args);
+        processExpander(args);
 
         bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
         lights[SYNC_NEG_ENABLE_LIGHT].setBrightness(sync_neg);
