@@ -453,26 +453,34 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
 
-    /** initCommandBus
+    /** getCardHardwareId
+     * return the hardware Id of the 3340 card
+     */
+    static const uint8_t hardwareId = 0x01;
+    uint8_t getHardwareId() override {
+        return hardwareId;
+    }
+
+    /** initCommandMsgState
      * override and provide data basd on discovery
      */
-    void initCommandBus() override {
+    void initCommandMsgState() override {
         zCommand_a.authoritativeSource = true;
         zCommand_a.test = 10;
         // channelAssignment data:
         // hardware cardId, channelOffset, assignmentOwned
-        // hardcoded for now, later this ought to be received
+        // hardcoded/mocked data for now, later this ought to be received
         // via midi from the controlling board
-        zCommand_a.channelAssignments[0] = { 0x01, 0, false };
-        zCommand_a.channelAssignments[1] = { 0x02, 3, false };
-        zCommand_a.channelAssignments[2] = { 0x02, 9, false };
-        zCommand_a.channelAssignments[3] = { 0x00, -1, false };
-        zCommand_a.channelAssignments[4] = { 0x00, -1, false };
-        zCommand_a.channelAssignments[5] = { 0x00, -1, false };
-        zCommand_a.channelAssignments[6] = { 0x00, -1, false };
-        zCommand_a.channelAssignments[7] = { 0x00, -1, false };
+        zCommand_a.channelAssignments[0] = { getHardwareId(), 0, 1, false };
+        zCommand_a.channelAssignments[1] = { 0x02, 3, 2, false };
+        zCommand_a.channelAssignments[2] = { 0x02, 9, 3, false };
+        zCommand_a.channelAssignments[3] = { 0x00, -1, -1, false };
+        zCommand_a.channelAssignments[4] = { 0x00, -1, -1, false };
+        zCommand_a.channelAssignments[5] = { 0x00, -1, -1, false };
+        zCommand_a.channelAssignments[6] = { 0x00, -1, -1, false };
+        zCommand_a.channelAssignments[7] = { 0x00, -1, -1, false };
         zCommand_b = zCommand_a;
-        INFO("PatchingMatrix: set command bus message to authoritative");
+        INFO("PatchingMatrix: set command msg to authoritative");
     }
 
 

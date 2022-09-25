@@ -5,50 +5,53 @@
 
 const int maxChannels = 31;
 
-/** ZoxnoxiousControlBus:
+/** ZoxnoxiousControlMsg:
  * messages originating from hardware cards (expansion modules) are
  * received from the left.  The expansion module populates channels it
  * is responsible for and passes the message to the right.
  */
 
-class ZoxnoxiousControlBus {
+class ZoxnoxiousControlMsg {
 public:
     float frame[maxChannels];
     // TODO: add MIDI event
 };
 
 
-/** ZoxnoxiousCommandBus 
+/** ZoxnoxiousCommandMsg 
  * messages originating from backplane card (the only required card)
  * are received from the right expansion.  The purpose is to define
- * channel ownership for signals on the ZoxnoxiousControlBus.
+ * channel ownership for signals on the ZoxnoxiousControlMsg.
  */
 
 static const int maxCards = 8;
+static const int invalidCvChannelOffset = -1;
+static const int invalidMidiChannel = -1;
 
 struct ChannelAssignment {
-    unsigned char cardId; // physical card's identifier
-    int channelOffset;  // offset to write channel to the controlbus frame
+    uint8_t cardId; // physical card's identifier
+    int cvChannelOffset;  // offset to write channel to the controlmsg frame
+    int midiChannel;
     bool assignmentOwned; // true if a card claimed this assignment
 };
 
-struct ZoxnoxiousCommandBus {
-    struct ChannelAssignment channelAssignments[maxCards];
+struct ZoxnoxiousCommandMsg {
     bool authoritativeSource;
     int test;
+    struct ChannelAssignment channelAssignments[maxCards];
 };
 
 
-static const ZoxnoxiousCommandBus commandEmpty =
+static const ZoxnoxiousCommandMsg commandEmpty =
   {
-      // channelAssignmens
-      { { 0, 0, false}, { 0, 0, false}, { 0, 0, false}, { 0, 0, false},
-        { 0, 0, false}, { 0, 0, false}, { 0, 0, false}, { 0, 0, false}
-      },
       // authoritativeSource
       false,
       // test int
-      1
+      1,
+      // cardId, cvChannelOffset, midiChannel, assignmentOwned
+      { { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false},
+        { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false}
+      }
   };
       
     
@@ -72,16 +75,18 @@ struct ZoxnoxiousModule : Module {
 private:
     bool validRightExpander;
     bool validLeftExpander;
-    //ZoxnoxiousControlBus controlProducerLeft;
-    //ZoxnoxiousControlBus controlConsumerLeft;
+    //ZoxnoxiousControlMsg controlProducerLeft;
+    //ZoxnoxiousControlMsg controlConsumerLeft;
 
- 
 public:
-    ZoxnoxiousModule() : validRightExpander(false), validLeftExpander(false) {
+    ZoxnoxiousModule() :
+        validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
+        cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel) {
+
         leftExpander.producerMessage = &zCommand_a;
         leftExpander.consumerMessage = &zCommand_b;
 
-        initCommandBus();
+        initCommandMsgState();
 
         //rightExpander.producerMessage = &controlProducerRight;
         //rightExpander.consumerMessage = &controlConsumerRight;
@@ -120,18 +125,29 @@ public:
             INFO("Z Expander: invalid %s expander", e.side ? "right" : "left");
         }
 
-        // command bus changed (added or removed) on the right- reset/mark (un)authoritative
+        // command msg changed (added or removed) on the right- reset/mark (un)authoritative
         // so this passes along to the left 
-        initCommandBus();
+        initCommandMsgState();
+
+
         // thinking this isn't necessary as it's already set:
         //leftExpander.producerMessage = &zCommand_a;
         //leftExpander.consumerMessage = &zCommand_b;
     }
 
 
+
+
 protected:
-    ZoxnoxiousCommandBus zCommand_a;
-    ZoxnoxiousCommandBus zCommand_b;
+    ZoxnoxiousCommandMsg zCommand_a;
+    ZoxnoxiousCommandMsg zCommand_b;
+
+    // data acquired from the ZoxnoxiousCommandMsg-
+    // this data will be used when writing to the ZonxnoxiousControlMsg
+    bool hasChannelAssignment;
+    int cvChannelOffset;
+    int midiChannel;
+
 
     /** processExpander
      * to make use of the expander, this method ought to be
@@ -145,22 +161,23 @@ protected:
         // from the consumerMessage.  Write back to it via the
         // producerMessage on local Expander and call set messageFlipRequested.
         if (rightExpander.module != NULL && validRightExpander) {
-            ZoxnoxiousCommandBus *rightConsumerMessage = static_cast<ZoxnoxiousCommandBus*>(rightExpander.module->leftExpander.consumerMessage);
+            ZoxnoxiousCommandMsg *rightExpanderConsumerMessage = static_cast<ZoxnoxiousCommandMsg*>(rightExpander.module->leftExpander.consumerMessage);
                 
-            // Do any reading of the rightConsumerMessage here Copy
+            // Do any reading of the rightExpanderConsumerMessage here.  Copy
             // the right's consumer message to our left producer
-            // message, effectively daisy chaining it to the left.  To
-            // do the copy, determine which buffer is the
-            // ProducerMessage and write to it.
-            ZoxnoxiousCommandBus *leftExpanderProducerMessage =
+            // message.  Effectively, this daisy chains it to the
+            // left.  To do the copy, determine which buffer point to
+            // the ProducerMessage and write to it.
+            ZoxnoxiousCommandMsg *leftExpanderProducerMessage =
                 leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
 
-            *leftExpanderProducerMessage = *rightConsumerMessage; // copy / daisy chain
+            *leftExpanderProducerMessage = *rightExpanderConsumerMessage; // copy/daisy chain
 
             // TODO: extract channel assignment, claim ownership.  Do
             // this by iterating over the leftExpanderProducerMessage,
-            // finding if we own anything there.
-
+            // finding if we own anything there.  This may/will modify
+            // the message if we claim ownership of a ChannelAssignment.
+            processZoxnoxiousCommand(leftExpanderProducerMessage);
 
 
             leftExpanderProducerMessage->test++;
@@ -168,22 +185,54 @@ protected:
 
 
             if (APP->engine->getFrame() % 60000 == 0) {
-                INFO("Z Expander: frame %ld : module id %ld : requested message flip: authoritative: %d : zCommand_a int: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource, leftExpanderProducerMessage->test);
+                INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : requested message flip: authoritative: %d : zCommand_a int: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource, leftExpanderProducerMessage->test);
             }
         }
 
     }
 
 
-    /** initCommandBus
+    /** getCardHardwareId
+     * return the hardware Id of the card.  Derived class needs to implement this.
+     */
+    virtual uint8_t getHardwareId() = 0;
+
+
+    /** processZoxnoxiousCommand
+     * parse the ZoxnoxiousCommand to get a cvChannelOffset and a midiChannel.
+     * If we find a cardId matching our Id, and the assignment isn't owned, set it to owned.
+     * pre:
+     * zCommand message state has list of channelassignment with hardware ids
+     * post:
+     * (1) this object sets hasChannelAssignment, cvChannelOffset, midiChannel.
+     * (2) the zCommand message has a ChannelAssignment.assignmentOwned flipped from false to true
+     */
+    virtual void processZoxnoxiousCommand(ZoxnoxiousCommandMsg *zCommand) {
+        // if we have an authoritative source and no channel assignment...
+        if (zCommand->authoritativeSource && ! hasChannelAssignment) {
+
+        }
+    }
+
+
+
+    /** initCommandMsgState
      *
      * set both zCommand_a and zCommand_b to an (identical) initial
      * state.  Since the data is synthesized here, it gets marked as
      * from a not-authoritative source.
+     * Reset any state variables since they may change with an expander change.
      */
-    virtual void initCommandBus() {
+    virtual void initCommandMsgState() {
         zCommand_a = commandEmpty;
         zCommand_b = commandEmpty;
+
+        hasChannelAssignment = false;
+        cvChannelOffset = invalidCvChannelOffset;
+        midiChannel = invalidMidiChannel;
     }
+
+
+
 
 };
