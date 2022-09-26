@@ -479,6 +479,10 @@ struct PatchingMatrix : ZoxnoxiousModule {
         zCommand_a.channelAssignments[5] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[6] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[7] = { 0x00, -1, -1, false };
+
+        // take ownership of our card
+        processZoxnoxiousCommand(&zCommand_a);
+
         zCommand_b = zCommand_a;
         INFO("PatchingMatrix: set command msg to authoritative");
     }

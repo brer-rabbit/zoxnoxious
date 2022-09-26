@@ -25,9 +25,9 @@ public:
  */
 
 static const int maxCards = 8;
+static const int invalidSlot = maxCards;
 static const int invalidCvChannelOffset = -1;
 static const int invalidMidiChannel = -1;
-static const int invalidSlot = maxCards;
 
 struct ChannelAssignment {
     uint8_t cardId; // physical card's identifier
@@ -113,18 +113,18 @@ public:
 
         // if we previously had a validExpander, it's been replaced
         if (*validExpander) {
-            INFO("Z Expander: replacing a valid %s expander", e.side ? "right" : "left");
+            INFO("Z Expander: module id %" PRId64 " replacing a valid %s expander", getId(), e.side ? "right" : "left");
         }
 
         if (dynamic_cast<ZoxnoxiousModule*>(expander.module) != NULL) {
             // hey, this module looks familiar
             *validExpander = true;
-            INFO("Z Expander: valid %s expander", e.side ? "right" : "left");
+            INFO("Z Expander: module id %" PRId64 " VALID %s expander", getId(), e.side ? "right" : "left");
         }
         else {
             // I don't know you
             *validExpander = false;
-            INFO("Z Expander: invalid %s expander", e.side ? "right" : "left");
+            INFO("Z Expander: module id %" PRId64 " invalid %s expander", getId(), e.side ? "right" : "left");
         }
 
         // command msg changed (added or removed) on the right- reset/mark (un)authoritative
@@ -176,12 +176,12 @@ protected:
 
             *leftExpanderProducerMessage = *rightExpanderConsumerMessage; // copy/daisy chain
 
-            // TODO: extract channel assignment, claim ownership.  Do
-            // this by iterating over the leftExpanderProducerMessage,
+            // Extract channel assignment, claim ownership.
+            // Do this by iterating over the leftExpanderProducerMessage,
             // finding if we own anything there.  This may/will modify
-            // the message if we claim ownership of a ChannelAssignment.
+            // the message if we claim ownership of a
+            // ChannelAssignment.
             processZoxnoxiousCommand(leftExpanderProducerMessage);
-
 
             leftExpanderProducerMessage->test++;
             leftExpander.messageFlipRequested = true;
