@@ -27,6 +27,7 @@ public:
 static const int maxCards = 8;
 static const int invalidCvChannelOffset = -1;
 static const int invalidMidiChannel = -1;
+static const int invalidSlot = maxCards;
 
 struct ChannelAssignment {
     uint8_t cardId; // physical card's identifier
@@ -42,6 +43,7 @@ struct ZoxnoxiousCommandMsg {
 };
 
 
+// this "empty command" is used for both initialization and when
 static const ZoxnoxiousCommandMsg commandEmpty =
   {
       // authoritativeSource
@@ -81,7 +83,7 @@ private:
 public:
     ZoxnoxiousModule() :
         validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
-        cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel) {
+        cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel), slot(invalidSlot) {
 
         leftExpander.producerMessage = &zCommand_a;
         leftExpander.consumerMessage = &zCommand_b;
@@ -147,6 +149,7 @@ protected:
     bool hasChannelAssignment;
     int cvChannelOffset;
     int midiChannel;
+    int slot;
 
 
     /** processExpander
@@ -185,7 +188,7 @@ protected:
 
 
             if (APP->engine->getFrame() % 60000 == 0) {
-                INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : requested message flip: authoritative: %d : zCommand_a int: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource, leftExpanderProducerMessage->test);
+                //INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : requested message flip: authoritative: %d : zCommand_a int: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource, leftExpanderProducerMessage->test);
             }
         }
 
@@ -202,15 +205,39 @@ protected:
      * parse the ZoxnoxiousCommand to get a cvChannelOffset and a midiChannel.
      * If we find a cardId matching our Id, and the assignment isn't owned, set it to owned.
      * pre:
-     * zCommand message state has list of channelassignment with hardware ids
+     * (1) zCommand message state has list of channelassignment with hardware ids
      * post:
      * (1) this object sets hasChannelAssignment, cvChannelOffset, midiChannel.
      * (2) the zCommand message has a ChannelAssignment.assignmentOwned flipped from false to true
      */
     virtual void processZoxnoxiousCommand(ZoxnoxiousCommandMsg *zCommand) {
-        // if we have an authoritative source and no channel assignment...
-        if (zCommand->authoritativeSource && ! hasChannelAssignment) {
 
+        if (! hasChannelAssignment && zCommand->authoritativeSource) {
+            // if we have an authoritative source and no channel assignment...
+            for (slot = 0; slot < maxCards; ++slot) {
+                if (zCommand->channelAssignments[slot].cardId == getHardwareId() &&
+                    ! zCommand->channelAssignments[slot].assignmentOwned) {
+                    zCommand->channelAssignments[slot].assignmentOwned = true; // I OWNEZ THEE
+                    midiChannel = zCommand->channelAssignments[slot].midiChannel;
+                    cvChannelOffset = zCommand->channelAssignments[slot].cvChannelOffset;
+                    hasChannelAssignment = true;
+
+                    INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : hasChannelAssignment at slot %d", APP->engine->getFrame(), getId(), slot);
+                    break;
+                }
+            }
+        }
+        else if (! zCommand->authoritativeSource) {
+            // received message from a non-auth source, reset whatever we know
+            if (hasChannelAssignment) {
+                INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : unset ChannelAssignment", APP->engine->getFrame(), getId());
+            }
+
+            hasChannelAssignment = false;
+        }
+        else {
+            // typical case -- prob ought to optimize this if/else block
+            zCommand->channelAssignments[slot].assignmentOwned = true;
         }
     }
 
