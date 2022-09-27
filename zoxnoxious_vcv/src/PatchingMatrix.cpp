@@ -453,6 +453,10 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
 
+    void processControlMessage(ZoxnoxiousControlMsg *controlMsg) override {
+    }
+
+
     /** getCardHardwareId
      * return the hardware Id of the 3340 card
      */

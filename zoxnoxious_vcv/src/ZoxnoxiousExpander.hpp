@@ -9,13 +9,19 @@ const int maxChannels = 31;
  * messages originating from hardware cards (expansion modules) are
  * received from the left.  The expansion module populates channels it
  * is responsible for and passes the message to the right.
+ * Only one midiMessage per clock tick is allowed- modules should queue
+ * messages if the bus is in use.  The module is responsible for completely
+ * clearing out the midiMessage before use.
  */
 
-class ZoxnoxiousControlMsg {
-public:
+struct ZoxnoxiousControlMsg {
     float frame[maxChannels];
-    // TODO: add MIDI event
+    bool midiMessageSet;
+    midi::Message midiMessage;
 };
+
+
+static const ZoxnoxiousControlMsg controlEmpty = { };
 
 
 /** ZoxnoxiousCommandMsg 
@@ -77,21 +83,20 @@ struct ZoxnoxiousModule : Module {
 private:
     bool validRightExpander;
     bool validLeftExpander;
-    //ZoxnoxiousControlMsg controlProducerLeft;
-    //ZoxnoxiousControlMsg controlConsumerLeft;
 
 public:
     ZoxnoxiousModule() :
         validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
         cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel), slot(invalidSlot) {
 
+        // command
         leftExpander.producerMessage = &zCommand_a;
         leftExpander.consumerMessage = &zCommand_b;
-
         initCommandMsgState();
 
-        //rightExpander.producerMessage = &controlProducerRight;
-        //rightExpander.consumerMessage = &controlConsumerRight;
+        // control
+        rightExpander.producerMessage = &zControl_a;
+        rightExpander.consumerMessage = &zControl_b;
     }
 
 
@@ -130,17 +135,15 @@ public:
         // command msg changed (added or removed) on the right- reset/mark (un)authoritative
         // so this passes along to the left 
         initCommandMsgState();
-
-
-        // thinking this isn't necessary as it's already set:
-        //leftExpander.producerMessage = &zCommand_a;
-        //leftExpander.consumerMessage = &zCommand_b;
     }
 
 
 
 
 protected:
+    ZoxnoxiousControlMsg zControl_a;
+    ZoxnoxiousControlMsg zControl_b;
+
     ZoxnoxiousCommandMsg zCommand_a;
     ZoxnoxiousCommandMsg zCommand_b;
 
@@ -158,12 +161,25 @@ protected:
      */
     virtual void processExpander(const ProcessArgs &args) {
 
-        Expander rightExpander = getRightExpander();
+        // find the correct right producer message to modify
+        ZoxnoxiousControlMsg *rightExpanderProducerMessage =
+            rightExpander.producerMessage == &zControl_a ? &zControl_a : &zControl_b;
 
-        // The _only_ thing you can do with the Module pointer is read
-        // from the consumerMessage.  Write back to it via the
-        // producerMessage on local Expander and call set messageFlipRequested.
+        // get the message from the left, if we have a left expander, so it can be relayed
+        if (leftExpander.module != NULL && validLeftExpander) {
+            ZoxnoxiousControlMsg *leftExpanderConsumerMessage = static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
+
+            *rightExpanderProducerMessage = *leftExpanderConsumerMessage;
+        }
+
+
         if (rightExpander.module != NULL && validRightExpander) {
+            // call the concrete module to fill in the control message
+            processControlMessage(static_cast<ZoxnoxiousControlMsg*>(rightExpanderProducerMessage));
+            rightExpander.messageFlipRequested = true;
+
+            // Next pass the right's Consumer message to our left
+
             ZoxnoxiousCommandMsg *rightExpanderConsumerMessage = static_cast<ZoxnoxiousCommandMsg*>(rightExpander.module->leftExpander.consumerMessage);
                 
             // Do any reading of the rightExpanderConsumerMessage here.  Copy
@@ -193,6 +209,16 @@ protected:
         }
 
     }
+
+
+
+    /** processControlMessage
+     *
+     * default behavior is to just zero out whatever channels we're responsible for.
+     * Subclass will need to override this.
+     */
+    virtual void processControlMessage(ZoxnoxiousControlMsg *controlMsg) = 0;
+
 
 
     /** getCardHardwareId

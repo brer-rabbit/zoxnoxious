@@ -164,75 +164,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
 
 
-        // Any buttons params pushed need to send midi events
-        for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
-            int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
-
-            if (buttonParamToMidiProgramList[i].previousValue != newValue) {
-                buttonParamToMidiProgramList[i].previousValue = newValue;
-                // midi program to send is index by the (integer)
-
-
-                //TODO: send midi message
-                //midiOutput.sendProgramChange(buttonParamToMidiProgramList[i].midiProgram[newValue]);
-            }
-        }
-
-
-
-        dsp::Frame<num_audio_inputs> inputFrame = {};
-        float v;
-        const float clipTime = 0.25f;
-
-
-
-        // linear
-        v = params[LINEAR_INPUT].getValue() + inputs[LINEAR_KNOB_PARAM].getVoltageSum() / 10.f;
-        inputFrame.samples[5] = clamp(v, 0.f, 1.f);
-        if (inputFrame.samples[5] != v) {
-            linearClipTimer = clipTime;
-        }
-                    
-
-        // external mod amount
-        v = params[EXT_MOD_AMOUNT_INPUT].getValue() + inputs[EXT_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
-        inputFrame.samples[4] = clamp(v, 0.f, 1.f);
-        if (inputFrame.samples[4] != v) {
-            extModAmountClipTimer = clipTime;
-        }
-
-
-        // mix1 triangle
-        v = params[MIX1_TRIANGLE_VCA_INPUT].getValue() + inputs[MIX1_TRIANGLE_KNOB_PARAM].getVoltageSum() / 10.f;
-        inputFrame.samples[3] = clamp(v, 0.f, 1.f);
-        if (inputFrame.samples[3] != v) {
-            mix1TriangleVcaClipTimer = clipTime;
-        }
-            
-        // pulse width
-        v = params[PULSE_WIDTH_INPUT].getValue() + inputs[PULSE_WIDTH_KNOB_PARAM].getVoltageSum() / 10.f;
-        inputFrame.samples[2] = clamp(v, 0.f, 1.f);
-        if (inputFrame.samples[2] != v) {
-            pulseWidthClipTimer = clipTime;
-        }
-
-
-        // sync phase
-        v = params[SYNC_PHASE_INPUT].getValue() + inputs[SYNC_PHASE_KNOB_PARAM].getVoltageSum() / 10.f;
-        inputFrame.samples[1] = clamp(v, 0.f, 1.f);
-        if (inputFrame.samples[1] != v) {
-            syncPhaseClipTimer = clipTime;
-        }
-
-
-        // frequency
-        v = params[FREQ_INPUT].getValue() + inputs[FREQ_KNOB_PARAM].getVoltageSum() / 10.f;
-        inputFrame.samples[0] = clamp(v, 0.f, 1.f);
-        if (inputFrame.samples[0] != v) {
-            freqClipTimer = clipTime;
-        }
-
-
 
         if (lightDivider.process()) {
             const float lightTime = args.sampleTime * lightDivider.getDivision();
@@ -256,6 +187,89 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             extModAmountClipTimer -= lightTime;
             lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
         }
+    }
+
+
+
+    /** processControlMessage
+     *
+     * add our control voltage values to the control message.  Add or queue any MIDI message.
+     */
+    void processControlMessage(ZoxnoxiousControlMsg *controlMsg) override {
+
+        if (!hasChannelAssignment) {
+            if (APP->engine->getFrame() % 60000 == 0) {
+                INFO("zoxnoxious: module id %" PRId64 " no channel assignment", getId());
+            }
+            return;
+        }
+
+        // Any buttons params pushed need to send midi events
+        for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
+            int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
+
+            if (buttonParamToMidiProgramList[i].previousValue != newValue) {
+                buttonParamToMidiProgramList[i].previousValue = newValue;
+                // midi program to send is index by the (integer)
+                //TODO: send midi message
+                //midiOutput.sendProgramChange(buttonParamToMidiProgramList[i].midiProgram[newValue]);
+            }
+        }
+
+
+        if (APP->engine->getFrame() % 60000 == 0) {
+            INFO("zoxnoxious: module id %" PRId64 " writing to channel offset %d", getId(), cvChannelOffset);
+        }
+
+        float v;
+        const float clipTime = 0.25f;
+
+        // linear
+        v = params[LINEAR_INPUT].getValue() + inputs[LINEAR_KNOB_PARAM].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 5] != v) {
+            linearClipTimer = clipTime;
+        }
+                    
+
+        // external mod amount
+        v = params[EXT_MOD_AMOUNT_INPUT].getValue() + inputs[EXT_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 4] != v) {
+            extModAmountClipTimer = clipTime;
+        }
+
+
+        // mix1 triangle
+        v = params[MIX1_TRIANGLE_VCA_INPUT].getValue() + inputs[MIX1_TRIANGLE_KNOB_PARAM].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 3] != v) {
+            mix1TriangleVcaClipTimer = clipTime;
+        }
+            
+        // pulse width
+        v = params[PULSE_WIDTH_INPUT].getValue() + inputs[PULSE_WIDTH_KNOB_PARAM].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 2] != v) {
+            pulseWidthClipTimer = clipTime;
+        }
+
+
+        // sync phase
+        v = params[SYNC_PHASE_INPUT].getValue() + inputs[SYNC_PHASE_KNOB_PARAM].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 1] != v) {
+            syncPhaseClipTimer = clipTime;
+        }
+
+
+        // frequency
+        v = params[FREQ_INPUT].getValue() + inputs[FREQ_KNOB_PARAM].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 0] != v) {
+            freqClipTimer = clipTime;
+        }
+
     }
 
 
