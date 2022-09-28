@@ -3,6 +3,7 @@
 
 #include <rack.hpp>
 
+
 const int maxChannels = 31;
 
 /** ZoxnoxiousControlMsg:
@@ -20,8 +21,8 @@ struct ZoxnoxiousControlMsg {
     midi::Message midiMessage;
 };
 
-
-static const ZoxnoxiousControlMsg controlEmpty = { };
+static const uint8_t midiProgramChangeStatus = 0xC;
+static const ZoxnoxiousControlMsg controlEmpty = { .midiMessageSet = true };
 
 
 /** ZoxnoxiousCommandMsg 
@@ -88,6 +89,10 @@ public:
     ZoxnoxiousModule() :
         validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
         cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel), slot(invalidSlot) {
+
+        // delete these:
+        zControl_a = controlEmpty;//delete
+        zControl_b = controlEmpty; // delete
 
         // command
         leftExpander.producerMessage = &zCommand_a;
@@ -161,24 +166,29 @@ protected:
      */
     virtual void processExpander(const ProcessArgs &args) {
 
-        // find the correct right producer message to modify
-        ZoxnoxiousControlMsg *rightExpanderProducerMessage =
-            rightExpander.producerMessage == &zControl_a ? &zControl_a : &zControl_b;
-
-        // get the message from the left, if we have a left expander, so it can be relayed
-        if (leftExpander.module != NULL && validLeftExpander) {
-            ZoxnoxiousControlMsg *leftExpanderConsumerMessage = static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
-
-            *rightExpanderProducerMessage = *leftExpanderConsumerMessage;
-        }
-
-
         if (rightExpander.module != NULL && validRightExpander) {
+            //
+            // Left Consumer Message Passing to our RightExpander Producer
+            //
+
+            // find the correct right producer message to modify
+            ZoxnoxiousControlMsg *rightExpanderProducerMessage =
+                rightExpander.producerMessage == &zControl_a ? &zControl_a : &zControl_b;
+
+            // get the message from the left, if we have a left expander, so it can be relayed
+            if (leftExpander.module != NULL && validLeftExpander) {
+                ZoxnoxiousControlMsg *leftExpanderConsumerMessage = static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
+
+                *rightExpanderProducerMessage = *leftExpanderConsumerMessage;  // daisy chain
+            }
+
             // call the concrete module to fill in the control message
             processControlMessage(static_cast<ZoxnoxiousControlMsg*>(rightExpanderProducerMessage));
             rightExpander.messageFlipRequested = true;
 
-            // Next pass the right's Consumer message to our left
+            //
+            // Right Consumer Message Passing to our LeftExpander Producer
+            //
 
             ZoxnoxiousCommandMsg *rightExpanderConsumerMessage = static_cast<ZoxnoxiousCommandMsg*>(rightExpander.module->leftExpander.consumerMessage);
                 
@@ -214,8 +224,9 @@ protected:
 
     /** processControlMessage
      *
-     * default behavior is to just zero out whatever channels we're responsible for.
-     * Subclass will need to override this.
+     * Intended  behavior is to fill in what channels we're responsible for.
+     * The controlMsg will be modified.
+     * Subclass will need to implement this.
      */
     virtual void processControlMessage(ZoxnoxiousControlMsg *controlMsg) = 0;
 
@@ -239,7 +250,8 @@ protected:
     virtual void processZoxnoxiousCommand(ZoxnoxiousCommandMsg *zCommand) {
 
         if (! hasChannelAssignment && zCommand->authoritativeSource) {
-            // if we have an authoritative source and no channel assignment...
+            // if we have an authoritative source and no channel assignment,
+            // run through the available assignments and pick one up if possible
             for (slot = 0; slot < maxCards; ++slot) {
                 if (zCommand->channelAssignments[slot].cardId == getHardwareId() &&
                     ! zCommand->channelAssignments[slot].assignmentOwned) {

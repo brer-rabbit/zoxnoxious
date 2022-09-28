@@ -68,6 +68,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     float syncPhaseClipTimer;
     float extModAmountClipTimer;
 
+    std::deque<midi::Message> midiMessageQueue;
+
     // detect state changes so we can send a MIDI event.
     // Assume int_min is an invalid value.  On start, idea would be
     // to send current state via midi to the board is in sync with
@@ -204,15 +206,42 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             return;
         }
 
-        // Any buttons params pushed need to send midi events
+
+        // if we have any queued midi messages, send them if possible
+        if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
+            INFO("zoxnoxious3340: bus is open, popping MIDI message from queue");
+            controlMsg->midiMessageSet = true;
+            controlMsg->midiMessage = midiMessageQueue.front();
+            midiMessageQueue.pop_front();
+        }
+
+
+        // Any buttons params pushed need to send midi events.  Send directly or queue.
         for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
             int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
 
             if (buttonParamToMidiProgramList[i].previousValue != newValue) {
                 buttonParamToMidiProgramList[i].previousValue = newValue;
-                // midi program to send is index by the (integer)
-                //TODO: send midi message
-                //midiOutput.sendProgramChange(buttonParamToMidiProgramList[i].midiProgram[newValue]);
+                if (controlMsg->midiMessageSet == false) {
+                    // send direct
+                    INFO("zoxnoxioius3340: sending MIDI message without queueing");
+                    controlMsg->midiMessage.setSize(2);
+                    controlMsg->midiMessage.setChannel(midiChannel);
+                    controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
+                    controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
+                }
+                else if (midiMessageQueue.size() < 8) {
+                    midi::Message queuedMessage;
+                    queuedMessage.setSize(2);
+                    queuedMessage.setChannel(midiChannel);
+                    queuedMessage.setStatus(midiProgramChangeStatus);
+                    queuedMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
+                    midiMessageQueue.push_back(queuedMessage);
+                    INFO("zoxnoxioius3340: queueing MIDI message, queue size %d", midiMessageQueue.size());
+                }
+                else {
+                    INFO("zoxnoxioius3340: dropping MIDI message, bus full and queue full");
+                }
             }
         }
 
