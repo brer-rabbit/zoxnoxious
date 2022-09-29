@@ -29,12 +29,8 @@ struct ZoxnoxiousMidiOutput : midi::Output {
         Output::reset();
     }
 
-    void sendProgramChange(uint8_t midiProgram) {
-        midi::Message message;
-        message.setSize(2);
-        message.setStatus(programChangeStatus);
-        message.setNote(midiProgram);
-        Output::sendMessage(message);
+    void sendMidiMessage(midi::Message midiMessage) {
+        Output::sendMessage(midiMessage);
     }
 
 };

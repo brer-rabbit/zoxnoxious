@@ -22,7 +22,7 @@ struct ZoxnoxiousControlMsg {
 };
 
 static const uint8_t midiProgramChangeStatus = 0xC;
-static const ZoxnoxiousControlMsg controlEmpty = { .midiMessageSet = true };
+//static const ZoxnoxiousControlMsg controlEmpty = { .midiMessageSet = true };
 
 
 /** ZoxnoxiousCommandMsg 
@@ -89,10 +89,6 @@ public:
     ZoxnoxiousModule() :
         validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
         cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel), slot(invalidSlot) {
-
-        // delete these:
-        zControl_a = controlEmpty;//delete
-        zControl_b = controlEmpty; // delete
 
         // command
         leftExpander.producerMessage = &zCommand_a;

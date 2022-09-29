@@ -202,6 +202,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
     ZoxnoxiousAudioPort audioPort;
     ZoxnoxiousMidiOutput midiOutput;
+    std::deque<midi::Message> midiMessageQueue;
 
     PatchingMatrix() : audioPort(this) {
 
@@ -454,6 +455,31 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
     void processControlMessage(ZoxnoxiousControlMsg *controlMsg) override {
+        // this ought to be the case -- maybe make this an assertion
+        if (!hasChannelAssignment) {
+            if (APP->engine->getFrame() % 60000 == 0) {
+                INFO("zoxnoxious: module id %" PRId64 " no channel assignment", getId());
+            }
+            return;
+        }
+
+        // handle midi messaging.  We may have received one via controlMsg.
+        // May also have a queue that needs to be drained.
+        // Or a button pushed to generate one.  Do this:
+        // (1) Check buttons, add anything to queue
+        // (2) check control message, send it if set
+        // (3) if no control msg, pop from our queue
+        // if we have any queued midi messages, send them if possible
+        if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
+            INFO("PatchingMatrix: bus is open, popping MIDI message from queue");
+            midiOutput.sendMidiMessage(midiMessageQueue.front());
+            midiMessageQueue.pop_front();
+        }
+        else if (controlMsg->midiMessageSet) {
+            midiOutput.sendMidiMessage(controlMsg->midiMessage);
+        }
+
+
     }
 
 
