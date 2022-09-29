@@ -431,16 +431,17 @@ struct PatchingMatrix : ZoxnoxiousModule {
             default:
             case 2:
                 // left level
-                v = params[LEFT_LEVEL_INPUT].getValue() + inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f;
+                v = params[LEFT_LEVEL_KNOB_PARAM].getValue() + inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f;
                 inputFrame.samples[1] = clamp(v, 0.f, 1.f);
                 if (inputFrame.samples[1] != v) {
                     leftLevelClipTimer = clipTime;
                 }
 
                 if (APP->engine->getFrame() % 60000 == 0) {
-                    INFO("PatchingMatrix: Left: params[LEFT_LEVEL_INPUT].getValue() = %g ; inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f = %g",
-                         params[LEFT_LEVEL_INPUT].getValue(),
-                         inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f);
+                    INFO("PatchingMatrix: Left: params[LEFT_LEVEL_INPUT].getValue() = %f ; inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f = %f ; sum %f",
+                         params[LEFT_LEVEL_KNOB_PARAM].getValue(),
+                         inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f,
+                         v);
                 }
 
                 // fall through
@@ -479,11 +480,11 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
 
-    /** processControlMessage
+    /** processZoxnoxiousControl
      *
      * intake a control message which contains CV data and possibly a midi message
      */
-    void processControlMessage(ZoxnoxiousControlMsg *controlMsg) override {
+    void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
         // this ought to be the case -- consider making this an assertion
         if (!hasChannelAssignment) {
             if (APP->engine->getFrame() % 60000 == 0) {
@@ -507,7 +508,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
             midiOutput.sendMidiMessage(controlMsg->midiMessage);
         }
 
-        // 
+        // copy the control voltages to an output frame and add voltages in for our output
     }
 
 

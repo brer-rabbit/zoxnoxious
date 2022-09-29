@@ -192,11 +192,12 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
 
 
-    /** processControlMessage
+    /** processZoxnoxiousControl
      *
      * add our control voltage values to the control message.  Add or queue any MIDI message.
+     *
      */
-    void processControlMessage(ZoxnoxiousControlMsg *controlMsg) override {
+    void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
 
         if (!hasChannelAssignment) {
             if (APP->engine->getFrame() % 60000 == 0) {
@@ -253,7 +254,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         const float clipTime = 0.25f;
 
         // linear
-        v = params[LINEAR_INPUT].getValue() + inputs[LINEAR_KNOB_PARAM].getVoltageSum() / 10.f;
+        v = params[LINEAR_KNOB_PARAM].getValue() + inputs[LINEAR_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 5] != v) {
             linearClipTimer = clipTime;
@@ -261,7 +262,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                     
 
         // external mod amount
-        v = params[EXT_MOD_AMOUNT_INPUT].getValue() + inputs[EXT_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
+        v = params[EXT_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[EXT_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 4] != v) {
             extModAmountClipTimer = clipTime;
@@ -269,14 +270,14 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
 
         // mix1 triangle
-        v = params[MIX1_TRIANGLE_VCA_INPUT].getValue() + inputs[MIX1_TRIANGLE_KNOB_PARAM].getVoltageSum() / 10.f;
+        v = params[MIX1_TRIANGLE_KNOB_PARAM].getValue() + inputs[MIX1_TRIANGLE_VCA_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 3] != v) {
             mix1TriangleVcaClipTimer = clipTime;
         }
             
         // pulse width
-        v = params[PULSE_WIDTH_INPUT].getValue() + inputs[PULSE_WIDTH_KNOB_PARAM].getVoltageSum() / 10.f;
+        v = params[PULSE_WIDTH_KNOB_PARAM].getValue() + inputs[PULSE_WIDTH_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 2] != v) {
             pulseWidthClipTimer = clipTime;
@@ -284,7 +285,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
 
         // sync phase
-        v = params[SYNC_PHASE_INPUT].getValue() + inputs[SYNC_PHASE_KNOB_PARAM].getVoltageSum() / 10.f;
+        v = params[SYNC_PHASE_KNOB_PARAM].getValue() + inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 1] != v) {
             syncPhaseClipTimer = clipTime;
@@ -292,7 +293,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
 
         // frequency
-        v = params[FREQ_INPUT].getValue() + inputs[FREQ_KNOB_PARAM].getVoltageSum() / 10.f;
+        v = params[FREQ_KNOB_PARAM].getValue() + inputs[FREQ_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 0] != v) {
             freqClipTimer = clipTime;

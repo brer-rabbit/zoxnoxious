@@ -176,7 +176,7 @@ protected:
             }
 
             // call the concrete module to fill in the control message
-            processControlMessage(static_cast<ZoxnoxiousControlMsg*>(rightExpanderProducerMessage));
+            processZoxnoxiousControl(static_cast<ZoxnoxiousControlMsg*>(rightExpanderProducerMessage));
             rightExpander.messageFlipRequested = true;
 
             //
@@ -214,13 +214,13 @@ protected:
 
 
 
-    /** processControlMessage
+    /** processZoxnoxiousControl
      *
      * Intended  behavior is to fill in what channels we're responsible for.
      * The controlMsg will be modified.
      * Subclass will need to implement this.
      */
-    virtual void processControlMessage(ZoxnoxiousControlMsg *controlMsg) = 0;
+    virtual void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) = 0;
 
 
 
