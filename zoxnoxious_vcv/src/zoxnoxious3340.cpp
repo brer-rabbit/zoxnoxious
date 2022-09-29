@@ -138,36 +138,35 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     void process(const ProcessArgs& args) override {
         processExpander(args);
 
-        bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
-        lights[SYNC_NEG_ENABLE_LIGHT].setBrightness(sync_neg);
-
-        bool sync_pos = params[SYNC_POS_BUTTON_PARAM].getValue() > 0.f;
-        lights[SYNC_POS_ENABLE_LIGHT].setBrightness(sync_pos);
-
-        bool mix1_pulse = params[MIX1_PULSE_BUTTON_PARAM].getValue() > 0.f;
-        lights[MIX1_PULSE_BUTTON_LIGHT].setBrightness(mix1_pulse);
-
-        bool mix1_comparator = params[MIX1_COMPARATOR_BUTTON_PARAM].getValue() > 0.f;
-        lights[MIX1_COMPARATOR_BUTTON_LIGHT].setBrightness(mix1_comparator);
-
-        bool mix2_pulse = params[MIX2_PULSE_BUTTON_PARAM].getValue() > 0.f;
-        lights[MIX2_PULSE_BUTTON_LIGHT].setBrightness(mix2_pulse);
-
-        bool ext_mod_pwm = params[EXT_MOD_PWM_BUTTON_PARAM].getValue() > 0.f;
-        lights[EXT_MOD_PWM_BUTTON_LIGHT].setBrightness(ext_mod_pwm);
-
-        bool exp_fm = params[EXP_FM_BUTTON_PARAM].getValue() > 0.f;
-        lights[EXP_FM_BUTTON_LIGHT].setBrightness(exp_fm);
-
-        bool linear_fm = params[LINEAR_FM_BUTTON_PARAM].getValue() > 0.f;
-        lights[LINEAR_FM_BUTTON_LIGHT].setBrightness(linear_fm);
-
-        bool mix2_saw = params[MIX2_SAW_BUTTON_PARAM].getValue() > 0.f;
-        lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
-
-
-
         if (lightDivider.process()) {
+            bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
+            lights[SYNC_NEG_ENABLE_LIGHT].setBrightness(sync_neg);
+
+            bool sync_pos = params[SYNC_POS_BUTTON_PARAM].getValue() > 0.f;
+            lights[SYNC_POS_ENABLE_LIGHT].setBrightness(sync_pos);
+
+            bool mix1_pulse = params[MIX1_PULSE_BUTTON_PARAM].getValue() > 0.f;
+            lights[MIX1_PULSE_BUTTON_LIGHT].setBrightness(mix1_pulse);
+
+            bool mix1_comparator = params[MIX1_COMPARATOR_BUTTON_PARAM].getValue() > 0.f;
+            lights[MIX1_COMPARATOR_BUTTON_LIGHT].setBrightness(mix1_comparator);
+
+            bool mix2_pulse = params[MIX2_PULSE_BUTTON_PARAM].getValue() > 0.f;
+            lights[MIX2_PULSE_BUTTON_LIGHT].setBrightness(mix2_pulse);
+
+            bool ext_mod_pwm = params[EXT_MOD_PWM_BUTTON_PARAM].getValue() > 0.f;
+            lights[EXT_MOD_PWM_BUTTON_LIGHT].setBrightness(ext_mod_pwm);
+
+            bool exp_fm = params[EXP_FM_BUTTON_PARAM].getValue() > 0.f;
+            lights[EXP_FM_BUTTON_LIGHT].setBrightness(exp_fm);
+
+            bool linear_fm = params[LINEAR_FM_BUTTON_PARAM].getValue() > 0.f;
+            lights[LINEAR_FM_BUTTON_LIGHT].setBrightness(linear_fm);
+
+            bool mix2_saw = params[MIX2_SAW_BUTTON_PARAM].getValue() > 0.f;
+            lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
+
+
             const float lightTime = args.sampleTime * lightDivider.getDivision();
             const float brightnessDeltaTime = 1 / lightTime;
 
@@ -237,7 +236,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                     queuedMessage.setStatus(midiProgramChangeStatus);
                     queuedMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
                     midiMessageQueue.push_back(queuedMessage);
-                    INFO("zoxnoxioius3340: queueing MIDI message, queue size %d", midiMessageQueue.size());
+                    INFO("zoxnoxioius3340: queueing MIDI message, queue size %lu", midiMessageQueue.size());
                 }
                 else {
                     INFO("zoxnoxioius3340: dropping MIDI message, bus full and queue full");

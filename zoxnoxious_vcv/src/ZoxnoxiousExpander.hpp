@@ -45,7 +45,6 @@ struct ChannelAssignment {
 
 struct ZoxnoxiousCommandMsg {
     bool authoritativeSource;
-    int test;
     struct ChannelAssignment channelAssignments[maxCards];
 };
 
@@ -55,8 +54,6 @@ static const ZoxnoxiousCommandMsg commandEmpty =
   {
       // authoritativeSource
       false,
-      // test int
-      1,
       // cardId, cvChannelOffset, midiChannel, assignmentOwned
       { { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false},
         { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false}
@@ -205,12 +202,11 @@ protected:
             // ChannelAssignment.
             processZoxnoxiousCommand(leftExpanderProducerMessage);
 
-            leftExpanderProducerMessage->test++;
             leftExpander.messageFlipRequested = true;
 
 
             if (APP->engine->getFrame() % 60000 == 0) {
-                //INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : requested message flip: authoritative: %d : zCommand_a int: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource, leftExpanderProducerMessage->test);
+                //INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : requested message flip: authoritative: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource);
             }
         }
 

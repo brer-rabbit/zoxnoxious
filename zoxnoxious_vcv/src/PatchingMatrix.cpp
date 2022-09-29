@@ -97,14 +97,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
         PARAMS_LEN
     };
     enum InputId {
-        LEFT_LEVEL_INPUT_INPUT,
-        RIGHT_LEVEL_INPUT_INPUT,
-        CARD_A_POLY_IN_INPUT,
-        CARD_B_POLY_IN_INPUT,
-        CARD_C_POLY_IN_INPUT,
-        CARD_D_POLY_IN_INPUT,
-        CARD_E_POLY_IN_INPUT,
-        CARD_F_POLY_IN_INPUT,
+        LEFT_LEVEL_INPUT,
+        RIGHT_LEVEL_INPUT,
         INPUTS_LEN
     };
     enum OutputId {
@@ -204,13 +198,18 @@ struct PatchingMatrix : ZoxnoxiousModule {
     ZoxnoxiousMidiOutput midiOutput;
     std::deque<midi::Message> midiMessageQueue;
 
+    dsp::ClockDivider lightDivider;
+    float leftLevelClipTimer;
+    float rightLevelClipTimer;
+
+
     PatchingMatrix() : audioPort(this) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configSwitch(MIX_LEFT_SELECT_PARAM, 0.f, 1.f, 0.f, "Left Output", { "Out1", "Out2" });
         configSwitch(MIX_RIGHT_SELECT_PARAM, 0.f, 1.f, 0.f, "Right Output", { "Out1", "Out2" });
-        configSwitch(LEFT_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.f, "Left Level");
-        configSwitch(RIGHT_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.f, "Right Level");
+        configParam(LEFT_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Left Level", " V", 0.f, 10.f);
+        configParam(RIGHT_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Right Level", " V", 0.f, 10.f);
 
         configSwitch(CARD_A_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card A", { "Off", "On" });
         configSwitch(CARD_A_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card B");
@@ -308,8 +307,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
         configSwitch(CARD_F_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Audio Out");
         configSwitch(CARD_F_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Audio Out");
 
-        configInput(LEFT_LEVEL_INPUT_INPUT, "");
-        configInput(RIGHT_LEVEL_INPUT_INPUT, "");
+        configInput(LEFT_LEVEL_INPUT, "");
+        configInput(RIGHT_LEVEL_INPUT, "");
 
         onReset();
     }
@@ -426,19 +425,32 @@ struct PatchingMatrix : ZoxnoxiousModule {
         if (audioPort.deviceNumOutputs > 0) {
             dsp::Frame<num_audio_inputs> inputFrame = {};
             float v;
+            const float clipTime = 0.25f;
 
             switch (audioPort.deviceNumOutputs) {
             default:
             case 2:
                 // left level
-                v = params[LEFT_LEVEL_KNOB_PARAM].getValue();
+                v = params[LEFT_LEVEL_INPUT].getValue() + inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f;
                 inputFrame.samples[1] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[1] != v) {
+                    leftLevelClipTimer = clipTime;
+                }
+
+                if (APP->engine->getFrame() % 60000 == 0) {
+                    INFO("PatchingMatrix: Left: params[LEFT_LEVEL_INPUT].getValue() = %g ; inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f = %g",
+                         params[LEFT_LEVEL_INPUT].getValue(),
+                         inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f);
+                }
 
                 // fall through
             case 1:
                 // right level
                 v = params[RIGHT_LEVEL_KNOB_PARAM].getValue();
                 inputFrame.samples[0] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[0] != v) {
+                    rightLevelClipTimer = clipTime;
+                }
 
                 // fall through
             case 0:
@@ -450,12 +462,29 @@ struct PatchingMatrix : ZoxnoxiousModule {
                 audioPort.engineInputBuffer.push(inputFrame);
             }
         }
+
+        if (lightDivider.process()) {
+            // slower moving stuff here
+            const float lightTime = args.sampleTime * lightDivider.getDivision();
+            const float brightnessDeltaTime = 1 / lightTime;
+
+            leftLevelClipTimer -= lightTime;
+            lights[LEFT_LEVEL_CLIP_LIGHT].setBrightnessSmooth(leftLevelClipTimer > 0.f, brightnessDeltaTime);
+
+            rightLevelClipTimer -= lightTime;
+            lights[RIGHT_LEVEL_CLIP_LIGHT].setBrightnessSmooth(rightLevelClipTimer > 0.f, brightnessDeltaTime);
+        }
+
     }
 
 
 
+    /** processControlMessage
+     *
+     * intake a control message which contains CV data and possibly a midi message
+     */
     void processControlMessage(ZoxnoxiousControlMsg *controlMsg) override {
-        // this ought to be the case -- maybe make this an assertion
+        // this ought to be the case -- consider making this an assertion
         if (!hasChannelAssignment) {
             if (APP->engine->getFrame() % 60000 == 0) {
                 INFO("zoxnoxious: module id %" PRId64 " no channel assignment", getId());
@@ -463,12 +492,11 @@ struct PatchingMatrix : ZoxnoxiousModule {
             return;
         }
 
+        // TODO
         // handle midi messaging.  We may have received one via controlMsg.
-        // May also have a queue that needs to be drained.
-        // Or a button pushed to generate one.  Do this:
-        // (1) Check buttons, add anything to queue
-        // (2) check control message, send it if set
-        // (3) if no control msg, pop from our queue
+        // (1) Check buttons, add anything to local queue
+        // (2) check control message, send it if received
+        // (3) if no control msg, pop from our queue and send a midi message
         // if we have any queued midi messages, send them if possible
         if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
             INFO("PatchingMatrix: bus is open, popping MIDI message from queue");
@@ -479,7 +507,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
             midiOutput.sendMidiMessage(controlMsg->midiMessage);
         }
 
-
+        // 
     }
 
 
@@ -496,7 +524,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
      */
     void initCommandMsgState() override {
         zCommand_a.authoritativeSource = true;
-        zCommand_a.test = 10;
+        // TODO: this is hardcoded for now.  Figure out discovery.
         // channelAssignment data:
         // hardware cardId, channelOffset, assignmentOwned
         // hardcoded/mocked data for now, later this ought to be received
@@ -630,14 +658,8 @@ struct PatchingMatrixWidget : ModuleWidget {
         addParam(createParamCentered<CKSS>(mm2px(Vec(139.661, 17.478)), module, PatchingMatrix::MIX_LEFT_SELECT_PARAM));
         addParam(createParamCentered<CKSS>(mm2px(Vec(139.661, 117.692)), module, PatchingMatrix::MIX_RIGHT_SELECT_PARAM));
 
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.6, 57.166)), module, PatchingMatrix::LEFT_LEVEL_INPUT_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.6, 99.334)), module, PatchingMatrix::RIGHT_LEVEL_INPUT_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36.051, 117.36)), module, PatchingMatrix::CARD_A_POLY_IN_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(48.666, 117.36)), module, PatchingMatrix::CARD_B_POLY_IN_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(61.266, 117.36)), module, PatchingMatrix::CARD_C_POLY_IN_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(73.865, 117.36)), module, PatchingMatrix::CARD_D_POLY_IN_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(86.465, 117.36)), module, PatchingMatrix::CARD_E_POLY_IN_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(99.064, 117.36)), module, PatchingMatrix::CARD_F_POLY_IN_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.6, 57.166)), module, PatchingMatrix::LEFT_LEVEL_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.6, 99.334)), module, PatchingMatrix::RIGHT_LEVEL_INPUT));
 
 
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(147.6, 38.417)), module, PatchingMatrix::LEFT_LEVEL_CLIP_LIGHT));
