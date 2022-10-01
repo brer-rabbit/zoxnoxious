@@ -1,4 +1,5 @@
 #include "plugin.hpp"
+#include "zcomponentlib.hpp"
 #include "ZoxnoxiousExpander.hpp"
 
 const static int num_audio_inputs = 6;
@@ -56,6 +57,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 	SYNC_PHASE_CLIP_LIGHT,
 	EXT_MOD_AMOUNT_CLIP_LIGHT,
         SYNC_POS_ENABLE_LIGHT,
+        ENUMS(LEFT_EXPANDER_LIGHT, 3),
+        ENUMS(RIGHT_EXPANDER_LIGHT, 3),
         LIGHTS_LEN
     };
 
@@ -129,6 +132,9 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         configInput(MIX1_TRIANGLE_VCA_INPUT, "Mix1 Triangle Level");
         configInput(EXT_MOD_AMOUNT_INPUT, "External Modulation Amount");
 
+        configLight(LEFT_EXPANDER_LIGHT, "Connection");
+        configLight(RIGHT_EXPANDER_LIGHT, "Connection");
+
         lightDivider.setDivision(512);
     }
 
@@ -187,6 +193,51 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
             extModAmountClipTimer -= lightTime;
             lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
+
+            // what to communicate to the user:
+            // left state:
+            // channelassignment && valid left: green
+            // valid left expander: yellow
+            // neither of the above: red
+            // 
+
+            if (hasChannelAssignment && validLeftExpander) {
+                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
+                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
+                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+            }
+            else if (validLeftExpander) {
+                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(1.f);
+                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
+                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+            }
+            else {
+                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(1.f);
+                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(0.f);
+                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+            }
+
+            // right state:
+            // channel assignment: green
+            // valid right expander: yellow
+            // neither of the above: red
+
+            if (hasChannelAssignment) {
+                lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(0.f);
+                lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
+                lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+            }
+            else if (validRightExpander) {
+                lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
+                lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
+                lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+            }
+            else {
+                lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
+                lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(0.f);
+                lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+            }
+
         }
     }
 
@@ -370,6 +421,9 @@ struct Zoxnoxious3340Widget : ModuleWidget {
         //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(52.59, 39.52)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(37.61, 84.09)), module, Zoxnoxious3340::SYNC_PHASE_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(10.76, 84.09)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_CLIP_LIGHT));
+
+        addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.0, 71.0)), module, Zoxnoxious3340::LEFT_EXPANDER_LIGHT));
+        addChild(createLightCentered<TriangleRightLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(69.0, 71.0)), module, Zoxnoxious3340::RIGHT_EXPANDER_LIGHT));
 
     }
 

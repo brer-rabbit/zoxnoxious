@@ -494,26 +494,17 @@ struct PatchingMatrix : ZoxnoxiousModule {
             rightLevelClipTimer -= lightTime;
             lights[RIGHT_LEVEL_CLIP_LIGHT].setBrightnessSmooth(rightLevelClipTimer > 0.f, brightnessDeltaTime);
 
-            if (hasChannelAssignment) {
-                if (lights[LEFT_EXPANDER_LIGHT + 1].getBrightness() < 0.5) {
-                    INFO("PatchingMatrix: EXPANDER LIGHT has channel assignment");
-                }
+            if (validLeftExpander) {
                 lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
                 lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
                 lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
             }
-            else if (validLeftExpander) {
-                if (lights[LEFT_EXPANDER_LIGHT + 2].getBrightness() < 0.5) {
-                    INFO("PatchingMatrix: EXPANDER LIGHT has valid expander");
-                }
+            else if (hasChannelAssignment) {
                 lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
-                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(0.f);
-                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(1.f);
+                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
+                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
             }
             else {
-                if (lights[LEFT_EXPANDER_LIGHT + 0].getBrightness() < 0.5) {
-                    INFO("PatchingMatrix: EXPANDER LIGHT neither channel nor expander");
-                }
                 lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(1.f);
                 lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(0.f);
                 lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
@@ -841,7 +832,7 @@ struct PatchingMatrixWidget : ModuleWidget {
         addChild(cardFInputTextField);
 
 
-        addChild(createLightCentered<TriangleLeftLight<SmallLight<RedLight>>>(mm2px(Vec(2.0, 71.0)), module, PatchingMatrix::LEFT_EXPANDER_LIGHT));
+        addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.0, 71.0)), module, PatchingMatrix::LEFT_EXPANDER_LIGHT));
     }
 
 
