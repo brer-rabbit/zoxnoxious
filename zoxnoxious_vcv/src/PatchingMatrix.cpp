@@ -191,6 +191,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         CARD_F_MIX2_CARD_E_BUTTON_LIGHT,
         CARD_F_MIX2_CARD_F_BUTTON_LIGHT,
         CARD_F_MIX2_OUTPUT_BUTTON_LIGHT,
+        ENUMS(LEFT_EXPANDER_LIGHT, 3),
         LIGHTS_LEN
     };
 
@@ -311,6 +312,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
         configInput(LEFT_LEVEL_INPUT, "");
         configInput(RIGHT_LEVEL_INPUT, "");
 
+        configLight(LEFT_EXPANDER_LIGHT, "Connection");
+
         onReset();
     }
 
@@ -418,11 +421,6 @@ struct PatchingMatrix : ZoxnoxiousModule {
         lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
 
 
-        // this stuff ought to go in the parent class...
-        ZoxnoxiousControlMsg *leftExpanderConsumerMessage;
-        if (leftExpander.module != NULL && validLeftExpander) {
-            leftExpanderConsumerMessage = static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
-        }
 
         // Push inputs to buffer
         //if (audioPort.deviceNumOutputs != maxChannels) {
@@ -437,9 +435,16 @@ struct PatchingMatrix : ZoxnoxiousModule {
             const float clipTime = 0.25f;
 
             // copy expander control voltages to Frame
-            //for (int i = 0; i < audioPort.deviceNumOutputs; ++i) {
-            for (int i = 0; i < maxChannels; ++i) {
-                inputFrame.samples[i] = leftExpanderConsumerMessage->frame[i];
+            // this stuff ought to go in the parent class...
+            if (leftExpander.module != NULL && validLeftExpander) {
+                ZoxnoxiousControlMsg *leftExpanderConsumerMessage;
+                leftExpanderConsumerMessage = static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
+                if (leftExpanderConsumerMessage) {
+                    //for (int i = 0; i < audioPort.deviceNumOutputs; ++i) {  // TODO: USE THIS LINE NOT THE NEXT
+                    for (int i = 0; i < maxChannels; ++i) {
+                        inputFrame.samples[i] = leftExpanderConsumerMessage->frame[i];
+                    }
+                }
             }
 
             // add in local control voltages
@@ -488,6 +493,31 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
             rightLevelClipTimer -= lightTime;
             lights[RIGHT_LEVEL_CLIP_LIGHT].setBrightnessSmooth(rightLevelClipTimer > 0.f, brightnessDeltaTime);
+
+            if (hasChannelAssignment) {
+                if (lights[LEFT_EXPANDER_LIGHT + 1].getBrightness() < 0.5) {
+                    INFO("PatchingMatrix: EXPANDER LIGHT has channel assignment");
+                }
+                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
+                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
+                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+            }
+            else if (validLeftExpander) {
+                if (lights[LEFT_EXPANDER_LIGHT + 2].getBrightness() < 0.5) {
+                    INFO("PatchingMatrix: EXPANDER LIGHT has valid expander");
+                }
+                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
+                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(0.f);
+                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(1.f);
+            }
+            else {
+                if (lights[LEFT_EXPANDER_LIGHT + 0].getBrightness() < 0.5) {
+                    INFO("PatchingMatrix: EXPANDER LIGHT neither channel nor expander");
+                }
+                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(1.f);
+                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(0.f);
+                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+            }
         }
 
     }
@@ -687,6 +717,7 @@ struct PatchingMatrixWidget : ModuleWidget {
 
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(147.6, 38.417)), module, PatchingMatrix::LEFT_LEVEL_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(147.6, 80.585)), module, PatchingMatrix::RIGHT_LEVEL_CLIP_LIGHT));
+        //addChild(createLightCentered<TriangleLeftLight<MediumLight<RedLight>>>(mm2px(Vec(147.6, 80.585)), module, PatchingMatrix::RIGHT_LEVEL_CLIP_LIGHT));
 
 
         // mm2px(Vec(27.171, 3.636))
@@ -809,6 +840,8 @@ struct PatchingMatrixWidget : ModuleWidget {
         cardFInputTextField->setRotation(-3.1416f / 4.f);
         addChild(cardFInputTextField);
 
+
+        addChild(createLightCentered<TriangleLeftLight<SmallLight<RedLight>>>(mm2px(Vec(2.0, 71.0)), module, PatchingMatrix::LEFT_EXPANDER_LIGHT));
     }
 
 
