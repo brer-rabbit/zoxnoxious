@@ -46,8 +46,8 @@ struct ZoxnoxiousMidiOutput : midi::Output {
 // depending on the hardware and the particular signal, so it makes sense the
 // hardware module writer implementor better know the clamping
 // requirements for each signal.
-const int num_audio_inputs = 6;
-const int num_audio_outputs = 6;
+const int num_audio_inputs = 31;
+const int num_audio_outputs = 31;
 struct ZoxnoxiousAudioPort : audio::Port {
 	Module* module;
 

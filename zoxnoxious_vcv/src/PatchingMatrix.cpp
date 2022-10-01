@@ -204,6 +204,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
     PatchingMatrix() : audioPort(this) {
+        setExpanderPrimary();
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configSwitch(MIX_LEFT_SELECT_PARAM, 0.f, 1.f, 0.f, "Left Output", { "Out1", "Out2" });
@@ -417,23 +418,38 @@ struct PatchingMatrix : ZoxnoxiousModule {
         lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
 
 
-        // Push inputs to buffer
-        if (audioPort.deviceNumOutputs != 6) {
-            //std::cout << "deviceNumOutputs == " << port.deviceNumOutputs << std::endl;
+        // this stuff ought to go in the parent class...
+        ZoxnoxiousControlMsg *leftExpanderConsumerMessage;
+        if (leftExpander.module != NULL && validLeftExpander) {
+            leftExpanderConsumerMessage = static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
         }
 
+        // Push inputs to buffer
+        //if (audioPort.deviceNumOutputs != maxChannels) {
+        //if (APP->engine->getFrame() % 120000 == 0) {
+        //INFO("PatchingMatrix unhappy on number of channels");
+        //}
+        //}
+
         if (audioPort.deviceNumOutputs > 0) {
-            dsp::Frame<num_audio_inputs> inputFrame = {};
+            dsp::Frame<maxChannels> inputFrame = {};
             float v;
             const float clipTime = 0.25f;
 
+            // copy expander control voltages to Frame
+            //for (int i = 0; i < audioPort.deviceNumOutputs; ++i) {
+            for (int i = 0; i < maxChannels; ++i) {
+                inputFrame.samples[i] = leftExpanderConsumerMessage->frame[i];
+            }
+
+            // add in local control voltages
             switch (audioPort.deviceNumOutputs) {
             default:
             case 2:
                 // left level
                 v = params[LEFT_LEVEL_KNOB_PARAM].getValue() + inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f;
-                inputFrame.samples[1] = clamp(v, 0.f, 1.f);
-                if (inputFrame.samples[1] != v) {
+                inputFrame.samples[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[cvChannelOffset + 1] != v) {
                     leftLevelClipTimer = clipTime;
                 }
 
@@ -443,13 +459,12 @@ struct PatchingMatrix : ZoxnoxiousModule {
                          inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f,
                          v);
                 }
-
                 // fall through
             case 1:
                 // right level
                 v = params[RIGHT_LEVEL_KNOB_PARAM].getValue();
-                inputFrame.samples[0] = clamp(v, 0.f, 1.f);
-                if (inputFrame.samples[0] != v) {
+                inputFrame.samples[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[cvChannelOffset + 0] != v) {
                     rightLevelClipTimer = clipTime;
                 }
 
@@ -457,7 +472,6 @@ struct PatchingMatrix : ZoxnoxiousModule {
             case 0:
                 break;
             }
-
 
             if (!audioPort.engineInputBuffer.full()) {
                 audioPort.engineInputBuffer.push(inputFrame);
@@ -480,9 +494,17 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
 
+    /* There really is no proper integration with the parent
+     * class... just call this method the Command message is
+     * essentially a constant/unchanging from the source.  It keeps
+     * getting sent out to account for left-modules moving around an
+     * re-positioning.
+     */
+    
+
     /** processZoxnoxiousControl
      *
-     * intake a control message which contains CV data and possibly a midi message
+     * intake a control message which contains CV data and possibly a midi message.
      */
     void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
         // this ought to be the case -- consider making this an assertion

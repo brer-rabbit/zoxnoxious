@@ -4,7 +4,7 @@
 #include <rack.hpp>
 
 
-const int maxChannels = 31;
+static const int maxChannels = 31;
 
 /** ZoxnoxiousControlMsg:
  * messages originating from hardware cards (expansion modules) are
@@ -22,7 +22,7 @@ struct ZoxnoxiousControlMsg {
 };
 
 static const uint8_t midiProgramChangeStatus = 0xC;
-//static const ZoxnoxiousControlMsg controlEmpty = { .midiMessageSet = true };
+static const ZoxnoxiousControlMsg controlEmpty = { };
 
 
 /** ZoxnoxiousCommandMsg 
@@ -31,7 +31,7 @@ static const uint8_t midiProgramChangeStatus = 0xC;
  * channel ownership for signals on the ZoxnoxiousControlMsg.
  */
 
-static const int maxCards = 8;
+static const int maxCards = 8; // need this just to size channelAssignments array, that's it
 static const int invalidSlot = maxCards;
 static const int invalidCvChannelOffset = -1;
 static const int invalidMidiChannel = -1;
@@ -79,12 +79,11 @@ static const ZoxnoxiousCommandMsg commandEmpty =
 struct ZoxnoxiousModule : Module {
 
 private:
-    bool validRightExpander;
-    bool validLeftExpander;
+    bool isPrimary;
 
 public:
     ZoxnoxiousModule() :
-        validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
+        isPrimary(false), validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
         cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel), slot(invalidSlot) {
 
         // command
@@ -95,6 +94,16 @@ public:
         // control
         rightExpander.producerMessage = &zControl_a;
         rightExpander.consumerMessage = &zControl_b;
+    }
+
+
+    /** setExpanderPrimary
+     *
+     * declare this ZoxnoxiousExpander to be the primary, it will be responsible for audio and midi output.
+     */
+    void setExpanderPrimary() {
+        // ...and this isn't actually used for anything yet
+        isPrimary = true;
     }
 
 
@@ -139,6 +148,9 @@ public:
 
 
 protected:
+    bool validRightExpander;
+    bool validLeftExpander;
+
     ZoxnoxiousControlMsg zControl_a;
     ZoxnoxiousControlMsg zControl_b;
 
@@ -174,6 +186,10 @@ protected:
 
                 *rightExpanderProducerMessage = *leftExpanderConsumerMessage;  // daisy chain
             }
+            else {
+                // no connection-- bootstrap from an empty message
+                *rightExpanderProducerMessage = controlEmpty;
+            }
 
             // call the concrete module to fill in the control message
             processZoxnoxiousControl(static_cast<ZoxnoxiousControlMsg*>(rightExpanderProducerMessage));
@@ -201,7 +217,6 @@ protected:
             // the message if we claim ownership of a
             // ChannelAssignment.
             processZoxnoxiousCommand(leftExpanderProducerMessage);
-
             leftExpander.messageFlipRequested = true;
 
 
@@ -218,7 +233,7 @@ protected:
      *
      * Intended  behavior is to fill in what channels we're responsible for.
      * The controlMsg will be modified.
-     * Subclass will need to implement this.
+     * Subclass will need to implement this, this class doesn't know the specifics.
      */
     virtual void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) = 0;
 
@@ -248,6 +263,7 @@ protected:
                 if (zCommand->channelAssignments[slot].cardId == getHardwareId() &&
                     ! zCommand->channelAssignments[slot].assignmentOwned) {
                     zCommand->channelAssignments[slot].assignmentOwned = true; // I OWNEZ THEE
+                    // then copy the relevant info
                     midiChannel = zCommand->channelAssignments[slot].midiChannel;
                     cvChannelOffset = zCommand->channelAssignments[slot].cvChannelOffset;
                     hasChannelAssignment = true;
@@ -266,7 +282,8 @@ protected:
             hasChannelAssignment = false;
         }
         else {
-            // typical case -- prob ought to optimize this if/else block
+            // typical case -- we have a channel assignemnt already.
+            // Claim our assignment so the command can be daisy chained along.
             zCommand->channelAssignments[slot].assignmentOwned = true;
         }
     }

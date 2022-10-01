@@ -2,7 +2,7 @@
 #include "ZoxnoxiousExpander.hpp"
 
 const static int num_audio_inputs = 6;
-
+const static int midiMessageQueueMaxSize = 16;
 
 struct Zoxnoxious3340 : ZoxnoxiousModule {
     // the ParamId ordering *is* relevant.
@@ -209,7 +209,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
         // if we have any queued midi messages, send them if possible
         if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
-            INFO("zoxnoxious3340: bus is open, popping MIDI message from queue");
+            INFO("zoxnoxious3340: clock %ld : bus is open, popping MIDI message from queue", APP->engine->getFrame());
             controlMsg->midiMessageSet = true;
             controlMsg->midiMessage = midiMessageQueue.front();
             midiMessageQueue.pop_front();
@@ -224,13 +224,14 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                 buttonParamToMidiProgramList[i].previousValue = newValue;
                 if (controlMsg->midiMessageSet == false) {
                     // send direct
-                    INFO("zoxnoxioius3340: sending MIDI message without queueing");
+                    INFO("zoxnoxioius3340: clock %ld sending MIDI message without queueing", APP->engine->getFrame());
                     controlMsg->midiMessage.setSize(2);
                     controlMsg->midiMessage.setChannel(midiChannel);
                     controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
                     controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
+                    controlMsg->midiMessageSet = true;
                 }
-                else if (midiMessageQueue.size() < 8) {
+                else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
                     midi::Message queuedMessage;
                     queuedMessage.setSize(2);
                     queuedMessage.setChannel(midiChannel);
