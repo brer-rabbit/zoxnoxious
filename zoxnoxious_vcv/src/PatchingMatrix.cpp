@@ -192,6 +192,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         CARD_F_MIX2_CARD_F_BUTTON_LIGHT,
         CARD_F_MIX2_OUTPUT_BUTTON_LIGHT,
         ENUMS(LEFT_EXPANDER_LIGHT, 3),
+        ENUMS(RIGHT_EXPANDER_LIGHT, 3),
         LIGHTS_LEN
     };
 
@@ -313,6 +314,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         configInput(RIGHT_LEVEL_INPUT, "");
 
         configLight(LEFT_EXPANDER_LIGHT, "Connection");
+        configLight(RIGHT_EXPANDER_LIGHT, "Connection");
 
         onReset();
     }

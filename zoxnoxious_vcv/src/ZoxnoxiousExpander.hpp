@@ -49,7 +49,7 @@ struct ZoxnoxiousCommandMsg {
 };
 
 
-// this "empty command" is used for both initialization and when
+// this "empty command" is used for initialization and to reset when the expander changes.  8 cards.
 static const ZoxnoxiousCommandMsg commandEmpty =
   {
       // authoritativeSource
@@ -78,13 +78,12 @@ static const ZoxnoxiousCommandMsg commandEmpty =
 
 struct ZoxnoxiousModule : Module {
 
-private:
-    bool isPrimary;
-
 public:
+
     ZoxnoxiousModule() :
-        isPrimary(false), validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
-        cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel), slot(invalidSlot) {
+        validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
+        cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel), slot(invalidSlot),
+        isPrimary(false) {
 
         // command
         leftExpander.producerMessage = &zCommand_a;
@@ -288,8 +287,6 @@ protected:
         }
     }
 
-
-
     /** initCommandMsgState
      *
      * set both zCommand_a and zCommand_b to an (identical) initial
@@ -305,6 +302,10 @@ protected:
         cvChannelOffset = invalidCvChannelOffset;
         midiChannel = invalidMidiChannel;
     }
+
+
+private:
+    bool isPrimary;
 
 
 

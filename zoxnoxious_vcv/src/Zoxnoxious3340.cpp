@@ -199,15 +199,13 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             // channelassignment && valid left: green
             // valid left expander: yellow
             // neither of the above: red
-            // 
-
-            if (hasChannelAssignment && validLeftExpander) {
+            if (validLeftExpander) {
                 lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
                 lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
                 lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
             }
-            else if (validLeftExpander) {
-                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(1.f);
+            else if (hasChannelAssignment) {
+                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
                 lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
                 lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
             }
@@ -260,7 +258,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
         // if we have any queued midi messages, send them if possible
         if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
-            INFO("zoxnoxious3340: clock %ld : bus is open, popping MIDI message from queue", APP->engine->getFrame());
+            INFO("zoxnoxious3340: clock %" PRId64 " : bus is open, popping MIDI message from queue", APP->engine->getFrame());
             controlMsg->midiMessageSet = true;
             controlMsg->midiMessage = midiMessageQueue.front();
             midiMessageQueue.pop_front();
@@ -275,7 +273,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                 buttonParamToMidiProgramList[i].previousValue = newValue;
                 if (controlMsg->midiMessageSet == false) {
                     // send direct
-                    INFO("zoxnoxioius3340: clock %ld sending MIDI message without queueing", APP->engine->getFrame());
+                    INFO("zoxnoxioius3340: clock %" PRId64 " sending MIDI message without queueing", APP->engine->getFrame());
                     controlMsg->midiMessage.setSize(2);
                     controlMsg->midiMessage.setChannel(midiChannel);
                     controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
@@ -373,7 +371,7 @@ struct Zoxnoxious3340Widget : ModuleWidget {
 
     Zoxnoxious3340Widget(Zoxnoxious3340* module) {
         setModule(module);
-        setPanel(createPanel(asset::plugin(pluginInstance, "res/zoxnoxious3340.svg")));
+        setPanel(createPanel(asset::plugin(pluginInstance, "res/Zoxnoxious3340.svg")));
 
         addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

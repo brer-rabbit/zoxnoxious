@@ -1,21 +1,6 @@
 #include "plugin.hpp"
 
-
-/** 
- * midi/audio manager.
- *
- * "owner" module registers a midi or audio device.  This may occur,
- * for example, on selection of a device.
- * A non-owner module calls in to report itself and request a midi and audio device.
- * The Audio request includes number of channels required.
- *
- * The return is midi and audio device.  Audio return includes offset
- * to channel number to start with; the module has from offset to
- * requested num channels - 1 to use.  Midi return is channel number specific to the module.
- */
-
-
-
+/* this code is pretty much all taken from VCV Rack's Fundamental.  */
 
 struct ZoxnoxiousMidiOutput : midi::Output {
     static const uint8_t programChangeStatus = 0xC;
@@ -36,11 +21,11 @@ struct ZoxnoxiousMidiOutput : midi::Output {
 };
 
 
-// taken from Fundamental Audio.cpp and CV_MIDI.cpp
+
 // this ought to be chopped in half since it only really
 // uses the inputs.  Outputs could be removed.
 
-// NOTE: THIS DOES NOT CLAMP: USER OF THIS AUDIO PORT SHOULD CLAMP ALL INPUTS
+// NOTE: THIS DOES NOT CLAMP: User of this audio port should clamp all inputs.
 // Maybe I'll change that later... the unmeasurable effieciency gained
 // is perhaps the wrong optimization.  The inputs may have varying ranges
 // depending on the hardware and the particular signal, so it makes sense the
