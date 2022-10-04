@@ -496,21 +496,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
             rightLevelClipTimer -= lightTime;
             lights[RIGHT_LEVEL_CLIP_LIGHT].setBrightnessSmooth(rightLevelClipTimer > 0.f, brightnessDeltaTime);
 
-            if (validLeftExpander) {
-                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
-                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
-            }
-            else if (hasChannelAssignment) {
-                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
-                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
-            }
-            else {
-                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(1.f);
-                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(0.f);
-                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
-            }
+            setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
         }
 
     }

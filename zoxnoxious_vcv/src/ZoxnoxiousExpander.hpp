@@ -304,10 +304,62 @@ protected:
     }
 
 
+    /** setLeftExpanderLight
+     *
+     * convenience function to set the RGB lights for left expander.
+     * Intended to provide consistency among modules.
+     * Assumes the lightEnum passed in is an RGB.
+     * what is communicated to the user:
+     * Green: channelassignment && valid left:
+     * yellow: valid left expander
+     * red: none of the above
+     */
+    virtual void setLeftExpanderLight(int lightEnum) {
+        if (hasChannelAssignment && validLeftExpander) {
+            lights[lightEnum + 0].setBrightness(0.f);
+            lights[lightEnum + 1].setBrightness(1.f);
+            lights[lightEnum + 2].setBrightness(0.f);
+        }
+        else if (validLeftExpander) {
+            lights[lightEnum + 0].setBrightness(1.f);
+            lights[lightEnum + 1].setBrightness(1.f);
+            lights[lightEnum + 2].setBrightness(0.f);
+        }
+        else {
+            lights[lightEnum + 0].setBrightness(1.f);
+            lights[lightEnum + 1].setBrightness(0.f);
+            lights[lightEnum + 2].setBrightness(0.f);
+        }
+    }
+
+    /** setRightExpanderLight
+     *
+     * convenience function to set the RGB lights for right expander.
+     * See above.  Logic is slightly different:
+     * Green: has channel assignment (also implies valid expander)
+     * Yellow: valid right expander
+     * Red: none of the above
+     */
+    virtual void setRightExpanderLight(int lightEnum) {
+        if (hasChannelAssignment) {
+            lights[lightEnum + 0].setBrightness(0.f);
+            lights[lightEnum + 1].setBrightness(1.f);
+            lights[lightEnum + 2].setBrightness(0.f);
+        }
+        else if (validRightExpander) {
+            lights[lightEnum + 0].setBrightness(1.f);
+            lights[lightEnum + 1].setBrightness(1.f);
+            lights[lightEnum + 2].setBrightness(0.f);
+        }
+        else {
+            lights[lightEnum + 0].setBrightness(1.f);
+            lights[lightEnum + 1].setBrightness(0.f);
+            lights[lightEnum + 2].setBrightness(0.f);
+        }
+    }
+
 private:
     bool isPrimary;
-
-
 
 
 };

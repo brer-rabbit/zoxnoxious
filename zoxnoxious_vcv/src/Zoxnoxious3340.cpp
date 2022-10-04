@@ -132,8 +132,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         configInput(MIX1_TRIANGLE_VCA_INPUT, "Mix1 Triangle Level");
         configInput(EXT_MOD_AMOUNT_INPUT, "External Modulation Amount");
 
-        configLight(LEFT_EXPANDER_LIGHT, "Connection");
-        configLight(RIGHT_EXPANDER_LIGHT, "Connection");
+        configLight(LEFT_EXPANDER_LIGHT, "Connection Status");
+        configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
 
         lightDivider.setDivision(512);
     }
@@ -194,47 +194,9 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             extModAmountClipTimer -= lightTime;
             lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
 
-            // what to communicate to the user:
-            // left state:
-            // channelassignment && valid left: green
-            // valid left expander: yellow
-            // neither of the above: red
-            if (validLeftExpander) {
-                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
-                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
-            }
-            else if (hasChannelAssignment) {
-                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(0.f);
-                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
-            }
-            else {
-                lights[LEFT_EXPANDER_LIGHT + 0].setBrightness(1.f);
-                lights[LEFT_EXPANDER_LIGHT + 1].setBrightness(0.f);
-                lights[LEFT_EXPANDER_LIGHT + 2].setBrightness(0.f);
-            }
+            setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
+            setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
 
-            // right state:
-            // channel assignment: green
-            // valid right expander: yellow
-            // neither of the above: red
-
-            if (hasChannelAssignment) {
-                lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(0.f);
-                lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-                lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
-            }
-            else if (validRightExpander) {
-                lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
-                lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-                lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
-            }
-            else {
-                lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
-                lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(0.f);
-                lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
-            }
 
         }
     }
