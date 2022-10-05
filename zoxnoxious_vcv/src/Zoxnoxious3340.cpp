@@ -211,16 +211,12 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
 
         if (!hasChannelAssignment) {
-            if (APP->engine->getFrame() % 60000 == 0) {
-                INFO("zoxnoxious: module id %" PRId64 " no channel assignment", getId());
-            }
             return;
         }
 
-
         // if we have any queued midi messages, send them if possible
         if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
-            INFO("zoxnoxious3340: clock %" PRId64 " : bus is open, popping MIDI message from queue", APP->engine->getFrame());
+            //INFO("zoxnoxious3340: clock %" PRId64 " : bus is open, popping MIDI message from queue", APP->engine->getFrame());
             controlMsg->midiMessageSet = true;
             controlMsg->midiMessage = midiMessageQueue.front();
             midiMessageQueue.pop_front();
@@ -235,7 +231,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                 buttonParamToMidiProgramList[i].previousValue = newValue;
                 if (controlMsg->midiMessageSet == false) {
                     // send direct
-                    INFO("zoxnoxioius3340: clock %" PRId64 " sending MIDI message without queueing", APP->engine->getFrame());
                     controlMsg->midiMessage.setSize(2);
                     controlMsg->midiMessage.setChannel(midiChannel);
                     controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
@@ -249,18 +244,13 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                     queuedMessage.setStatus(midiProgramChangeStatus);
                     queuedMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
                     midiMessageQueue.push_back(queuedMessage);
-                    INFO("zoxnoxioius3340: queueing MIDI message, queue size %lu", midiMessageQueue.size());
                 }
                 else {
-                    INFO("zoxnoxioius3340: dropping MIDI message, bus full and queue full");
+                    INFO("Zoxnoxioius3340: dropping MIDI message, bus full and queue full");
                 }
             }
         }
 
-
-        if (APP->engine->getFrame() % 60000 == 0) {
-            INFO("zoxnoxious: module id %" PRId64 " writing to channel offset %d", getId(), cvChannelOffset);
-        }
 
         float v;
         const float clipTime = 0.25f;
