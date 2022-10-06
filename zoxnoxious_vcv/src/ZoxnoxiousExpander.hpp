@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 
 #include <rack.hpp>
 
@@ -19,6 +18,7 @@ struct ZoxnoxiousControlMsg {
     float frame[maxChannels];
     bool midiMessageSet;
     midi::Message midiMessage;
+    long moduleId;
 };
 
 static const uint8_t midiProgramChangeStatus = 0xC;
@@ -81,7 +81,7 @@ struct ZoxnoxiousModule : Module {
 public:
 
     ZoxnoxiousModule() :
-        validRightExpander(false), validLeftExpander(false), hasChannelAssignment(false),
+        validRightExpander(false), validLeftExpander(false), controlMessageIndex(0), hasChannelAssignment(false),
         cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel), slot(invalidSlot),
         isPrimary(false) {
 
@@ -91,8 +91,11 @@ public:
         initCommandMsgState();
 
         // control
-        rightExpander.producerMessage = &zControl_a;
-        rightExpander.consumerMessage = &zControl_b;
+        for (int i = 0; i < 8; ++i) {
+            zControlMessages[i] = controlEmpty;
+        }
+        rightExpander.producerMessage = &zControlMessages[0];
+        rightExpander.consumerMessage = &zControlMessages[7];
     }
 
 
@@ -122,21 +125,8 @@ public:
             validExpander = &validLeftExpander;
         }
 
-        // if we previously had a validExpander, it's been replaced
-        if (*validExpander) {
-            INFO("Z Expander: module id %" PRId64 " replacing a valid %s expander", getId(), e.side ? "right" : "left");
-        }
-
-        if (dynamic_cast<ZoxnoxiousModule*>(expander.module) != NULL) {
-            // hey, this module looks familiar
-            *validExpander = true;
-            INFO("Z Expander: module id %" PRId64 " VALID %s expander", getId(), e.side ? "right" : "left");
-        }
-        else {
-            // I don't know you
-            *validExpander = false;
-            INFO("Z Expander: module id %" PRId64 " invalid %s expander", getId(), e.side ? "right" : "left");
-        }
+        *validExpander = dynamic_cast<ZoxnoxiousModule*>(expander.module) ?
+            true : false;
 
         // command msg changed (added or removed) on the right- reset/mark (un)authoritative
         // so this passes along to the left 
@@ -150,8 +140,9 @@ protected:
     bool validRightExpander;
     bool validLeftExpander;
 
-    ZoxnoxiousControlMsg zControl_a;
-    ZoxnoxiousControlMsg zControl_b;
+    // if we're the authority, hand these out on every clock
+    ZoxnoxiousControlMsg zControlMessages[8];
+    int controlMessageIndex;
 
     ZoxnoxiousCommandMsg zCommand_a;
     ZoxnoxiousCommandMsg zCommand_b;
@@ -175,23 +166,27 @@ protected:
             // Left Consumer Message Passing to our RightExpander Producer
             //
 
-            // find the correct right producer message to modify
-            ZoxnoxiousControlMsg *rightExpanderProducerMessage =
-                rightExpander.producerMessage == &zControl_a ? &zControl_a : &zControl_b;
-
-            // get the message from the left, if we have a left expander, so it can be relayed
+            ZoxnoxiousControlMsg *rightExpanderProducerMessage;
+            // left most module is the message owner
             if (leftExpander.module != NULL && validLeftExpander) {
-                ZoxnoxiousControlMsg *leftExpanderConsumerMessage = static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
-
-                *rightExpanderProducerMessage = *leftExpanderConsumerMessage;  // daisy chain
+                rightExpanderProducerMessage =
+                    static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
             }
             else {
-                // no connection-- bootstrap from an empty message
-                *rightExpanderProducerMessage = controlEmpty;
+                // this is the left most module.  Clear it, then send.
+                zControlMessages[controlMessageIndex] = controlEmpty;
+                zControlMessages[controlMessageIndex].moduleId = getId();
+                rightExpanderProducerMessage =
+                    &zControlMessages[controlMessageIndex];
+                if (++controlMessageIndex == 8) {
+                    controlMessageIndex = 0;
+                }
             }
 
+
             // call the concrete module to fill in the control message
-            processZoxnoxiousControl(static_cast<ZoxnoxiousControlMsg*>(rightExpanderProducerMessage));
+            processZoxnoxiousControl(rightExpanderProducerMessage);
+            rightExpander.producerMessage = rightExpanderProducerMessage;
             rightExpander.messageFlipRequested = true;
 
             //
@@ -218,10 +213,6 @@ protected:
             processZoxnoxiousCommand(leftExpanderProducerMessage);
             leftExpander.messageFlipRequested = true;
 
-
-            if (APP->engine->getFrame() % 60000 == 0) {
-                //INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : requested message flip: authoritative: %d", APP->engine->getFrame(), getId(), leftExpanderProducerMessage->authoritativeSource);
-            }
         }
 
     }
@@ -266,18 +257,13 @@ protected:
                     midiChannel = zCommand->channelAssignments[slot].midiChannel;
                     cvChannelOffset = zCommand->channelAssignments[slot].cvChannelOffset;
                     hasChannelAssignment = true;
-
-                    INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : hasChannelAssignment at slot %d", APP->engine->getFrame(), getId(), slot);
+                    //INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : hasChannelAssignment at slot %d", APP->engine->getFrame(), getId(), slot);
                     break;
                 }
             }
         }
         else if (! zCommand->authoritativeSource) {
             // received message from a non-auth source, reset whatever we know
-            if (hasChannelAssignment) {
-                INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : unset ChannelAssignment", APP->engine->getFrame(), getId());
-            }
-
             hasChannelAssignment = false;
         }
         else {
