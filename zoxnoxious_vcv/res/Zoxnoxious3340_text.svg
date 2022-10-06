@@ -7,7 +7,7 @@
    viewBox="0 0 76.199997 128.5"
    version="1.1"
    id="svg26"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
    sodipodi:docname="Zoxnoxious3340_text.svg"
    inkscape:export-filename="/home/kaf/Downloads/Zoxnoxious3340_text.png"
    inkscape:export-xdpi="150.02802"
@@ -41,15 +41,15 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="0.92027869"
-     inkscape:cx="173.31706"
-     inkscape:cy="237.42808"
+     inkscape:zoom="2.2464914"
+     inkscape:cx="1.3354158"
+     inkscape:cy="260.85121"
      inkscape:window-width="1373"
      inkscape:window-height="760"
-     inkscape:window-x="49"
-     inkscape:window-y="27"
+     inkscape:window-x="34"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer1"
      width="71.12mm"
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#cfdee6"
@@ -73,7 +73,8 @@
        apply_no_radius="true"
        apply_with_radius="true"
        only_selected="false"
-       hide_knots="false" />
+       hide_knots="false"
+       nodesatellites_param="F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1" />
     <inkscape:path-effect
        effect="fillet_chamfer"
        id="path-effect147"
@@ -90,7 +91,8 @@
        apply_no_radius="true"
        apply_with_radius="true"
        only_selected="false"
-       hide_knots="false" />
+       hide_knots="false"
+       nodesatellites_param="F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1" />
     <inkscape:path-effect
        effect="fillet_chamfer"
        id="path-effect145"
@@ -107,7 +109,8 @@
        apply_no_radius="true"
        apply_with_radius="true"
        only_selected="false"
-       hide_knots="false" />
+       hide_knots="false"
+       nodesatellites_param="F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1 @ F,0,0,1,0,2.6458333,0,1" />
     <inkscape:path-effect
        effect="fillet_chamfer"
        id="path-effect143"
@@ -124,7 +127,8 @@
        apply_no_radius="true"
        apply_with_radius="true"
        only_selected="false"
-       hide_knots="false" />
+       hide_knots="false"
+       nodesatellites_param="F,0,0,1,0,2.6458333,0,2 @ F,0,0,1,0,2.6458333,0,2 @ F,0,0,1,0,2.6458333,0,2 @ F,0,0,1,0,2.6458333,0,2" />
     <marker
        style="overflow:visible"
        id="Arrow1Lend"
@@ -327,41 +331,34 @@
      inkscape:label="background"
      style="display:inline">
     <rect
-       style="opacity:0.89;fill:#ffffff;stroke:#000000;stroke-width:0.222;paint-order:markers fill stroke;fill-opacity:1"
+       style="display:inline;opacity:0.89;fill:#eeeeee;fill-opacity:1;stroke:#000000;stroke-width:0.222;paint-order:markers fill stroke"
        id="rect297"
        width="77.225906"
        height="129.32208"
        x="-0.27284041"
        y="-0.031160831" />
-    <rect
-       style="display:none;fill:#b1b1b1;fill-opacity:1;stroke:#980000;stroke-width:0.258616"
-       id="rect1059"
-       width="75.941383"
-       height="128.24138"
-       x="0.12930755"
-       y="0.12930755" />
     <path
-       style="display:inline;fill:#cc9696;fill-opacity:1;stroke:#980000;stroke-width:0.107924"
+       style="display:inline;fill:#cc9696;fill-opacity:1;stroke:#980000;stroke-width:0.158;stroke-dasharray:none"
        id="rect1316"
        width="44.892311"
        height="33.142895"
-       x="5.0539622"
+       x="4.4039626"
        y="10.863962"
        inkscape:path-effect="#path-effect143"
-       d="M 7.6997955,10.863962 H 47.30044 a 2.6458333,2.6458333 45 0 1 2.645833,2.645833 V 41.361024 A 2.6458333,2.6458333 135 0 1 47.30044,44.006857 H 7.6997955 A 2.6458333,2.6458333 45 0 1 5.0539622,41.361024 V 13.509795 a 2.6458333,2.6458333 135 0 1 2.6458333,-2.645833 z"
+       d="M 7.0497959,10.863962 H 46.65044 a 2.6458333,2.6458333 45 0 1 2.645834,2.645833 V 41.361024 A 2.6458333,2.6458333 135 0 1 46.65044,44.006857 H 7.0497959 A 2.6458333,2.6458333 45 0 1 4.4039626,41.361024 V 13.509795 a 2.6458333,2.6458333 135 0 1 2.6458333,-2.645833 z"
        sodipodi:type="rect" />
     <path
        style="display:inline;fill:#aeb7ab;fill-opacity:1;stroke:#980000;stroke-width:0.157904"
        id="rect1316-4"
        width="44.846672"
        height="76.332794"
-       x="5.0789518"
+       x="4.4289522"
        y="46.4823"
        inkscape:path-effect="#path-effect149"
-       d="M 7.7247851,46.4823 H 47.279791 a 2.6458333,2.6458333 45 0 1 2.645833,2.645833 v 71.041127 a 2.6458333,2.6458333 135 0 1 -2.645833,2.64583 H 7.7247851 A 2.6458333,2.6458333 45 0 1 5.0789518,120.16926 V 49.128133 A 2.6458333,2.6458333 135 0 1 7.7247851,46.4823 Z"
+       d="M 7.0747855,46.4823 H 46.629791 a 2.6458333,2.6458333 45 0 1 2.645833,2.645833 v 71.041127 a 2.6458333,2.6458333 135 0 1 -2.645833,2.64583 H 7.0747855 A 2.6458333,2.6458333 45 0 1 4.4289522,120.16926 V 49.128133 A 2.6458333,2.6458333 135 0 1 7.0747855,46.4823 Z"
        sodipodi:type="rect" />
     <path
-       style="display:inline;fill:#c7b89b;fill-opacity:1;stroke:#980000;stroke-width:0.108263"
+       style="display:inline;fill:#c7b89b;fill-opacity:1;stroke:#980000;stroke-width:0.158;stroke-dasharray:none"
        id="rect1316-8"
        width="20.228563"
        height="79.516335"
@@ -371,14 +368,14 @@
        d="M 54.884054,10.863811 H 69.82095 a 2.6458333,2.6458333 45 0 1 2.645834,2.645833 V 87.734312 A 2.6458333,2.6458333 135 0 1 69.82095,90.380145 H 54.884054 A 2.6458333,2.6458333 45 0 1 52.23822,87.734312 V 13.509644 a 2.6458333,2.6458333 135 0 1 2.645834,-2.645833 z"
        sodipodi:type="rect" />
     <path
-       style="display:inline;fill:#ada9b9;fill-opacity:1;stroke:#980000;stroke-width:0.06825"
+       style="display:inline;fill:#ada9b9;fill-opacity:1;stroke:#980000;stroke-width:0.158;stroke-dasharray:none"
        id="rect1316-8-9"
-       width="20.268333"
-       height="31.178902"
-       x="52.11623"
-       y="91.579376"
+       width="20.271093"
+       height="30.094759"
+       x="52.114849"
+       y="92.720284"
        inkscape:path-effect="#path-effect147"
-       d="M 54.762063,91.579376 H 69.73873 a 2.6458333,2.6458333 45 0 1 2.645833,2.645834 v 25.88723 a 2.6458333,2.6458333 135 0 1 -2.645833,2.64584 H 54.762063 A 2.6458333,2.6458333 45 0 1 52.11623,120.11244 V 94.22521 a 2.6458333,2.6458333 135 0 1 2.645833,-2.645834 z"
+       d="m 54.760682,92.720284 h 14.979427 a 2.6458333,2.6458333 45 0 1 2.645833,2.645833 v 24.803093 a 2.6458333,2.6458333 135 0 1 -2.645833,2.64583 H 54.760682 a 2.6458333,2.6458333 45 0 1 -2.645833,-2.64583 V 95.366117 a 2.6458333,2.6458333 135 0 1 2.645833,-2.645833 z"
        sodipodi:type="rect" />
   </g>
   <g
@@ -463,19 +460,21 @@
          y="20.898756">PULSE</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689;font-variant-east-asian:normal"
-       x="7.0733361"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="6.0094781"
        y="51.818535"
        id="text92-2-5"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
-         id="tspan1072">MODULATION</tspan></text>
+         id="tspan1072"
+         x="6.0094781"
+         y="51.818535">MODULATION</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="7.187541"
+       x="6.127645"
        y="57.673218"
        id="text92-2-5-97-8-5"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -483,12 +482,12 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan8636"
-         x="7.187541"
+         x="6.127645"
          y="57.673218">SOURCE</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="32.339809"
+       x="31.68981"
        y="78.857521"
        id="text92-2-5-97-5"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -496,7 +495,7 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan3052"
-         x="32.339809"
+         x="31.68981"
          y="78.857521">SYNC PHASE</tspan></text>
     <text
        xml:space="preserve"
@@ -540,21 +539,21 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="58.631847"
-       y="64.540207"
+       x="59.65527"
+       y="63.538521"
        id="text3638-6-0"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan3849"
-         x="58.631847"
-         y="64.540207">SAW</tspan></text>
+         x="59.65527"
+         y="63.538521">SAW</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        x="52.977188"
-       y="76.236992"
+       y="76.737839"
        id="text3638-6-0-7"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
@@ -562,25 +561,25 @@
          sodipodi:role="line"
          id="tspan3998"
          x="52.977188"
-         y="76.236992">OFF</tspan></text>
+         y="76.737839">OFF</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="53.90369"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="54.749546"
        y="82.667175"
        id="text3638-6-5"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
-         id="tspan11138"
-         x="53.90369"
-         y="82.667175">COMPARATOR</tspan></text>
+         id="tspan31322"
+         x="54.749546"
+         y="82.667175">CROSS MOD</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        x="61.027439"
-       y="76.12365"
+       y="76.624496"
        id="text4002-9"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
@@ -588,23 +587,23 @@
          sodipodi:role="line"
          id="tspan11304"
          x="61.027439"
-         y="76.12365">L / M / H</tspan></text>
+         y="76.624496">L / M / H</tspan></text>
     <path
        id="path11165"
        style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.222;stroke-miterlimit:4;stroke-dasharray:none;marker-end:url(#Arrow1Lend)"
-       d="m 17.463228,64.861592 c 0.761362,0.02018 4.757421,-3.956772 14.87457,-4.854781"
+       d="m 16.813228,64.861592 c 0.761362,0.02018 4.757421,-3.956772 14.87457,-4.854781"
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0" />
     <path
        id="path11165-3"
        style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.222;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend-2)"
-       d="m 12.151432,69.545185 c 3.337419,-0.408664 2.577378,6.808024 2.577378,6.808024"
+       d="m 15.270272,68.838527 c 3.337419,-0.408664 -1.191462,7.514682 -1.191462,7.514682"
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0" />
     <path
        id="path11165-3-00"
        style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.222;stroke-miterlimit:4;stroke-dasharray:none;marker-end:url(#Arrow1Lend-2-1)"
-       d="m 18.7453,68.266435 c 14.61095,6.858477 21.433321,0.515031 33.767694,11.080957"
+       d="m 18.7453,68.266435 c 14.61095,6.858477 24.759631,-0.845732 33.767694,13.348896"
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0" />
     <path
@@ -615,7 +614,7 @@
        inkscape:connector-curvature="0" />
     <path
        style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:0.168692;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.168692, 0.337384;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 72.149218,61.118565 -19.618031,0.04011"
+       d="m 72.149218,58.948241 -19.618031,0.04011"
        id="path2871-1-7"
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0" />
@@ -634,7 +633,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="6.6920342"
+       x="6.0420346"
        y="79.618515"
        id="text92-2-39-6-1"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -642,36 +641,36 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan2260"
-         x="6.6920342"
+         x="6.0420346"
          y="79.618515">MOD AMOUNT</tspan></text>
     <path
        style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:0.150637;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.150637, 0.301275;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 28.380617,68.256595 0.413655,35.906075"
+       d="m 27.730617,68.256595 0.413655,35.906075"
        id="path3554-4"
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0" />
     <path
        id="path11165-3-7"
        style="display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.222;stroke-miterlimit:4;stroke-dasharray:none;marker-end:url(#Arrow1Lend-2-3)"
-       d="M 20.325646,96.128654 C 23.663065,95.71999 36.933808,107.70442 36.933808,107.70442"
+       d="M 19.675646,96.128654 C 23.013065,95.71999 36.283808,107.70442 36.283808,107.70442"
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0" />
     <path
        id="path11165-3-6"
        style="display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.222;stroke-miterlimit:4;stroke-dasharray:none;marker-end:url(#Arrow1Lend-2-5)"
-       d="m 20.325646,96.128654 c 3.337419,-0.408664 4.212032,10.349776 4.212032,10.349776"
+       d="m 19.675646,96.128654 c 3.337419,-0.408664 4.212032,10.349776 4.212032,10.349776"
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0" />
     <path
        id="path11165-3-8"
        style="display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.222;stroke-miterlimit:4;stroke-dasharray:none;marker-end:url(#Arrow1Lend-2-2)"
-       d="M 20.325646,96.128654 C 23.663065,95.71999 15.6833,109.20286 15.6833,109.20286"
+       d="M 19.675646,96.128654 C 23.013065,95.71999 15.0333,109.20286 15.0333,109.20286"
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="7.771018"
+       x="7.1210184"
        y="15.570153"
        id="text92-2"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -679,7 +678,7 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan1840"
-         x="7.771018"
+         x="7.1210184"
          y="15.570153">FREQ</tspan></text>
     <text
        xml:space="preserve"
@@ -712,7 +711,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="23.101561"
+       x="22.451561"
        y="15.649734"
        id="text92-2-3"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -720,12 +719,12 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan1226"
-         x="23.101561"
+         x="22.451561"
          y="15.649734">LINEAR</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="39.351074"
+       x="38.701073"
        y="14.038331"
        id="text92-2-39"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -733,16 +732,16 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan1228"
-         x="39.351074"
+         x="38.701073"
          y="14.038331">PULSE</tspan><tspan
          sodipodi:role="line"
          id="tspan1230"
-         x="39.351074"
+         x="38.701073"
          y="17.125132">WIDTH</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="31.656403"
+       x="31.006403"
        y="64.062721"
        id="text92-2-5-97-8"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -750,7 +749,7 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan2274"
-         x="31.656403"
+         x="31.006403"
          y="64.062721">POS</tspan></text>
     <text
        inkscape:export-ydpi="600.01202"
@@ -758,12 +757,12 @@
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        id="text2262"
        y="59.439224"
-       x="36.801796"
+       x="36.151794"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        xml:space="preserve"><tspan
          sodipodi:role="line"
          id="tspan2276"
-         x="36.801796"
+         x="36.151794"
          y="59.439224">SYNC</tspan></text>
     <text
        inkscape:export-ydpi="600.01202"
@@ -771,17 +770,17 @@
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        id="text2270"
        y="64.062721"
-       x="43.159107"
+       x="42.509106"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        xml:space="preserve"><tspan
          sodipodi:role="line"
          id="tspan2272"
-         x="43.159107"
+         x="42.509106"
          y="64.062721">NEG</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="8.2450838"
+       x="7.5950842"
        y="113.43208"
        id="text92-2-5-97-9-2"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -789,12 +788,12 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan3271"
-         x="8.2450838"
+         x="7.5950842"
          y="113.43208">PWM</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="23.941328"
+       x="23.291328"
        y="110.96729"
        id="text92-2-5-97"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -802,16 +801,16 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan271"
-         x="23.941328"
+         x="23.291328"
          y="110.96729">EXP</tspan><tspan
          sodipodi:role="line"
          id="tspan273"
-         x="23.941328"
+         x="23.291328"
          y="114.05409">FREQ</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="39.381756"
+       x="38.731754"
        y="110.96729"
        id="text92-2-5-97-9"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -819,11 +818,11 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan249"
-         x="39.381756"
+         x="38.731754"
          y="110.96729">LINEAR</tspan><tspan
          sodipodi:role="line"
          id="tspan251"
-         x="39.381756"
+         x="38.731754"
          y="114.05409">FREQ</tspan></text>
   </g>
   <g
@@ -835,14 +834,14 @@
        id="b39d990d-64d8-41f9-b92c-7dcc2247a0f0-1-4-4-6"
        data-name="In03#PJ301MPort"
        cx="62.487648"
-       cy="55.450672"
+       cy="54.615932"
        r="1.3229166"
        style="display:inline;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="MIX1_TRIANGLE_VCA_INPUT" />
     <circle
        id="b39d990d-64d8-41f9-b92c-7dcc2247a0f0-1-4-4-6-1"
        data-name="In03#PJ301MPort"
-       cx="40.140007"
+       cx="39.490005"
        cy="102.29285"
        r="1.3229166"
        style="display:inline;fill:#00ff00;stroke-width:0.264583"
@@ -859,22 +858,22 @@
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9"
        data-name="Tempo#RoundLargeBlackKnob"
        cx="62.487648"
-       cy="87.758873"
+       cy="86.757187"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
        inkscape:label="MIX1_COMPARATOR_BUTTON" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="9.2555351"
-       cy="65.668495"
+       cx="10.200032"
+       cy="64.985138"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
        inkscape:label="EXT_MOD_SELECT_SWITCH" />
     <circle
        id="b39d990d-64d8-41f9-b92c-7dcc2247a0f0-1-4-4-6-1-8"
        data-name="In03#PJ301MPort"
-       cx="13.181956"
+       cx="14.175037"
        cy="102.29285"
        r="1.3229166"
        style="display:inline;fill:#00ff00;stroke-width:0.264583"
@@ -882,7 +881,7 @@
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="13.181956"
+       cx="14.175037"
        cy="92.627869"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
@@ -907,7 +906,7 @@
        id="b903da6b-121c-4663-8772-b399a6eccb9e-9"
        data-name="Tempo#RoundLargeBlackKnob"
        cx="62.321125"
-       cy="44.613102"
+       cy="43.444469"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
        inkscape:label="MIX1_TRIANGLE_KNOB" />
@@ -922,7 +921,7 @@
     <circle
        id="b39d990d-64d8-41f9-b92c-7dcc2247a0f0-1"
        data-name="In03#PJ301MPort"
-       cx="11.276418"
+       cx="10.626418"
        cy="40.646168"
        r="1.3229166"
        style="display:inline;fill:#00ff00;stroke-width:0.264583"
@@ -930,7 +929,7 @@
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="11.276418"
+       cx="10.626418"
        cy="118.52378"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
@@ -938,7 +937,7 @@
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-8"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="11.276418"
+       cx="10.626418"
        cy="30.981186"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
@@ -946,7 +945,7 @@
     <circle
        id="b9452edd-6f79-47c8-a395-da97cf0e28c9"
        data-name="RGreen1#RedLight"
-       cx="11.276418"
+       cx="10.626418"
        cy="21.89719"
        r="0.79374999"
        style="display:inline;opacity:1;fill:#ff00ff;stroke-width:0.264583"
@@ -962,7 +961,7 @@
     <circle
        id="b39d990d-64d8-41f9-b92c-7dcc2247a0f0-1-4"
        data-name="In03#PJ301MPort"
-       cx="27.313295"
+       cx="26.663296"
        cy="40.646168"
        r="1.3229166"
        style="display:inline;fill:#00ff00;stroke-width:0.264583"
@@ -970,7 +969,7 @@
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3-9"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="27.313295"
+       cx="26.663296"
        cy="118.52378"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
@@ -978,7 +977,7 @@
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-3"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="27.313295"
+       cx="26.663296"
        cy="30.981186"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
@@ -987,14 +986,14 @@
        style="display:inline;opacity:1;fill:#ff00ff;stroke-width:0.264583"
        r="0.79374999"
        cy="21.89719"
-       cx="27.313295"
+       cx="26.663296"
        data-name="RGreen1#RedLight"
        id="circle3097"
        inkscape:label="LINEAR_CLIP" />
     <circle
        id="b39d990d-64d8-41f9-b92c-7dcc2247a0f0-1-4-4"
        data-name="In03#PJ301MPort"
-       cx="43.925743"
+       cx="43.275742"
        cy="40.646168"
        r="1.3229166"
        style="display:inline;fill:#00ff00;stroke-width:0.264583"
@@ -1002,7 +1001,7 @@
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3-9-2"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="43.925743"
+       cx="43.275742"
        cy="118.52378"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
@@ -1010,7 +1009,7 @@
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-5"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="43.925743"
+       cx="43.275742"
        cy="30.981186"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
@@ -1019,14 +1018,14 @@
        inkscape:label="PULSE_WIDTH_CLIP"
        id="circle3099"
        data-name="RGreen1#RedLight"
-       cx="43.925743"
+       cx="43.275742"
        cy="21.89719"
        r="0.79374999"
        style="display:inline;opacity:1;fill:#ff00ff;stroke-width:0.264583" />
     <circle
        style="display:inline;opacity:1;fill:#ff00ff;stroke-width:0.264583"
        r="0.79374999"
-       cy="38.974113"
+       cy="50.994366"
        cx="55.19006"
        data-name="RGreen1#RedLight"
        id="circle3171"
@@ -1035,7 +1034,7 @@
        inkscape:label="SYNC_PHASE_CLIP"
        id="circle3173"
        data-name="RGreen1#RedLight"
-       cx="40.140007"
+       cx="39.490005"
        cy="83.543869"
        r="0.79374999"
        style="display:inline;opacity:1;fill:#ff00ff;stroke-width:0.264583" />
@@ -1043,14 +1042,14 @@
        style="display:inline;opacity:1;fill:#ff00ff;stroke-width:0.264583"
        r="0.79374999"
        cy="83.543869"
-       cx="13.181956"
+       cx="14.175037"
        data-name="RGreen1#RedLight"
        id="circle3175"
        inkscape:label="EXT_MOD_AMOUNT_CLIP" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-76"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="40.140007"
+       cx="39.490005"
        cy="92.627869"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
@@ -1058,7 +1057,7 @@
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="34.209045"
+       cx="33.559044"
        cy="68.099426"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
@@ -1068,7 +1067,7 @@
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
        r="1.3229166"
        cy="68.099426"
-       cx="45.839565"
+       cx="45.189564"
        data-name="Tempo#RoundLargeBlackKnob"
        id="circle8638" />
     <circle
