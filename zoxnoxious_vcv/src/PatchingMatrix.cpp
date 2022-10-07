@@ -7,91 +7,19 @@
 struct PatchingMatrix : ZoxnoxiousModule {
     enum ParamId {
         MIX_LEFT_SELECT_PARAM,
-        CARD_A_MIX1_CARD_A_BUTTON_PARAM,
-        CARD_A_MIX1_CARD_B_BUTTON_PARAM,
-        CARD_A_MIX1_CARD_C_BUTTON_PARAM,
-        CARD_A_MIX1_CARD_D_BUTTON_PARAM,
-        CARD_A_MIX1_CARD_E_BUTTON_PARAM,
-        CARD_A_MIX1_CARD_F_BUTTON_PARAM,
-        CARD_A_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_A_MIX2_CARD_A_BUTTON_PARAM,
-        CARD_A_MIX2_CARD_B_BUTTON_PARAM,
-        CARD_A_MIX2_CARD_C_BUTTON_PARAM,
-        CARD_A_MIX2_CARD_D_BUTTON_PARAM,
-        CARD_A_MIX2_CARD_E_BUTTON_PARAM,
-        CARD_A_MIX2_CARD_F_BUTTON_PARAM,
-        CARD_A_MIX2_OUTPUT_BUTTON_PARAM,
         LEFT_LEVEL_KNOB_PARAM,
-        CARD_B_MIX1_CARD_A_BUTTON_PARAM,
-        CARD_B_MIX1_CARD_B_BUTTON_PARAM,
-        CARD_B_MIX1_CARD_C_BUTTON_PARAM,
-        CARD_B_MIX1_CARD_D_BUTTON_PARAM,
-        CARD_B_MIX1_CARD_E_BUTTON_PARAM,
-        CARD_B_MIX1_CARD_F_BUTTON_PARAM,
-        CARD_B_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_B_MIX2_CARD_A_BUTTON_PARAM,
-        CARD_B_MIX2_CARD_B_BUTTON_PARAM,
-        CARD_B_MIX2_CARD_C_BUTTON_PARAM,
-        CARD_B_MIX2_CARD_D_BUTTON_PARAM,
-        CARD_B_MIX2_CARD_E_BUTTON_PARAM,
-        CARD_B_MIX2_CARD_F_BUTTON_PARAM,
-        CARD_B_MIX2_OUTPUT_BUTTON_PARAM,
-        CARD_C_MIX1_CARD_A_BUTTON_PARAM,
-        CARD_C_MIX1_CARD_B_BUTTON_PARAM,
-        CARD_C_MIX1_CARD_C_BUTTON_PARAM,
-        CARD_C_MIX1_CARD_D_BUTTON_PARAM,
-        CARD_C_MIX1_CARD_E_BUTTON_PARAM,
-        CARD_C_MIX1_CARD_F_BUTTON_PARAM,
-        CARD_C_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_C_MIX2_CARD_A_BUTTON_PARAM,
-        CARD_C_MIX2_CARD_B_BUTTON_PARAM,
-        CARD_C_MIX2_CARD_C_BUTTON_PARAM,
-        CARD_C_MIX2_CARD_D_BUTTON_PARAM,
-        CARD_C_MIX2_CARD_E_BUTTON_PARAM,
-        CARD_C_MIX2_CARD_F_BUTTON_PARAM,
-        CARD_C_MIX2_OUTPUT_BUTTON_PARAM,
-        CARD_D_MIX1_CARD_A_BUTTON_PARAM,
-        CARD_D_MIX1_CARD_B_BUTTON_PARAM,
-        CARD_D_MIX1_CARD_C_BUTTON_PARAM,
-        CARD_D_MIX1_CARD_D_BUTTON_PARAM,
-        CARD_D_MIX1_CARD_E_BUTTON_PARAM,
-        CARD_D_MIX1_CARD_F_BUTTON_PARAM,
-        CARD_D_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_D_MIX2_CARD_A_BUTTON_PARAM,
-        CARD_D_MIX2_CARD_B_BUTTON_PARAM,
-        CARD_D_MIX2_CARD_C_BUTTON_PARAM,
-        CARD_D_MIX2_CARD_D_BUTTON_PARAM,
-        CARD_D_MIX2_CARD_E_BUTTON_PARAM,
-        CARD_D_MIX2_CARD_F_BUTTON_PARAM,
-        CARD_D_MIX2_OUTPUT_BUTTON_PARAM,
         RIGHT_LEVEL_KNOB_PARAM,
-        CARD_E_MIX1_CARD_A_BUTTON_PARAM,
-        CARD_E_MIX1_CARD_B_BUTTON_PARAM,
-        CARD_E_MIX1_CARD_C_BUTTON_PARAM,
-        CARD_E_MIX1_CARD_D_BUTTON_PARAM,
-        CARD_E_MIX1_CARD_E_BUTTON_PARAM,
-        CARD_E_MIX1_CARD_F_BUTTON_PARAM,
+        CARD_A_MIX1_OUTPUT_BUTTON_PARAM,
+        CARD_A_MIX2_OUTPUT_BUTTON_PARAM,
+        CARD_B_MIX1_OUTPUT_BUTTON_PARAM,
+        CARD_B_MIX2_OUTPUT_BUTTON_PARAM,
+        CARD_C_MIX1_OUTPUT_BUTTON_PARAM,
+        CARD_C_MIX2_OUTPUT_BUTTON_PARAM,
+        CARD_D_MIX1_OUTPUT_BUTTON_PARAM,
+        CARD_D_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_E_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_E_MIX2_CARD_A_BUTTON_PARAM,
-        CARD_E_MIX2_CARD_B_BUTTON_PARAM,
-        CARD_E_MIX2_CARD_C_BUTTON_PARAM,
-        CARD_E_MIX2_CARD_D_BUTTON_PARAM,
-        CARD_E_MIX2_CARD_E_BUTTON_PARAM,
-        CARD_E_MIX2_CARD_F_BUTTON_PARAM,
         CARD_E_MIX2_OUTPUT_BUTTON_PARAM,
-        CARD_F_MIX1_CARD_A_BUTTON_PARAM,
-        CARD_F_MIX1_CARD_B_BUTTON_PARAM,
-        CARD_F_MIX1_CARD_C_BUTTON_PARAM,
-        CARD_F_MIX1_CARD_D_BUTTON_PARAM,
-        CARD_F_MIX1_CARD_E_BUTTON_PARAM,
-        CARD_F_MIX1_CARD_F_BUTTON_PARAM,
         CARD_F_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_F_MIX2_CARD_A_BUTTON_PARAM,
-        CARD_F_MIX2_CARD_B_BUTTON_PARAM,
-        CARD_F_MIX2_CARD_C_BUTTON_PARAM,
-        CARD_F_MIX2_CARD_D_BUTTON_PARAM,
-        CARD_F_MIX2_CARD_E_BUTTON_PARAM,
-        CARD_F_MIX2_CARD_F_BUTTON_PARAM,
         CARD_F_MIX2_OUTPUT_BUTTON_PARAM,
         MIX_RIGHT_SELECT_PARAM,
         PARAMS_LEN
@@ -107,89 +35,17 @@ struct PatchingMatrix : ZoxnoxiousModule {
     enum LightId {
         LEFT_LEVEL_CLIP_LIGHT,
         RIGHT_LEVEL_CLIP_LIGHT,
-        CARD_A_MIX1_CARD_A_BUTTON_LIGHT,
-        CARD_A_MIX1_CARD_B_BUTTON_LIGHT,
-        CARD_A_MIX1_CARD_C_BUTTON_LIGHT,
-        CARD_A_MIX1_CARD_D_BUTTON_LIGHT,
-        CARD_A_MIX1_CARD_E_BUTTON_LIGHT,
-        CARD_A_MIX1_CARD_F_BUTTON_LIGHT,
         CARD_A_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_A_MIX2_CARD_A_BUTTON_LIGHT,
-        CARD_A_MIX2_CARD_B_BUTTON_LIGHT,
-        CARD_A_MIX2_CARD_C_BUTTON_LIGHT,
-        CARD_A_MIX2_CARD_D_BUTTON_LIGHT,
-        CARD_A_MIX2_CARD_E_BUTTON_LIGHT,
-        CARD_A_MIX2_CARD_F_BUTTON_LIGHT,
         CARD_A_MIX2_OUTPUT_BUTTON_LIGHT,
-        CARD_B_MIX1_CARD_A_BUTTON_LIGHT,
-        CARD_B_MIX1_CARD_B_BUTTON_LIGHT,
-        CARD_B_MIX1_CARD_C_BUTTON_LIGHT,
-        CARD_B_MIX1_CARD_D_BUTTON_LIGHT,
-        CARD_B_MIX1_CARD_E_BUTTON_LIGHT,
-        CARD_B_MIX1_CARD_F_BUTTON_LIGHT,
         CARD_B_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_B_MIX2_CARD_A_BUTTON_LIGHT,
-        CARD_B_MIX2_CARD_B_BUTTON_LIGHT,
-        CARD_B_MIX2_CARD_C_BUTTON_LIGHT,
-        CARD_B_MIX2_CARD_D_BUTTON_LIGHT,
-        CARD_B_MIX2_CARD_E_BUTTON_LIGHT,
-        CARD_B_MIX2_CARD_F_BUTTON_LIGHT,
         CARD_B_MIX2_OUTPUT_BUTTON_LIGHT,
-        CARD_C_MIX1_CARD_A_BUTTON_LIGHT,
-        CARD_C_MIX1_CARD_B_BUTTON_LIGHT,
-        CARD_C_MIX1_CARD_C_BUTTON_LIGHT,
-        CARD_C_MIX1_CARD_D_BUTTON_LIGHT,
-        CARD_C_MIX1_CARD_E_BUTTON_LIGHT,
-        CARD_C_MIX1_CARD_F_BUTTON_LIGHT,
         CARD_C_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_C_MIX2_CARD_A_BUTTON_LIGHT,
-        CARD_C_MIX2_CARD_B_BUTTON_LIGHT,
-        CARD_C_MIX2_CARD_C_BUTTON_LIGHT,
-        CARD_C_MIX2_CARD_D_BUTTON_LIGHT,
-        CARD_C_MIX2_CARD_E_BUTTON_LIGHT,
-        CARD_C_MIX2_CARD_F_BUTTON_LIGHT,
         CARD_C_MIX2_OUTPUT_BUTTON_LIGHT,
-        CARD_D_MIX1_CARD_A_BUTTON_LIGHT,
-        CARD_D_MIX1_CARD_B_BUTTON_LIGHT,
-        CARD_D_MIX1_CARD_C_BUTTON_LIGHT,
-        CARD_D_MIX1_CARD_D_BUTTON_LIGHT,
-        CARD_D_MIX1_CARD_E_BUTTON_LIGHT,
-        CARD_D_MIX1_CARD_F_BUTTON_LIGHT,
         CARD_D_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_D_MIX2_CARD_A_BUTTON_LIGHT,
-        CARD_D_MIX2_CARD_B_BUTTON_LIGHT,
-        CARD_D_MIX2_CARD_C_BUTTON_LIGHT,
-        CARD_D_MIX2_CARD_D_BUTTON_LIGHT,
-        CARD_D_MIX2_CARD_E_BUTTON_LIGHT,
-        CARD_D_MIX2_CARD_F_BUTTON_LIGHT,
         CARD_D_MIX2_OUTPUT_BUTTON_LIGHT,
-        CARD_E_MIX1_CARD_A_BUTTON_LIGHT,
-        CARD_E_MIX1_CARD_B_BUTTON_LIGHT,
-        CARD_E_MIX1_CARD_C_BUTTON_LIGHT,
-        CARD_E_MIX1_CARD_D_BUTTON_LIGHT,
-        CARD_E_MIX1_CARD_E_BUTTON_LIGHT,
-        CARD_E_MIX1_CARD_F_BUTTON_LIGHT,
         CARD_E_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_E_MIX2_CARD_A_BUTTON_LIGHT,
-        CARD_E_MIX2_CARD_B_BUTTON_LIGHT,
-        CARD_E_MIX2_CARD_C_BUTTON_LIGHT,
-        CARD_E_MIX2_CARD_D_BUTTON_LIGHT,
-        CARD_E_MIX2_CARD_E_BUTTON_LIGHT,
-        CARD_E_MIX2_CARD_F_BUTTON_LIGHT,
         CARD_E_MIX2_OUTPUT_BUTTON_LIGHT,
-        CARD_F_MIX1_CARD_A_BUTTON_LIGHT,
-        CARD_F_MIX1_CARD_B_BUTTON_LIGHT,
-        CARD_F_MIX1_CARD_C_BUTTON_LIGHT,
-        CARD_F_MIX1_CARD_D_BUTTON_LIGHT,
-        CARD_F_MIX1_CARD_E_BUTTON_LIGHT,
-        CARD_F_MIX1_CARD_F_BUTTON_LIGHT,
         CARD_F_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_F_MIX2_CARD_A_BUTTON_LIGHT,
-        CARD_F_MIX2_CARD_B_BUTTON_LIGHT,
-        CARD_F_MIX2_CARD_C_BUTTON_LIGHT,
-        CARD_F_MIX2_CARD_D_BUTTON_LIGHT,
-        CARD_F_MIX2_CARD_E_BUTTON_LIGHT,
-        CARD_F_MIX2_CARD_F_BUTTON_LIGHT,
         CARD_F_MIX2_OUTPUT_BUTTON_LIGHT,
         ENUMS(LEFT_EXPANDER_LIGHT, 3),
         ENUMS(RIGHT_EXPANDER_LIGHT, 3),
@@ -214,89 +70,6 @@ struct PatchingMatrix : ZoxnoxiousModule {
         configParam(LEFT_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Left Level", " V", 0.f, 10.f);
         configParam(RIGHT_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Right Level", " V", 0.f, 10.f);
 
-        configSwitch(CARD_A_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card A", { "Off", "On" });
-        configSwitch(CARD_A_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card B");
-        configSwitch(CARD_A_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card C");
-        configSwitch(CARD_A_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card D");
-        configSwitch(CARD_A_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card E");
-        configSwitch(CARD_A_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Card F");
-
-        configSwitch(CARD_A_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card A");
-        configSwitch(CARD_A_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card B");
-        configSwitch(CARD_A_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card C");
-        configSwitch(CARD_A_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card D");
-        configSwitch(CARD_A_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card E");
-        configSwitch(CARD_A_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Card F");
-
-        configSwitch(CARD_B_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card A");
-        configSwitch(CARD_B_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card B");
-        configSwitch(CARD_B_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card C");
-        configSwitch(CARD_B_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card D");
-        configSwitch(CARD_B_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card E");
-        configSwitch(CARD_B_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Card F");
-
-        configSwitch(CARD_B_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card A");
-        configSwitch(CARD_B_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card B");
-        configSwitch(CARD_B_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card C");
-        configSwitch(CARD_B_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card D");
-        configSwitch(CARD_B_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card E");
-        configSwitch(CARD_B_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 2 to Card F");
-
-        configSwitch(CARD_C_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1 to Card A");
-        configSwitch(CARD_C_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1 to Card B");
-        configSwitch(CARD_C_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1 to Card C");
-        configSwitch(CARD_C_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1 to Card D");
-        configSwitch(CARD_C_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1 to Card E");
-        configSwitch(CARD_C_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 1 to Card F");
-        configSwitch(CARD_C_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "");
-        configSwitch(CARD_C_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2 to Card A");
-        configSwitch(CARD_C_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2 to Card B");
-        configSwitch(CARD_C_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2 to Card C");
-        configSwitch(CARD_C_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2 to Card D");
-        configSwitch(CARD_C_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2 to Card E");
-        configSwitch(CARD_C_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card C Out 2 to Card F");
-
-        configSwitch(CARD_D_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card A");
-        configSwitch(CARD_D_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card B");
-        configSwitch(CARD_D_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card C");
-        configSwitch(CARD_D_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card D");
-        configSwitch(CARD_D_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card E");
-        configSwitch(CARD_D_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 1 to Card F");
-        configSwitch(CARD_D_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card A");
-        configSwitch(CARD_D_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card B");
-        configSwitch(CARD_D_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card C");
-        configSwitch(CARD_D_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card D");
-        configSwitch(CARD_D_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card E");
-        configSwitch(CARD_D_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card D Out 2 to Card F");
-
-        configSwitch(CARD_E_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card A");
-        configSwitch(CARD_E_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card B");
-        configSwitch(CARD_E_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card C");
-        configSwitch(CARD_E_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card D");
-        configSwitch(CARD_E_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card E");
-        configSwitch(CARD_E_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 1 to Card F");
-        configSwitch(CARD_E_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card A");
-        configSwitch(CARD_E_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card B");
-        configSwitch(CARD_E_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card C");
-        configSwitch(CARD_E_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card D");
-        configSwitch(CARD_E_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card E");
-        configSwitch(CARD_E_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card E Out 2 to Card F");
-
-        configSwitch(CARD_F_MIX1_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card A");
-        configSwitch(CARD_F_MIX1_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card B");
-        configSwitch(CARD_F_MIX1_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card C");
-        configSwitch(CARD_F_MIX1_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card D");
-        configSwitch(CARD_F_MIX1_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card E");
-        configSwitch(CARD_F_MIX1_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Card F");
-
-        configSwitch(CARD_F_MIX2_CARD_A_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card A");
-        configSwitch(CARD_F_MIX2_CARD_B_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card B");
-        configSwitch(CARD_F_MIX2_CARD_C_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card C");
-        configSwitch(CARD_F_MIX2_CARD_D_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card D");
-        configSwitch(CARD_F_MIX2_CARD_E_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card E");
-        configSwitch(CARD_F_MIX2_CARD_F_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Card F");
-
-
         configSwitch(CARD_A_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 1 to Audio Out");
         configSwitch(CARD_A_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card A Out 2 to Audio Out");
         configSwitch(CARD_B_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card B Out 1 to Audio Out");
@@ -313,10 +86,12 @@ struct PatchingMatrix : ZoxnoxiousModule {
         configInput(LEFT_LEVEL_INPUT, "");
         configInput(RIGHT_LEVEL_INPUT, "");
 
-        configLight(LEFT_EXPANDER_LIGHT, "Connection");
-        configLight(RIGHT_EXPANDER_LIGHT, "Connection");
+        configLight(LEFT_EXPANDER_LIGHT, "Connection Status");
+        configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
 
         onReset();
+
+        lightDivider.setDivision(512);
     }
 
 
@@ -337,99 +112,19 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
     void process(const ProcessArgs& args) override {
-        lights[CARD_A_MIX1_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX1_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX1_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX1_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX1_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX1_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_A_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX2_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX2_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX2_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX2_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX2_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX2_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX1_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX1_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX1_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX1_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX1_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX1_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_B_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX2_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX2_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX2_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX2_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX2_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX2_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX1_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX1_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX1_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX1_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX1_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX1_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_C_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX2_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX2_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX2_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX2_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX2_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX2_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX1_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX1_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX1_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX1_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX1_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX1_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_D_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX2_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX2_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX2_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX2_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX2_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX2_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX1_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX1_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX1_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX1_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX1_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX1_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_E_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX2_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX2_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX2_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX2_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX2_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX2_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX1_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX1_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX1_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX1_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX1_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX1_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_F_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX2_CARD_A_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_CARD_A_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX2_CARD_B_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_CARD_B_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX2_CARD_C_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_CARD_C_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX2_CARD_D_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_CARD_D_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX2_CARD_E_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_CARD_E_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX2_CARD_F_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_CARD_F_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
 
-
-
-        // Push inputs to buffer
-        //if (audioPort.deviceNumOutputs != maxChannels) {
-        //if (APP->engine->getFrame() % 120000 == 0) {
-        //INFO("PatchingMatrix unhappy on number of channels");
-        //}
-        //}
 
         if (audioPort.deviceNumOutputs > 0) {
             dsp::Frame<maxChannels> inputFrame = {};
@@ -594,91 +289,19 @@ struct PatchingMatrixWidget : ModuleWidget {
         addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.0, 38.587)), module, PatchingMatrix::CARD_A_MIX1_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX1_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.6, 38.587)), module, PatchingMatrix::CARD_A_MIX1_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX1_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.199, 38.587)), module, PatchingMatrix::CARD_A_MIX1_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX1_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.798, 38.587)), module, PatchingMatrix::CARD_A_MIX1_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX1_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.398, 38.587)), module, PatchingMatrix::CARD_A_MIX1_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX1_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(98.997, 38.587)), module, PatchingMatrix::CARD_A_MIX1_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX1_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(113.465, 38.587)), module, PatchingMatrix::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.067, 43.278)), module, PatchingMatrix::CARD_A_MIX2_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX2_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.666, 43.278)), module, PatchingMatrix::CARD_A_MIX2_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX2_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.266, 43.278)), module, PatchingMatrix::CARD_A_MIX2_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX2_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.865, 43.278)), module, PatchingMatrix::CARD_A_MIX2_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX2_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.465, 43.278)), module, PatchingMatrix::CARD_A_MIX2_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX2_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(99.064, 43.278)), module, PatchingMatrix::CARD_A_MIX2_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX2_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 43.278)), module, PatchingMatrix::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.0, 51.648)), module, PatchingMatrix::CARD_B_MIX1_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX1_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.6, 51.648)), module, PatchingMatrix::CARD_B_MIX1_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX1_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.199, 51.648)), module, PatchingMatrix::CARD_B_MIX1_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX1_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.798, 51.648)), module, PatchingMatrix::CARD_B_MIX1_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX1_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.398, 51.648)), module, PatchingMatrix::CARD_B_MIX1_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX1_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(98.997, 51.648)), module, PatchingMatrix::CARD_B_MIX1_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX1_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(113.465, 51.648)), module, PatchingMatrix::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.067, 56.835)), module, PatchingMatrix::CARD_B_MIX2_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX2_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.666, 56.835)), module, PatchingMatrix::CARD_B_MIX2_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX2_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.266, 56.835)), module, PatchingMatrix::CARD_B_MIX2_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX2_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.865, 56.835)), module, PatchingMatrix::CARD_B_MIX2_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX2_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.465, 56.835)), module, PatchingMatrix::CARD_B_MIX2_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX2_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(99.064, 56.835)), module, PatchingMatrix::CARD_B_MIX2_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX2_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 56.835)), module, PatchingMatrix::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.0, 64.71)), module, PatchingMatrix::CARD_C_MIX1_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX1_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.6, 64.71)), module, PatchingMatrix::CARD_C_MIX1_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX1_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.199, 64.71)), module, PatchingMatrix::CARD_C_MIX1_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX1_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.798, 64.71)), module, PatchingMatrix::CARD_C_MIX1_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX1_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.398, 64.71)), module, PatchingMatrix::CARD_C_MIX1_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX1_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(98.997, 64.71)), module, PatchingMatrix::CARD_C_MIX1_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX1_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(113.465, 64.71)), module, PatchingMatrix::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.067, 69.897)), module, PatchingMatrix::CARD_C_MIX2_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX2_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.666, 69.897)), module, PatchingMatrix::CARD_C_MIX2_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX2_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.266, 69.897)), module, PatchingMatrix::CARD_C_MIX2_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX2_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.865, 69.897)), module, PatchingMatrix::CARD_C_MIX2_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX2_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.465, 69.897)), module, PatchingMatrix::CARD_C_MIX2_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX2_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(99.064, 69.897)), module, PatchingMatrix::CARD_C_MIX2_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX2_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 69.897)), module, PatchingMatrix::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.0, 77.771)), module, PatchingMatrix::CARD_D_MIX1_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX1_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.6, 77.771)), module, PatchingMatrix::CARD_D_MIX1_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX1_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.199, 77.771)), module, PatchingMatrix::CARD_D_MIX1_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX1_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.798, 77.771)), module, PatchingMatrix::CARD_D_MIX1_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX1_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.398, 77.771)), module, PatchingMatrix::CARD_D_MIX1_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX1_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(98.997, 77.771)), module, PatchingMatrix::CARD_D_MIX1_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX1_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(113.465, 77.771)), module, PatchingMatrix::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.067, 82.958)), module, PatchingMatrix::CARD_D_MIX2_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX2_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.666, 82.958)), module, PatchingMatrix::CARD_D_MIX2_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX2_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.266, 82.958)), module, PatchingMatrix::CARD_D_MIX2_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX2_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.865, 82.958)), module, PatchingMatrix::CARD_D_MIX2_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX2_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.465, 82.958)), module, PatchingMatrix::CARD_D_MIX2_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX2_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(99.064, 82.958)), module, PatchingMatrix::CARD_D_MIX2_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX2_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 82.958)), module, PatchingMatrix::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.0, 90.833)), module, PatchingMatrix::CARD_E_MIX1_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX1_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.6, 90.833)), module, PatchingMatrix::CARD_E_MIX1_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX1_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.199, 90.833)), module, PatchingMatrix::CARD_E_MIX1_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX1_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.798, 90.833)), module, PatchingMatrix::CARD_E_MIX1_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX1_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.398, 90.833)), module, PatchingMatrix::CARD_E_MIX1_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX1_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(98.997, 90.833)), module, PatchingMatrix::CARD_E_MIX1_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX1_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(113.465, 90.833)), module, PatchingMatrix::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.067, 96.02)), module, PatchingMatrix::CARD_E_MIX2_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX2_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.666, 96.02)), module, PatchingMatrix::CARD_E_MIX2_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX2_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.266, 96.02)), module, PatchingMatrix::CARD_E_MIX2_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX2_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.865, 96.02)), module, PatchingMatrix::CARD_E_MIX2_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX2_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.465, 96.02)), module, PatchingMatrix::CARD_E_MIX2_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX2_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(99.064, 96.02)), module, PatchingMatrix::CARD_E_MIX2_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX2_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 96.02)), module, PatchingMatrix::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.0, 103.894)), module, PatchingMatrix::CARD_F_MIX1_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX1_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.6, 103.894)), module, PatchingMatrix::CARD_F_MIX1_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX1_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.199, 103.894)), module, PatchingMatrix::CARD_F_MIX1_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX1_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.798, 103.894)), module, PatchingMatrix::CARD_F_MIX1_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX1_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.398, 103.894)), module, PatchingMatrix::CARD_F_MIX1_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX1_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(98.997, 103.894)), module, PatchingMatrix::CARD_F_MIX1_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX1_CARD_F_BUTTON_LIGHT));
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(113.465, 103.894)), module, PatchingMatrix::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.067, 109.081)), module, PatchingMatrix::CARD_F_MIX2_CARD_A_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_CARD_A_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.666, 109.081)), module, PatchingMatrix::CARD_F_MIX2_CARD_B_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_CARD_B_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.266, 109.081)), module, PatchingMatrix::CARD_F_MIX2_CARD_C_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_CARD_C_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(73.865, 109.081)), module, PatchingMatrix::CARD_F_MIX2_CARD_D_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_CARD_D_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(86.465, 109.081)), module, PatchingMatrix::CARD_F_MIX2_CARD_E_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_CARD_E_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(99.064, 109.081)), module, PatchingMatrix::CARD_F_MIX2_CARD_F_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_CARD_F_BUTTON_LIGHT));
-
         addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 109.081)), module, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
+
 //        ParamWidget *cardFMix2Output = createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 109.081)), module, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT);
 //        addChild(cardFMix2Output);
 //        cardFMix2Output->setVisible(false);
@@ -772,53 +395,6 @@ struct PatchingMatrixWidget : ModuleWidget {
         cardFOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
         cardFOutput2TextField->setText("CardF Out2");
         addChild(cardFOutput2TextField);
-
-
-
-        // mm2px(Vec(14.42, 3.636))
-        cardAInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(33.851, 25.977)));
-        cardAInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
-        cardAInputTextField->setText("CardA In");
-        cardAInputTextField->setRotation(-3.1416f / 4.f);
-        addChild(cardAInputTextField);
-
-
-        // mm2px(Vec(14.42, 3.636))
-        cardBInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(46.451, 25.977)));
-        cardBInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
-        cardBInputTextField->setText("CardB In");
-        cardBInputTextField->setRotation(-3.1416f / 4.f);
-        addChild(cardBInputTextField);
-
-
-        // mm2px(Vec(14.42, 3.636))
-        cardCInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(59.050, 25.977)));
-        cardCInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
-        cardCInputTextField->setText("CardC In");
-        cardCInputTextField->setRotation(-3.1416f / 4.f);
-        addChild(cardCInputTextField);
-
-
-        // mm2px(Vec(14.42, 3.636))
-        cardDInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(71.649, 25.977)));
-        cardDInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
-        cardDInputTextField->setText("CardD In");
-        cardDInputTextField->setRotation(-3.1416f / 4.f);
-        addChild(cardDInputTextField);
-
-        // mm2px(Vec(14.42, 3.636))
-        cardEInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(84.248, 25.977)));;
-        cardEInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
-        cardEInputTextField->setText("CardE In");
-        cardEInputTextField->setRotation(-3.1416f / 4.f);
-        addChild(cardEInputTextField);
-
-        // mm2px(Vec(14.42, 3.636))
-        cardFInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(96.847, 25.977)));
-        cardFInputTextField->box.size = (mm2px(Vec(14.420, 3.636)));
-        cardFInputTextField->setText("CardF In");
-        cardFInputTextField->setRotation(-3.1416f / 4.f);
-        addChild(cardFInputTextField);
 
 
         addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.0, 71.0)), module, PatchingMatrix::LEFT_EXPANDER_LIGHT));
