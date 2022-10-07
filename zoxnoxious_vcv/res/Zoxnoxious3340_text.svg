@@ -7,7 +7,7 @@
    viewBox="0 0 76.199997 128.5"
    version="1.1"
    id="svg26"
-   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    sodipodi:docname="Zoxnoxious3340_text.svg"
    inkscape:export-filename="/home/kaf/Downloads/Zoxnoxious3340_text.png"
    inkscape:export-xdpi="150.02802"
@@ -42,12 +42,12 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="2.2464914"
-     inkscape:cx="1.3354158"
-     inkscape:cy="260.85121"
-     inkscape:window-width="1373"
-     inkscape:window-height="760"
-     inkscape:window-x="34"
-     inkscape:window-y="25"
+     inkscape:cx="230.58179"
+     inkscape:cy="118.18429"
+     inkscape:window-width="1287"
+     inkscape:window-height="710"
+     inkscape:window-x="77"
+     inkscape:window-y="68"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1"
      width="71.12mm"
@@ -421,7 +421,7 @@
          style="stroke-width:0.111451">3340</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689;font-variant-east-asian:normal"
        x="55.786167"
        y="15.834297"
        id="text3638"
@@ -429,12 +429,10 @@
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
-         id="tspan3683"
-         x="55.786167"
-         y="15.834297">MIX ONE</tspan></text>
+         id="tspan1676">OUT ONE</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689;font-variant-east-asian:normal"
        x="55.396183"
        y="95.822472"
        id="text3638-0"
@@ -442,9 +440,7 @@
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
-         id="tspan4192"
-         x="55.396183"
-         y="95.822472">MIX TWO</tspan></text>
+         id="tspan1656">OUT TWO</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"

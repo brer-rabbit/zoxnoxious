@@ -23,15 +23,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.7799327"
-     inkscape:cx="164.11672"
-     inkscape:cy="162.83456"
-     inkscape:window-width="1287"
+     inkscape:zoom="1.5598654"
+     inkscape:cx="172.45078"
+     inkscape:cy="103.21403"
+     inkscape:window-width="1419"
      inkscape:window-height="705"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer2"
      inkscape:snap-nodes="false" />
   <defs
      id="defs1196">
@@ -315,24 +315,25 @@
        id="path7432"
        sodipodi:nodetypes="ccc" />
     <g
-       id="g3272"
-       transform="translate(-3.9549815)">
+       id="g2124"
+       transform="translate(4.2136217)">
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.24991px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.131248"
-         x="54.290993"
-         y="6.9354177"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.46091px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.111523"
+         x="46.093109"
+         y="6.349833"
          id="text23912-0"
          inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
          inkscape:export-xdpi="600.01202"
          inkscape:export-ydpi="600.01202"><tspan
            sodipodi:role="line"
            id="tspan1899"
-           x="54.290993"
-           y="6.9354177">AUDIO OUT</tspan></text>
+           x="46.093109"
+           y="6.349833"
+           style="stroke-width:0.111523">AUDIO OUT</tspan></text>
       <path
-         style="display:inline;fill:none;fill-opacity:1;stroke:#110000;stroke-width:0.131248px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 15.416851,6.7922276 2.593354,-3.56088 1.255998,-0.024 -0.03954,3.75013 2.840786,-0.0204 -0.07226,-3.71113 1.262296,-0.0418 2.41557,3.63095 1.402918,-0.0214 0.0203,-3.44799 2.52571,3.30514 -0.0113,-3.38645 1.40125,-0.0299 0.0113,3.54908 2.81419,0.061 -0.053,-3.61966 1.32161,-0.0102 2.49911,3.68231 1.42158,-0.0208 0.039,-3.68343 1.43285,-0.0706 0.13158,3.80651 2.82839,-9.5e-4 -0.1434,-3.74441 1.51472,-0.0102 0.0604,3.75847 2.38508,-0.0327 0.061,-3.74441 1.60104,0.0102 2.18236,3.81333"
+         style="display:inline;fill:none;fill-opacity:1;stroke:#110000;stroke-width:0.111572px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 11.453916,6.2317076 2.204565,-3.0270411 1.067701,-0.020402 -0.03361,3.1879192 2.414902,-0.017342 -0.06143,-3.154766 1.073056,-0.035533 2.053433,3.0866064 1.192596,-0.018192 0.01726,-2.9310753 2.147062,2.8096411 -0.0096,-2.8787613 1.191178,-0.025418 0.0096,3.0170102 2.392294,0.051855 -0.04505,-3.0770089 1.123478,-0.00867 2.124449,3.1302666 1.20846,-0.017682 0.03315,-3.1312187 1.218041,-0.060016 0.111853,3.2358468 2.404365,-8.075e-4 -0.121902,-3.1830568 1.287636,-0.00867 0.05135,3.1950089 2.027514,-0.027798 0.05186,-3.1830567 1.361016,0.00867 1.855185,3.2416444"
          id="path22502"
          sodipodi:nodetypes="cccccccccccccccccccccccccccccc"
          inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -705,7 +706,7 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:'.Keyboard';-inkscape-font-specification:'.Keyboard, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        x="10.298512"
-       y="-88.934967"
+       y="-87.246971"
        id="text92-2-1-3"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
@@ -714,15 +715,15 @@
          sodipodi:role="line"
          id="tspan3292"
          x="10.298512"
-         y="-88.934967">STATUS</tspan></text>
+         y="-87.246971">STATUS</tspan></text>
     <circle
        id="circle1254"
        data-name="RGreen1#RedLight"
-       cx="89.82724"
+       cx="89.193748"
        cy="8.21875"
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LEFT_EXPANDER_LIGHT" />
+       inkscape:label="RIGHT_EXPANDER_LIGHT" />
     <circle
        id="b9452edd-6f79-47c8-a395-da97cf0e28c9-8"
        data-name="RGreen1#RedLight"
