@@ -443,13 +443,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
                 leftExpanderConsumerMessage = static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
                 if (leftExpanderConsumerMessage) {
 
-                    if (APP->engine->getFrame() % 60000 == 0) {
-                        INFO("PatchingMatrix: expander source %" PRId64,
-                             leftExpanderConsumerMessage->moduleId);
-                    }
-
                     //for (int i = 0; i < audioPort.deviceNumOutputs; ++i) {  // TODO: USE THIS LINE NOT THE NEXT
-                    for (int i = 0; i < maxChannels; ++i) {
+                    for (int i = 0; i < maxChannels; ++i) { // DELETE THIS LINE
                         inputFrame.samples[i] = leftExpanderConsumerMessage->frame[i];
                     }
                 }

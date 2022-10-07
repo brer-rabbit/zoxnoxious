@@ -5,6 +5,12 @@
 
 static const int maxChannels = 31;
 
+// command messages are only once every this many clock cycles.
+// The data doesn't change that often, really it's only important
+// for when the expander connection changes.  But since stuff is daisy
+// chained we can't rely on onExpanderChange alone.
+static const int commandMessageClockDivider = 10000;
+
 /** ZoxnoxiousControlMsg:
  * messages originating from hardware cards (expansion modules) are
  * received from the left.  The expansion module populates channels it
@@ -18,7 +24,6 @@ struct ZoxnoxiousControlMsg {
     float frame[maxChannels];
     bool midiMessageSet;
     midi::Message midiMessage;
-    long moduleId;
 };
 
 static const uint8_t midiProgramChangeStatus = 0xC;
@@ -83,7 +88,8 @@ public:
     ZoxnoxiousModule() :
         validRightExpander(false), validLeftExpander(false), controlMessageIndex(0), hasChannelAssignment(false),
         cvChannelOffset(invalidCvChannelOffset), midiChannel(invalidMidiChannel), slot(invalidSlot),
-        isPrimary(false) {
+        isPrimary(false),
+        commandMessageClockDividerCount(APP->engine->getFrame() % commandMessageClockDivider) {
 
         // command
         leftExpander.producerMessage = &zCommand_a;
@@ -166,17 +172,16 @@ protected:
             // Left Consumer Message Passing to our RightExpander Producer
             //
 
-            ZoxnoxiousControlMsg *rightExpanderProducerMessage;
+            ZoxnoxiousControlMsg *leftExpanderConsumerMessage;
             // left most module is the message owner
             if (leftExpander.module != NULL && validLeftExpander) {
-                rightExpanderProducerMessage =
+                leftExpanderConsumerMessage =
                     static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
             }
             else {
                 // this is the left most module.  Clear it, then send.
                 zControlMessages[controlMessageIndex] = controlEmpty;
-                zControlMessages[controlMessageIndex].moduleId = getId();
-                rightExpanderProducerMessage =
+                leftExpanderConsumerMessage =
                     &zControlMessages[controlMessageIndex];
                 if (++controlMessageIndex == 8) {
                     controlMessageIndex = 0;
@@ -185,34 +190,37 @@ protected:
 
 
             // call the concrete module to fill in the control message
-            processZoxnoxiousControl(rightExpanderProducerMessage);
-            rightExpander.producerMessage = rightExpanderProducerMessage;
+            processZoxnoxiousControl(leftExpanderConsumerMessage);
+            rightExpander.producerMessage = leftExpanderConsumerMessage;
             rightExpander.messageFlipRequested = true;
 
             //
             // Right Consumer Message Passing to our LeftExpander Producer
             //
 
-            ZoxnoxiousCommandMsg *rightExpanderConsumerMessage = static_cast<ZoxnoxiousCommandMsg*>(rightExpander.module->leftExpander.consumerMessage);
+            if (++commandMessageClockDividerCount > commandMessageClockDivider) {
+                commandMessageClockDividerCount = 0;
+
+                ZoxnoxiousCommandMsg *rightExpanderConsumerMessage = static_cast<ZoxnoxiousCommandMsg*>(rightExpander.module->leftExpander.consumerMessage);
                 
-            // Do any reading of the rightExpanderConsumerMessage here.  Copy
-            // the right's consumer message to our left producer
-            // message.  Effectively, this daisy chains it to the
-            // left.  To do the copy, determine which buffer point to
-            // the ProducerMessage and write to it.
-            ZoxnoxiousCommandMsg *leftExpanderProducerMessage =
-                leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
+                // Do any reading of the rightExpanderConsumerMessage here.  Copy
+                // the right's consumer message to our left producer
+                // message.  Effectively, this daisy chains it to the
+                // left.  To do the copy, determine which buffer point to
+                // the ProducerMessage and write to it.
+                ZoxnoxiousCommandMsg *leftExpanderProducerMessage =
+                    leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
 
-            *leftExpanderProducerMessage = *rightExpanderConsumerMessage; // copy/daisy chain
+                *leftExpanderProducerMessage = *rightExpanderConsumerMessage; // copy/daisy chain
 
-            // Extract channel assignment, claim ownership.
-            // Do this by iterating over the leftExpanderProducerMessage,
-            // finding if we own anything there.  This may/will modify
-            // the message if we claim ownership of a
-            // ChannelAssignment.
-            processZoxnoxiousCommand(leftExpanderProducerMessage);
-            leftExpander.messageFlipRequested = true;
-
+                // Extract channel assignment, claim ownership.
+                // Do this by iterating over the leftExpanderProducerMessage,
+                // finding if we own anything there.  This may/will modify
+                // the message if we claim ownership of a
+                // ChannelAssignment.
+                processZoxnoxiousCommand(leftExpanderProducerMessage);
+                leftExpander.messageFlipRequested = true;
+            }
         }
 
     }
@@ -346,6 +354,6 @@ protected:
 
 private:
     bool isPrimary;
-
+    int commandMessageClockDividerCount;
 
 };
