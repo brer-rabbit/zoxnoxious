@@ -281,7 +281,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
 struct PatchingMatrixWidget : ModuleWidget {
     PatchingMatrixWidget(PatchingMatrix* module) {
         setModule(module);
-        setPanel(createPanel(asset::plugin(pluginInstance, "res/PatchingMatrix.svg")));
+        setPanel(createPanel(asset::plugin(pluginInstance, "res/AudioOut.svg")));
 
         addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
