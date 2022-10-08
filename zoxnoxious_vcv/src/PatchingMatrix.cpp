@@ -418,8 +418,6 @@ struct PatchingMatrixWidget : ModuleWidget {
                                          }));
     }
 
-
-
     CardTextDisplay *cardAInputTextField;
     CardTextDisplay *cardAOutput1TextField;
     CardTextDisplay *cardAOutput2TextField;

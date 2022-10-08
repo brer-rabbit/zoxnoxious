@@ -345,7 +345,7 @@ struct Zoxnoxious3340Widget : ModuleWidget {
 
         addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(62.488, 69.012)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
 
-        addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(10.2, 64.985)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_PARAM));
+        addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(10.627, 64.985)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_PARAM));
 
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(62.488, 86.757)), module, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_PARAM, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_LIGHT));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.175, 92.628)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
@@ -372,8 +372,25 @@ struct Zoxnoxious3340Widget : ModuleWidget {
         addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.02, 8.219)), module, Zoxnoxious3340::LEFT_EXPANDER_LIGHT));
         addChild(createLightCentered<TriangleRightLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(74.427, 8.219)), module, Zoxnoxious3340::RIGHT_EXPANDER_LIGHT));
 
+        mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(52.791, 12.989)));
+        mix1OutputTextField->box.size = (mm2px(Vec(19.124, 3.636)));
+        mix1OutputTextField->setText("CardA Out1");
+        addChild(mix1OutputTextField);
+
+        mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(52.791, 94.213)));
+        mix2OutputTextField->box.size = (mm2px(Vec(19.124, 3.636)));
+        mix2OutputTextField->setText("CardA Out2");
+        addChild(mix2OutputTextField);
+
+        modulationInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(6.286, 53.135)));
+        modulationInputTextField->box.size = (mm2px(Vec(22.438, 3.636)));
+        modulationInputTextField->setText("CardB Out1");
+        addChild(modulationInputTextField);
     }
 
+    CardTextDisplay *mix1OutputTextField;
+    CardTextDisplay *mix2OutputTextField;
+    CardTextDisplay *modulationInputTextField;
 
 };
 
