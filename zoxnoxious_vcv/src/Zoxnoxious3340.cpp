@@ -75,7 +75,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
     std::deque<midi::Message> midiMessageQueue;
 
-    std::string modulationInputString;
+    std::vector<std::string> modulationInputStrings;
+    float modulationInputParamPrevValue;
 
     // detect state changes so we can send a MIDI event.
     // Assume int_min is an invalid value.  On start, idea would be
@@ -104,7 +105,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             { SYNC_POS_BUTTON_PARAM, INT_MIN, { 22, 23 } }
         };
 
-    Zoxnoxious3340() {
+    Zoxnoxious3340() : modulationInputParamPrevValue(-1.f) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
@@ -140,6 +141,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
 
         lightDivider.setDivision(512);
+
+        modulationInputStrings.reserve(8);
     }
 
 
@@ -147,6 +150,20 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
     void process(const ProcessArgs& args) override {
         processExpander(args);
+
+
+            if (APP->engine->getFrame() % 30000 == 0) {
+                INFO("z3340: param value %f prev value %f",
+                     params[EXT_MOD_SELECT_SWITCH_PARAM].getValue(),
+                     modulationInputParamPrevValue);
+            }
+
+            if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() != modulationInputParamPrevValue) {
+                // if the value changed, update the string
+                modulationInputParamPrevValue = params[EXT_MOD_SELECT_SWITCH_PARAM].getValue();
+                modulationInputString = getCardOutputName(0x02, 1, 1);
+            }
+
 
         if (lightDivider.process()) {
             bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
@@ -177,30 +194,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
 
 
-            if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() < 0.5f) {
-                if (modulationInputString != cardStrings[0]) {
-                    INFO("zoxnoxious3340: modulationInputString %s", modulationInputString.c_str());
-                }
-                modulationInputString = cardStrings[0];
-            }
-            else if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() < 1.5f) {
-                if (modulationInputString != cardStrings[1]) {
-                    INFO("zoxnoxious3340: modulationInputString %s", modulationInputString.c_str());
-                }
-                modulationInputString = cardStrings[1];
-            }
-            else if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() < 2.5f) {
-                if (modulationInputString != cardStrings[2]) {
-                    INFO("zoxnoxious3340: modulationInputString %s", modulationInputString.c_str());
-                }
-                modulationInputString = cardStrings[2];
-            }
-            else if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() < 3.5f) {
-                modulationInputString = cardStrings[3];
-            }
-            else {
-                modulationInputString = cardStrings[4];
-            }
+
 
             const float lightTime = args.sampleTime * lightDivider.getDivision();
             const float brightnessDeltaTime = 1 / lightTime;
@@ -225,8 +219,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
             setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
             setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
-
-
         }
     }
 
