@@ -5,6 +5,8 @@
 const static int num_audio_inputs = 6;
 const static int midiMessageQueueMaxSize = 16;
 
+static std::vector<std::string> cardStrings = { "CardA Out1", "CardA Out2", "CardB Out1", "CardB Out2", "CardC Out1" };
+
 struct Zoxnoxious3340 : ZoxnoxiousModule {
     // the ParamId ordering *is* relevant.
     // this order should reflect the channel mapping (WHY?)
@@ -72,6 +74,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     float extModAmountClipTimer;
 
     std::deque<midi::Message> midiMessageQueue;
+
+    std::string modulationInputString;
 
     // detect state changes so we can send a MIDI event.
     // Assume int_min is an invalid value.  On start, idea would be
@@ -172,6 +176,31 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             bool mix2_saw = params[MIX2_SAW_BUTTON_PARAM].getValue() > 0.f;
             lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
 
+
+            if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() < 0.5f) {
+                if (modulationInputString != cardStrings[0]) {
+                    INFO("zoxnoxious3340: modulationInputString %s", modulationInputString.c_str());
+                }
+                modulationInputString = cardStrings[0];
+            }
+            else if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() < 1.5f) {
+                if (modulationInputString != cardStrings[1]) {
+                    INFO("zoxnoxious3340: modulationInputString %s", modulationInputString.c_str());
+                }
+                modulationInputString = cardStrings[1];
+            }
+            else if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() < 2.5f) {
+                if (modulationInputString != cardStrings[2]) {
+                    INFO("zoxnoxious3340: modulationInputString %s", modulationInputString.c_str());
+                }
+                modulationInputString = cardStrings[2];
+            }
+            else if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() < 3.5f) {
+                modulationInputString = cardStrings[3];
+            }
+            else {
+                modulationInputString = cardStrings[4];
+            }
 
             const float lightTime = args.sampleTime * lightDivider.getDivision();
             const float brightnessDeltaTime = 1 / lightTime;
@@ -374,17 +403,19 @@ struct Zoxnoxious3340Widget : ModuleWidget {
 
         mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(52.791, 12.989)));
         mix1OutputTextField->box.size = (mm2px(Vec(19.124, 3.636)));
-        mix1OutputTextField->setText("CardA Out1");
+        //mix1OutputTextField->setText("CardA Out1");
+        mix1OutputTextField->setText(NULL);
         addChild(mix1OutputTextField);
 
         mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(52.791, 94.213)));
         mix2OutputTextField->box.size = (mm2px(Vec(19.124, 3.636)));
-        mix2OutputTextField->setText("CardA Out2");
+        //mix2OutputTextField->setText("CardA Out2");
+        mix2OutputTextField->setText(NULL);
         addChild(mix2OutputTextField);
 
         modulationInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(6.286, 53.135)));
         modulationInputTextField->box.size = (mm2px(Vec(22.438, 3.636)));
-        modulationInputTextField->setText("CardB Out1");
+        modulationInputTextField->setText(module ? &module->modulationInputString  : NULL);
         addChild(modulationInputTextField);
     }
 

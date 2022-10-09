@@ -155,11 +155,9 @@ static const int cardTextLetterSpacing = 0;
 static const int cardTextLeftMargin = 2;
 
 struct CardTextDisplay : TransparentWidget {
-    std::string to_display;
-    float rotation;
+    const std::string *displayString;
 
-    CardTextDisplay() {
-        this->rotation = 0.f;
+    CardTextDisplay() : displayString(NULL) {
     }
 
     void draw(const DrawArgs& args) override {
@@ -170,41 +168,31 @@ struct CardTextDisplay : TransparentWidget {
 
         // Draw dark background
         nvgBeginPath(vg);
-        nvgRotate(vg, rotation);
         nvgRect(vg, 0, 0, box.size.x, box.size.y);
         nvgFillColor(vg, nvgRGBA(20, 20, 20, 255));
         nvgFill(vg);
 
-        //
-        // Draw track names
-        //
-        if (1) {
+        // If the track name is not empty, then display it
+        if (displayString)  {
+            // Set up font parameters
+            nvgFontSize(vg, cardTextFontSize);
+            nvgTextLetterSpacing(vg, cardTextLetterSpacing);
 
-            // If the track name is not empty, then display it
-            if (this->to_display != "")  {
-                // Set up font parameters
-                nvgFontSize(vg, cardTextFontSize);
-                nvgTextLetterSpacing(vg, cardTextLetterSpacing);
+            nvgFillColor(vg, nvgRGBA(255, 215, 20, 0xff));
+            nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 
-                nvgFillColor(vg, nvgRGBA(255, 215, 20, 0xff));
-                nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-
-                float bounds[4];
-                nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, this->to_display.c_str(), NULL, bounds);
-                float textHeight = bounds[3];
-                nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, this->to_display.c_str(), NULL);
-            }
+            float bounds[4];
+            nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, displayString->c_str(), NULL, bounds);
+            float textHeight = bounds[3];
+            nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, displayString->c_str(), NULL);
         }
 
         nvgRestore(vg);
     }
 
 
-    void setText(std::string newString) {
-        to_display = newString;
+    void setText(const std::string *newString) {
+        displayString = newString;
     }
 
-    void setRotation(float newRotation) {
-        rotation = newRotation;
-    }
 };
