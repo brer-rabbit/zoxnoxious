@@ -111,7 +111,8 @@ public:
         rightExpander.producerMessage = &zControlMessages[0];
         rightExpander.consumerMessage = &zControlMessages[maxCards - 1];
 
-        cardOutputNames.reserve(maxCards * 2);
+        cardOutputNames.resize(maxCards * 2);
+        onChannelAssignmentLost();
     }
 
 
@@ -374,12 +375,12 @@ protected:
         for (int i = 0; i < maxCards; ++i) {
             cardId = zCommand->channelAssignments[i].cardId;
             if (cardId != invalidCardId) {
-                cardOutputNames[i * 2] = getCardOutputName(cardId, 1, i);
-                cardOutputNames[i * 2 + 1] = getCardOutputName(cardId, 2, i);
+                cardOutputNames[i * 2].assign(getCardOutputName(cardId, 1, i));
+                cardOutputNames[i * 2 + 1].assign(getCardOutputName(cardId, 2, i));
             }
             else {
-                cardOutputNames[i * 2] = std::string("----");
-                cardOutputNames[i * 2 + 1] = std::string("----");
+                cardOutputNames[i * 2].assign("----");
+                cardOutputNames[i * 2 + 1].assign("----");
             }
         }
     }
@@ -393,8 +394,8 @@ protected:
      */
     virtual void onChannelAssignmentLost() {
         for (int i = 0; i < maxCards; ++i) {
-            cardOutputNames[i * 2] = std::string("----");
-            cardOutputNames[i * 2 + 1] = std::string("----");
+            cardOutputNames[i * 2].assign("----");
+            cardOutputNames[i * 2 + 1].assign("----");
         }
     }
 

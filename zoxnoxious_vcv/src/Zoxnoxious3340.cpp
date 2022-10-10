@@ -154,9 +154,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     void process(const ProcessArgs& args) override {
         processExpander(args);
 
-
-
-
         if (lightDivider.process()) {
             bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
             lights[SYNC_NEG_ENABLE_LIGHT].setBrightness(sync_neg);
@@ -219,9 +216,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             // oddly (well, by design) this is how the mux is wired up:
             // CardA_Out1, CardA_Out2, CardB_Out1, CardC_Out1,
             // CardD_Out1, CardE_Out1, CardF_Out1, CardG_Out1,
-            
             int modulationParam = (int) params[EXT_MOD_SELECT_SWITCH_PARAM].getValue();
-            // this happens to handle the cases 0-7 for the mux
+            // this handles the cases 0-7 for the mux
             if (modulationParam > 2) {
                 modulationParam = (modulationParam - 1) * 2;
             }
@@ -232,14 +228,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                 ;
             }
 
-
-            if (APP->engine->getFrame() % 30000 == 0) {
-                INFO("z3340: param value %f prev value %f",
-                     params[EXT_MOD_SELECT_SWITCH_PARAM].getValue(),
-                     modulationInputParamPrevValue);
-            }
-
-                     
         }
     }
 
