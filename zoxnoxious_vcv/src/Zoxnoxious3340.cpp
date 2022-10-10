@@ -73,7 +73,9 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
     std::deque<midi::Message> midiMessageQueue;
 
-    std::string modulationInputString;
+    std::string output1NameString;
+    std::string output2NameString;
+    std::string modulationInputNameString;
     float modulationInputParamPrevValue; // detect whether it changed
 
     // detect state changes so we can send a MIDI event.
@@ -144,6 +146,9 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
         lightDivider.setDivision(512);
 
+        output1NameString = invalidCardOutputName;
+        output2NameString = invalidCardOutputName;
+        modulationInputNameString = invalidCardOutputName;
     }
 
 
@@ -220,12 +225,21 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                 modulationParam = (modulationParam - 1) * 2;
             }
 
-            modulationInputString = cardOutputNames[modulationParam];
+            modulationInputNameString = cardOutputNames[modulationParam];
             if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() != modulationInputParamPrevValue) {
                 // send midi command
                 ;
             }
 
+            // TODO: override onChannelAssignment methods and do this there
+            if (hasChannelAssignment) {
+                output1NameString = getCardOutputName(hardwareId, 1, slot);
+                output2NameString = getCardOutputName(hardwareId, 2, slot);
+            }
+            else {
+                output1NameString = invalidCardOutputName;
+                output2NameString = invalidCardOutputName;
+            }
         }
     }
 
@@ -402,19 +416,17 @@ struct Zoxnoxious3340Widget : ModuleWidget {
 
         mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(52.791, 12.989)));
         mix1OutputTextField->box.size = (mm2px(Vec(19.124, 3.636)));
-        //mix1OutputTextField->setText("CardA Out1");
-        mix1OutputTextField->setText(NULL);
+        mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
         addChild(mix1OutputTextField);
 
         mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(52.791, 94.213)));
         mix2OutputTextField->box.size = (mm2px(Vec(19.124, 3.636)));
-        //mix2OutputTextField->setText("CardA Out2");
-        mix2OutputTextField->setText(NULL);
+        mix2OutputTextField->setText(module ? &module->output2NameString : NULL);
         addChild(mix2OutputTextField);
 
         modulationInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(6.286, 53.135)));
         modulationInputTextField->box.size = (mm2px(Vec(22.438, 3.636)));
-        modulationInputTextField->setText(module ? &module->modulationInputString  : NULL);
+        modulationInputTextField->setText(module ? &module->modulationInputNameString  : NULL);
         addChild(modulationInputTextField);
     }
 
