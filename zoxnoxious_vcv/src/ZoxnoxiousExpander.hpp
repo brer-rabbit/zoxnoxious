@@ -40,6 +40,7 @@ static const int maxCards = 8; // need this just to size channelAssignments arra
 static const int invalidSlot = maxCards;
 static const int invalidCvChannelOffset = -1;
 static const int invalidMidiChannel = -1;
+static const uint8_t invalidCardId = 0;
 
 struct ChannelAssignment {
     uint8_t cardId; // physical card's identifier
@@ -60,8 +61,15 @@ static const ZoxnoxiousCommandMsg commandEmpty =
       // authoritativeSource
       false,
       // cardId, cvChannelOffset, midiChannel, assignmentOwned
-      { { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false},
-        { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false}, { 0, -1, -1, false}
+      {
+          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false}
       }
   };
       
@@ -97,11 +105,13 @@ public:
         initCommandMsgState();
 
         // control
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < maxCards; ++i) {
             zControlMessages[i] = controlEmpty;
         }
         rightExpander.producerMessage = &zControlMessages[0];
-        rightExpander.consumerMessage = &zControlMessages[7];
+        rightExpander.consumerMessage = &zControlMessages[maxCards - 1];
+
+        cardOutputNames.reserve(maxCards * 2);
     }
 
 
@@ -238,12 +248,6 @@ protected:
 
 
 
-    /** getCardHardwareId
-     * return the hardware Id of the card.  Derived class needs to implement this.
-     */
-    virtual uint8_t getHardwareId() = 0;
-
-
     /** processZoxnoxiousCommand
      * parse the ZoxnoxiousCommand to get a cvChannelOffset and a midiChannel.
      * If we find a cardId matching our Id, and the assignment isn't owned, set it to owned.
@@ -361,10 +365,25 @@ protected:
     /** channelAssignmentEstablished
      *
      * override this when a module establishes a channel assignment.
+     * run through the command message, find what cards we have.  Populate
+     * cardOutputNames based on this.
      */
     virtual void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) {
+        uint8_t cardId;
 
+        for (int i = 0; i < maxCards; ++i) {
+            cardId = zCommand->channelAssignments[i].cardId;
+            if (cardId != invalidCardId) {
+                cardOutputNames[i * 2] = getCardOutputName(cardId, 1, i);
+                cardOutputNames[i * 2 + 1] = getCardOutputName(cardId, 2, i);
+            }
+            else {
+                cardOutputNames[i * 2] = std::string("----");
+                cardOutputNames[i * 2 + 1] = std::string("----");
+            }
+        }
     }
+
 
     /** channelAssignmentLost
      *
@@ -373,9 +392,18 @@ protected:
      * module removed, hardware issue detected, etc)
      */
     virtual void onChannelAssignmentLost() {
+        for (int i = 0; i < maxCards; ++i) {
+            cardOutputNames[i * 2] = std::string("----");
+            cardOutputNames[i * 2 + 1] = std::string("----");
+        }
     }
 
 
+
+    /** getCardHardwareId
+     * return the hardware Id of the card.  Derived class needs to implement this.
+     */
+    virtual uint8_t getHardwareId() = 0;
 
 
 private:

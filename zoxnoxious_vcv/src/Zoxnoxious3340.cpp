@@ -75,6 +75,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
     std::deque<midi::Message> midiMessageQueue;
 
+    std::string modulationInputString;
     float modulationInputParamPrevValue; // detect whether it changed
 
     // detect state changes so we can send a MIDI event.
@@ -105,6 +106,9 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         };
 
     Zoxnoxious3340() :
+        freqClipTimer(0.f), pulseWidthClipTimer(0.f), linearClipTimer(0.f),
+        mix1TriangleVcaClipTimer(0.f), syncPhaseClipTimer(0.f),
+        extModAmountClipTimer(0.f),
         modulationInputParamPrevValue(-1.f) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -151,11 +155,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         processExpander(args);
 
 
-            if (APP->engine->getFrame() % 30000 == 0) {
-                INFO("z3340: param value %f prev value %f",
-                     params[EXT_MOD_SELECT_SWITCH_PARAM].getValue(),
-                     modulationInputParamPrevValue);
-            }
 
 
         if (lightDivider.process()) {
@@ -211,6 +210,36 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
             setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
             setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
+
+            // TODO: rework this without string copy.
+            // Could do something like:
+            // if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() != modulationInputParamPrevValue)...
+            // but then the field isn't populated on connection.  sigh.
+            //
+            // oddly (well, by design) this is how the mux is wired up:
+            // CardA_Out1, CardA_Out2, CardB_Out1, CardC_Out1,
+            // CardD_Out1, CardE_Out1, CardF_Out1, CardG_Out1,
+            
+            int modulationParam = (int) params[EXT_MOD_SELECT_SWITCH_PARAM].getValue();
+            // this happens to handle the cases 0-7 for the mux
+            if (modulationParam > 2) {
+                modulationParam = (modulationParam - 1) * 2;
+            }
+
+            modulationInputString = cardOutputNames[modulationParam];
+            if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() != modulationInputParamPrevValue) {
+                // send midi command
+                ;
+            }
+
+
+            if (APP->engine->getFrame() % 30000 == 0) {
+                INFO("z3340: param value %f prev value %f",
+                     params[EXT_MOD_SELECT_SWITCH_PARAM].getValue(),
+                     modulationInputParamPrevValue);
+            }
+
+                     
         }
     }
 

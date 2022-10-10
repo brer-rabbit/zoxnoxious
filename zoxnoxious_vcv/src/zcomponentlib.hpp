@@ -155,7 +155,7 @@ static const int cardTextLetterSpacing = 0;
 static const int cardTextLeftMargin = 2;
 
 struct CardTextDisplay : TransparentWidget {
-    const std::string *displayString;
+    std::string *displayString;
 
     CardTextDisplay() : displayString(NULL) {
     }
@@ -191,7 +191,7 @@ struct CardTextDisplay : TransparentWidget {
     }
 
 
-    void setText(const std::string *newString) {
+    void setText(std::string *newString) {
         displayString = newString;
     }
 
