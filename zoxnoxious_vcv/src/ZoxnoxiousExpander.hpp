@@ -37,6 +37,7 @@ static const int invalidSlot = maxCards;
 static const int invalidCvChannelOffset = -1;
 static const int invalidMidiChannel = -1;
 static const uint8_t invalidCardId = 0;
+static const std::string invalidCardOutputName = "----";
 
 struct ChannelAssignment {
     uint8_t cardId; // physical card's identifier

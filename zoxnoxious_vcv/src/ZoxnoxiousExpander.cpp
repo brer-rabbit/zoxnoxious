@@ -239,8 +239,8 @@ void ZoxnoxiousModule::onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCom
             cardOutputNames[i * 2 + 1].assign(getCardOutputName(cardId, 2, i));
         }
         else {
-            cardOutputNames[i * 2].assign("----");
-            cardOutputNames[i * 2 + 1].assign("----");
+            cardOutputNames[i * 2].assign(invalidCardOutputName);
+            cardOutputNames[i * 2 + 1].assign(invalidCardOutputName);
         }
     }
 }
@@ -248,8 +248,8 @@ void ZoxnoxiousModule::onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCom
 
 void ZoxnoxiousModule::onChannelAssignmentLost() {
     for (int i = 0; i < maxCards; ++i) {
-        cardOutputNames[i * 2].assign("----");
-        cardOutputNames[i * 2 + 1].assign("----");
+        cardOutputNames[i * 2].assign(invalidCardOutputName);
+        cardOutputNames[i * 2 + 1].assign(invalidCardOutputName);
     }
 }
 
