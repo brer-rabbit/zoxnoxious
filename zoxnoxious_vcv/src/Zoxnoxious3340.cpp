@@ -5,8 +5,6 @@
 const static int num_audio_inputs = 6;
 const static int midiMessageQueueMaxSize = 16;
 
-static std::vector<std::string> cardStrings = { "CardA Out1", "CardA Out2", "CardB Out1", "CardB Out2", "CardC Out1" };
-
 struct Zoxnoxious3340 : ZoxnoxiousModule {
     // the ParamId ordering *is* relevant.
     // this order should reflect the channel mapping (WHY?)
