@@ -42,14 +42,14 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="1.1232457"
-     inkscape:cx="121.07769"
+     inkscape:cx="170.93322"
      inkscape:cy="211.88597"
      inkscape:window-width="1287"
      inkscape:window-height="739"
-     inkscape:window-x="130"
-     inkscape:window-y="94"
+     inkscape:window-x="29"
+     inkscape:window-y="27"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer3"
      width="71.12mm"
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#cfdee6"
@@ -330,13 +330,19 @@
      id="layer3"
      inkscape:label="background"
      style="display:inline">
-    <rect
-       style="display:inline;opacity:0.89;fill:#eeeeee;fill-opacity:1;stroke:#000000;stroke-width:0.222;paint-order:markers fill stroke"
+    <g
        id="rect297"
-       width="77.225906"
-       height="129.32208"
-       x="-0.27284041"
-       y="-0.031160831" />
+       style="display:inline;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-opacity:1"
+       transform="matrix(1.0034175,0,0,1.021367,0.38608058,0.14562459)">
+      <path
+         style="color:#000000;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-width:0.222;stroke-opacity:1;-inkscape-stroke:none;paint-order:markers fill stroke"
+         d="M -0.27284041,-0.03116083 H 76.953066 V 129.29092 H -0.27284041 Z"
+         id="path32372" />
+      <path
+         style="color:#000000;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-opacity:1;-inkscape-stroke:none;paint-order:markers fill stroke"
+         d="M -0.38476563,-0.14257812 V -0.03125 129.40234 H 77.064453 V -0.14257812 Z m 0.22265626,0.22265624 H 76.841797 V 129.17969 H -0.16210937 Z"
+         id="path32374" />
+    </g>
     <path
        style="display:inline;fill:#cc9696;fill-opacity:1;stroke:#980000;stroke-width:0.158;stroke-dasharray:none"
        id="rect1316"

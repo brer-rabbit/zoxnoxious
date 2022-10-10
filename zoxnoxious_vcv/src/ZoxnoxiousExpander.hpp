@@ -160,6 +160,7 @@ protected:
     int midiChannel;
     int slot;
 
+    std::vector<std::string> cardOutputNames;
 
     /** processExpander
      * to make use of the expander, this method ought to be
@@ -202,7 +203,7 @@ protected:
                 commandMessageClockDividerCount = 0;
 
                 ZoxnoxiousCommandMsg *rightExpanderConsumerMessage = static_cast<ZoxnoxiousCommandMsg*>(rightExpander.module->leftExpander.consumerMessage);
-                
+
                 // Do any reading of the rightExpanderConsumerMessage here.  Copy
                 // the right's consumer message to our left producer
                 // message.  Effectively, this daisy chains it to the
@@ -266,12 +267,16 @@ protected:
                     cvChannelOffset = zCommand->channelAssignments[slot].cvChannelOffset;
                     hasChannelAssignment = true;
                     //INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : hasChannelAssignment at slot %d", APP->engine->getFrame(), getId(), slot);
+                    onChannelAssignmentEstablished(zCommand);
                     break;
                 }
             }
         }
         else if (! zCommand->authoritativeSource) {
             // received message from a non-auth source, reset whatever we know
+            if (hasChannelAssignment) {
+                onChannelAssignmentLost();
+            }
             hasChannelAssignment = false;
         }
         else {
@@ -351,6 +356,27 @@ protected:
             lights[lightEnum + 2].setBrightness(0.f);
         }
     }
+
+
+    /** channelAssignmentEstablished
+     *
+     * override this when a module establishes a channel assignment.
+     */
+    virtual void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) {
+
+    }
+
+    /** channelAssignmentLost
+     *
+     * override this when a module loses a channel assignment
+     * (eg- module moved so expander connectivity lost, primary
+     * module removed, hardware issue detected, etc)
+     */
+    virtual void onChannelAssignmentLost() {
+    }
+
+
+
 
 private:
     bool isPrimary;

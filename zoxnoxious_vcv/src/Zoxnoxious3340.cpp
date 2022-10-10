@@ -75,8 +75,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
     std::deque<midi::Message> midiMessageQueue;
 
-    std::vector<std::string> modulationInputStrings;
-    float modulationInputParamPrevValue;
+    float modulationInputParamPrevValue; // detect whether it changed
 
     // detect state changes so we can send a MIDI event.
     // Assume int_min is an invalid value.  On start, idea would be
@@ -105,7 +104,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             { SYNC_POS_BUTTON_PARAM, INT_MIN, { 22, 23 } }
         };
 
-    Zoxnoxious3340() : modulationInputParamPrevValue(-1.f) {
+    Zoxnoxious3340() :
+        modulationInputParamPrevValue(-1.f) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
@@ -142,7 +142,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
         lightDivider.setDivision(512);
 
-        modulationInputStrings.reserve(8);
     }
 
 
@@ -156,12 +155,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                 INFO("z3340: param value %f prev value %f",
                      params[EXT_MOD_SELECT_SWITCH_PARAM].getValue(),
                      modulationInputParamPrevValue);
-            }
-
-            if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() != modulationInputParamPrevValue) {
-                // if the value changed, update the string
-                modulationInputParamPrevValue = params[EXT_MOD_SELECT_SWITCH_PARAM].getValue();
-                modulationInputString = getCardOutputName(0x02, 1, 1);
             }
 
 
@@ -194,8 +187,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
 
 
-
-
+            // clipping light timer
             const float lightTime = args.sampleTime * lightDivider.getDivision();
             const float brightnessDeltaTime = 1 / lightTime;
 
@@ -272,7 +264,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             }
         }
 
-
         float v;
         const float clipTime = 0.25f;
 
@@ -323,6 +314,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         }
 
     }
+
 
 
     /** getCardHardwareId
