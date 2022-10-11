@@ -87,29 +87,32 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     struct buttonParamMidiProgram {
         enum ParamId button;
         int previousValue;
-        uint8_t midiProgram[3];
+        uint8_t midiProgram[8];
     };
 
     struct buttonParamMidiProgram buttonParamToMidiProgramList[11] =
         {
             { SYNC_NEG_BUTTON_PARAM, INT_MIN, { 0, 1 } },
             { MIX1_PULSE_BUTTON_PARAM, INT_MIN, { 2, 3 } },
-            { EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 4, 5 } },
-            { MIX1_COMPARATOR_BUTTON_PARAM, INT_MIN, { 6, 7 } },
-            { MIX2_PULSE_BUTTON_PARAM, INT_MIN, { 8, 9 } },
-            { EXT_MOD_PWM_BUTTON_PARAM, INT_MIN, { 10, 11 } },
-            { EXP_FM_BUTTON_PARAM, INT_MIN, { 12, 13 } },
-            { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 14, 15 } },
-            { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 16, 17 } },
+            { MIX1_COMPARATOR_BUTTON_PARAM, INT_MIN, { 4, 5 } },
+            { MIX2_PULSE_BUTTON_PARAM, INT_MIN, { 6, 7 } },
+            { EXT_MOD_PWM_BUTTON_PARAM, INT_MIN, { 8, 9 } },
+            { EXP_FM_BUTTON_PARAM, INT_MIN, { 10, 11 } },
+            { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 12, 13 } },
+            { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 14, 15 } },
+            { SYNC_POS_BUTTON_PARAM, INT_MIN, { 16, 17 } },
             { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20 } },
-            { SYNC_POS_BUTTON_PARAM, INT_MIN, { 22, 23 } }
+            { EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 21, 22, 23, 24, 25, 26, 27, 28 } }
         };
 
     Zoxnoxious3340() :
         freqClipTimer(0.f), pulseWidthClipTimer(0.f), linearClipTimer(0.f),
         mix1TriangleVcaClipTimer(0.f), syncPhaseClipTimer(0.f),
         extModAmountClipTimer(0.f),
-        modulationInputParamPrevValue(-1) {
+        modulationInputParamPrevValue(-1),
+        output1NameString(invalidCardOutputName),
+        output2NameString(invalidCardOutputName),
+        modulationInputNameString(invalidCardOutputName) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
@@ -145,10 +148,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
 
         lightDivider.setDivision(512);
-
-        output1NameString = invalidCardOutputName;
-        output2NameString = invalidCardOutputName;
-        modulationInputNameString = invalidCardOutputName;
     }
 
 
@@ -292,14 +291,12 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             linearClipTimer = clipTime;
         }
                     
-
         // external mod amount
         v = params[EXT_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[EXT_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 4] != v) {
             extModAmountClipTimer = clipTime;
         }
-
 
         // mix1 triangle
         v = params[MIX1_TRIANGLE_KNOB_PARAM].getValue() + inputs[MIX1_TRIANGLE_VCA_INPUT].getVoltageSum() / 10.f;
@@ -315,7 +312,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             pulseWidthClipTimer = clipTime;
         }
 
-
         // sync phase
         v = params[SYNC_PHASE_KNOB_PARAM].getValue() + inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
@@ -323,14 +319,12 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             syncPhaseClipTimer = clipTime;
         }
 
-
         // frequency
         v = params[FREQ_KNOB_PARAM].getValue() + inputs[FREQ_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 0] != v) {
             freqClipTimer = clipTime;
         }
-
     }
 
 

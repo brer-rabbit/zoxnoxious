@@ -61,7 +61,33 @@ struct PatchingMatrix : ZoxnoxiousModule {
     float rightLevelClipTimer;
 
 
-    PatchingMatrix() : audioPort(this) {
+    std::string cardAOutput1NameString;
+    std::string cardAOutput2NameString;
+    std::string cardBOutput1NameString;
+    std::string cardBOutput2NameString;
+    std::string cardCOutput1NameString;
+    std::string cardCOutput2NameString;
+    std::string cardDOutput1NameString;
+    std::string cardDOutput2NameString;
+    std::string cardEOutput1NameString;
+    std::string cardEOutput2NameString;
+    std::string cardFOutput1NameString;
+    std::string cardFOutput2NameString;
+
+
+    PatchingMatrix() : audioPort(this),
+                       cardAOutput1NameString(invalidCardOutputName),
+                       cardAOutput2NameString(invalidCardOutputName),
+                       cardBOutput1NameString(invalidCardOutputName),
+                       cardBOutput2NameString(invalidCardOutputName),
+                       cardCOutput1NameString(invalidCardOutputName),
+                       cardCOutput2NameString(invalidCardOutputName),
+                       cardDOutput1NameString(invalidCardOutputName),
+                       cardDOutput2NameString(invalidCardOutputName),
+                       cardEOutput1NameString(invalidCardOutputName),
+                       cardEOutput2NameString(invalidCardOutputName),
+                       cardFOutput1NameString(invalidCardOutputName),
+                       cardFOutput2NameString(invalidCardOutputName) {
         setExpanderPrimary();
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -276,6 +302,33 @@ struct PatchingMatrix : ZoxnoxiousModule {
     }
 
 
+    void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) override {
+        ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
+
+        cardAOutput1NameString = getCardOutputName(zCommand_a.channelAssignments[0].cardId, 1, 0);
+        cardAOutput2NameString = getCardOutputName(zCommand_a.channelAssignments[0].cardId, 2, 0);
+
+        cardBOutput1NameString = getCardOutputName(zCommand_a.channelAssignments[1].cardId, 1, 1);
+        cardBOutput2NameString = getCardOutputName(zCommand_a.channelAssignments[1].cardId, 2, 1);
+
+        cardCOutput1NameString = getCardOutputName(zCommand_a.channelAssignments[2].cardId, 1, 2);
+        cardCOutput2NameString = getCardOutputName(zCommand_a.channelAssignments[2].cardId, 2, 2);
+
+        cardDOutput1NameString = getCardOutputName(zCommand_a.channelAssignments[3].cardId, 1, 3);
+        cardDOutput2NameString = getCardOutputName(zCommand_a.channelAssignments[3].cardId, 2, 3);
+
+        cardEOutput1NameString = getCardOutputName(zCommand_a.channelAssignments[4].cardId, 1, 4);
+        cardEOutput2NameString = getCardOutputName(zCommand_a.channelAssignments[4].cardId, 2, 4);
+
+        cardFOutput1NameString = getCardOutputName(zCommand_a.channelAssignments[5].cardId, 1, 5);
+        cardFOutput2NameString = getCardOutputName(zCommand_a.channelAssignments[5].cardId, 2, 6);
+
+    }
+
+    void onChannelAssignmentLost() override {
+        ZoxnoxiousModule::onChannelAssignmentLost();
+    }
+
 
 };
 
@@ -327,76 +380,75 @@ struct PatchingMatrixWidget : ModuleWidget {
         // mm2px(Vec(27.171, 3.636))
         cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 36.769)));
         cardAOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardAOutput1TextField->setText("CardA Out1");
+        cardAOutput1TextField->setText(module ? &module->cardAOutput1NameString : NULL);
         addChild(cardAOutput1TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardAOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 41.46)));
         cardAOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardAOutput2TextField->setText("CardA Out2");
+        cardAOutput2TextField->setText(module ? &module->cardAOutput2NameString : NULL);
         addChild(cardAOutput2TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardBOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 49.83)));
         cardBOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardBOutput1TextField->setText("CardB Out1");
+        cardBOutput1TextField->setText(module ? &module->cardBOutput1NameString : NULL);
         addChild(cardBOutput1TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardBOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 55.017)));
         cardBOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardBOutput2TextField->setText("CardB Out2");
+        cardBOutput2TextField->setText(module ? &module->cardBOutput2NameString : NULL);
         addChild(cardBOutput2TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardCOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 62.892)));
         cardCOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardCOutput1TextField->setText("CardC Out1");
+        cardCOutput1TextField->setText(module ? &module->cardCOutput1NameString : NULL);
         addChild(cardCOutput1TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardCOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 68.078)));
         cardCOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardCOutput2TextField->setText("CardC Out2");
+        cardCOutput2TextField->setText(module ? &module->cardCOutput2NameString : NULL);
         addChild(cardCOutput2TextField);
 
 
         // mm2px(Vec(27.171, 3.636))
         cardDOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 75.953)));
         cardDOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardDOutput1TextField->setText("CardD Out1");
+        cardDOutput1TextField->setText(module ? &module->cardDOutput1NameString : NULL);
         addChild(cardDOutput1TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardDOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 81.14)));
         cardDOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardDOutput2TextField->setText("CardD Out2");
+        cardDOutput2TextField->setText(module ? &module->cardDOutput2NameString : NULL);
         addChild(cardDOutput2TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardEOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 89.015)));
         cardEOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardEOutput1TextField->setText("CardE Out1");
+        cardEOutput1TextField->setText(module ? &module->cardEOutput1NameString : NULL);
         addChild(cardEOutput1TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardEOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 94.201)));
         cardEOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardEOutput2TextField->setText("CardE Out1");
+        cardEOutput2TextField->setText(module ? &module->cardEOutput2NameString : NULL);
         addChild(cardEOutput2TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardFOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 102.076)));
         cardFOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardFOutput1TextField->setText("CardF Out1");
+        cardFOutput1TextField->setText(module ? &module->cardFOutput1NameString : NULL);
         addChild(cardFOutput1TextField);
 
         // mm2px(Vec(27.171, 3.636))
         cardFOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 107.263)));
         cardFOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
-        //cardFOutput2TextField->setText("CardF Out2");
+        cardFOutput2TextField->setText(module ? &module->cardFOutput2NameString : NULL);
         addChild(cardFOutput2TextField);
-
 
         addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.02, 8.219)), module, PatchingMatrix::LEFT_EXPANDER_LIGHT));
         addChild(createLightCentered<MediumLight<RedGreenBlueLight>>(mm2px(Vec(88.4, 8.219)), module, PatchingMatrix::RIGHT_EXPANDER_LIGHT));

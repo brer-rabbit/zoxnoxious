@@ -247,6 +247,7 @@ void ZoxnoxiousModule::onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCom
 
 
 void ZoxnoxiousModule::onChannelAssignmentLost() {
+    INFO("expander: onChannelAssignmentLost");
     hasChannelAssignment = false;
     for (int i = 0; i < maxCards; ++i) {
         cardOutputNames[i * 2].assign(invalidCardOutputName);

@@ -33,7 +33,7 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
         cardName = "3340";
     }
     else {
-        cardName = "<unknown>";
+        return "----";
     }
 
     return cardName +
