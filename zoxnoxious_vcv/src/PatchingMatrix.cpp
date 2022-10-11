@@ -260,7 +260,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
         // via midi from the controlling board
         zCommand_a.channelAssignments[0] = { 0x02, 3, 2, false };
         zCommand_a.channelAssignments[1] = { 0x02, 9, 3, false };
-        zCommand_a.channelAssignments[2] = { 0x00, -1, -1, false };
+        //zCommand_a.channelAssignments[2] = { 0x00, -1, -1, false };
+        zCommand_a.channelAssignments[2] = { 0x02, 15, 4, false };
         zCommand_a.channelAssignments[3] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[4] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[5] = { 0x00, -1, -1, false };

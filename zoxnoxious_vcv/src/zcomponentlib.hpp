@@ -150,7 +150,7 @@ struct TriangleRightLight : TBase {
 // Text Display box
 //
 
-static const int cardTextFontSize = 8;
+static const int cardTextFontSize = 9;
 static const int cardTextLetterSpacing = 0;
 static const int cardTextLeftMargin = 2;
 

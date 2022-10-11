@@ -36,9 +36,9 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
         cardName = "<unknown>";
     }
 
-    return (slot == -1 ? "" : ( "(" + slotNameString + ") " )) +
-        cardName +
-        (outputNumber == 1 ? " Out 1" : (outputNumber == 2 ? " Out 2" : "") );
+    return cardName +
+        (outputNumber == 1 ? " Out 1" : (outputNumber == 2 ? " Out 2" : "") ) +
+        (slot == -1 ? "" : ( ":" + slotNameString ));
 }
 
 
