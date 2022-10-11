@@ -158,7 +158,6 @@ void ZoxnoxiousModule::processZoxnoxiousCommand(ZoxnoxiousCommandMsg *zCommand) 
                 // then copy the relevant info
                 midiChannel = zCommand->channelAssignments[slot].midiChannel;
                 cvChannelOffset = zCommand->channelAssignments[slot].cvChannelOffset;
-                hasChannelAssignment = true;
                 //INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : hasChannelAssignment at slot %d", APP->engine->getFrame(), getId(), slot);
                 onChannelAssignmentEstablished(zCommand);
                 break;
@@ -170,7 +169,6 @@ void ZoxnoxiousModule::processZoxnoxiousCommand(ZoxnoxiousCommandMsg *zCommand) 
         if (hasChannelAssignment) {
             onChannelAssignmentLost();
         }
-        hasChannelAssignment = false;
     }
     else {
         // typical case -- we have a channel assignemnt already.
@@ -232,6 +230,8 @@ void ZoxnoxiousModule::setRightExpanderLight(int lightEnum) {
 void ZoxnoxiousModule::onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) {
     uint8_t cardId;
 
+    hasChannelAssignment = true;
+
     for (int i = 0; i < maxCards; ++i) {
         cardId = zCommand->channelAssignments[i].cardId;
         if (cardId != invalidCardId) {
@@ -247,6 +247,7 @@ void ZoxnoxiousModule::onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCom
 
 
 void ZoxnoxiousModule::onChannelAssignmentLost() {
+    hasChannelAssignment = false;
     for (int i = 0; i < maxCards; ++i) {
         cardOutputNames[i * 2].assign(invalidCardOutputName);
         cardOutputNames[i * 2 + 1].assign(invalidCardOutputName);

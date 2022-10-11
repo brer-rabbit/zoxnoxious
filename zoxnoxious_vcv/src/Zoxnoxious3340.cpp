@@ -76,7 +76,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     std::string output1NameString;
     std::string output2NameString;
     std::string modulationInputNameString;
-    float modulationInputParamPrevValue; // detect whether it changed
+    int modulationInputParamPrevValue; // detect whether it changed
 
     // detect state changes so we can send a MIDI event.
     // Assume int_min is an invalid value.  On start, idea would be
@@ -109,7 +109,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         freqClipTimer(0.f), pulseWidthClipTimer(0.f), linearClipTimer(0.f),
         mix1TriangleVcaClipTimer(0.f), syncPhaseClipTimer(0.f),
         extModAmountClipTimer(0.f),
-        modulationInputParamPrevValue(-1.f) {
+        modulationInputParamPrevValue(-1) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
@@ -219,26 +219,15 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             // oddly (well, by design) this is how the mux is wired up:
             // CardA_Out1, CardA_Out2, CardB_Out1, CardC_Out1,
             // CardD_Out1, CardE_Out1, CardF_Out1, CardG_Out1,
-            int modulationParam = (int) params[EXT_MOD_SELECT_SWITCH_PARAM].getValue();
+            int modulationParam = static_cast<int>(params[EXT_MOD_SELECT_SWITCH_PARAM].getValue());
             // this handles the cases 0-7 for the mux
             if (modulationParam > 2) {
                 modulationParam = (modulationParam - 1) * 2;
             }
 
-            modulationInputNameString = cardOutputNames[modulationParam];
-            if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() != modulationInputParamPrevValue) {
+            if (modulationParam != modulationInputParamPrevValue) {
+                modulationInputNameString = cardOutputNames[modulationParam];
                 // send midi command
-                ;
-            }
-
-            // TODO: override onChannelAssignment methods and do this there
-            if (hasChannelAssignment) {
-                output1NameString = getCardOutputName(hardwareId, 1, slot);
-                output2NameString = getCardOutputName(hardwareId, 2, slot);
-            }
-            else {
-                output1NameString = invalidCardOutputName;
-                output2NameString = invalidCardOutputName;
             }
         }
     }
@@ -354,6 +343,18 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         return hardwareId;
     }
 
+
+    void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) override {
+        ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
+        output1NameString = getCardOutputName(hardwareId, 1, slot);
+        output2NameString = getCardOutputName(hardwareId, 2, slot);
+    }
+
+    void onChannelAssignmentLost() override {
+        ZoxnoxiousModule::onChannelAssignmentLost();
+        output1NameString = invalidCardOutputName;
+        output2NameString = invalidCardOutputName;
+    }
 
 };
 

@@ -191,8 +191,8 @@ struct CardTextDisplay : TransparentWidget {
     }
 
 
-    void setText(std::string *newString) {
-        displayString = newString;
+    void setText(std::string *theString) {
+        displayString = theString;
     }
 
 };
