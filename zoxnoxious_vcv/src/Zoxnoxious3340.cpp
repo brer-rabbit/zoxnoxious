@@ -266,6 +266,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                     controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
                     controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
                     controlMsg->midiMessageSet = true;
+                    INFO("zoxnoxious3340: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
                 }
                 else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
                     midi::Message queuedMessage;

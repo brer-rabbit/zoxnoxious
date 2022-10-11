@@ -138,6 +138,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
     void process(const ProcessArgs& args) override {
+        processExpander(args);
+
         lights[CARD_A_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
         lights[CARD_B_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
@@ -152,6 +154,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
 
 
+        // TODO: move this to processZoxnoxiousCommand
         if (audioPort.deviceNumOutputs > 0) {
             dsp::Frame<maxChannels> inputFrame = {};
             float v;
@@ -259,6 +262,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
             midiMessageQueue.pop_front();
         }
         else if (controlMsg->midiMessageSet) {
+            INFO("AudioOut: sending midi message from control msg");
             midiOutput.sendMidiMessage(controlMsg->midiMessage);
         }
 

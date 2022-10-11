@@ -87,7 +87,7 @@ void ZoxnoxiousModule::onExpanderChange (const ExpanderChangeEvent &e) {
 
 void ZoxnoxiousModule::processExpander(const ProcessArgs &args) {
 
-    if (rightExpander.module != NULL && validRightExpander) {
+    if (rightExpander.module != NULL && validRightExpander && !isPrimary) {
         //
         // Left Consumer Message Passing to our RightExpander Producer
         //
@@ -99,7 +99,7 @@ void ZoxnoxiousModule::processExpander(const ProcessArgs &args) {
                 static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
         }
         else {
-            // this is the left most module.  Clear it, then send.
+            // this is the left most module.  Clear a msg to send, then send.
             zControlMessages[controlMessageIndex] = controlEmpty;
             leftExpanderConsumerMessage =
                 &zControlMessages[controlMessageIndex];
@@ -142,6 +142,10 @@ void ZoxnoxiousModule::processExpander(const ProcessArgs &args) {
             leftExpander.messageFlipRequested = true;
         }
     }
+    else if (isPrimary && leftExpander.module != NULL && validLeftExpander) {
+        processZoxnoxiousControl(static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage));
+    }
+
 
 }
 

@@ -3,7 +3,6 @@
 /* this code is pretty much all taken from VCV Rack's Fundamental.  */
 
 struct ZoxnoxiousMidiOutput : midi::Output {
-    static const uint8_t programChangeStatus = 0xC;
 
     ZoxnoxiousMidiOutput() {
         reset();
@@ -12,6 +11,7 @@ struct ZoxnoxiousMidiOutput : midi::Output {
 
     void reset() {
         Output::reset();
+        setChannel(-1); // allow messages out on any channel
     }
 
     void sendMidiMessage(midi::Message midiMessage) {
