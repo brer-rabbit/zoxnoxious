@@ -60,6 +60,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
     float leftLevelClipTimer;
     float rightLevelClipTimer;
 
+    bool mix2ButtonsPreviousState[6];
 
     std::string cardAOutput1NameString;
     std::string cardAOutput2NameString;
@@ -76,6 +77,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
     PatchingMatrix() : audioPort(this),
+                       mix2ButtonsPreviousState{false},
                        cardAOutput1NameString(invalidCardOutputName),
                        cardAOutput2NameString(invalidCardOutputName),
                        cardBOutput1NameString(invalidCardOutputName),
@@ -144,16 +146,62 @@ struct PatchingMatrix : ZoxnoxiousModule {
         if (lightDivider.process()) {
             // slower moving stuff here
             lights[CARD_A_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
             lights[CARD_B_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
             lights[CARD_C_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
             lights[CARD_D_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
             lights[CARD_E_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
             lights[CARD_F_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+
+
+            if (mix2ButtonsPreviousState[0] == false &&
+                params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f) {
+                mix2ButtonsPreviousState[0] = true;
+                lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(1);
+                params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].setValue(1);
+
+                mix2ButtonsPreviousState[1] = false;
+                lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+                mix2ButtonsPreviousState[2] = false;
+                lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+                mix2ButtonsPreviousState[3] = false;
+                lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+                mix2ButtonsPreviousState[4] = false;
+                lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+                mix2ButtonsPreviousState[5] = false;
+                lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+            }
+            else if (mix2ButtonsPreviousState[1] == false &&
+                params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f) {
+                mix2ButtonsPreviousState[0] = false;
+                lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+
+                mix2ButtonsPreviousState[1] = true;
+                lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(1);
+
+                mix2ButtonsPreviousState[2] = false;
+                lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+                mix2ButtonsPreviousState[3] = false;
+                lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+                mix2ButtonsPreviousState[4] = false;
+                lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+                mix2ButtonsPreviousState[5] = false;
+                lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
+                params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+            }
+
+            lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
             lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
 
             const float lightTime = args.sampleTime * lightDivider.getDivision();
