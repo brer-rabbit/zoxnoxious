@@ -40,7 +40,11 @@ ZoxnoxiousModule::ZoxnoxiousModule() :
     // command
     leftExpander.producerMessage = &zCommand_a;
     leftExpander.consumerMessage = &zCommand_b;
-    initCommandMsgState();
+
+    cardOutputNames.resize(maxCards * 2);
+    ZoxnoxiousModule::onChannelAssignmentLost();
+
+    ZoxnoxiousModule::initCommandMsgState();
 
     // control
     for (int i = 0; i < maxCards; ++i) {
@@ -48,9 +52,6 @@ ZoxnoxiousModule::ZoxnoxiousModule() :
     }
     rightExpander.producerMessage = &zControlMessages[0];
     rightExpander.consumerMessage = &zControlMessages[maxCards - 1];
-
-    cardOutputNames.resize(maxCards * 2);
-    onChannelAssignmentLost();
 }
 
 void ZoxnoxiousModule::setExpanderPrimary() {
@@ -253,6 +254,7 @@ void ZoxnoxiousModule::onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCom
 void ZoxnoxiousModule::onChannelAssignmentLost() {
     INFO("expander: onChannelAssignmentLost");
     hasChannelAssignment = false;
+
     for (int i = 0; i < maxCards; ++i) {
         cardOutputNames[i * 2].assign(invalidCardOutputName);
         cardOutputNames[i * 2 + 1].assign(invalidCardOutputName);

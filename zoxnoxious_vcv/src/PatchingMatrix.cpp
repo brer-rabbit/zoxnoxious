@@ -89,6 +89,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
                        cardFOutput1NameString(invalidCardOutputName),
                        cardFOutput2NameString(invalidCardOutputName) {
         setExpanderPrimary();
+        PatchingMatrix::initCommandMsgState();
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configSwitch(MIX_LEFT_SELECT_PARAM, 0.f, 1.f, 0.f, "Left Output", { "Out1", "Out2" });
@@ -140,78 +141,21 @@ struct PatchingMatrix : ZoxnoxiousModule {
     void process(const ProcessArgs& args) override {
         processExpander(args);
 
-        lights[CARD_A_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-        lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-
-
-        // TODO: move this to processZoxnoxiousCommand
-        if (audioPort.deviceNumOutputs > 0) {
-            dsp::Frame<maxChannels> inputFrame = {};
-            float v;
-            const float clipTime = 0.25f;
-
-            // copy expander control voltages to Frame
-            // this stuff ought to go in the parent class...
-            if (leftExpander.module != NULL && validLeftExpander) {
-                ZoxnoxiousControlMsg *leftExpanderConsumerMessage;
-                leftExpanderConsumerMessage = static_cast<ZoxnoxiousControlMsg*>(leftExpander.module->rightExpander.consumerMessage);
-                if (leftExpanderConsumerMessage) {
-
-                    //for (int i = 0; i < audioPort.deviceNumOutputs; ++i) {  // TODO: USE THIS LINE NOT THE NEXT
-                    for (int i = 0; i < maxChannels; ++i) { // DELETE THIS LINE
-                        inputFrame.samples[i] = leftExpanderConsumerMessage->frame[i];
-                    }
-                }
-            }
-
-            // add in local control voltages
-            switch (audioPort.deviceNumOutputs) {
-            default:
-            case 2:
-                // left level
-                v = params[LEFT_LEVEL_KNOB_PARAM].getValue() + inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f;
-                inputFrame.samples[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
-                if (inputFrame.samples[cvChannelOffset + 1] != v) {
-                    leftLevelClipTimer = clipTime;
-                }
-
-                if (APP->engine->getFrame() % 60000 == 0) {
-                    INFO("PatchingMatrix: Left: params[LEFT_LEVEL_INPUT].getValue() = %f ; inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f = %f ; sum %f",
-                         params[LEFT_LEVEL_KNOB_PARAM].getValue(),
-                         inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f,
-                         v);
-                }
-                // fall through
-            case 1:
-                // right level
-                v = params[RIGHT_LEVEL_KNOB_PARAM].getValue();
-                inputFrame.samples[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
-                if (inputFrame.samples[cvChannelOffset + 0] != v) {
-                    rightLevelClipTimer = clipTime;
-                }
-
-                // fall through
-            case 0:
-                break;
-            }
-
-            if (!audioPort.engineInputBuffer.full()) {
-                audioPort.engineInputBuffer.push(inputFrame);
-            }
-        }
-
         if (lightDivider.process()) {
             // slower moving stuff here
+            lights[CARD_A_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_B_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_C_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_D_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_E_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_F_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+
             const float lightTime = args.sampleTime * lightDivider.getDivision();
             const float brightnessDeltaTime = 1 / lightTime;
 
@@ -229,12 +173,6 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
 
-    /* There really is no proper integration with the parent
-     * class... just call this method the Command message is
-     * essentially a constant/unchanging from the source.  It keeps
-     * getting sent out to account for left-modules moving around an
-     * re-positioning.
-     */
     
 
     /** processZoxnoxiousControl
@@ -249,6 +187,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
             }
             return;
         }
+
+        processControlChannels(controlMsg);
 
         // TODO
         // handle midi messaging.  We may have received one via controlMsg.
@@ -302,7 +242,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         processZoxnoxiousCommand(&zCommand_a);
 
         zCommand_b = zCommand_a;
-        INFO("PatchingMatrix: set command msg to authoritative");
+        INFO("PatchingMatrix: set command msg to authoritative; channel assignment: %d", hasChannelAssignment);
     }
 
 
@@ -333,6 +273,62 @@ struct PatchingMatrix : ZoxnoxiousModule {
         ZoxnoxiousModule::onChannelAssignmentLost();
     }
 
+private:
+
+    /** processControlChannels
+     *
+     * pull the CV channels out of the control message and send
+     * them to the audio out
+     */
+    void processControlChannels(ZoxnoxiousControlMsg *controlMsg) {
+
+        if (audioPort.deviceNumOutputs > 0) {
+            dsp::Frame<maxChannels> inputFrame = {};
+            float v;
+            const float clipTime = 0.25f;
+
+            // copy expander control voltages to Frame
+            //for (int i = 0; i < audioPort.deviceNumOutputs; ++i) {  // TODO: USE THIS LINE NOT THE NEXT
+            for (int i = 0; i < maxChannels; ++i) { // DELETE THIS LINE
+                inputFrame.samples[i] = controlMsg->frame[i];
+            }
+
+            // add in local control voltages
+            switch (audioPort.deviceNumOutputs) {
+            default:
+            case 2:
+                // left level
+                v = params[LEFT_LEVEL_KNOB_PARAM].getValue() + inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f;
+                inputFrame.samples[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[cvChannelOffset + 1] != v) {
+                    leftLevelClipTimer = clipTime;
+                }
+
+                if (APP->engine->getFrame() % 60000 == 0) {
+                    INFO("PatchingMatrix: Left: params[LEFT_LEVEL_INPUT].getValue() = %f ; inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f = %f ; sum %f",
+                         params[LEFT_LEVEL_KNOB_PARAM].getValue(),
+                         inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f,
+                         v);
+                }
+                // fall through
+            case 1:
+                // right level
+                v = params[RIGHT_LEVEL_KNOB_PARAM].getValue();
+                inputFrame.samples[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
+                if (inputFrame.samples[cvChannelOffset + 0] != v) {
+                    rightLevelClipTimer = clipTime;
+                }
+
+                // fall through
+            case 0:
+                break;
+            }
+
+            if (!audioPort.engineInputBuffer.full()) {
+                audioPort.engineInputBuffer.push(inputFrame);
+            }
+        }
+    }
 
 };
 
