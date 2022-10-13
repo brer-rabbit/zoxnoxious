@@ -75,6 +75,15 @@ struct PatchingMatrix : ZoxnoxiousModule {
     std::string cardFOutput2NameString;
 
 
+    /*
+    struct buttonParamMidiProgram {
+        enum ParamId button;
+        int previousValue;
+        uint8_t midiProgram[8];
+    } buttonParamToMidiProgramList[11] =
+    */
+
+
     PatchingMatrix() : audioPort(this),
                        cardAOutput1NameString(invalidCardOutputName),
                        cardAOutput2NameString(invalidCardOutputName),

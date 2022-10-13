@@ -88,31 +88,29 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         enum ParamId button;
         int previousValue;
         uint8_t midiProgram[8];
-    };
-
-    struct buttonParamMidiProgram buttonParamToMidiProgramList[11] =
-        {
-            { SYNC_NEG_BUTTON_PARAM, INT_MIN, { 0, 1 } },
-            { MIX1_PULSE_BUTTON_PARAM, INT_MIN, { 2, 3 } },
-            { MIX1_COMPARATOR_BUTTON_PARAM, INT_MIN, { 4, 5 } },
-            { MIX2_PULSE_BUTTON_PARAM, INT_MIN, { 6, 7 } },
-            { EXT_MOD_PWM_BUTTON_PARAM, INT_MIN, { 8, 9 } },
-            { EXP_FM_BUTTON_PARAM, INT_MIN, { 10, 11 } },
-            { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 12, 13 } },
-            { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 14, 15 } },
-            { SYNC_POS_BUTTON_PARAM, INT_MIN, { 16, 17 } },
-            { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20 } },
-            { EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 21, 22, 23, 24, 25, 26, 27, 28 } }
-        };
+    } buttonParamToMidiProgramList[11] =
+      {
+          { SYNC_NEG_BUTTON_PARAM, INT_MIN, { 0, 1 } },
+          { MIX1_PULSE_BUTTON_PARAM, INT_MIN, { 2, 3 } },
+          { MIX1_COMPARATOR_BUTTON_PARAM, INT_MIN, { 4, 5 } },
+          { MIX2_PULSE_BUTTON_PARAM, INT_MIN, { 6, 7 } },
+          { EXT_MOD_PWM_BUTTON_PARAM, INT_MIN, { 8, 9 } },
+          { EXP_FM_BUTTON_PARAM, INT_MIN, { 10, 11 } },
+          { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 12, 13 } },
+          { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 14, 15 } },
+          { SYNC_POS_BUTTON_PARAM, INT_MIN, { 16, 17 } },
+          { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20 } },
+          { EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 21, 22, 23, 24, 25, 26, 27, 28 } }
+      };
 
     Zoxnoxious3340() :
         freqClipTimer(0.f), pulseWidthClipTimer(0.f), linearClipTimer(0.f),
         mix1TriangleVcaClipTimer(0.f), syncPhaseClipTimer(0.f),
         extModAmountClipTimer(0.f),
-        modulationInputParamPrevValue(-1),
         output1NameString(invalidCardOutputName),
         output2NameString(invalidCardOutputName),
-        modulationInputNameString(invalidCardOutputName) {
+        modulationInputNameString(invalidCardOutputName),
+        modulationInputParamPrevValue(-1) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
