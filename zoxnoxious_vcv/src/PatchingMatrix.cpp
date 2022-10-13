@@ -10,16 +10,17 @@ struct PatchingMatrix : ZoxnoxiousModule {
         LEFT_LEVEL_KNOB_PARAM,
         RIGHT_LEVEL_KNOB_PARAM,
         CARD_A_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_A_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_B_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_B_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_C_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_C_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_D_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_D_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_E_MIX1_OUTPUT_BUTTON_PARAM,
-        CARD_E_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_F_MIX1_OUTPUT_BUTTON_PARAM,
+        // the MIX2 enums need to be ordered:
+        CARD_A_MIX2_OUTPUT_BUTTON_PARAM,
+        CARD_B_MIX2_OUTPUT_BUTTON_PARAM,
+        CARD_C_MIX2_OUTPUT_BUTTON_PARAM,
+        CARD_D_MIX2_OUTPUT_BUTTON_PARAM,
+        CARD_E_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_F_MIX2_OUTPUT_BUTTON_PARAM,
         MIX_RIGHT_SELECT_PARAM,
         PARAMS_LEN
@@ -36,16 +37,17 @@ struct PatchingMatrix : ZoxnoxiousModule {
         LEFT_LEVEL_CLIP_LIGHT,
         RIGHT_LEVEL_CLIP_LIGHT,
         CARD_A_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_A_MIX2_OUTPUT_BUTTON_LIGHT,
         CARD_B_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_B_MIX2_OUTPUT_BUTTON_LIGHT,
         CARD_C_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_C_MIX2_OUTPUT_BUTTON_LIGHT,
         CARD_D_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_D_MIX2_OUTPUT_BUTTON_LIGHT,
         CARD_E_MIX1_OUTPUT_BUTTON_LIGHT,
-        CARD_E_MIX2_OUTPUT_BUTTON_LIGHT,
         CARD_F_MIX1_OUTPUT_BUTTON_LIGHT,
+        // the MIX2 enums need to be ordered:
+        CARD_A_MIX2_OUTPUT_BUTTON_LIGHT,
+        CARD_B_MIX2_OUTPUT_BUTTON_LIGHT,
+        CARD_C_MIX2_OUTPUT_BUTTON_LIGHT,
+        CARD_D_MIX2_OUTPUT_BUTTON_LIGHT,
+        CARD_E_MIX2_OUTPUT_BUTTON_LIGHT,
         CARD_F_MIX2_OUTPUT_BUTTON_LIGHT,
         ENUMS(LEFT_EXPANDER_LIGHT, 3),
         ENUMS(RIGHT_EXPANDER_LIGHT, 3),
@@ -162,50 +164,41 @@ struct PatchingMatrix : ZoxnoxiousModule {
             lights[CARD_F_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
 
 
-            if (mix2ButtonsPreviousState[0] == false &&
-                params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f) {
-                mix2ButtonsPreviousState[0] = true;
-                lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(1);
-                params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].setValue(1);
+            // implement radio-button functionality for the six MIX2 outputs.
+            // Unlike typical radio buttons, allow for zero buttons to
+            // be depressed: detect button up for the single pressed button.
+            {
+                int changed;
 
-                mix2ButtonsPreviousState[1] = false;
-                lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
-                mix2ButtonsPreviousState[2] = false;
-                lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
-                mix2ButtonsPreviousState[3] = false;
-                lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
-                mix2ButtonsPreviousState[4] = false;
-                lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
-                mix2ButtonsPreviousState[5] = false;
-                lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
+                // find if one changed (either pressed to de-pressed. depressed?)
+                for (changed = 0; changed < 6; ++changed) {
+                    if (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f != mix2ButtonsPreviousState[changed]) {
+
+                        mix2ButtonsPreviousState[changed] =
+                            (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f);
+                        lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(mix2ButtonsPreviousState[changed]);
+                        // TODO send midi message
+                        break;
+                    }
+                }
+
+                // if we've set something, unset everything else
+                if (mix2ButtonsPreviousState[changed] && changed < 6) {
+                    // turn everything else off
+                    for (int i = 0; i < changed; ++i) {
+                        mix2ButtonsPreviousState[i] = 0;
+                        params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].setValue(0.f);
+                        lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + i].setBrightness(0.f);
+                    }
+
+                    for (int i = changed + 1; i < 6; ++i) {
+                        mix2ButtonsPreviousState[i] = 0;
+                        params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].setValue(0.f);
+                        lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + i].setBrightness(0.f);
+                    }
+                }
             }
-            else if (mix2ButtonsPreviousState[1] == false &&
-                params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f) {
-                mix2ButtonsPreviousState[0] = false;
-                lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
 
-                mix2ButtonsPreviousState[1] = true;
-                lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(1);
-
-                mix2ButtonsPreviousState[2] = false;
-                lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
-                mix2ButtonsPreviousState[3] = false;
-                lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
-                mix2ButtonsPreviousState[4] = false;
-                lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
-                mix2ButtonsPreviousState[5] = false;
-                lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(0);
-                params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].setValue(0);
-            }
 
             lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
             lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
