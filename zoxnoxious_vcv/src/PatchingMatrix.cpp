@@ -97,8 +97,9 @@ struct PatchingMatrix : ZoxnoxiousModule {
           { CARD_A_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 16, 17, 18, 19, 20, 21, 22 } }
       };
     // index to above array
-    const static int CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index = 8;
     const static int MIX_LEFT_SELECT_PARAM_index = 6;
+    const static int MIX_RIGHT_SELECT_PARAM_index = 7;
+    const static int CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index = 8;
 
     PatchingMatrix() : audioPort(this),
                        mix2ButtonsPreviousState{false},
@@ -203,7 +204,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
                 // find if one changed (either pressed to de-pressed. depressed?)
                 for (changed = 0; changed < 6; ++changed) {
-                    if (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f != mix2ButtonsPreviousState[changed]) {
+                    if ( (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f) != mix2ButtonsPreviousState[changed]) {
 
                         mix2ButtonsPreviousState[changed] =
                             (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f);
