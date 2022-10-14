@@ -82,23 +82,23 @@ struct PatchingMatrix : ZoxnoxiousModule {
         enum ParamId button;
         int previousValue;
         uint8_t midiProgram[7];
-    } buttonParamToMidiProgramList[10] =
+    } buttonParamToMidiProgramList[9] =
       {
           // the ordering here is important- taking a dependency on
           // ordering when producing midi messages
           { CARD_A_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 0, 1 } },
-          { CARD_A_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 2, 3 } },
-          { CARD_B_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 4, 5 } },
-          { CARD_C_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 6, 7 } },
-          { CARD_D_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 8, 9 } },
-          { CARD_E_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 10, 11 } },
-          { CARD_F_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 12, 13 } },
-          { MIX_LEFT_SELECT_PARAM, INT_MIN, { 14, 15 } },
-          { MIX_RIGHT_SELECT_PARAM, INT_MIN, { 16, 17 } },
-          { CARD_A_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 18, 19, 20, 21, 22, 23, 24 } }
+          { CARD_B_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 2, 3 } },
+          { CARD_C_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 4, 5 } },
+          { CARD_D_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 6, 7 } },
+          { CARD_E_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 8, 9 } },
+          { CARD_F_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 10, 11 } },
+          { MIX_LEFT_SELECT_PARAM, INT_MIN, { 12, 13 } },
+          { MIX_RIGHT_SELECT_PARAM, INT_MIN, { 14, 15 } },
+          { CARD_A_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 16, 17, 18, 19, 20, 21, 22 } }
       };
     // index to above array
-    const static int CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index = 9;
+    const static int CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index = 8;
+    const static int MIX_LEFT_SELECT_PARAM_index = 6;
 
     PatchingMatrix() : audioPort(this),
                        mix2ButtonsPreviousState{false},
@@ -190,7 +190,6 @@ struct PatchingMatrix : ZoxnoxiousModule {
                     lights[lightParam].setBrightness(buttonParamValue);
                     int midiProgram = buttonParamToMidiProgramList[i].midiProgram[buttonParamValue];
                     sendMidiProgramChangeMessage(midiProgram);
-                    INFO("AudioOut: sending program %d for button %d", midiProgram, i);
                 }
             }
 
@@ -208,7 +207,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
                         mix2ButtonsPreviousState[changed] =
                             (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f);
-                        lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(mix2ButtonsPreviousState[changed]);
+                        lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + changed].setBrightness(mix2ButtonsPreviousState[changed]);
 
                         // send the approp program change-
                         // if no buttons are now pressed it's poorly
@@ -240,11 +239,20 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
             // LEFT / RIGHT SELECT
-            //TODO
+            int value = (params[MIX_LEFT_SELECT_PARAM].getValue() > 0.f);
+            if (value != buttonParamToMidiProgramList[MIX_LEFT_SELECT_PARAM_index].previousValue) {
+                buttonParamToMidiProgramList[MIX_LEFT_SELECT_PARAM_index].previousValue = value;
+                sendMidiProgramChangeMessage(buttonParamToMidiProgramList[MIX_LEFT_SELECT_PARAM_index].midiProgram[value]);
+            }
+
+            value = (params[MIX_RIGHT_SELECT_PARAM].getValue() > 0.f);
+            if (value != buttonParamToMidiProgramList[MIX_RIGHT_SELECT_PARAM_index].previousValue) {
+                buttonParamToMidiProgramList[MIX_RIGHT_SELECT_PARAM_index].previousValue = value;
+                sendMidiProgramChangeMessage(buttonParamToMidiProgramList[MIX_RIGHT_SELECT_PARAM_index].midiProgram[value]);
+            }
 
 
-
-
+            // LEDs: clipping and expander connections
             const float lightTime = args.sampleTime * lightDivider.getDivision();
             const float brightnessDeltaTime = 1 / lightTime;
 
