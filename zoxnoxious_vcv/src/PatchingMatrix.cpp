@@ -137,8 +137,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
         configSwitch(CARD_F_MIX1_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 1 to Audio Out");
         configSwitch(CARD_F_MIX2_OUTPUT_BUTTON_PARAM, 0.f, 1.f, 0.f, "Card F Out 2 to Audio Out");
 
-        configInput(LEFT_LEVEL_INPUT, "");
-        configInput(RIGHT_LEVEL_INPUT, "");
+        configInput(LEFT_LEVEL_INPUT, "Left VCA Level");
+        configInput(RIGHT_LEVEL_INPUT, "Right VCA Level");
 
         configLight(LEFT_EXPANDER_LIGHT, "Connection Status");
         configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
@@ -315,13 +315,13 @@ struct PatchingMatrix : ZoxnoxiousModule {
         zCommand_a.authoritativeSource = true;
         // TODO: this is hardcoded for now.  Figure out discovery.
         // channelAssignment data:
-        // hardware cardId, channelOffset, assignmentOwned
+        // hardware cardId, channelOffset (from zero), assignmentOwned
         // hardcoded/mocked data for now, later this ought to be received
         // via midi from the controlling board
-        zCommand_a.channelAssignments[0] = { 0x02, 3, 2, false };
-        zCommand_a.channelAssignments[1] = { 0x02, 9, 3, false };
+        zCommand_a.channelAssignments[0] = { 0x02, 2, 2, false };
+        zCommand_a.channelAssignments[1] = { 0x02, 8, 3, false };
         //zCommand_a.channelAssignments[2] = { 0x00, -1, -1, false };
-        zCommand_a.channelAssignments[2] = { 0x02, 15, 4, false };
+        zCommand_a.channelAssignments[2] = { 0x02, 14, 4, false };
         zCommand_a.channelAssignments[3] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[4] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[5] = { 0x00, -1, -1, false };
@@ -378,8 +378,8 @@ private:
             const float clipTime = 0.25f;
 
             // copy expander control voltages to Frame
-            //for (int i = 0; i < audioPort.deviceNumOutputs; ++i) {  // TODO: USE THIS LINE NOT THE NEXT
-            for (int i = 0; i < maxChannels; ++i) { // DELETE THIS LINE
+            for (int i = 0; i < audioPort.deviceNumOutputs; ++i) {  // TODO: USE THIS LINE NOT THE NEXT
+            //for (int i = 0; i < maxChannels; ++i) { // DELETE THIS LINE
                 inputFrame.samples[i] = controlMsg->frame[i];
             }
 
@@ -394,16 +394,10 @@ private:
                     leftLevelClipTimer = clipTime;
                 }
 
-                if (APP->engine->getFrame() % 60000 == 0) {
-                    INFO("PatchingMatrix: Left: params[LEFT_LEVEL_INPUT].getValue() = %f ; inputs[LEFT_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f = %f ; sum %f",
-                         params[LEFT_LEVEL_KNOB_PARAM].getValue(),
-                         inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f,
-                         v);
-                }
                 // fall through
             case 1:
                 // right level
-                v = params[RIGHT_LEVEL_KNOB_PARAM].getValue();
+                v = params[RIGHT_LEVEL_KNOB_PARAM].getValue() + inputs[RIGHT_LEVEL_INPUT].getVoltageSum() / 10.f;
                 inputFrame.samples[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
                 if (inputFrame.samples[cvChannelOffset + 0] != v) {
                     rightLevelClipTimer = clipTime;
