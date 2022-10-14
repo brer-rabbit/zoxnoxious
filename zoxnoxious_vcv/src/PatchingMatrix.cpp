@@ -4,9 +4,11 @@
 #include "zcomponentlib.hpp"
 #include "ZoxnoxiousExpander.hpp"
 
+
 struct PatchingMatrix : ZoxnoxiousModule {
     enum ParamId {
         MIX_LEFT_SELECT_PARAM,
+        MIX_RIGHT_SELECT_PARAM,
         LEFT_LEVEL_KNOB_PARAM,
         RIGHT_LEVEL_KNOB_PARAM,
         CARD_A_MIX1_OUTPUT_BUTTON_PARAM,
@@ -22,7 +24,6 @@ struct PatchingMatrix : ZoxnoxiousModule {
         CARD_D_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_E_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_F_MIX2_OUTPUT_BUTTON_PARAM,
-        MIX_RIGHT_SELECT_PARAM,
         PARAMS_LEN
     };
     enum InputId {
@@ -56,7 +57,6 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
     ZoxnoxiousAudioPort audioPort;
     ZoxnoxiousMidiOutput midiOutput;
-    std::deque<midi::Message> midiMessageQueue;
 
     dsp::ClockDivider lightDivider;
     float leftLevelClipTimer;
@@ -78,14 +78,27 @@ struct PatchingMatrix : ZoxnoxiousModule {
     std::string cardFOutput2NameString;
 
 
-    /*
     struct buttonParamMidiProgram {
         enum ParamId button;
         int previousValue;
-        uint8_t midiProgram[8];
-    } buttonParamToMidiProgramList[11] =
-    */
-
+        uint8_t midiProgram[7];
+    } buttonParamToMidiProgramList[10] =
+      {
+          // the ordering here is important- taking a dependency on
+          // ordering when producing midi messages
+          { CARD_A_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 0, 1 } },
+          { CARD_A_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 2, 3 } },
+          { CARD_B_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 4, 5 } },
+          { CARD_C_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 6, 7 } },
+          { CARD_D_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 8, 9 } },
+          { CARD_E_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 10, 11 } },
+          { CARD_F_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 12, 13 } },
+          { MIX_LEFT_SELECT_PARAM, INT_MIN, { 14, 15 } },
+          { MIX_RIGHT_SELECT_PARAM, INT_MIN, { 16, 17 } },
+          { CARD_A_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 18, 19, 20, 21, 22, 23, 24 } }
+      };
+    // index to above array
+    const static int CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index = 9;
 
     PatchingMatrix() : audioPort(this),
                        mix2ButtonsPreviousState{false},
@@ -156,14 +169,33 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
         if (lightDivider.process()) {
             // slower moving stuff here
-            lights[CARD_A_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_B_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_C_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_D_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_E_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_F_MIX1_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX1_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+
+            // MIX1 buttons to midi programs
+            //
+            // check for any MIX1 buttons changing state and send midi
+            // messages for them.  Toggle light if so.  Do this by
+            // indexing the enums -- just don't re-order the enums
+
+            for (int i = 0; i < 6; ++i) {
+                int buttonParam = CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i;
+                int lightParam = CARD_A_MIX1_OUTPUT_BUTTON_LIGHT + i;
+                
+                if (params[buttonParam].getValue() !=
+                    buttonParamToMidiProgramList[i].previousValue) {
+
+                    buttonParamToMidiProgramList[i].previousValue =
+                        params[buttonParam].getValue();
+
+                    int buttonParamValue = (params[buttonParam].getValue() > 0.f);
+                    lights[lightParam].setBrightness(buttonParamValue);
+                    int midiProgram = buttonParamToMidiProgramList[i].midiProgram[buttonParamValue];
+                    sendMidiProgramChangeMessage(midiProgram);
+                    INFO("AudioOut: sending program %d for button %d", midiProgram, i);
+                }
+            }
 
 
+            // MIX2 buttons to midi programs
             // implement radio-button functionality for the six MIX2 outputs.
             // Unlike typical radio buttons, allow for zero buttons to
             // be depressed: detect button up for the single pressed button.
@@ -177,7 +209,14 @@ struct PatchingMatrix : ZoxnoxiousModule {
                         mix2ButtonsPreviousState[changed] =
                             (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f);
                         lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(mix2ButtonsPreviousState[changed]);
-                        // TODO send midi message
+
+                        // send the approp program change-
+                        // if no buttons are now pressed it's poorly
+                        // hardcoded to be the the last entry in  the
+                        // midiProgram array
+                        sendMidiProgramChangeMessage(mix2ButtonsPreviousState[changed] == 0 ?
+                                                     buttonParamToMidiProgramList[CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index].midiProgram[6] :
+                                                     buttonParamToMidiProgramList[CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index].midiProgram[changed] );
                         break;
                     }
                 }
@@ -200,11 +239,11 @@ struct PatchingMatrix : ZoxnoxiousModule {
             }
 
 
-            lights[CARD_B_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_B_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_C_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_C_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_D_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_D_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_E_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_E_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
-            lights[CARD_F_MIX2_OUTPUT_BUTTON_LIGHT].setBrightness(params[CARD_F_MIX2_OUTPUT_BUTTON_PARAM].getValue() > 0.f);
+            // LEFT / RIGHT SELECT
+            //TODO
+
+
+
 
             const float lightTime = args.sampleTime * lightDivider.getDivision();
             const float brightnessDeltaTime = 1 / lightTime;
@@ -227,7 +266,9 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
     /** processZoxnoxiousControl
      *
-     * intake a control message which contains CV data and possibly a midi message.
+     * intake a control message which contains CV data and possibly a
+     * MIDI message.  MIDI message sending is done here since this is
+     * where we're processing the control messages.
      */
     void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
         // this ought to be the case -- consider making this an assertion
@@ -240,18 +281,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
         processControlChannels(controlMsg);
 
-        // TODO
-        // handle midi messaging.  We may have received one via controlMsg.
-        // (1) Check buttons, add anything to local queue
-        // (2) check control message, send it if received
-        // (3) if no control msg, pop from our queue and send a midi message
-        // if we have any queued midi messages, send them if possible
-        if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
-            INFO("PatchingMatrix: bus is open, popping MIDI message from queue");
-            midiOutput.sendMidiMessage(midiMessageQueue.front());
-            midiMessageQueue.pop_front();
-        }
-        else if (controlMsg->midiMessageSet) {
+        // Send a MIDI message if present in the control message
+        if (controlMsg->midiMessageSet) {
             INFO("AudioOut: sending midi message from control msg");
             midiOutput.sendMidiMessage(controlMsg->midiMessage);
         }
@@ -378,6 +409,23 @@ private:
                 audioPort.engineInputBuffer.push(inputFrame);
             }
         }
+    }
+
+
+    /** sendMidiProgramChangeMessage
+     *
+     * send a program change message
+     */
+    int sendMidiProgramChangeMessage(int programNumber) {
+        midi::Message midiProgramMessage;
+        midiProgramMessage.setSize(2);
+        midiProgramMessage.setChannel(midiChannel);
+        midiProgramMessage.setStatus(midiProgramChangeStatus);
+        midiProgramMessage.setNote(programNumber);
+        midiOutput.sendMidiMessage(midiProgramMessage);
+        INFO("sending midi message for program %d channel %d",
+             programNumber, midiChannel);
+        return 0;
     }
 
 };
