@@ -36,7 +36,7 @@ int discover_cards(int i2c_address, struct plugin_card **plugin_cards, int *num_
   *plugin_cards[0] = (struct plugin_card)
     {
       .slot = 0,
-      .card_id = 0x01,
+      .card_id = 0x02,
       .plugin_name = "VCO3340",
       .process_samples_f = NULL,
       .process_midi_f = NULL,
@@ -48,7 +48,18 @@ int discover_cards(int i2c_address, struct plugin_card **plugin_cards, int *num_
     i2c_handle = i2cOpen(1, i2c_address + i, 0);
     if (i2c_handle >= 0) {
       card_id = i2cReadByteData(i2c_handle, 0);
-      INFO("read card id %d", card_id);
+      if (card_id == PI_BAD_HANDLE ||
+          card_id == PI_BAD_PARAM) {
+        INFO("I2C read bad handle for slot %d", i);
+      }
+      else if (card_id == PI_I2C_READ_FAILED) {
+        INFO("no card present slot %d", i);
+      }
+      else {
+        INFO("Found card in slot %d with id 0x%x", i, card_id);
+        // TODO: action
+      }
+
     }
     else {
       INFO("failed to open handle for address %d\n", i2c_address + i);

@@ -117,6 +117,7 @@ int main(int argc, char **argv, char **envp) {
   }
 
 
+  // TODO: hardcoded directory
   if (zlog_init("/home/kaf/git/zoxnoxious/raspberry_pi/etc/zlog.cfg")) {
     printf("zlog_init failed");
     return -1;
@@ -140,7 +141,7 @@ int main(int argc, char **argv, char **envp) {
 
 
   if (config_filename[0] != '\0') {
-    printf("using config %s\n", config_filename);
+    INFO("using config %s\n", config_filename);
   }
   else if (getenv(ZOXNOXIOUS_DIR_ENV_VAR_NAME) != NULL) {
     snprintf(config_filename, 128, "%s%s%s",
@@ -166,12 +167,22 @@ int main(int argc, char **argv, char **envp) {
   }
 
 
+  // SPI, pigpio start
+  if (gpioInitialise() < 0) {
+    ERROR("gpioInitialise failed, bye!");
+    return -1;
+  }
+  else {
+    INFO("gpioInitialise complete");
+  }
+
 
   /* detect installed cards */
   struct plugin_card *plugin_cards;
   int num_cards;
   int i2c_base_address;
   config_lookup_int(cfg, config_lookup_eeprom_base_i2c_address, &i2c_base_address);
+  INFO("got base address 0x%x", i2c_base_address);
   discover_cards(i2c_base_address, &plugin_cards, &num_cards);
 
 
