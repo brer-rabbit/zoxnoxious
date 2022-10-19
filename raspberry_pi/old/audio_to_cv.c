@@ -4,6 +4,7 @@
  * gcc -Wall -o audio_to_cv audio_to_cv.c -lasound -lpigpio
  * Run:
  * sudo audio_to_cv -d hw:CARD=UAC2Gadget,DEV=0 -m hw:1,0
+ * ideally at a real-time priority such as "chrt -f 40"
  *
  * a Makefile and additional functionality will be useful.
  * Right now this just listens for incoming audio and maps the first
