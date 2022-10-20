@@ -194,7 +194,6 @@ int main(int argc, char **argv, char **envp) {
   struct card_manager *card_mgr = init_card_manager(cfg);
   discover_cards(card_mgr);
 
-  /* load and initialize plugins */
 
 
   /* init alsa */

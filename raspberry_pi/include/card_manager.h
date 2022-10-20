@@ -22,20 +22,7 @@
 
 struct card_manager;
 
-/* properties of a plugin_card */
-struct plugin_card {
-  int slot;
-  int card_id;
-  char *plugin_name;
-  int i2c_handle;
-  // plugin interface function pointers:
-  process_samples process_samples_f;
-  process_midi process_midi_f;
-  process_midi_program_change process_midi_program_change_f;
-  free_zcard free_zcard_f;
-  void *plugin_object;
-};
-
+struct plugin_card;
 
 
 /* init_card_manager

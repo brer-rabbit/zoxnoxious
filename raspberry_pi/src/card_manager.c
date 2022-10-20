@@ -30,13 +30,26 @@
 char *config_lookup_eeprom_base_i2c_address = "card_manager.eeprom_base_i2c_address";
 
 
+/* properties of a plugin_card */
+struct plugin_card {
+  int slot;
+  int card_id;
+  char *plugin_name;
+  // plugin interface function pointers:
+  process_samples process_samples_f;
+  process_midi process_midi_f;
+  process_midi_program_change process_midi_program_change_f;
+  free_zcard free_zcard_f;
+  void *plugin_object;
+};
+
 
 /* card manager which holds all the fun stuff */
 struct card_manager {
   config_t *cfg;
   uint8_t card_ids[8];  // 8-bit Id of each card indexed by slot, or zero if no card present
   int num_cards;
-  struct plugin_card cards[8];
+  struct plugin_card cards[8]; // plugins- empty slots skipped, so num_cards-1 is max index (not slot indexed)
 };
 
 
@@ -95,19 +108,16 @@ int discover_cards(struct card_manager *card_mgr) {
           card_mgr->card_ids[i] == PI_BAD_PARAM) {
         INFO("I2C read bad handle for slot %d", i);
         card_mgr->card_ids[i] = 0;
-        i2cClose(i2c_handle);
       }
       else if (card_mgr->card_ids[i] == PI_I2C_READ_FAILED) {
         INFO("no card present slot %d", i);
         card_mgr->card_ids[i] = 0;
-        i2cClose(i2c_handle);
       }
       else {
         INFO("Found card in slot %d with id 0x%x", i, card_mgr->card_ids[i]);
         card_mgr->num_cards++;
-        // TODO: Store i2c handle
       }
-
+      i2cClose(i2c_handle);
     }
     else {
       INFO("failed to open handle for address %d", i2c_base_address + i);
@@ -118,4 +128,10 @@ int discover_cards(struct card_manager *card_mgr) {
 
   INFO("found %d cards", card_mgr->num_cards);
   return 0;
+}
+
+
+
+int load_plugins(struct card_manager *card_mgr) {
+  // iterate over card_ids, store data to plugin_card[i]
 }
