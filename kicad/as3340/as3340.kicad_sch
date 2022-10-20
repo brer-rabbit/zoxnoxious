@@ -4508,8 +4508,13 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 2d17cecf-69c3-4d69-b8cb-3cb1588cc955)
   )
-  (text "DG442: Ensure model is spec’d for +/- 12V. LE is not\nMAX333A: MAX333AEWP+ or MAX333ACWP+"
-    (at 129.54 265.43 0)
+  (text "MAX333A: MAX333AEWP+ or MAX333ACWP+\nDG333A(DW) may substitue (not DG333AL)"
+    (at 115.57 265.43 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 317ffece-d34b-4b73-8947-ac10b03834c0)
+  )
+  (text "DG442: Ensure part is spec’d for +/- 12V. LE is not"
+    (at 161.29 265.43 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 3be6803a-080c-4bea-b34b-5b106115ad54)
   )
