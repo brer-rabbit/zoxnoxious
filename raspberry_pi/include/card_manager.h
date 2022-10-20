@@ -14,8 +14,8 @@
  */
 
 
-#ifndef CARD_H
-#define CARD_H
+#ifndef CARD_MANAGER_H
+#define CARD_MANAGER_H
 
 #include "zoxnoxiousd.h"
 
@@ -27,6 +27,7 @@ struct plugin_card {
   int slot;
   int card_id;
   char *plugin_name;
+  int i2c_handle;
   // plugin interface function pointers:
   process_samples process_samples_f;
   process_midi process_midi_f;
@@ -54,7 +55,7 @@ struct card_manager* init_card_manager(config_t *cfg);
  * Array of plugin_cards found
  * number of cards found set at int*
  */
-struct plugin_card* discover_cards(int i2c_address, int *num_cards_found);
+int discover_cards(struct card_manager *card_mgr);
 
 
 int load_card_plugin(struct plugin_card *plugin_card);

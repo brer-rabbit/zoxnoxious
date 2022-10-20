@@ -48,7 +48,11 @@ void sig_cleanup_and_exit(int signum) {
 
 
 static void help() {
-  printf("Usage: zoxnoxiousd ...\n");
+  printf("Usage: zoxnoxiousd <options>\n"
+         "  -i <config_file>\n"
+         "  -d <usb audio 1>\n"
+         "  -e <usb audio 2>\n"
+         "  -m <midi device>\n");
 }
 
 
@@ -64,7 +68,8 @@ struct alsa_pcm_state {
 
 
 /* Config keys */
-char *config_lookup_eeprom_base_i2c_address = "eeprom_base_i2c_address";
+/* When needed go here */
+
 
 
 /* zlog loggin */
@@ -76,7 +81,6 @@ int main(int argc, char **argv, char **envp) {
   config_t *cfg;
   char *audio_device1_name = NULL, *audio_device2_name = NULL, *midi_device_name = NULL;
   char config_filename[128] = { '\0' };
-
   char *opt_string = "hi:d:e:m:v";
 
   struct option long_option[] = {
@@ -166,7 +170,7 @@ int main(int argc, char **argv, char **envp) {
 
 
   // SPI, pigpio start
-  if (gpioInitialise() < 0) {
+  if (0 && gpioInitialise() < 0) {
     ERROR("gpioInitialise failed, bye!");
     return -1;
   }
@@ -187,12 +191,8 @@ int main(int argc, char **argv, char **envp) {
 
 
   /* detect installed cards- get the card manager going */
-  int num_cards;
-  int i2c_base_address;
-  config_lookup_int(cfg, config_lookup_eeprom_base_i2c_address, &i2c_base_address);
-  discover_cards(i2c_base_address, &num_cards);
-
-  INFO("found %d cards", num_cards);
+  struct card_manager *card_mgr = init_card_manager(cfg);
+  discover_cards(card_mgr);
 
   /* load and initialize plugins */
 

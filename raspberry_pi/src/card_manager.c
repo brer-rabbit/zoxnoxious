@@ -26,18 +26,35 @@
 #include "zoxnoxiousd.h"
 
 
-struct card_manager {
-  uint8_t card_ids[8];  // 8-bit Id of each card indexed by slot, or zero if no card present
+/* Config keys */
+char *config_lookup_eeprom_base_i2c_address = "card_manager.eeprom_base_i2c_address";
 
+
+
+/* card manager which holds all the fun stuff */
+struct card_manager {
+  config_t *cfg;
+  uint8_t card_ids[8];  // 8-bit Id of each card indexed by slot, or zero if no card present
+  int num_cards;
+  struct plugin_card cards[8];
 };
 
 
+
+
+
+/* init_card_manager
+ *
+ * initialize a card manager.  Takes an open libconfig to start.
+ */
 struct card_manager* init_card_manager(config_t *cfg) {
-  struct card_manager *mgr = (struct card_manager *)malloc(sizeof(struct card_manager));
+  struct card_manager *mgr = (struct card_manager *)calloc(sizeof(struct card_manager), 1);
   if (!mgr) {
     FATAL("failed to alloc for card_manager");
     return 0;
   }
+
+  mgr->cfg = cfg;
   return mgr;
 }
 
@@ -60,46 +77,45 @@ struct card_manager* init_card_manager(config_t *cfg) {
   */
 
 
-struct plugin_card* discover_cards(int i2c_address, int *num_cards_found) {
+int discover_cards(struct card_manager *card_mgr) {
   int i2c_handle;
-  uint8_t card_ids[8];
+  int i2c_base_address;
 
   /* this should probe 8 sequential I2C addresses in the range
-   * i2c_address to find what is present
+   * i2c_address/3 to find what is present
    */
-
-  *num_cards_found = 0;
+  config_lookup_int(card_mgr->cfg, config_lookup_eeprom_base_i2c_address, &i2c_base_address);
 
   for (int i = 0; i < 8; ++i) {
-    i2c_handle = i2cOpen(1, i2c_address + i, 0);
+    i2c_handle = i2cOpen(1, i2c_base_address + i, 0);
     if (i2c_handle >= 0) {
-      card_ids[i] = i2cReadByteData(i2c_handle, 0);
+      card_mgr->card_ids[i] = i2cReadByteData(i2c_handle, 0);
 
-      if (card_ids[i] == PI_BAD_HANDLE ||
-          card_ids[i] == PI_BAD_PARAM) {
+      if (card_mgr->card_ids[i] == PI_BAD_HANDLE ||
+          card_mgr->card_ids[i] == PI_BAD_PARAM) {
         INFO("I2C read bad handle for slot %d", i);
-        card_ids[i] = 0;
+        card_mgr->card_ids[i] = 0;
+        i2cClose(i2c_handle);
       }
-      else if (card_ids[i] == PI_I2C_READ_FAILED) {
+      else if (card_mgr->card_ids[i] == PI_I2C_READ_FAILED) {
         INFO("no card present slot %d", i);
-        card_ids[i] = 0;
+        card_mgr->card_ids[i] = 0;
+        i2cClose(i2c_handle);
       }
       else {
-        INFO("Found card in slot %d with id 0x%x", i, card_ids[i]);
-        *num_cards_found++;
+        INFO("Found card in slot %d with id 0x%x", i, card_mgr->card_ids[i]);
+        card_mgr->num_cards++;
+        // TODO: Store i2c handle
       }
 
     }
     else {
-      INFO("failed to open handle for address %d\n", i2c_address + i);
-      card_ids[i] = 0;
+      INFO("failed to open handle for address %d", i2c_base_address + i);
+      card_mgr->card_ids[i] = 0;
     }
+
   }
 
-
+  INFO("found %d cards", card_mgr->num_cards);
   return 0;
 }
-
-
-
-
