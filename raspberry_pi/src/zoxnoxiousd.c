@@ -130,12 +130,6 @@ int main(int argc, char **argv, char **envp) {
     return -1;
   }
 
-
-  INFO("zlog info message");
-  DEBUG("zlog debug message");
-  WARN("zlog warn message");
-  
-
   cfg = (config_t*)malloc(sizeof(config_t));
   config_init(cfg);
 
@@ -177,13 +171,23 @@ int main(int argc, char **argv, char **envp) {
   }
 
 
+  /* Basic initialization done:
+   * + libconf opened, available
+   * + zlog enabled, logging available
+   * + pigpio init, can start talking to hardware
+   *
+   * what's not done:
+   * - load card plugins
+   * - alsa init
+   */
+
+
   /* detect installed cards */
   struct plugin_card *plugin_cards;
   int num_cards;
   int i2c_base_address;
   config_lookup_int(cfg, config_lookup_eeprom_base_i2c_address, &i2c_base_address);
-  INFO("got base address 0x%x", i2c_base_address);
-  discover_cards(i2c_base_address, &plugin_cards, &num_cards);
+  plugin_cards = discover_cards(i2c_base_address, &num_cards);
 
 
   /* load and initialize plugins */

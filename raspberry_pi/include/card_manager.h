@@ -26,9 +26,13 @@
  * given a base i2c address, probe all addresses for the last 3 bits
  * (8 addresses total).  If a response is received, read the first
  * byte from the ROM for the card id.
+ * Returns:
+ * Array of plugin_cards found
+ * number of cards found set at int*
  */
-int discover_cards(int i2c_address, struct plugin_card **plugin_cards, int *num_cards_found);
+struct plugin_card* discover_cards(int i2c_address, int *num_cards_found);
 
 
+int load_card_plugin(struct plugin_card *plugin_card);
 
 #endif

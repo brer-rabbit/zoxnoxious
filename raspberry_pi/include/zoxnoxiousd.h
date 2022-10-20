@@ -24,6 +24,7 @@
 #define INFO(...)  zlog_info(zlog_c, __VA_ARGS__)
 #define WARN(...)  zlog_warn(zlog_c, __VA_ARGS__)
 #define ERROR(...) zlog_error(zlog_c, __VA_ARGS__)
+#define FATAL(...) zlog_fatal(zlog_c, __VA_ARGS__)
 extern zlog_category_t *zlog_c;
 
 

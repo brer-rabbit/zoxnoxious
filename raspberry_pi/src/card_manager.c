@@ -22,7 +22,7 @@
 
 
 
-int discover_cards(int i2c_address, struct plugin_card **plugin_cards, int *num_cards_found) {
+struct plugin_card* discover_cards(int i2c_address, int *num_cards_found) {
   int i2c_handle;
   int byte_read;
   int card_id;
