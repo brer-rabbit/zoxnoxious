@@ -20,6 +20,30 @@
 #include "zoxnoxiousd.h"
 
 
+struct card_manager;
+
+/* properties of a plugin_card */
+struct plugin_card {
+  int slot;
+  int card_id;
+  char *plugin_name;
+  // plugin interface function pointers:
+  process_samples process_samples_f;
+  process_midi process_midi_f;
+  process_midi_program_change process_midi_program_change_f;
+  free_zcard free_zcard_f;
+  void *plugin_object;
+};
+
+
+
+/* init_card_manager
+ *
+ * start the card manager.  Give it a handle to the libconfig.
+ */
+struct card_manager* init_card_manager(config_t *cfg);
+
+
 /* discover_cards
  *
  * Search for all M24C02 ROMs.

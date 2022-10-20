@@ -28,19 +28,5 @@
 extern zlog_category_t *zlog_c;
 
 
-struct plugin_card {
-  int slot;
-  int card_id;
-  char *plugin_name;
-  // plugin interface function pointers:
-  process_samples process_samples_f;
-  process_midi process_midi_f;
-  process_midi_program_change process_midi_program_change_f;
-  free_zcard free_zcard_f;
-  void *plugin_object;
-};
-
-
-
 
 #endif

@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/* main file for zoxnoxiousd server application.  Handle basic setup of components,
+ * init, get things going.
+ */
+
 #include <alsa/asoundlib.h>
 #include <getopt.h>
 #include <libconfig.h>
@@ -29,7 +33,7 @@
 #include <zlog.h>
 
 #include "zoxnoxiousd.h"
-#include "card.h"
+#include "card_manager.h"
 
 #define DEFAULT_ZOXNOXIOUS_DIRECTORY "/usr/local/zoxnoxiousd"
 #define ZOXNOXIOUS_DIR_ENV_VAR_NAME "ZOXNOXIOUS_DIR"
@@ -182,13 +186,13 @@ int main(int argc, char **argv, char **envp) {
    */
 
 
-  /* detect installed cards */
-  struct plugin_card *plugin_cards;
+  /* detect installed cards- get the card manager going */
   int num_cards;
   int i2c_base_address;
   config_lookup_int(cfg, config_lookup_eeprom_base_i2c_address, &i2c_base_address);
-  plugin_cards = discover_cards(i2c_base_address, &num_cards);
+  discover_cards(i2c_base_address, &num_cards);
 
+  INFO("found %d cards", num_cards);
 
   /* load and initialize plugins */
 
