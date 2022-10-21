@@ -29,7 +29,16 @@
 /* set_spi_interface
  * must be called by plugin prior to the initial spiWrite()
  */
-int set_spi_interface(int slot, int spi_mode);
+int set_spi_interface(int spi_mode, int slot);
+
+
+/* request_channels
+ *
+ * as part of init_zcard, the card plugin should request the number of
+ * audio channels it requires.  It passes which slot it is in as well.
+ */
+int request_channels(int channels, int slot);
+
 
 
 /* init the plugin.
@@ -39,13 +48,13 @@ int set_spi_interface(int slot, int spi_mode);
  * (zcard_plugin in other calls).
  * Any i2cOpen calls should be done here with the handle cached.
  */
-typedef void* (*init_zcard)(int slot);
+typedef void* (*init_zcard_f)(int slot);
 
 /* free_zcard
  *
  * called prior to card deletion / plugin removal.
  */
-typedef void (*free_zcard)(void *zcard_plugin);
+typedef void (*free_zcard_f)(void *zcard_plugin);
 
 
 /* get_plugin_name
@@ -53,7 +62,9 @@ typedef void (*free_zcard)(void *zcard_plugin);
  * return the plugin name in under 32 chars with a null terminator.
  * Caller is responsible for free'ing memory.
  */
-typedef char* (*get_plugin_name)();
+typedef char* (*get_plugin_name_f)();
+
+
 
 
 /** process_samples
@@ -64,7 +75,7 @@ typedef char* (*get_plugin_name)();
  * channel.
  * Pre: SPI handle will be set to the correct mode that the plugin requires.
  */
-typedef int (*process_samples)(void *zcard_plugin, int16_t *samples, int spi_handle);
+typedef int (*process_samples_f)(void *zcard_plugin, int16_t *samples, int spi_handle);
 
 
 
@@ -73,14 +84,14 @@ typedef int (*process_samples)(void *zcard_plugin, int16_t *samples, int spi_han
  * process a midi message for the card.  Message is filtered to be for this plugin.
  * This interface is for non-program change messages.
  */
-typedef int (*process_midi)(void *zcard_plugin, uint8_t *midi_message, size_t size);
+typedef int (*process_midi_f)(void *zcard_plugin, uint8_t *midi_message, size_t size);
 
 
 /** process_midi_program_change
  *
  * process a midi message program change for this plugin.
  */
-typedef int (*process_midi_program_change)(void *zcard_plugin, uint8_t program_number);
+typedef int (*process_midi_program_change_f)(void *zcard_plugin, uint8_t program_number);
 
 
 
