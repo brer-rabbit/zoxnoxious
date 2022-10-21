@@ -138,9 +138,6 @@ int main(int argc, char **argv, char **envp) {
     return -1;
   }
 
-  cfg = (config_t*)malloc(sizeof(config_t));
-  config_init(cfg);
-
 
   if (config_filename[0] != '\0') {
     INFO("using config %s\n", config_filename);
@@ -164,13 +161,18 @@ int main(int argc, char **argv, char **envp) {
          audio_device2_name ? audio_device2_name : "(null)",
          midi_device_name ? midi_device_name : "(null)");
 
-  if (! config_read_file(cfg, config_filename)) {
-    printf("config read failed\n");
+
+  cfg = (config_t*)malloc(sizeof(config_t));
+  config_init(cfg);
+
+  if (config_read_file(cfg, config_filename) == CONFIG_FALSE) {
+    ERROR("config read failed to read file %s: %s (%d)", config_filename, config_error_text(cfg), config_error_type(cfg));
+    return -1;
   }
 
 
   // SPI, pigpio start
-  if (0 && gpioInitialise() < 0) {
+  if (gpioInitialise() < 0) {
     ERROR("gpioInitialise failed, bye!");
     return -1;
   }

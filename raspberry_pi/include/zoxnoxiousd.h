@@ -27,6 +27,8 @@
 #define FATAL(...) zlog_fatal(zlog_c, __VA_ARGS__)
 extern zlog_category_t *zlog_c;
 
+#define DEFAULT_ZOXNOXIOUS_DIRECTORY "/usr/local/zoxnoxiousd"
+#define ZOXNOXIOUS_DIR_ENV_VAR_NAME "ZOXNOXIOUS_DIR"
 
 
 #endif

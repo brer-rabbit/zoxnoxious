@@ -27,7 +27,8 @@
 #include "card_manager.h"
 
 /* Config keys */
-char *config_lookup_eeprom_base_i2c_address = "card_manager.eeprom_base_i2c_address";
+#define CARD_MANAGER_KEY_NAME_PREFIX "card_manager."
+char *config_lookup_eeprom_base_i2c_address = CARD_MANAGER_KEY_NAME_PREFIX "eeprom_base_i2c_address";
 
 
 /* properties of a plugin_card */
@@ -99,40 +100,44 @@ struct card_manager* init_card_manager(config_t *cfg) {
 int discover_cards(struct card_manager *card_mgr) {
   int i2c_handle;
   int i2c_base_address;
+  int i2c_read;
 
   /* this should probe 8 sequential I2C addresses in the range
    * i2c_address/3 to find what is present
    */
   config_lookup_int(card_mgr->cfg, config_lookup_eeprom_base_i2c_address, &i2c_base_address);
+  INFO("base address: %d 0x%x", i2c_base_address, i2c_base_address);
 
   for (int slot_num = 0; slot_num < MAX_SLOTS; ++slot_num) {
     i2c_handle = i2cOpen(1, i2c_base_address + slot_num, 0);
-    if (i2c_handle >= 0) {
-      card_mgr->card_ids[slot_num] = i2cReadByteData(i2c_handle, 0);
 
-      if (card_mgr->card_ids[slot_num] == PI_BAD_HANDLE ||
-          card_mgr->card_ids[slot_num] == PI_BAD_PARAM) {
+    if (i2c_handle >= 0) {
+      // this needs to be a 32 bit type, not 8 bit
+      i2c_read = i2cReadByteData(i2c_handle, 0);
+
+      if (i2c_read == PI_BAD_HANDLE || i2c_read == PI_BAD_PARAM) {
         INFO("I2C read bad handle for slot %d", slot_num);
-        card_mgr->card_ids[slot_num] = 0;
+        i2c_read = 0;
       }
-      else if (card_mgr->card_ids[slot_num] == PI_I2C_READ_FAILED) {
+      else if (i2c_read == PI_I2C_READ_FAILED) {
         INFO("no card present slot %d", slot_num);
-        card_mgr->card_ids[slot_num] = 0;
+        i2c_read = 0;
       }
       else {
-        INFO("Found card in slot %d with id 0x%x",
-             slot_num, card_mgr->card_ids[slot_num]);
+        INFO("Found card in slot %d (I2C 0x%x) with id 0x%x",
+             slot_num, i2c_base_address + slot_num, i2c_read);
+        card_mgr->card_ids[slot_num] = i2c_read;
         card_mgr->num_cards++;
       }
 
-      i2cClose(i2c_handle);
     }
     else {
-      INFO("failed to open handle for address %d",
+      INFO("failed to open handle for I2C address 0x%x",
            i2c_base_address + slot_num);
       card_mgr->card_ids[slot_num] = 0;
     }
 
+    i2cClose(i2c_handle);
   }
 
   INFO("found %d cards", card_mgr->num_cards);
@@ -141,9 +146,13 @@ int discover_cards(struct card_manager *card_mgr) {
 
 
 
+#define KEY_NAME_LENGTH 32
 int load_card_plugins(struct card_manager *card_mgr) {
   // iterate over card_ids, store data to plugin_card[i]
   int card_num = 0;
+  char key_name[KEY_NAME_LENGTH];
+  const char *dynlib_basename;
+  char dynlib_fullname[128];
 
 
   for (int slot_num = 0; slot_num < MAX_SLOTS; ++slot_num) {
@@ -152,6 +161,17 @@ int load_card_plugins(struct card_manager *card_mgr) {
       // card_id ends up getting stored twice
       card_mgr->cards[card_num].card_id = card_mgr->card_ids[slot_num];
       
+      snprintf(key_name, KEY_NAME_LENGTH, CARD_MANAGER_KEY_NAME_PREFIX "plugin_ids.*%d", card_mgr->card_ids[slot_num]);
+
+      config_lookup_string(card_mgr->cfg, key_name, &dynlib_basename);
+
+      snprintf(dynlib_fullname, 128, "%s/lib/%s.plugin.so",
+               getenv(ZOXNOXIOUS_DIR_ENV_VAR_NAME) ? getenv(ZOXNOXIOUS_DIR_ENV_VAR_NAME) : DEFAULT_ZOXNOXIOUS_DIRECTORY,
+               dynlib_basename);
+      INFO("using %s to get: %s",
+           getenv(ZOXNOXIOUS_DIR_ENV_VAR_NAME) ? getenv(ZOXNOXIOUS_DIR_ENV_VAR_NAME) : DEFAULT_ZOXNOXIOUS_DIRECTORY,
+           dynlib_fullname);
+
     }
   }
 
