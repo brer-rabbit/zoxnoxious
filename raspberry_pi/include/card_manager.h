@@ -20,6 +20,9 @@
 #include "zoxnoxiousd.h"
 
 
+#define MAX_SLOTS 8
+
+
 struct card_manager;
 
 struct plugin_card;
@@ -45,6 +48,6 @@ struct card_manager* init_card_manager(config_t *cfg);
 int discover_cards(struct card_manager *card_mgr);
 
 
-int load_card_plugin(struct plugin_card *plugin_card);
+int load_card_plugins(struct card_manager *card_mgr);
 
 #endif

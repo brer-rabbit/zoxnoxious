@@ -24,7 +24,7 @@
 #include <zlog.h>
 
 #include "zoxnoxiousd.h"
-
+#include "card_manager.h"
 
 /* Config keys */
 char *config_lookup_eeprom_base_i2c_address = "card_manager.eeprom_base_i2c_address";
@@ -46,10 +46,16 @@ struct plugin_card {
 
 /* card manager which holds all the fun stuff */
 struct card_manager {
+  // libconfig handle
   config_t *cfg;
-  uint8_t card_ids[8];  // 8-bit Id of each card indexed by slot, or zero if no card present
+
+  // 8-bit Id of cards, indexed by physical slot, or zero if no card present:
+  uint8_t card_ids[MAX_SLOTS];
+
+  // plugins- num_cards are used; index does not represent physical
+  // ordering of slots:
+  struct plugin_card cards[MAX_SLOTS];
   int num_cards;
-  struct plugin_card cards[8]; // plugins- empty slots skipped, so num_cards-1 is max index (not slot indexed)
 };
 
 
@@ -99,29 +105,32 @@ int discover_cards(struct card_manager *card_mgr) {
    */
   config_lookup_int(card_mgr->cfg, config_lookup_eeprom_base_i2c_address, &i2c_base_address);
 
-  for (int i = 0; i < 8; ++i) {
-    i2c_handle = i2cOpen(1, i2c_base_address + i, 0);
+  for (int slot_num = 0; slot_num < MAX_SLOTS; ++slot_num) {
+    i2c_handle = i2cOpen(1, i2c_base_address + slot_num, 0);
     if (i2c_handle >= 0) {
-      card_mgr->card_ids[i] = i2cReadByteData(i2c_handle, 0);
+      card_mgr->card_ids[slot_num] = i2cReadByteData(i2c_handle, 0);
 
-      if (card_mgr->card_ids[i] == PI_BAD_HANDLE ||
-          card_mgr->card_ids[i] == PI_BAD_PARAM) {
-        INFO("I2C read bad handle for slot %d", i);
-        card_mgr->card_ids[i] = 0;
+      if (card_mgr->card_ids[slot_num] == PI_BAD_HANDLE ||
+          card_mgr->card_ids[slot_num] == PI_BAD_PARAM) {
+        INFO("I2C read bad handle for slot %d", slot_num);
+        card_mgr->card_ids[slot_num] = 0;
       }
-      else if (card_mgr->card_ids[i] == PI_I2C_READ_FAILED) {
-        INFO("no card present slot %d", i);
-        card_mgr->card_ids[i] = 0;
+      else if (card_mgr->card_ids[slot_num] == PI_I2C_READ_FAILED) {
+        INFO("no card present slot %d", slot_num);
+        card_mgr->card_ids[slot_num] = 0;
       }
       else {
-        INFO("Found card in slot %d with id 0x%x", i, card_mgr->card_ids[i]);
+        INFO("Found card in slot %d with id 0x%x",
+             slot_num, card_mgr->card_ids[slot_num]);
         card_mgr->num_cards++;
       }
+
       i2cClose(i2c_handle);
     }
     else {
-      INFO("failed to open handle for address %d", i2c_base_address + i);
-      card_mgr->card_ids[i] = 0;
+      INFO("failed to open handle for address %d",
+           i2c_base_address + slot_num);
+      card_mgr->card_ids[slot_num] = 0;
     }
 
   }
@@ -132,6 +141,20 @@ int discover_cards(struct card_manager *card_mgr) {
 
 
 
-int load_plugins(struct card_manager *card_mgr) {
+int load_card_plugins(struct card_manager *card_mgr) {
   // iterate over card_ids, store data to plugin_card[i]
+  int card_num = 0;
+
+
+  for (int slot_num = 0; slot_num < MAX_SLOTS; ++slot_num) {
+    if (card_mgr->card_ids[slot_num] != 0) {
+      card_mgr->cards[card_num].slot = slot_num;
+      // card_id ends up getting stored twice
+      card_mgr->cards[card_num].card_id = card_mgr->card_ids[slot_num];
+      
+    }
+  }
+
+
+  return 0;
 }

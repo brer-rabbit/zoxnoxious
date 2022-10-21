@@ -193,12 +193,10 @@ int main(int argc, char **argv, char **envp) {
   /* detect installed cards- get the card manager going */
   struct card_manager *card_mgr = init_card_manager(cfg);
   discover_cards(card_mgr);
-
+  load_card_plugins(card_mgr);
 
 
   /* init alsa */
-
-
 
 
 
