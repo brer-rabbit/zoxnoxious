@@ -18,6 +18,7 @@
  */
 
 
+#include <dlfcn.h>
 #include <libconfig.h>
 #include <pigpio.h>
 #include <stdlib.h>
@@ -37,10 +38,10 @@ struct plugin_card {
   int card_id;
   char *plugin_name;
   // plugin interface function pointers:
-  process_samples process_samples_f;
-  process_midi process_midi_f;
-  process_midi_program_change process_midi_program_change_f;
-  free_zcard free_zcard_f;
+  process_samples_f process_samples;
+  process_midi_f process_midi;
+  process_midi_program_change_f process_midi_program_change;
+  free_zcard_f free_zcard;
   void *plugin_object;
 };
 
@@ -171,6 +172,17 @@ int load_card_plugins(struct card_manager *card_mgr) {
       INFO("using %s to get: %s",
            getenv(ZOXNOXIOUS_DIR_ENV_VAR_NAME) ? getenv(ZOXNOXIOUS_DIR_ENV_VAR_NAME) : DEFAULT_ZOXNOXIOUS_DIRECTORY,
            dynlib_fullname);
+
+      void *plugin_lib = dlopen(dynlib_fullname, RTLD_NOW|RTLD_LOCAL);
+      if (plugin_lib == NULL) {
+        INFO("failed to dlopen %s", dynlib_fullname);
+      }
+
+      card_mgr->cards[card_num].process_samples = dlsym(plugin_lib, "process_samples");
+      if (card_mgr->cards[card_num].process_samples == NULL) {
+        INFO("failed find symbol process_samples");
+      }
+
 
     }
   }

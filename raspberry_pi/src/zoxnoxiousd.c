@@ -35,8 +35,6 @@
 #include "zoxnoxiousd.h"
 #include "card_manager.h"
 
-#define DEFAULT_ZOXNOXIOUS_DIRECTORY "/usr/local/zoxnoxiousd"
-#define ZOXNOXIOUS_DIR_ENV_VAR_NAME "ZOXNOXIOUS_DIR"
 #define CONFIG_DIRNAME "/etc/"
 #define CONFIG_FILENAME "zoxnoxiousd.cfg"
 
