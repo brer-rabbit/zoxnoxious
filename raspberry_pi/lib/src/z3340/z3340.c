@@ -21,6 +21,9 @@ void* init_zcard(int slot) {
 }
 
 
+void free_zcard(void *zcard_plugin) {
+}
+
 char* get_plugin_name() {
   return "Zoxnoxious 3340";
 }

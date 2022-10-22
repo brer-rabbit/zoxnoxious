@@ -181,31 +181,43 @@ int load_card_plugins(struct card_manager *card_mgr) {
 
       card->init_zcard = dlsym(card->dl_plugin_lib, INIT_ZCARD);
       if (card->init_zcard == NULL) {
-        INFO("failed find symbol " INIT_ZCARD ", %s", dlerror());
+        ERROR("failed find symbol " INIT_ZCARD ", %s", dlerror());
+        return 1;
       }
 
-      card->process_samples = dlsym(card->dl_plugin_lib, PROCESS_SAMPLES);
-      if (card->process_samples == NULL) {
-        INFO("failed find symbol " PROCESS_SAMPLES ", %s", dlerror());
-      }
-
-      card->process_midi = dlsym(card->dl_plugin_lib, PROCESS_MIDI);
-      if (card->process_midi == NULL) {
-        INFO("failed find symbol " PROCESS_MIDI ", %s", dlerror());
-      }
-
-      card->process_midi_program_change = dlsym(card->dl_plugin_lib, PROCESS_MIDI_PROGRAM_CHANGE);
-      if (card->process_midi_program_change == NULL) {
-        INFO("failed find symbol " PROCESS_MIDI_PROGRAM_CHANGE ", %s", dlerror());
+      card->free_zcard = dlsym(card->dl_plugin_lib, FREE_ZCARD);
+      if (card->free_zcard == NULL) {
+        ERROR("failed find symbol " FREE_ZCARD ", %s", dlerror());
+        return 1;
       }
 
       // no need to store the handle here- just call the function and store the name
       get_plugin_name_f get_plugin_name = dlsym(card->dl_plugin_lib, GET_PLUGIN_NAME);
       if (get_plugin_name == NULL) {
-        INFO("failed find symbol " PROCESS_MIDI ", %s", dlerror());
+        ERROR("failed find symbol " PROCESS_MIDI ", %s", dlerror());
+        return 1;
       }
-      card->plugin_name = (*get_plugin_name)();
 
+      card->process_samples = dlsym(card->dl_plugin_lib, PROCESS_SAMPLES);
+      if (card->process_samples == NULL) {
+        ERROR("failed find symbol " PROCESS_SAMPLES ", %s", dlerror());
+        return 1;
+      }
+
+      card->process_midi = dlsym(card->dl_plugin_lib, PROCESS_MIDI);
+      if (card->process_midi == NULL) {
+        ERROR("failed find symbol " PROCESS_MIDI ", %s", dlerror());
+        return 1;
+      }
+
+      card->process_midi_program_change = dlsym(card->dl_plugin_lib, PROCESS_MIDI_PROGRAM_CHANGE);
+      if (card->process_midi_program_change == NULL) {
+        ERROR("failed find symbol " PROCESS_MIDI_PROGRAM_CHANGE ", %s", dlerror());
+        return 1;
+      }
+
+      card->plugin_name = (*get_plugin_name)();
+      INFO("loaded plugin for %s", card->plugin_name);
     }
   }
 
