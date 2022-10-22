@@ -27,9 +27,19 @@
 #include "zoxnoxiousd.h"
 #include "card_manager.h"
 
-/* Config keys */
+
+// config keys
 #define CARD_MANAGER_KEY_NAME_PREFIX "card_manager."
-char *config_lookup_eeprom_base_i2c_address = CARD_MANAGER_KEY_NAME_PREFIX "eeprom_base_i2c_address";
+static const char *config_lookup_eeprom_base_i2c_address = CARD_MANAGER_KEY_NAME_PREFIX "eeprom_base_i2c_address";
+
+
+// symbols to load from the dynamic library
+#define INIT_ZCARD "init_zcard"
+#define FREE_ZCARD "free_zcard"
+#define GET_PLUGIN_NAME "get_plugin_name"
+#define PROCESS_SAMPLES "process_samples"
+#define PROCESS_MIDI "process_midi"
+#define PROCESS_MIDI_PROGRAM_CHANGE "process_midi_program_change"
 
 
 /* properties of a plugin_card */
@@ -37,7 +47,13 @@ struct plugin_card {
   int slot;
   int card_id;
   char *plugin_name;
+
+  // find this card's channels in the stream via offset
+  int channel_offset;
+  
   // plugin interface function pointers:
+  void *dl_plugin_lib;
+  init_zcard_f init_zcard;
   process_samples_f process_samples;
   process_midi_f process_midi;
   process_midi_program_change_f process_midi_program_change;
@@ -79,23 +95,6 @@ struct card_manager* init_card_manager(config_t *cfg) {
   return mgr;
 }
 
-
-
-  /*
-  *num_cards_found = 3;
-  *plugin_cards = (struct plugin_card*) calloc(3, sizeof(struct plugin_card));
-
-  *plugin_cards[0] = (struct plugin_card)
-    {
-      .slot = 0,
-      .card_id = 0x02,
-      .plugin_name = "VCO3340",
-      .process_samples_f = NULL,
-      .process_midi_f = NULL,
-      .process_midi_program_change_f = NULL,
-      .free_zcard_f = NULL
-    };
-  */
 
 
 int discover_cards(struct card_manager *card_mgr) {
@@ -154,13 +153,15 @@ int load_card_plugins(struct card_manager *card_mgr) {
   char key_name[KEY_NAME_LENGTH];
   const char *dynlib_basename;
   char dynlib_fullname[128];
+  struct plugin_card *card; // alias to simplify
 
 
   for (int slot_num = 0; slot_num < MAX_SLOTS; ++slot_num) {
     if (card_mgr->card_ids[slot_num] != 0) {
-      card_mgr->cards[card_num].slot = slot_num;
+      card = &card_mgr->cards[card_num]; // alias
+      card->slot = slot_num;
       // card_id ends up getting stored twice
-      card_mgr->cards[card_num].card_id = card_mgr->card_ids[slot_num];
+      card->card_id = card_mgr->card_ids[slot_num];
       
       snprintf(key_name, KEY_NAME_LENGTH, CARD_MANAGER_KEY_NAME_PREFIX "plugin_ids.*%d", card_mgr->card_ids[slot_num]);
 
@@ -173,16 +174,37 @@ int load_card_plugins(struct card_manager *card_mgr) {
            getenv(ZOXNOXIOUS_DIR_ENV_VAR_NAME) ? getenv(ZOXNOXIOUS_DIR_ENV_VAR_NAME) : DEFAULT_ZOXNOXIOUS_DIRECTORY,
            dynlib_fullname);
 
-      void *plugin_lib = dlopen(dynlib_fullname, RTLD_NOW|RTLD_LOCAL);
-      if (plugin_lib == NULL) {
-        INFO("failed to dlopen %s", dynlib_fullname);
+      card->dl_plugin_lib = dlopen(dynlib_fullname, RTLD_NOW|RTLD_LOCAL);
+      if (card->dl_plugin_lib == NULL) {
+        INFO("failed to dlopen %s: %s", dynlib_fullname, dlerror());
       }
 
-      card_mgr->cards[card_num].process_samples = dlsym(plugin_lib, "process_samples");
-      if (card_mgr->cards[card_num].process_samples == NULL) {
-        INFO("failed find symbol process_samples");
+      card->init_zcard = dlsym(card->dl_plugin_lib, INIT_ZCARD);
+      if (card->init_zcard == NULL) {
+        INFO("failed find symbol " INIT_ZCARD ", %s", dlerror());
       }
 
+      card->process_samples = dlsym(card->dl_plugin_lib, PROCESS_SAMPLES);
+      if (card->process_samples == NULL) {
+        INFO("failed find symbol " PROCESS_SAMPLES ", %s", dlerror());
+      }
+
+      card->process_midi = dlsym(card->dl_plugin_lib, PROCESS_MIDI);
+      if (card->process_midi == NULL) {
+        INFO("failed find symbol " PROCESS_MIDI ", %s", dlerror());
+      }
+
+      card->process_midi_program_change = dlsym(card->dl_plugin_lib, PROCESS_MIDI_PROGRAM_CHANGE);
+      if (card->process_midi_program_change == NULL) {
+        INFO("failed find symbol " PROCESS_MIDI_PROGRAM_CHANGE ", %s", dlerror());
+      }
+
+      // no need to store the handle here- just call the function and store the name
+      get_plugin_name_f get_plugin_name = dlsym(card->dl_plugin_lib, GET_PLUGIN_NAME);
+      if (get_plugin_name == NULL) {
+        INFO("failed find symbol " PROCESS_MIDI ", %s", dlerror());
+      }
+      card->plugin_name = (*get_plugin_name)();
 
     }
   }
