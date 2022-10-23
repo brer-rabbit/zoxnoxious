@@ -27,8 +27,10 @@
 #define FATAL(...) zlog_fatal(zlog_c, __VA_ARGS__)
 extern zlog_category_t *zlog_c;
 
-#define DEFAULT_ZOXNOXIOUS_DIRECTORY "/usr/local/zoxnoxious"
 #define ZOXNOXIOUS_DIR_ENV_VAR_NAME "ZOXNOXIOUS_DIR"
+#define DEFAULT_ZOXNOXIOUS_DIRECTORY "/usr/local/zoxnoxious"
+#define CONFIG_DIRNAME "/etc/"
+#define CONFIG_FILENAME "zoxnoxiousd.cfg"
 
 
 #endif

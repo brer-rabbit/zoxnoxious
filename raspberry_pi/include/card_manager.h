@@ -48,6 +48,13 @@ struct card_manager* init_card_manager(config_t *cfg);
 int discover_cards(struct card_manager *card_mgr);
 
 
+/* load_card_plugins
+
+ * load the dynamic lib plugins for each card.  Store function
+ * pointers for the functions needed, get the card name from the
+ * plugin and store that too.
+ */
 int load_card_plugins(struct card_manager *card_mgr);
+
 
 #endif

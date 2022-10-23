@@ -35,8 +35,6 @@
 #include "zoxnoxiousd.h"
 #include "card_manager.h"
 
-#define CONFIG_DIRNAME "/etc/"
-#define CONFIG_FILENAME "zoxnoxiousd.cfg"
 
 
 void sig_cleanup_and_exit(int signum) {
@@ -77,7 +75,8 @@ zlog_category_t *zlog_c = NULL;
 
 int main(int argc, char **argv, char **envp) {
   config_t *cfg;
-  char *audio_device1_name = NULL, *audio_device2_name = NULL, *midi_device_name = NULL;
+  char *audio_device_name[2] = { NULL, NULL };
+  char *midi_device_name = NULL;
   char config_filename[128] = { '\0' };
   char *opt_string = "hi:d:e:m:v";
 
@@ -103,10 +102,10 @@ int main(int argc, char **argv, char **envp) {
       help();
       return 1;
     case 'd':
-      audio_device1_name = strdup(optarg);
+      audio_device_name[0] = strdup(optarg);
       break;
     case 'e':
-      audio_device2_name = strdup(optarg);
+      audio_device_name[1] = strdup(optarg);
       break;
     case 'i':
       strncpy(config_filename, optarg, sizeof(config_filename) - 1);
@@ -155,8 +154,8 @@ int main(int argc, char **argv, char **envp) {
          "  audio_device2: %s\n"
          "  midi_device: %s\n",
          config_filename,
-         audio_device1_name ? audio_device1_name : "(null)",
-         audio_device2_name ? audio_device2_name : "(null)",
+         audio_device_name[0] ? audio_device_name[0] : "(null)",
+         audio_device_name[1] ? audio_device_name[1] : "(null)",
          midi_device_name ? midi_device_name : "(null)");
 
 
@@ -204,11 +203,6 @@ int main(int argc, char **argv, char **envp) {
   zlog_fini();
   config_destroy(cfg);
   free(cfg);
-  free(audio_device1_name);
-  free(audio_device2_name);
-  free(midi_device_name);
-
-
 
   return 0;
 }
