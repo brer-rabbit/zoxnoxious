@@ -54,7 +54,7 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
   device_name = config_setting_get_string_elem(devices_setting, device_num);
 
   if (device_name == NULL) {
-    INFO("max pcm device id %d", device_num - 1);
+    INFO("max pcm device id " ZALSA_DEVICES "[%d]", device_num - 1);
     return NULL;
   }
 

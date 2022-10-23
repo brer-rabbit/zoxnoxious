@@ -57,11 +57,9 @@ static void help() {
 /* zlog loggin' */
 zlog_category_t *zlog_c = NULL;
 
-/* globals-
- * mainly so they can be accessed by signal handler
- */
+/* globals-  mainly so they can be accessed by signal handler  */
 struct card_manager *card_mgr = NULL;
-struct alsa_pcm_state *pcm_state[4] = { NULL, NULL, NULL, NULL };
+struct alsa_pcm_state *pcm_state[2] = { NULL, NULL };
 
 
 
@@ -181,9 +179,9 @@ int main(int argc, char **argv, char **envp) {
 
 
   /* init alsa */
-  for (int i = 0; i < 4; ++i) {
-    pcm_state[i] = init_alsa_device(cfg, i);
-  }
+  pcm_state[0] = init_alsa_device(cfg, 0);
+  pcm_state[1] = init_alsa_device(cfg, 1);
+
 
 
 
