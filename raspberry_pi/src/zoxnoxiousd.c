@@ -34,13 +34,8 @@
 
 #include "zoxnoxiousd.h"
 #include "card_manager.h"
+#include "zalsa.h"
 
-
-
-void sig_cleanup_and_exit(int signum) {
-  // log and close anything relevant
-  exit(0);
-}
 
 
 static void help() {
@@ -52,15 +47,6 @@ static void help() {
 }
 
 
-struct alsa_pcm_state {
-  snd_pcm_t *pcm_handle;
-  unsigned int sampling_rate;
-  snd_pcm_sframes_t period_size;  // Size to request on read()
-  snd_pcm_uframes_t buffer_size;  // size of ALSA buffer (in frames)
-  snd_pcm_format_t format;        // audiobuf format
-  unsigned int channels;          // number of channels
-  int first_period;               // boolean cleared after first frame processed, set after xrun
-};
 
 
 /* Config keys */
@@ -68,23 +54,32 @@ struct alsa_pcm_state {
 
 
 
-/* zlog loggin */
+/* zlog loggin' */
 zlog_category_t *zlog_c = NULL;
 
+/* globals-
+ * mainly so they can be accessed by signal handler
+ */
+struct card_manager *card_mgr = NULL;
+struct alsa_pcm_state *pcm_state[4] = { NULL, NULL, NULL, NULL };
+
+
+
+void sig_cleanup_and_exit(int signum) {
+  // log and close anything relevant
+  exit(0);
+}
 
 
 int main(int argc, char **argv, char **envp) {
   config_t *cfg;
-  char *audio_device_name[2] = { NULL, NULL };
   char *midi_device_name = NULL;
   char config_filename[128] = { '\0' };
-  char *opt_string = "hi:d:e:m:v";
+  char *opt_string = "hi:m:v";
 
   struct option long_option[] = {
     {"help", no_argument, NULL, 'h'},
     {"config", required_argument, NULL, 'i'},
-    {"device1", required_argument, NULL, 'd'},
-    {"device2", required_argument, NULL, 'e'},
     {"mididevice", required_argument, NULL, 'm'},
     {"verbose", required_argument, NULL, 'v'},
     {NULL, 0, NULL, 0},
@@ -101,12 +96,6 @@ int main(int argc, char **argv, char **envp) {
     case 'h':
       help();
       return 1;
-    case 'd':
-      audio_device_name[0] = strdup(optarg);
-      break;
-    case 'e':
-      audio_device_name[1] = strdup(optarg);
-      break;
     case 'i':
       strncpy(config_filename, optarg, sizeof(config_filename) - 1);
       config_filename[127] = '\0';
@@ -123,7 +112,7 @@ int main(int argc, char **argv, char **envp) {
 
 
   // TODO: hardcoded directory
-  if (zlog_init("/home/kaf/git/zoxnoxious/raspberry_pi/etc/zlog.cfg")) {
+  if (zlog_init("/home/kaf/git/zoxnoxious/raspberry_pi/etc/log.cfg")) {
     printf("zlog_init failed");
     return -1;
   }
@@ -150,12 +139,8 @@ int main(int argc, char **argv, char **envp) {
 
   printf("params:\n"
          "  config filename: %s\n"
-         "  audio_device1: %s\n"
-         "  audio_device2: %s\n"
          "  midi_device: %s\n",
          config_filename,
-         audio_device_name[0] ? audio_device_name[0] : "(null)",
-         audio_device_name[1] ? audio_device_name[1] : "(null)",
          midi_device_name ? midi_device_name : "(null)");
 
 
@@ -190,13 +175,15 @@ int main(int argc, char **argv, char **envp) {
 
 
   /* detect installed cards- get the card manager going */
-  struct card_manager *card_mgr = init_card_manager(cfg);
+  card_mgr = init_card_manager(cfg);
   discover_cards(card_mgr);
   load_card_plugins(card_mgr);
 
 
   /* init alsa */
-
+  for (int i = 0; i < 4; ++i) {
+    pcm_state[i] = init_alsa_device(cfg, i);
+  }
 
 
 

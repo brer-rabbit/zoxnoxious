@@ -18,12 +18,15 @@
 #include <zlog.h>
 
 #include "zoxnoxiousd.h"
+#include "zalsa.h"
+
 
 struct alsa_pcm_state {
   // libconfig handle
   config_t *cfg;
 
-  char *device;
+  int device_num;
+  char *device_name;
   snd_pcm_t *pcm_handle;
   unsigned int sampling_rate;
   snd_pcm_sframes_t period_size;  // Size to request on read()
@@ -35,14 +38,42 @@ struct alsa_pcm_state {
 
 
 
-/*
-struct alsa_pcm_state* init_alsa_device() {
+struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
   struct alsa_pcm_state *alsa_state;
   snd_pcm_hw_params_t *hw_params;
   int err;
+  const char *device_name;
 
+  config_setting_t *devices_setting = config_lookup(cfg, ZALSA_DEVICES);
+    
+  if (devices_setting == NULL) {
+    ERROR("cfg: no device setting found for " ZALSA_DEVICES);
+    return NULL;
+  }
 
+  device_name = config_setting_get_string_elem(devices_setting, device_num);
+
+  if (device_name == NULL) {
+    INFO("max pcm device id %d", device_num - 1);
+    return NULL;
+  }
+
+  // pretty sure we've now got a device name, so initialize it
   alsa_state = (struct alsa_pcm_state*) malloc(sizeof(struct alsa_pcm_state));
+  alsa_state->device_name = strdup(device_name);
+  INFO("pcm configured for device %s", alsa_state->device_name);
+
+  return NULL;
+}
+
+  /*
+  // TODO: get these from libconfig
+  alsa_state->buffer_size = buffer_size;
+  alsa_state->period_size = period_size;
+  alsa_state->format = format;
+  alsa_state->channels = channels;
+  alsa_state->first_period = 1;
+
 
   if ((err = snd_pcm_open(&(pcm_state->pcm_handle), device, SND_PCM_STREAM_CAPTURE, 0)) < 0) {
     fprintf (stderr, "cannot open audio device %s (%s)\n",  device, snd_strerror(err));
