@@ -19,10 +19,33 @@
 #define ZALSA_H
 
 // config lookup keys
-#define ZALSA_DEVICES "zalsa.devices"
+#define ZALSA_DEVICES_KEY "zalsa.devices"
+#define ZALSA_PERIOD_SIZE_KEY "zalsa.period_size"
+#define ZALSA_BUFFER_SIZE_KEY "zalsa.buffer_size"
+
+#define ZALSA_DEFAULT_PERIOD_SIZE 32
+#define ZALSA_DEFAULT_BUFFER_SIZE 64
+
 
 // forward reference
-struct alsa_pcm_state;
+struct alsa_pcm_state {
+  // libconfig handle
+  config_t *cfg;
+
+  int device_num;
+  char *device_name;
+  snd_pcm_t *pcm_handle;
+  unsigned int sampling_rate;
+  snd_pcm_sframes_t period_size;  // Size to request on read()
+  snd_pcm_uframes_t buffer_size;  // size of ALSA buffer (in frames)
+  snd_pcm_format_t format;        // audiobuf format
+  unsigned int channels;          // number of channels
+  int first_period;               // boolean cleared after first frame processed, set after xrun
+
+  // stats
+  int xrun_recovery_count;
+  int skiped_samples;
+};
 
 
 /** init_alsa_device

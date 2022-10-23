@@ -172,15 +172,26 @@ int main(int argc, char **argv, char **envp) {
    */
 
 
-  /* detect installed cards- get the card manager going */
+  // detect installed cards- get the card manager going
   card_mgr = init_card_manager(cfg);
   discover_cards(card_mgr);
   load_card_plugins(card_mgr);
 
 
-  /* init alsa */
+  // init alsa
   pcm_state[0] = init_alsa_device(cfg, 0);
-  pcm_state[1] = init_alsa_device(cfg, 1);
+
+  // only init the second if the first is valid
+  if (pcm_state[0]) {
+    INFO("pcm initialized for %s", pcm_state[0]->device_name);
+
+    pcm_state[1] = init_alsa_device(cfg, 1);
+
+    if (pcm_state[1]) {
+      INFO("pcm initialized for %s", pcm_state[1]->device_name);
+    }
+
+  }
 
 
 

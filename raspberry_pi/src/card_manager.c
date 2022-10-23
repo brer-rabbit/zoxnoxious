@@ -105,7 +105,11 @@ int discover_cards(struct card_manager *card_mgr) {
   /* this should probe 8 sequential I2C addresses in the range
    * i2c_address/3 to find what is present
    */
-  config_lookup_int(card_mgr->cfg, config_lookup_eeprom_base_i2c_address, &i2c_base_address);
+  if (config_lookup_int(card_mgr->cfg, config_lookup_eeprom_base_i2c_address, &i2c_base_address) == CONFIG_FALSE) {
+    ERROR("failed to find i2c base address in config file");
+    return 1;
+  }
+
   INFO("base address: %d 0x%x", i2c_base_address, i2c_base_address);
 
   for (int slot_num = 0; slot_num < MAX_SLOTS; ++slot_num) {
