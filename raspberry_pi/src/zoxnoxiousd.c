@@ -41,9 +41,6 @@
 static void help() {
   printf("Usage: zoxnoxiousd <options>\n"
          "  -i <config_file>\n"
-         "  -d <usb audio 1>\n"
-         "  -e <usb audio 2>\n"
-         "  -m <midi device>\n");
 }
 
 
@@ -178,7 +175,7 @@ int main(int argc, char **argv, char **envp) {
   load_card_plugins(card_mgr);
 
 
-  // init alsa
+  // init alsa pcm devices
   pcm_state[0] = init_alsa_device(cfg, 0);
 
   // only init the second if the first is valid
@@ -194,6 +191,16 @@ int main(int argc, char **argv, char **envp) {
   }
 
 
+  // init alsa midi device
+
+
+  // assign channels
+
+
+  // setup signal handling
+
+
+  // start threads
 
 
   zlog_fini();
