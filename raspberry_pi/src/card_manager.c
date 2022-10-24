@@ -37,6 +37,7 @@ static const char *config_lookup_eeprom_base_i2c_address = CARD_MANAGER_KEY_NAME
 #define INIT_ZCARD "init_zcard"
 #define FREE_ZCARD "free_zcard"
 #define GET_PLUGIN_NAME "get_plugin_name"
+#define GET_ZCARD_PROPERTIES "get_zcard_properties"
 #define PROCESS_SAMPLES "process_samples"
 #define PROCESS_MIDI "process_midi"
 #define PROCESS_MIDI_PROGRAM_CHANGE "process_midi_program_change"
@@ -54,6 +55,7 @@ struct plugin_card {
   // plugin interface function pointers:
   void *dl_plugin_lib;
   init_zcard_f init_zcard;
+  get_zcard_properties_f get_zcard_properties;
   process_samples_f process_samples;
   process_midi_f process_midi;
   process_midi_program_change_f process_midi_program_change;
@@ -71,9 +73,13 @@ struct card_manager {
   uint8_t card_ids[MAX_SLOTS];
 
   // plugins- num_cards are used; index does not represent physical
-  // ordering of slots:
+  // ordering of slots.  This is populated in load_card_plugins()
   struct plugin_card cards[MAX_SLOTS];
   int num_cards;
+
+  // update order for cards: order the cards to minimize latency- group cards by rules
+  // such as their spi mode
+  struct plugin_card *card_update_order[MAX_SLOTS];
 };
 
 
@@ -151,6 +157,7 @@ int discover_cards(struct card_manager *card_mgr) {
 
 
 #define KEY_NAME_LENGTH 32
+
 int load_card_plugins(struct card_manager *card_mgr) {
   // iterate over card_ids, store data to plugin_card[i]
   int card_num = 0;
@@ -162,7 +169,7 @@ int load_card_plugins(struct card_manager *card_mgr) {
 
   for (int slot_num = 0; slot_num < MAX_SLOTS; ++slot_num) {
     if (card_mgr->card_ids[slot_num] != 0) {
-      card = &card_mgr->cards[card_num]; // alias
+      card = &card_mgr->cards[card_num++]; // alias
       card->slot = slot_num;
       // card_id ends up getting stored twice
       card->card_id = card_mgr->card_ids[slot_num];
@@ -202,6 +209,12 @@ int load_card_plugins(struct card_manager *card_mgr) {
         return 1;
       }
 
+      card->get_zcard_properties = dlsym(card->dl_plugin_lib, GET_ZCARD_PROPERTIES);
+      if (card->get_zcard_properties == NULL) {
+        ERROR("failed find symbol " GET_ZCARD_PROPERTIES ", %s", dlerror());
+        return 1;
+      }
+
       card->process_samples = dlsym(card->dl_plugin_lib, PROCESS_SAMPLES);
       if (card->process_samples == NULL) {
         ERROR("failed find symbol " PROCESS_SAMPLES ", %s", dlerror());
@@ -227,4 +240,61 @@ int load_card_plugins(struct card_manager *card_mgr) {
 
 
   return 0;
+}
+
+
+
+struct card_sort_criteria {
+  int slot;
+  int spi_mode;
+  int num_channels;
+  struct plugin_card *card;
+};
+
+static int zcard_compare_f(const void *name1, const void *name2) {
+  // sort criteria:
+  // (1) spi mode
+  // (2) num channels (max to min)
+  // (3) slot number (tie breaker)
+  const struct card_sort_criteria *card1 = (const struct card_sort_criteria*) name1;
+  const struct card_sort_criteria *card2 = (const struct card_sort_criteria*) name2;
+
+  if (card1->spi_mode != card2->spi_mode) {
+    return card1->spi_mode > card2->spi_mode ? -1 : 1;
+  }
+  else if (card1->num_channels != card2->num_channels) {
+    return card1->num_channels < card2->num_channels ? -1 : 1;
+  }
+  else {
+    return card1->slot < card2->slot ? -1 : 1;
+  }
+  
+}
+
+
+void assign_update_order(struct card_manager *card_mgr) {
+  struct zcard_properties *zcard_props;
+  struct card_sort_criteria *cards;
+  cards = (struct card_sort_criteria*)calloc(sizeof(struct card_sort_criteria), card_mgr->num_cards);
+
+  // initialize order by just copying
+  for (int i = 0; i < card_mgr->num_cards; ++i) {
+    zcard_props = card_mgr->cards[i].get_zcard_properties();
+    cards[i].slot = card_mgr->cards[i].slot;
+    cards[i].spi_mode = zcard_props->spi_mode;
+    cards[i].num_channels = zcard_props->num_channels;
+    cards[i].card = &card_mgr->cards[i];
+    free(zcard_props);
+  }
+  
+  qsort(card_mgr->card_update_order, card_mgr->num_cards, sizeof(struct card_sort_criteria*), zcard_compare_f);
+
+  INFO("sorted:");
+
+  for (int i = 0; i < card_mgr->num_cards; ++i) {
+    card_mgr->card_update_order[i] = cards[i].card;
+    INFO("assign_update_order: %d : slot %d", i, cards[i].slot);
+  }
+
+  free(cards);
 }

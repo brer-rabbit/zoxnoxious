@@ -28,6 +28,15 @@ char* get_plugin_name() {
   return "Zoxnoxious 3340";
 }
 
+
+struct zcard_properties* get_zcard_properties() {
+  struct zcard_properties *props = (struct zcard_properties*) malloc(sizeof(struct zcard_properties));
+  props->num_channels = 6;
+  props->spi_mode = 0;
+  return props;
+}
+
+
 int process_samples(void *zcard_plugin, int16_t *samples, int spi_handle) {
   return 0;
 }

@@ -28,14 +28,14 @@ struct card_manager;
 struct plugin_card;
 
 
-/* init_card_manager
+/** init_card_manager
  *
  * start the card manager.  Give it a handle to the libconfig.
  */
 struct card_manager* init_card_manager(config_t *cfg);
 
 
-/* discover_cards
+/** discover_cards
  *
  * Search for all M24C02 ROMs.
  * given a base i2c address, probe all addresses for the last 3 bits
@@ -48,13 +48,21 @@ struct card_manager* init_card_manager(config_t *cfg);
 int discover_cards(struct card_manager *card_mgr);
 
 
-/* load_card_plugins
-
+/** load_card_plugins
  * load the dynamic lib plugins for each card.  Store function
  * pointers for the functions needed, get the card name from the
  * plugin and store that too.
  */
 int load_card_plugins(struct card_manager *card_mgr);
+
+
+/** assign_update_order
+ *
+ * assign the order for updates of the card to minimize changes in spi mode.
+ * pre: plugins loaded via discover cards
+ * post: an ordering for the plugin cards is determined and available
+ */
+void assign_update_order(struct card_manager *card_mgr);
 
 
 #endif

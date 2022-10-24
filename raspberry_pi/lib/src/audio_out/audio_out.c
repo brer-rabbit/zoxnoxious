@@ -29,6 +29,14 @@ char* get_plugin_name() {
   return "Audio Out";
 }
 
+struct zcard_properties* get_zcard_properties() {
+  struct zcard_properties *props = (struct zcard_properties*) malloc(sizeof(struct zcard_properties));
+  props->num_channels = 2;
+  props->spi_mode = 1; // think this is actually 0
+  return props;
+}
+
+
 int process_samples(void *zcard_plugin, int16_t *samples, int spi_handle) {
   return 0;
 }

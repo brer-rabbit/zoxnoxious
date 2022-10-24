@@ -40,7 +40,7 @@
 
 static void help() {
   printf("Usage: zoxnoxiousd <options>\n"
-         "  -i <config_file>\n"
+         "  -i <config_file>\n");
 }
 
 
@@ -173,6 +173,7 @@ int main(int argc, char **argv, char **envp) {
   card_mgr = init_card_manager(cfg);
   discover_cards(card_mgr);
   load_card_plugins(card_mgr);
+  assign_update_order(card_mgr);
 
 
   // init alsa pcm devices
@@ -195,6 +196,8 @@ int main(int argc, char **argv, char **envp) {
 
 
   // assign channels
+  // this is a bin packing problem.
+  // sort bt channels then use first fit.
 
 
   // setup signal handling

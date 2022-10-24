@@ -27,21 +27,14 @@
 
 
 /* set_spi_interface
- * must be called by plugin prior to the initial spiWrite()
+ * must be called by plugin prior to initial spiWrite() or where the spi mode changes
  */
 int set_spi_interface(int spi_mode, int slot);
 
 
-/* request_channels
- *
- * as part of init_zcard, the card plugin should request the number of
- * audio channels it requires.  It passes which slot it is in as well.
- */
-int request_channels(int channels, int slot);
 
 
-
-/* init the plugin.
+/** init the plugin.
  * Input: slot number for the card (0-7).
  * Any setup/state should be done here (constructor).  Return a
  * pointer to an object that will be used for subsequent calls
@@ -57,12 +50,29 @@ typedef void* (*init_zcard_f)(int slot);
 typedef void (*free_zcard_f)(void *zcard_plugin);
 
 
-/* get_plugin_name
+/** get_plugin_name
  *
  * return the plugin name in under 32 chars with a null terminator.
  * Caller is responsible for free'ing memory.
  */
 typedef char* (*get_plugin_name_f)();
+
+
+
+struct zcard_properties {
+  int num_channels;  // number of channles the card/plugin requires.
+  int spi_mode;  // spi mode used. if >1 mode, plugin should set most latency sensitive mode.
+};
+
+/** get_zcard_properties
+ *
+ * the plugin retuns a pointer to struct of properties.  The caller
+ * will be responsible for release of memory.
+ * num_channels is used for allocating where the card goes in channel mapping.
+ * spi_mode is used to optimize calling plugins that have the same spi_mode in sequence.
+ * 0,1,2,3 are valid spi modes.
+ */
+typedef struct zcard_properties* (*get_zcard_properties_f)();
 
 
 
