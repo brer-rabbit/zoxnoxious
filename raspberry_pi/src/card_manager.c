@@ -118,6 +118,21 @@ int discover_cards(struct card_manager *card_mgr) {
 
   INFO("base address: %d 0x%x", i2c_base_address, i2c_base_address);
 
+#ifdef MOCK_DATA
+  // setup 4 3340 cards, two audio outs, and return
+  // not realistic, but it's test
+  card_mgr->card_ids[0] = 0x02;
+  card_mgr->card_ids[1] = 0x02;
+  card_mgr->card_ids[2] = 0x00;
+  card_mgr->card_ids[3] = 0x02;
+  card_mgr->card_ids[4] = 0x02;
+  card_mgr->card_ids[5] = 0x01;
+  card_mgr->card_ids[6] = 0x00;
+  card_mgr->card_ids[7] = 0x01;
+  card_mgr->num_cards = 6;
+  return 0;
+#endif
+
   for (int slot_num = 0; slot_num < MAX_SLOTS; ++slot_num) {
     i2c_handle = i2cOpen(1, i2c_base_address + slot_num, 0);
 

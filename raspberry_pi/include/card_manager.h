@@ -69,4 +69,19 @@ int load_card_plugins(struct card_manager *card_mgr);
 void assign_update_order(struct card_manager *card_mgr);
 
 
+/** assign_channels
+ *
+ * assign the channels for the cards: given the one or two USB Audio
+ * streams hold 24 or 32 channels each (depending on how we config
+ * this), and each card requires a number of channels, assign this
+ * out.  This is basically a "bin packing problem" type of thing.
+ * Since we know all the cards upfront, use something like first-fit-
+ * decreasing to do the assignment:
+ *  --> sort based on number of channels, max to min
+ *  --> fit into first bucket (audio stream 1) or second if it doesn't fit
+ * if we can't fit a card...well crud, that's an issue.  A card is not
+ * split between two audio streams.
+ */
+
+
 #endif
