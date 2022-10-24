@@ -42,7 +42,11 @@ struct card_manager* init_card_manager(config_t *cfg);
  * (8 addresses total).  If a response is received, read the first
  * byte from the ROM for the card id.
  * Returns:
- * Array of plugin_cards found
+ * Zero for success; non-zero otherwise.
+ * Populates internal data structure:
+ *   foreach card
+ *     --> card_ids[slot] = Id byte from ROM if found otherwise zero
+ *     --> number of cards in system
  * number of cards found set at int*
  */
 int discover_cards(struct card_manager *card_mgr);

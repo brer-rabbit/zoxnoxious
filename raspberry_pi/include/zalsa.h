@@ -27,7 +27,6 @@
 #define ZALSA_DEFAULT_BUFFER_SIZE 64
 
 
-// forward reference
 struct alsa_pcm_state {
   // libconfig handle
   config_t *cfg;
