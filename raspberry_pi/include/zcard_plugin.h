@@ -82,10 +82,10 @@ typedef struct zcard_properties* (*get_zcard_properties_f)();
  * Plugin interface to receives samples and a spi handle.
  * Take a handle to the SPI channel and an array of samples to send to
  * card.  Card is responsible for sending the samples down the SPI
- * channel.
- * Pre: SPI handle will be set to the correct mode that the plugin requires.
+ * channel.  This method should call set_spi_interface() prior to sending
+ * any samples or changing spi mode.
  */
-typedef int (*process_samples_f)(void *zcard_plugin, int16_t *samples, int spi_handle);
+typedef int (*process_samples_f)(void *zcard_plugin, int16_t *samples);
 
 
 

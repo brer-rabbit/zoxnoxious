@@ -37,7 +37,7 @@ struct zcard_properties* get_zcard_properties() {
 }
 
 
-int process_samples(void *zcard_plugin, int16_t *samples, int spi_handle) {
+int process_samples(void *zcard_plugin, int16_t *samples) {
   return 0;
 }
 
