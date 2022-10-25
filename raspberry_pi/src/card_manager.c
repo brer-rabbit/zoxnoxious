@@ -50,7 +50,9 @@ struct plugin_card {
   char *plugin_name;
 
   // find this card's channels in the stream via offset
+  int pcm_device_num;
   int channel_offset;
+  int num_channels;
   
   // plugin interface function pointers:
   void *dl_plugin_lib;
@@ -123,11 +125,11 @@ int discover_cards(struct card_manager *card_mgr) {
   // not realistic, but it's test
   card_mgr->card_ids[0] = 0x02;
   card_mgr->card_ids[1] = 0x02;
-  card_mgr->card_ids[2] = 0x00;
+  card_mgr->card_ids[2] = 0x01;
   card_mgr->card_ids[3] = 0x02;
   card_mgr->card_ids[4] = 0x02;
   card_mgr->card_ids[5] = 0x01;
-  card_mgr->card_ids[6] = 0x00;
+  card_mgr->card_ids[6] = 0x02;
   card_mgr->card_ids[7] = 0x01;
   card_mgr->num_cards = 6;
   return 0;
@@ -259,20 +261,20 @@ int load_card_plugins(struct card_manager *card_mgr) {
 
 
 
-struct card_sort_criteria {
+struct card_spi_sort_criteria {
   int slot;
   int spi_mode;
   int num_channels;
   struct plugin_card *card;
 };
 
-static int zcard_compare_f(const void *name1, const void *name2) {
+static int zcard_compare_spi_f(const void *name1, const void *name2) {
   // sort criteria:
   // (1) spi mode
   // (2) num channels (max to min)
   // (3) slot number (tie breaker)
-  const struct card_sort_criteria *card1 = (const struct card_sort_criteria*) name1;
-  const struct card_sort_criteria *card2 = (const struct card_sort_criteria*) name2;
+  const struct card_spi_sort_criteria *card1 = (const struct card_spi_sort_criteria*) name1;
+  const struct card_spi_sort_criteria *card2 = (const struct card_spi_sort_criteria*) name2;
 
   if (card1->spi_mode != card2->spi_mode) {
     return card1->spi_mode > card2->spi_mode ? -1 : 1;
@@ -289,8 +291,8 @@ static int zcard_compare_f(const void *name1, const void *name2) {
 
 void assign_update_order(struct card_manager *card_mgr) {
   struct zcard_properties *zcard_props;
-  struct card_sort_criteria *cards;
-  cards = (struct card_sort_criteria*)calloc(sizeof(struct card_sort_criteria), card_mgr->num_cards);
+  struct card_spi_sort_criteria *cards;
+  cards = (struct card_spi_sort_criteria*)calloc(sizeof(struct card_spi_sort_criteria), card_mgr->num_cards);
 
   // initialize order by just copying
   for (int i = 0; i < card_mgr->num_cards; ++i) {
@@ -298,11 +300,12 @@ void assign_update_order(struct card_manager *card_mgr) {
     cards[i].slot = card_mgr->cards[i].slot;
     cards[i].spi_mode = zcard_props->spi_mode;
     cards[i].num_channels = zcard_props->num_channels;
+    card_mgr->cards[i].num_channels = zcard_props->num_channels; // refactor to just use this
     cards[i].card = &card_mgr->cards[i];
     free(zcard_props);
   }
   
-  qsort(card_mgr->card_update_order, card_mgr->num_cards, sizeof(struct card_sort_criteria*), zcard_compare_f);
+  qsort(card_mgr->card_update_order, card_mgr->num_cards, sizeof(struct card_spi_sort_criteria*), zcard_compare_spi_f);
 
   INFO("sorted:");
 
@@ -312,4 +315,41 @@ void assign_update_order(struct card_manager *card_mgr) {
   }
 
   free(cards);
+}
+
+
+
+/* assign_hw_audio_channels
+ *
+ * Take a pointer to an array of ints, representing the number of channels each hw device has available.
+ * The num_devices is the size of the array.
+ */
+
+void assign_hw_audio_channels(struct card_manager *card_mgr, int *channels, int num_devices) {
+  int *bin_current_index = (int*)calloc(sizeof(int), num_devices);
+  int card_idx, bin_num;
+
+  for (card_idx = 0; card_idx < card_mgr->num_cards; ++card_idx) {
+    for (bin_num = 0; bin_num < num_devices; ++bin_num) {
+      if (bin_current_index[bin_num] + card_mgr->card_update_order[card_idx]->num_channels <= channels[bin_num]) {
+        // store current pcm device (bin_num) as where control voltages come from.
+        // store the offset to the channels there too.
+        card_mgr->card_update_order[card_idx]->pcm_device_num = bin_num;
+        card_mgr->card_update_order[card_idx]->channel_offset = bin_current_index[bin_num];
+        bin_current_index[bin_num] += card_mgr->card_update_order[card_idx]->num_channels;
+        INFO("allocated %d channels on dev %d for %s at start %d (new idx %d)",
+             card_mgr->card_update_order[card_idx]->num_channels,
+             bin_num, card_mgr->card_update_order[card_idx]->plugin_name,
+             card_mgr->card_update_order[card_idx]->channel_offset,
+             bin_current_index[bin_num]);
+        break;
+      }
+    }
+    if (bin_num == num_devices) {
+      INFO("unable to find an allocation for %d %s", card_idx, card_mgr->card_update_order[card_idx]->plugin_name);
+    }
+  }
+
+
+  free(bin_current_index);
 }

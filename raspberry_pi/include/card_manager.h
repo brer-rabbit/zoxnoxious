@@ -69,7 +69,7 @@ int load_card_plugins(struct card_manager *card_mgr);
 void assign_update_order(struct card_manager *card_mgr);
 
 
-/** assign_channels
+/** assign_hw_audio_channels
  *
  * assign the channels for the cards: given the one or two USB Audio
  * streams hold 24 or 32 channels each (depending on how we config
@@ -81,7 +81,11 @@ void assign_update_order(struct card_manager *card_mgr);
  *  --> fit into first bucket (audio stream 1) or second if it doesn't fit
  * if we can't fit a card...well crud, that's an issue.  A card is not
  * split between two audio streams.
+ *
+ * Take a pointer to an array of ints, representing the number of channels each hw device has available.
+ * The num_devices is the size of the array.
  */
+void assign_hw_audio_channels(struct card_manager *card_mgr, int *channels, int num_devices);
 
 
 #endif

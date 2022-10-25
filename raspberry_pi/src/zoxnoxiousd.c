@@ -169,35 +169,35 @@ int main(int argc, char **argv, char **envp) {
    */
 
 
-  // detect installed cards- get the card manager going
-  card_mgr = init_card_manager(cfg);
-  discover_cards(card_mgr);
-  load_card_plugins(card_mgr);
-  assign_update_order(card_mgr);
-
-
   // init alsa pcm devices
   pcm_state[0] = init_alsa_device(cfg, 0);
+  int num_hw_channels[2] = { 0 };
 
   // only init the second if the first is valid
   if (pcm_state[0]) {
     INFO("pcm initialized for %s", pcm_state[0]->device_name);
+    num_hw_channels[0] = pcm_state[0]->channels;
 
     pcm_state[1] = init_alsa_device(cfg, 1);
 
     if (pcm_state[1]) {
       INFO("pcm initialized for %s", pcm_state[1]->device_name);
+      num_hw_channels[1] = pcm_state[1]->channels;
     }
 
   }
 
 
+  
+  // detect installed cards- get the card manager going
+  card_mgr = init_card_manager(cfg);
+  discover_cards(card_mgr);
+  load_card_plugins(card_mgr);
+  assign_update_order(card_mgr);
+  assign_hw_audio_channels(card_mgr, num_hw_channels, 2);
+
+
   // init alsa midi device
-
-
-  // assign channels
-  // this is a bin packing problem.
-  // sort bt channels then use first fit.
 
 
   // setup signal handling
