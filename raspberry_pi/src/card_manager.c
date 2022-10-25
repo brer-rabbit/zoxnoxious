@@ -105,6 +105,33 @@ struct card_manager* init_card_manager(config_t *cfg) {
 
 
 
+void free_card_manager(struct card_manager *card_mgr) {
+  // unclear how much is actually safe here- we're likely in an abort
+  // state.  Even calling log functions may not be safe...
+
+  if (card_mgr) {
+    for (int card_num = 0; card_num < MAX_SLOTS; ++card_num) {
+      // tell the card it's free
+      if (card_mgr->cards[card_num].free_zcard) {
+        card_mgr->cards[card_num].free_zcard( card_mgr->cards[card_num].plugin_object );
+        INFO("called free_zcard %d slot %d", card_num, card_mgr->cards[card_num].slot);
+      }
+
+      // close dl lib plugin
+      if (card_mgr->cards[card_num].dl_plugin_lib) {
+        dlclose(card_mgr->cards[card_num].dl_plugin_lib);
+        INFO("dlclose'd card %d", card_num);
+      }
+    }
+
+    // wrap it up
+    free(card_mgr);
+  }
+}
+
+
+
+
 int discover_cards(struct card_manager *card_mgr) {
   int i2c_handle;
   int i2c_base_address;
@@ -126,12 +153,12 @@ int discover_cards(struct card_manager *card_mgr) {
   card_mgr->card_ids[0] = 0x02;
   card_mgr->card_ids[1] = 0x02;
   card_mgr->card_ids[2] = 0x01;
-  card_mgr->card_ids[3] = 0x02;
-  card_mgr->card_ids[4] = 0x02;
-  card_mgr->card_ids[5] = 0x01;
-  card_mgr->card_ids[6] = 0x02;
+  card_mgr->card_ids[3] = 0x00;
+  card_mgr->card_ids[4] = 0x00;
+  card_mgr->card_ids[5] = 0x00;
+  card_mgr->card_ids[6] = 0x00;
   card_mgr->card_ids[7] = 0x01;
-  card_mgr->num_cards = 6;
+  card_mgr->num_cards = 4;
   return 0;
 #endif
 
@@ -222,7 +249,7 @@ int load_card_plugins(struct card_manager *card_mgr) {
       // no need to store the handle here- just call the function and store the name
       get_plugin_name_f get_plugin_name = dlsym(card->dl_plugin_lib, GET_PLUGIN_NAME);
       if (get_plugin_name == NULL) {
-        ERROR("failed find symbol " PROCESS_MIDI ", %s", dlerror());
+        ERROR("failed find symbol " GET_PLUGIN_NAME ", %s", dlerror());
         return 1;
       }
 

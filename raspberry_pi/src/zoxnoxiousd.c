@@ -60,7 +60,34 @@ struct alsa_pcm_state *pcm_state[2] = { NULL, NULL };
 
 
 
+static volatile sig_atomic_t in_aborting = 0;
+
 void sig_cleanup_and_exit(int signum) {
+  if (in_aborting) {
+    return;
+  }
+  in_aborting = 1;
+
+
+  // message threads to abort
+
+
+  // close pcm handles
+  if (pcm_state[0] && pcm_state[0]->pcm_handle) {
+    snd_pcm_abort(pcm_state[0]->pcm_handle);
+    snd_pcm_close(pcm_state[0]->pcm_handle);
+  }
+
+  if (pcm_state[1] && pcm_state[1]->pcm_handle) {
+    snd_pcm_abort(pcm_state[1]->pcm_handle);
+    snd_pcm_close(pcm_state[1]->pcm_handle);
+  }
+
+  // card mgr closes all plugins
+  if (card_mgr) {
+    free_card_manager(card_mgr);
+  }
+
   // log and close anything relevant
   exit(0);
 }
@@ -149,6 +176,7 @@ int main(int argc, char **argv, char **envp) {
 
 
   // SPI, pigpio start
+#ifndef MOCK_DATA
   if (gpioInitialise() < 0) {
     ERROR("gpioInitialise failed, bye!");
     return -1;
@@ -156,7 +184,7 @@ int main(int argc, char **argv, char **envp) {
   else {
     INFO("gpioInitialise complete");
   }
-
+#endif
 
   /* Basic initialization done:
    * + libconf opened, available
@@ -205,6 +233,7 @@ int main(int argc, char **argv, char **envp) {
 
   // start threads
 
+  sig_cleanup_and_exit(2);
 
   zlog_fini();
   config_destroy(cfg);

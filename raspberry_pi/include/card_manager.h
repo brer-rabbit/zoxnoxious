@@ -35,6 +35,17 @@ struct plugin_card;
 struct card_manager* init_card_manager(config_t *cfg);
 
 
+
+/** free_card_manager
+ *
+ * release all cards by calling the cards free_zcard_f method.
+ * close all dynlibs.
+ * free card manager.
+ */
+void free_card_manager(struct card_manager *card_mgr);
+
+
+
 /** discover_cards
  *
  * Search for all M24C02 ROMs.
