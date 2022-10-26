@@ -57,40 +57,14 @@ zlog_category_t *zlog_c = NULL;
 /* globals-  mainly so they can be accessed by signal handler  */
 struct card_manager *card_mgr = NULL;
 struct alsa_pcm_state *pcm_state[2] = { NULL, NULL };
+static snd_rawmidi_t *midi_in = NULL;
+static snd_rawmidi_t *midi_out = NULL;
 
 
-
-static volatile sig_atomic_t in_aborting = 0;
-
-void sig_cleanup_and_exit(int signum) {
-  if (in_aborting) {
-    return;
-  }
-  in_aborting = 1;
-
-
-  // message threads to abort
-
-
-  // close pcm handles
-  if (pcm_state[0] && pcm_state[0]->pcm_handle) {
-    snd_pcm_abort(pcm_state[0]->pcm_handle);
-    snd_pcm_close(pcm_state[0]->pcm_handle);
-  }
-
-  if (pcm_state[1] && pcm_state[1]->pcm_handle) {
-    snd_pcm_abort(pcm_state[1]->pcm_handle);
-    snd_pcm_close(pcm_state[1]->pcm_handle);
-  }
-
-  // card mgr closes all plugins
-  if (card_mgr) {
-    free_card_manager(card_mgr);
-  }
-
-  // log and close anything relevant
-  exit(0);
-}
+// static functions
+static void sig_cleanup_and_exit(int signum);
+static int open_midi_device(config_t *cfg);
+static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]);
 
 
 int main(int argc, char **argv, char **envp) {
@@ -216,6 +190,9 @@ int main(int argc, char **argv, char **envp) {
   }
 
 
+  // init alsa midi device
+  open_midi_device(cfg);
+
   
   // detect installed cards- get the card manager going
   card_mgr = init_card_manager(cfg);
@@ -225,19 +202,93 @@ int main(int argc, char **argv, char **envp) {
   assign_hw_audio_channels(card_mgr, num_hw_channels, 2);
 
 
-  // init alsa midi device
-
-
   // setup signal handling
+  signal(SIGHUP, sig_cleanup_and_exit);
+  signal(SIGINT, sig_cleanup_and_exit);
+  signal(SIGTERM, sig_cleanup_and_exit);
 
 
   // start threads
+  read_pcm_and_call_plugins(card_mgr, pcm_state);
 
-  sig_cleanup_and_exit(2);
+
 
   zlog_fini();
   config_destroy(cfg);
   free(cfg);
 
   return 0;
+}
+
+
+
+
+
+// Signal handling
+static volatile sig_atomic_t in_aborting = 0;
+
+void sig_cleanup_and_exit(int signum) {
+  if (in_aborting) {
+    return;
+  }
+  in_aborting = 1;
+
+
+  // message threads to abort
+
+
+  // close pcm handles
+  if (pcm_state[0] && pcm_state[0]->pcm_handle) {
+    snd_pcm_abort(pcm_state[0]->pcm_handle);
+    snd_pcm_close(pcm_state[0]->pcm_handle);
+  }
+
+  if (pcm_state[1] && pcm_state[1]->pcm_handle) {
+    snd_pcm_abort(pcm_state[1]->pcm_handle);
+    snd_pcm_close(pcm_state[1]->pcm_handle);
+  }
+
+  // card mgr closes all plugins
+  if (card_mgr) {
+    free_card_manager(card_mgr);
+  }
+
+  gpioTerminate();
+
+  // log and close anything relevant
+  exit(0);
+}
+
+
+
+static int open_midi_device(config_t *cfg) {
+  const char *midi_device_name;
+  config_setting_t *midi_device_setting = config_lookup(cfg, MIDI_DEVICE_KEY);
+    
+  if (midi_device_setting == NULL) {
+    ERROR("cfg: no midi config value found for " MIDI_DEVICE_KEY);
+    return 1;
+  }
+
+  midi_device_name = config_setting_get_string(midi_device_setting);
+
+  if (midi_device_name == NULL) {
+    ERROR("cfg: device name null for key " MIDI_DEVICE_KEY);
+    return 1;
+  }
+
+  if (snd_rawmidi_open(&midi_in, &midi_out, midi_device_name, SND_RAWMIDI_NONBLOCK) != 0) {
+    ERROR("failed to open midi device %s", midi_device_name);
+    return 1;
+  }
+
+  INFO("successfully opened midi device %s", midi_device_name);
+  return 0;
+}
+
+
+
+
+static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
+
 }

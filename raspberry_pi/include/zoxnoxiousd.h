@@ -32,5 +32,6 @@ extern zlog_category_t *zlog_c;
 #define CONFIG_DIRNAME "/etc/"
 #define CONFIG_FILENAME "zoxnoxiousd.cfg"
 
+#define MIDI_DEVICE_KEY "zmidi.device"
 
 #endif
