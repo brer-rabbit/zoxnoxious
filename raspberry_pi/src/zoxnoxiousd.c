@@ -27,6 +27,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <sys/timerfd.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
@@ -67,11 +68,23 @@ static int open_midi_device(config_t *cfg);
 static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]);
 
 
+
+
 int main(int argc, char **argv, char **envp) {
   config_t *cfg;
   char *midi_device_name = NULL;
   char config_filename[128] = { '\0' };
   char *opt_string = "hi:m:v";
+
+  /* bookkeeping stuff before getting to the important stuff:
+   * + libconf opened, available
+   * + zlog enabled, logging
+   * + pigpio init, can start talking to hardware
+   * + load card plugins
+   * + midi opened
+   * + alsa init
+   */
+
 
   struct option long_option[] = {
     {"help", no_argument, NULL, 'h'},
@@ -160,15 +173,6 @@ int main(int argc, char **argv, char **envp) {
   }
 #endif
 
-  /* Basic initialization done:
-   * + libconf opened, available
-   * + zlog enabled, logging available
-   * + pigpio init, can start talking to hardware
-   *
-   * what's not done:
-   * - load card plugins
-   * - alsa init
-   */
 
 
   // init alsa pcm devices
@@ -213,6 +217,7 @@ int main(int argc, char **argv, char **envp) {
 
 
 
+  // fall through to exit
   zlog_fini();
   config_destroy(cfg);
   free(cfg);
@@ -288,7 +293,61 @@ static int open_midi_device(config_t *cfg) {
 
 
 
+// start timer
+// forever:
+// foreach pcm stream
+//   alsa_pcm_ensure_ready
+//   snd_pcm_mmap_begin
+//   calc samples[channelnum]
+// 
+// do {
+//   call each plugin on stream 1
+//   if stream 2 call each plugin on stream 1
+//   if (!frames stream 1): commit, ensure ready, mmap
+//   if (!frames stream 2): commit, ensure ready, mmap
+//   read timer
+// } while (running flag)
 
 static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
+  int timerfd_sample_clock;
+  struct itimerspec itimerspec_sample_clock =
+    {
+      .it_interval.tv_sec = 0,
+      .it_interval.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
+      .it_value.tv_sec = 0,
+      .it_value.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
+    };
+
+  if ( (timerfd_sample_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to create timer: %s", error);
+  }
+  
+  INFO("starting timer %ld usec for sampling rate %d hz",
+       itimerspec_sample_clock.it_interval.tv_nsec / 1000,
+       pcm_state[0]->sampling_rate);
+
+  if ( (timerfd_settime(timerfd_sample_clock, 0, &itimerspec_sample_clock, 0) ) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to start timer: %s", error);
+  }
+
+  // timer now running, hurry :)
+  if ( alsa_pcm_ensure_ready(pcm_state[0]) ) {
+    ERROR("pcm0: error from alsa_pcm_ensure_ready");
+  }
+
+  if (pcm_state[1]) {
+    if ( alsa_pcm_ensure_ready(pcm_state[1]) ) {
+      ERROR("pcm1: error from alsa_pcm_ensure_ready");
+    }
+  }
+
+  alsa_mmap_begin_with_step_calc(pcm_state[0]);
+  if (pcm_state[1]) {
+    alsa_mmap_begin_with_step_calc(pcm_state[1]);
+  }
 
 }

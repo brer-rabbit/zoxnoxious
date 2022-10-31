@@ -25,12 +25,12 @@
 
 #define ZALSA_DEFAULT_PERIOD_SIZE 32
 #define ZALSA_DEFAULT_BUFFER_SIZE 64
-
+#define ABSOLUTE_MAX_CHANNELS 32  // we'll never have greater than this number of channels
 
 struct alsa_pcm_state {
   // libconfig handle
   config_t *cfg;
-
+  // set once type stuff
   int device_num;
   char *device_name;
   snd_pcm_t *pcm_handle;
@@ -39,7 +39,17 @@ struct alsa_pcm_state {
   snd_pcm_uframes_t buffer_size;  // size of ALSA buffer (in frames)
   snd_pcm_format_t format;        // audiobuf format
   unsigned int channels;          // number of channels
+
   int first_period;               // boolean cleared after first frame processed, set after xrun
+
+  // calculated once processing starts
+  int step_size_by_channel[ABSOLUTE_MAX_CHANNELS]; // step size for each channel in a frame
+
+  // dynamic as we process samples
+  snd_pcm_uframes_t frames_available;
+  snd_pcm_uframes_t offset;
+  const snd_pcm_channel_area_t *mmap_area;
+  const char **samples; // pointer per-channel to sample data: allocated during 
 
   // stats
   int xrun_recovery_count;
@@ -54,6 +64,36 @@ struct alsa_pcm_state {
  * interface.
  */
 struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num);
+
+
+/** alsa_pcm_ensure_ready
+ * check the state to make sure the pcm_handle is good then call snd_pcm_avail_update to make sure
+ * available frames is updated.
+ * This call is required prior to calling snd_pcm_mmap_begin(), and
+ * on return the pcm stream should be in a good state.
+ */
+int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state);
+
+
+/** alsa_mmap_begin_with_step_calc alsa_mmap_begin
+ *
+ * call snd_pcm_mmap_begin.  Pre: alsa_pcm_ensure_ready called just previous.
+ * Handle any xrun recovery required.
+ * alsa_mmap_begin_with_step_calc should be called the first time through; after
+ * that alsa_mmap_begin is preferred.
+ */
+int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state);
+int alsa_mmap_begin(struct alsa_pcm_state *pcm_state);
+
+
+/** alsa_drop_frames
+ *
+ * advance internal pointer, dropping the specified number of frames.
+ */
+void alsa_drop_frames(struct alsa_pcm_state *pcm_state, unsigned long frames);
+
+
+
 
 
 #endif
