@@ -261,8 +261,10 @@ int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
   // calculate the base address for each channelnum and step size
   for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
     pcm_state->step_size_by_channel[channelnum] = pcm_state->mmap_area[channelnum].step / 8;
+    // locate samples for this channel
     pcm_state->samples[channelnum] =
-      (( pcm_state->mmap_area[channelnum].addr) + (pcm_state->mmap_area[channelnum].first / 8)) +
+      pcm_state->mmap_area[channelnum].addr +
+      pcm_state->mmap_area[channelnum].first / 8 +
       pcm_state->offset * pcm_state->step_size_by_channel[channelnum];
 
     INFO("device %d step size channel %d : %d", pcm_state->device_num, channelnum, pcm_state->step_size_by_channel[channelnum]);
@@ -283,8 +285,6 @@ int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
   pcm_state->frames_available = pcm_state->period_size;
   ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_available);
 
-  INFO("alsa mmap begin requested %ld frames received %ld frames", pcm_state->period_size, pcm_state->frames_available);
-
   if (ret < 0) {
     ret = xrun_recovery(pcm_state, -ret);
     if (ret < 0) {
@@ -293,11 +293,11 @@ int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
     }
   }
 
-
-  // calculate the base address for each channelnum only
+  // calculate samples address for each channel
   for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
     pcm_state->samples[channelnum] =
-      (( pcm_state->mmap_area[channelnum].addr) + (pcm_state->mmap_area[channelnum].first / 8)) +
+      pcm_state->mmap_area[channelnum].addr +
+      pcm_state->mmap_area[channelnum].first / 8 +
       pcm_state->offset * pcm_state->step_size_by_channel[channelnum];
   }
 
