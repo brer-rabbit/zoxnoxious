@@ -266,8 +266,6 @@ int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
       pcm_state->mmap_area[channelnum].addr +
       pcm_state->mmap_area[channelnum].first / 8 +
       pcm_state->offset * pcm_state->step_size_by_channel[channelnum];
-
-    INFO("device %d step size channel %d : %d", pcm_state->device_num, channelnum, pcm_state->step_size_by_channel[channelnum]);
   }
 
 

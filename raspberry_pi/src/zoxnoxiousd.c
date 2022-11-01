@@ -191,6 +191,12 @@ int main(int argc, char **argv, char **envp) {
       num_hw_channels[1] = pcm_state[1]->channels;
     }
 
+    if (pcm_state[0]->channels != pcm_state[1]->channels) {
+      FATAL("devices must have same number of channels: %s (%d) and %s (%d)",
+            pcm_state[0]->device_name, pcm_state[0]->channels,
+            pcm_state[1]->device_name, pcm_state[1]->channels);
+      abort();
+    }
   }
 
 
@@ -303,9 +309,10 @@ static int open_midi_device(config_t *cfg) {
 // do {
 //   call each plugin on stream 1
 //   if stream 2 call each plugin on stream 1
+//   read timer
+//   advance samples pointer
 //   if (!frames stream 1): commit, ensure ready, mmap
 //   if (!frames stream 2): commit, ensure ready, mmap
-//   read timer
 // } while (running flag)
 
 static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
@@ -349,5 +356,39 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
   if (pcm_state[1]) {
     alsa_mmap_begin_with_step_calc(pcm_state[1]);
   }
+
+
+  do {
+
+    // Business Section
+    for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
+      // alias a couple big redirects here:
+      // lookup the card offset
+      int channel_offset = card_mgr->card_update_order[card_num]->channel_offset;
+
+      // the samples relevant for this card are at the offset on the approp pcm device
+      const int16_t *samples = (const int16_t*) ( card_mgr->card_update_order[card_num]->pcm_device_num == 0 ?
+                                                  pcm_state[0]->samples[channel_offset] : pcm_state[1]->samples[channel_offset] );
+
+      // then call the card's plugin with the samples via function pointer
+      (card_mgr->card_update_order[card_num]->process_samples)(card_mgr->card_update_order[card_num]->plugin_object, samples);
+    }
+
+
+    // advance sample pointers
+    if (pcm_state[1]) {
+      for (int i = 0; i < pcm_state[0]->channels; ++i) {
+        pcm_state[0]->samples[i] += pcm_state[0]->step_size_by_channel[i];
+        pcm_state[1]->samples[i] += pcm_state[1]->step_size_by_channel[i];
+      }
+    }
+    else {
+      for (int i = 0; i < pcm_state[0]->channels; ++i) {
+        pcm_state[0]->samples[i] += pcm_state[0]->step_size_by_channel[i];
+      }
+    }
+
+
+  } while (--pcm_state[0]->frames_available); // this isn't right- don't modify frames_available
 
 }

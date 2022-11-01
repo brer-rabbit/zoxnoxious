@@ -85,7 +85,7 @@ typedef struct zcard_properties* (*get_zcard_properties_f)();
  * channel.  This method should call set_spi_interface() prior to sending
  * any samples or changing spi mode.
  */
-typedef int (*process_samples_f)(void *zcard_plugin, int16_t *samples);
+typedef int (*process_samples_f)(void *zcard_plugin, const int16_t *samples);
 
 
 
