@@ -373,7 +373,7 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
 
 
 
-  for (int blah = 0; blah < 500; ++blah) {
+  for (int blah = 0; blah < 30000; ++blah) {
 
     // Business Section
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
@@ -386,7 +386,9 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
                                                   pcm_state[0]->samples[channel_offset] : pcm_state[1]->samples[channel_offset] );
 
       // then call the card's plugin with the samples via function pointer
-      (card_mgr->card_update_order[card_num]->process_samples)(card_mgr->card_update_order[card_num]->plugin_object, samples);
+      if ( (card_mgr->card_update_order[card_num]->process_samples)(card_mgr->card_update_order[card_num]->plugin_object, samples) != 0) {
+        INFO("card error");
+      }
     }
 
 
@@ -455,7 +457,7 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
 
   }
 
-  INFO("missed expirations: %lu ontime; %lu one-miss; %lu less than ten; %lu ten or more",
+  INFO("missed expirations: %llu ontime; %llu one-miss; %llu less than ten; %llu ten or more",
        missed_expirations[EXPIRATIONS_ONTIME],
        missed_expirations[EXPIRATIONS_MISSED_ONE],
        missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
