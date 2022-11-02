@@ -40,10 +40,12 @@ struct zcard_properties* get_zcard_properties() {
 
 
 int process_samples(void *zcard_plugin, const int16_t *samples) {
-  printf("z3340: samples: %p %hd %hd %hd %hd %hd %hd\n",
+
+  /*printf("z3340: samples: %p %hd %hd %hd %hd %hd %hd\n",
          (void*) samples,
          samples[0], samples[1], samples[2],
          samples[3], samples[4], samples[5]);
+  */
   return 0;
 }
 

@@ -35,7 +35,7 @@ struct alsa_pcm_state {
   char *device_name;
   snd_pcm_t *pcm_handle;
   unsigned int sampling_rate;
-  snd_pcm_sframes_t period_size;  // Size to request on read()
+  snd_pcm_sframes_t period_size;  // Size to request on read(), frames to request
   snd_pcm_uframes_t buffer_size;  // size of ALSA buffer (in frames)
   snd_pcm_format_t format;        // audiobuf format
   unsigned int channels;          // number of channels
@@ -46,7 +46,8 @@ struct alsa_pcm_state {
   int step_size_by_channel[ABSOLUTE_MAX_CHANNELS]; // step size for each channel in a frame
 
   // dynamic as we process samples
-  snd_pcm_uframes_t frames_available;
+  snd_pcm_uframes_t frames_provided;
+  snd_pcm_uframes_t frames_remaining;
   snd_pcm_uframes_t offset;
   const snd_pcm_channel_area_t *mmap_area;
   const char **samples; // pointer per-channel to sample data: allocated during 
@@ -84,6 +85,15 @@ int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state);
  */
 int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state);
 int alsa_mmap_begin(struct alsa_pcm_state *pcm_state);
+
+
+/** alsa_mmap_end
+ *
+ * it's called mmap_commit in the alsa API, call the function mmap_end
+ * here.  Handle any xrun error.  Return zero for success, non-zero
+ * for error.
+ */
+int alsa_mmap_end(struct alsa_pcm_state *pcm_state);
 
 
 /** alsa_drop_frames

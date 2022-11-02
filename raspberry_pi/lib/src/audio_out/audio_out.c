@@ -38,8 +38,6 @@ struct zcard_properties* get_zcard_properties() {
 
 
 int process_samples(void *zcard_plugin, const int16_t *samples) {
-  printf("audio_out: samples: %p %hd %hd\n",
-         (void*) samples, samples[0], samples[1]);
   return 0;
 }
 

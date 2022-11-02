@@ -244,10 +244,11 @@ int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
   assert(pcm_state != NULL);
 
   // request period_size of frames
-  pcm_state->frames_available = pcm_state->period_size;
-  ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_available);
+  pcm_state->frames_provided = pcm_state->period_size;
+  ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_provided);
+  pcm_state->frames_remaining = pcm_state->frames_provided;
 
-  INFO("alsa mmap begin requested %ld frames received %ld frames", pcm_state->period_size, pcm_state->frames_available);
+  INFO("alsa mmap begin requested %ld frames received %ld frames", pcm_state->period_size, pcm_state->frames_provided);
 
   if (ret < 0) {
     ret = xrun_recovery(pcm_state, -ret);
@@ -280,8 +281,9 @@ int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
   assert(pcm_state != NULL);
 
   // request period_size of frames
-  pcm_state->frames_available = pcm_state->period_size;
-  ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_available);
+  pcm_state->frames_provided = pcm_state->period_size;
+  ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_provided);
+  pcm_state->frames_remaining = pcm_state->frames_provided;
 
   if (ret < 0) {
     ret = xrun_recovery(pcm_state, -ret);
@@ -299,11 +301,25 @@ int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
       pcm_state->offset * pcm_state->step_size_by_channel[channelnum];
   }
 
-
   return 0;
 }
 
 
+
+
+int alsa_mmap_end(struct alsa_pcm_state *pcm_state) {
+  int ret = 0;
+  snd_pcm_sframes_t committed;
+
+  committed = snd_pcm_mmap_commit(pcm_state->pcm_handle, pcm_state->offset, pcm_state->frames_provided);
+  if (committed < 0 || committed != pcm_state->frames_provided) {
+    ret = xrun_recovery(pcm_state, committed >= 0 ? EPIPE : -committed);
+    if (ret < 0) {
+      return ret;
+    }
+  }
+  return ret;
+}
 
 
 

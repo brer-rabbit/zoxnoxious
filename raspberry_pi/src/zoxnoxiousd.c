@@ -191,7 +191,7 @@ int main(int argc, char **argv, char **envp) {
       num_hw_channels[1] = pcm_state[1]->channels;
     }
 
-    if (pcm_state[0]->channels != pcm_state[1]->channels) {
+    if (pcm_state[1] && pcm_state[0]->channels != pcm_state[1]->channels) {
       FATAL("devices must have same number of channels: %s (%d) and %s (%d)",
             pcm_state[0]->device_name, pcm_state[0]->channels,
             pcm_state[1]->device_name, pcm_state[1]->channels);
@@ -331,17 +331,7 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
     ERROR("failed to create timer: %s", error);
   }
   
-  INFO("starting timer %ld usec for sampling rate %d hz",
-       itimerspec_sample_clock.it_interval.tv_nsec / 1000,
-       pcm_state[0]->sampling_rate);
 
-  if ( (timerfd_settime(timerfd_sample_clock, 0, &itimerspec_sample_clock, 0) ) == -1) {
-    char error[256];
-    strerror_r(errno, error, 256);
-    ERROR("failed to start timer: %s", error);
-  }
-
-  // timer now running, hurry :)
   if ( alsa_pcm_ensure_ready(pcm_state[0]) ) {
     ERROR("pcm0: error from alsa_pcm_ensure_ready");
   }
@@ -357,8 +347,20 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
     alsa_mmap_begin_with_step_calc(pcm_state[1]);
   }
 
+  INFO("starting timer %ld usec for sampling rate %d hz",
+       itimerspec_sample_clock.it_interval.tv_nsec / 1000,
+       pcm_state[0]->sampling_rate);
 
-  do {
+  if ( (timerfd_settime(timerfd_sample_clock, 0, &itimerspec_sample_clock, 0) ) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to start timer: %s", error);
+  }
+
+  uint64_t expirations = 0;
+  int sample_advances = 0;
+  int new_periods = 0;
+  for (int blah = 0; blah < 500; ++blah) {
 
     // Business Section
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
@@ -375,20 +377,59 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
     }
 
 
-    // advance sample pointers
+    read(timerfd_sample_clock, &expirations, sizeof(expirations));
+    // TODO: error handling
+
+
+    // get new set of frames or advance sample pointers
     if (pcm_state[1]) {
-      for (int i = 0; i < pcm_state[0]->channels; ++i) {
-        pcm_state[0]->samples[i] += pcm_state[0]->step_size_by_channel[i];
-        pcm_state[1]->samples[i] += pcm_state[1]->step_size_by_channel[i];
+      // get new set of frames
+      if (--pcm_state[1]->frames_remaining == 0) {
+        if ( alsa_mmap_end(pcm_state[1]) ) {
+          ERROR("alsa_mmap_end returned non-zero");
+        }
+
+        if ( alsa_pcm_ensure_ready(pcm_state[1]) ) {
+          ERROR("alsa_pcm_ensure_ready returned non-zero");
+        }
+
+        if ( alsa_mmap_begin(pcm_state[1]) ) {
+          ERROR("alsa_mmap_begin returned non-zero");
+        }
+
       }
+      else {
+        // advance sample pointer
+        for (int i = 0; i < pcm_state[1]->channels; ++i) {
+          pcm_state[1]->samples[i] += pcm_state[1]->step_size_by_channel[i];
+        }
+      }
+    }
+
+
+    if (--pcm_state[0]->frames_remaining == 0) {
+      new_periods++;
+      if ( alsa_mmap_end(pcm_state[0]) ) {
+        ERROR("alsa_mmap_end returned non-zero");
+      }
+
+      if ( alsa_pcm_ensure_ready(pcm_state[0]) ) {
+        ERROR("alsa_pcm_ensure_ready returned non-zero");
+      }
+
+      if ( alsa_mmap_begin(pcm_state[0]) ) {
+        ERROR("alsa_mmap_begin returned non-zero");
+      }
+
     }
     else {
+      sample_advances++;
       for (int i = 0; i < pcm_state[0]->channels; ++i) {
         pcm_state[0]->samples[i] += pcm_state[0]->step_size_by_channel[i];
       }
     }
 
+  }
 
-  } while (--pcm_state[0]->frames_available); // this isn't right- don't modify frames_available
 
 }
