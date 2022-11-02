@@ -38,6 +38,12 @@
 #include "zalsa.h"
 
 
+// number of stats to track and what they mean
+#define NUM_MISSED_EXPIRATIONS_STATS 4
+#define EXPIRATIONS_ONTIME 0
+#define EXPIRATIONS_MISSED_ONE 1
+#define EXPIRATIONS_MISSED_LT_TEN 2
+#define EXPIRATIONS_MISSED_GTE_TEN 3
 
 static void help() {
   printf("Usage: zoxnoxiousd <options>\n"
@@ -317,6 +323,11 @@ static int open_midi_device(config_t *cfg) {
 
 static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
   int timerfd_sample_clock;
+  uint64_t expirations = 0;
+  _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 };
+  int sample_advances = 0;
+  int new_periods = 0;
+
   struct itimerspec itimerspec_sample_clock =
     {
       .it_interval.tv_sec = 0,
@@ -331,6 +342,12 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
     ERROR("failed to create timer: %s", error);
   }
   
+
+  // logging from here forward may be tricky / time sensitive
+  INFO("starting timer %ld usec for sampling rate %d hz",
+       itimerspec_sample_clock.it_interval.tv_nsec / 1000,
+       pcm_state[0]->sampling_rate);
+
 
   if ( alsa_pcm_ensure_ready(pcm_state[0]) ) {
     ERROR("pcm0: error from alsa_pcm_ensure_ready");
@@ -347,9 +364,6 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
     alsa_mmap_begin_with_step_calc(pcm_state[1]);
   }
 
-  INFO("starting timer %ld usec for sampling rate %d hz",
-       itimerspec_sample_clock.it_interval.tv_nsec / 1000,
-       pcm_state[0]->sampling_rate);
 
   if ( (timerfd_settime(timerfd_sample_clock, 0, &itimerspec_sample_clock, 0) ) == -1) {
     char error[256];
@@ -357,9 +371,8 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
     ERROR("failed to start timer: %s", error);
   }
 
-  uint64_t expirations = 0;
-  int sample_advances = 0;
-  int new_periods = 0;
+
+
   for (int blah = 0; blah < 500; ++blah) {
 
     // Business Section
@@ -378,13 +391,32 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
 
 
     read(timerfd_sample_clock, &expirations, sizeof(expirations));
-    // TODO: error handling
+    if (expirations == 1) {
+      missed_expirations[EXPIRATIONS_ONTIME]++;
+    }
+    else if (expirations == 2) {
+      missed_expirations[EXPIRATIONS_MISSED_ONE]++;
+    }
+    else if (expirations < 10) {
+      missed_expirations[EXPIRATIONS_MISSED_LT_TEN]++;
+    }
+    else {
+      missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]++;
+    }
 
 
     // get new set of frames or advance sample pointers
     if (pcm_state[1]) {
-      // get new set of frames
-      if (--pcm_state[1]->frames_remaining == 0) {
+
+      if (pcm_state[1]->frames_remaining > expirations) {
+        // advance sample pointer by expirations --
+        // TODO: error handling should use some DSP to smooth this if expirations > 1
+        for (int i = 0; i < pcm_state[1]->channels; ++i) {
+          pcm_state[1]->samples[i] += (expirations * pcm_state[1]->step_size_by_channel[i]);
+        }
+        pcm_state[1]->frames_remaining -= expirations;
+      }
+      else {
         if ( alsa_mmap_end(pcm_state[1]) ) {
           ERROR("alsa_mmap_end returned non-zero");
         }
@@ -396,18 +428,17 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
         if ( alsa_mmap_begin(pcm_state[1]) ) {
           ERROR("alsa_mmap_begin returned non-zero");
         }
-
-      }
-      else {
-        // advance sample pointer
-        for (int i = 0; i < pcm_state[1]->channels; ++i) {
-          pcm_state[1]->samples[i] += pcm_state[1]->step_size_by_channel[i];
-        }
       }
     }
 
 
-    if (--pcm_state[0]->frames_remaining == 0) {
+    if (pcm_state[0]->frames_remaining > expirations) {
+      sample_advances++;
+      for (int i = 0; i < pcm_state[0]->channels; ++i) {
+        pcm_state[0]->samples[i] += (expirations * pcm_state[0]->step_size_by_channel[i]);
+      }
+    }
+    else {
       new_periods++;
       if ( alsa_mmap_end(pcm_state[0]) ) {
         ERROR("alsa_mmap_end returned non-zero");
@@ -420,16 +451,13 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
       if ( alsa_mmap_begin(pcm_state[0]) ) {
         ERROR("alsa_mmap_begin returned non-zero");
       }
-
-    }
-    else {
-      sample_advances++;
-      for (int i = 0; i < pcm_state[0]->channels; ++i) {
-        pcm_state[0]->samples[i] += pcm_state[0]->step_size_by_channel[i];
-      }
     }
 
   }
 
-
+  INFO("missed expirations: %lu ontime; %lu one-miss; %lu less than ten; %lu ten or more",
+       missed_expirations[EXPIRATIONS_ONTIME],
+       missed_expirations[EXPIRATIONS_MISSED_ONE],
+       missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
+       missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
 }
