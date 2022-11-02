@@ -325,8 +325,7 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
   int timerfd_sample_clock;
   uint64_t expirations = 0;
   _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 };
-  int sample_advances = 0;
-  int new_periods = 0;
+
 
   struct itimerspec itimerspec_sample_clock =
     {
@@ -372,8 +371,7 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
   }
 
 
-
-  for (int blah = 0; blah < 30000; ++blah) {
+  for (int blah = 0; blah < 3000; ++blah) {
 
     // Business Section
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
@@ -435,13 +433,12 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
 
 
     if (pcm_state[0]->frames_remaining > expirations) {
-      sample_advances++;
       for (int i = 0; i < pcm_state[0]->channels; ++i) {
         pcm_state[0]->samples[i] += (expirations * pcm_state[0]->step_size_by_channel[i]);
       }
+      pcm_state[0]->frames_remaining -= expirations;
     }
     else {
-      new_periods++;
       if ( alsa_mmap_end(pcm_state[0]) ) {
         ERROR("alsa_mmap_end returned non-zero");
       }

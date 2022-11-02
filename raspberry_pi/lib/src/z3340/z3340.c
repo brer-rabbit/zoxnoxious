@@ -41,8 +41,6 @@ struct zcard_properties* get_zcard_properties() {
 
 #define SPI_RATE 12000000
 
-int f = 0;
-char blah[2] = { 0x00, 0x00 };
 int process_samples(void *zcard_plugin, const int16_t *samples) {
   int spi_channel;
   if ((spi_channel = spiOpen(0, SPI_RATE, 1)) < 0) {
@@ -50,19 +48,19 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   }
 
   for (int i = 0; i < 6; ++i) {
-    spiWrite(spi_channel, blah, 2);
+    spiWrite(spi_channel, &samples[i], 2); // just for test- this isn't the right data
   }
 
   spiClose(spi_channel);
 
 
-  if (f++ % 100 == 0) {
-    printf("z3340: f: %d\n", f);
+  /*
     printf("z3340: samples: %p %5hd %5hd %5hd %5hd %5hd %5hd\n",
            (void*) samples,
            samples[0], samples[1], samples[2],
            samples[3], samples[4], samples[5]);
   }
+  */
 
   return 0;
 }
