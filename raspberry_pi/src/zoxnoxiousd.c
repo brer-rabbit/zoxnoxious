@@ -79,6 +79,7 @@ int main(int argc, char **argv, char **envp) {
   char config_filename[128] = { '\0' };
   char *opt_string = "hi:m:v";
   pthread_t alsa_pcm_to_plugin_thread;
+  sigset_t signal_set;
   struct sigaction signal_action_cleanup, signal_action_stats;
 
   /* bookkeeping stuff before getting to the important stuff:
@@ -217,7 +218,12 @@ int main(int argc, char **argv, char **envp) {
   assign_hw_audio_channels(card_mgr, num_hw_channels, 2);
 
 
-
+  sigemptyset(&signal_set);
+  sigaddset(&signal_set, SIGUSR1);
+  sigaddset(&signal_set, SIGHUP);
+  sigaddset(&signal_set, SIGINT);
+  sigaddset(&signal_set, SIGTERM);
+  pthread_sigmask(SIG_BLOCK, &signal_set, NULL);
 
   // start threads
   if ( pthread_create(&alsa_pcm_to_plugin_thread, NULL, read_pcm_and_call_plugins, NULL) ) {
@@ -262,7 +268,7 @@ void sig_cleanup_and_exit(int signum) {
 
 
   // message threads to abort
-
+  alsa_thread_run = 0;
 
   // close pcm handles
   if (pcm_state[0] && pcm_state[0]->pcm_handle) {
@@ -349,16 +355,10 @@ static int open_midi_device(config_t *cfg) {
 
 //static void* read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
 static void* read_pcm_and_call_plugins(void *arg) {
-  struct sigaction signal_action;
   int timerfd_sample_clock;
   uint64_t expirations = 0;
   int frames_to_advance;
 
-
-  signal_action.sa_handler = SIG_IGN;
-  sigaction(SIGHUP, &signal_action, NULL);
-  sigaction(SIGINT, &signal_action, NULL);
-  sigaction(SIGTERM, &signal_action, NULL);
 
 
   struct itimerspec itimerspec_sample_clock =
@@ -400,7 +400,8 @@ static void* read_pcm_and_call_plugins(void *arg) {
   }
 
 
-  for (int blah = 0; blah < 38000; ) {
+  //for (int blah = 0; blah < 38000; ) {
+  while (alsa_thread_run) {
 
     // Business Section
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
@@ -436,7 +437,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
     // downcast
     frames_to_advance = expirations > INT_MAX ? INT_MAX : expirations;
-    blah += frames_to_advance;
+    //blah += frames_to_advance;
 
     // get new set of frames or advance sample pointers
     if (pcm_state[1]) {

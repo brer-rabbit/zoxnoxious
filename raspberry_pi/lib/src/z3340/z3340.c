@@ -41,14 +41,20 @@ struct zcard_properties* get_zcard_properties() {
 
 #define SPI_RATE 12000000
 
+static const int channel_map[] = { 0, 1, 3, 4, 5, 7 };
+
 int process_samples(void *zcard_plugin, const int16_t *samples) {
+  char samples_to_dac[2];
   int spi_channel;
   if ((spi_channel = spiOpen(0, SPI_RATE, 1)) < 0) {
     return 1;
   }
 
   for (int i = 0; i < 6; ++i) {
-    spiWrite(spi_channel, &samples[i], 2); // just for test- this isn't the right data
+    samples_to_dac[0] = (channel_map[i] << 4) |
+      (uint8_t) (samples[i]) >> 11;
+    samples_to_dac[1] = samples[i] >> 3;
+    spiWrite(spi_channel, samples_to_dac, 2);
   }
 
   spiClose(spi_channel);
