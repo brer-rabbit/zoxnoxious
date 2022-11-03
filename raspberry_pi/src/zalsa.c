@@ -20,6 +20,7 @@
 #include "zoxnoxiousd.h"
 #include "zalsa.h"
 
+#define INVALID_CHANNEL_STEP_SIZE -1
 
 static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err);
 
@@ -56,6 +57,7 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
   pcm_state->cfg = cfg;
   pcm_state->device_name = strdup(device_name);
   pcm_state->device_num = device_num;
+  pcm_state->channel_step_size = INVALID_CHANNEL_STEP_SIZE;
 
 
   // Params from config file:
@@ -189,7 +191,7 @@ int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames) 
     // advance sample pointer by frames --
     // TODO: error handling should use some DSP to smooth this if frames > 1
     for (int i = 0; i < pcm_state->channels; ++i) {
-      pcm_state->samples[i] += (frames * pcm_state->step_size_by_channel[i]);
+      pcm_state->samples[i] += (frames * pcm_state->channel_step_size);
     }
     pcm_state->frames_remaining -= frames;
   }
@@ -307,12 +309,20 @@ int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
 
   // calculate the base address for each channelnum and step size
   for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
-    pcm_state->step_size_by_channel[channelnum] = pcm_state->mmap_area[channelnum].step / 8;
+    if (pcm_state->channel_step_size == INVALID_CHANNEL_STEP_SIZE) {
+      pcm_state->channel_step_size = pcm_state->mmap_area[channelnum].step / 8;
+    }
+    else if (pcm_state->channel_step_size != pcm_state->mmap_area[channelnum].step / 8) {
+      ERROR("expected consistent channel step size: %d != %d unexpected",
+            pcm_state->channel_step_size,
+            pcm_state->mmap_area[channelnum].step / 8);
+    }
+
     // locate samples for this channel
     pcm_state->samples[channelnum] =
       pcm_state->mmap_area[channelnum].addr +
       pcm_state->mmap_area[channelnum].first / 8 +
-      pcm_state->offset * pcm_state->step_size_by_channel[channelnum];
+      pcm_state->offset * pcm_state->channel_step_size;
   }
 
 
@@ -344,7 +354,7 @@ int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
     pcm_state->samples[channelnum] =
       pcm_state->mmap_area[channelnum].addr +
       pcm_state->mmap_area[channelnum].first / 8 +
-      pcm_state->offset * pcm_state->step_size_by_channel[channelnum];
+      pcm_state->offset * pcm_state->channel_step_size;
   }
 
   return 0;

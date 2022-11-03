@@ -43,7 +43,7 @@ struct alsa_pcm_state {
   int first_period;               // boolean cleared after first frame processed, set after xrun
 
   // calculated once processing starts
-  int step_size_by_channel[ABSOLUTE_MAX_CHANNELS]; // step size for each channel in a frame
+  int channel_step_size; // step size for each channel in a frame
 
   // dynamic as we process samples
   snd_pcm_uframes_t frames_provided;

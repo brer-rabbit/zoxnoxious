@@ -46,34 +46,30 @@
 #define EXPIRATIONS_MISSED_LT_TEN 2
 #define EXPIRATIONS_MISSED_GTE_TEN 3
 
+
 static void help() {
   printf("Usage: zoxnoxiousd <options>\n"
          "  -i <config_file>\n");
 }
 
-
-
-
-/* Config keys */
-/* When needed go here */
-
-
-
 /* zlog loggin' */
 zlog_category_t *zlog_c = NULL;
 
 /* globals-  mainly so they can be accessed by signal handler  */
-struct card_manager *card_mgr = NULL;
-struct alsa_pcm_state *pcm_state[2] = { NULL, NULL };
+static struct card_manager *card_mgr = NULL;
+static struct alsa_pcm_state *pcm_state[2] = { NULL, NULL };
 static snd_rawmidi_t *midi_in = NULL;
 static snd_rawmidi_t *midi_out = NULL;
+
+static _Atomic int alsa_thread_run = 1;
+static _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 };
 
 
 // static functions
 static void sig_cleanup_and_exit(int signum);
+static void sig_dump_stats(int signum);
 static int open_midi_device(config_t *cfg);
-static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]);
-
+static void* read_pcm_and_call_plugins(void *);
 
 
 
@@ -82,6 +78,8 @@ int main(int argc, char **argv, char **envp) {
   char *midi_device_name = NULL;
   char config_filename[128] = { '\0' };
   char *opt_string = "hi:m:v";
+  pthread_t alsa_pcm_to_plugin_thread;
+  struct sigaction signal_action_cleanup, signal_action_stats;
 
   /* bookkeeping stuff before getting to the important stuff:
    * + libconf opened, available
@@ -219,16 +217,27 @@ int main(int argc, char **argv, char **envp) {
   assign_hw_audio_channels(card_mgr, num_hw_channels, 2);
 
 
-  // setup signal handling
-  signal(SIGHUP, sig_cleanup_and_exit);
-  signal(SIGINT, sig_cleanup_and_exit);
-  signal(SIGTERM, sig_cleanup_and_exit);
 
 
   // start threads
-  read_pcm_and_call_plugins(card_mgr, pcm_state);
+  if ( pthread_create(&alsa_pcm_to_plugin_thread, NULL, read_pcm_and_call_plugins, NULL) ) {
+    ERROR("failed to start thread for read_pcm_and_call_plugins");
+    abort();
+  }
 
 
+  // setup signal handling
+  signal_action_cleanup.sa_handler = sig_cleanup_and_exit;
+  sigaction(SIGHUP, &signal_action_cleanup, NULL);
+  sigaction(SIGINT, &signal_action_cleanup, NULL);
+  sigaction(SIGTERM, &signal_action_cleanup, NULL);
+
+  signal_action_stats.sa_handler = sig_dump_stats;
+  sigaction(SIGUSR1, &signal_action_stats, NULL);
+
+
+  int retval;
+  pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
 
   // fall through to exit
   zlog_fini();
@@ -273,10 +282,26 @@ void sig_cleanup_and_exit(int signum) {
 
   gpioTerminate();
 
-  // log and close anything relevant
-  exit(0);
+  // log and close anything relevant...which technically isn't safe to do
+  exit(EXIT_FAILURE);
 }
 
+
+static volatile sig_atomic_t in_dump_stats = 0;
+static void sig_dump_stats(int signum) {
+  if (in_dump_stats) {
+    return;
+  }
+  in_dump_stats = 1;
+
+  INFO("stats on missed expirations: %llu ontime; %llu one-miss; %llu less than ten; %llu ten or more",
+       missed_expirations[EXPIRATIONS_ONTIME],
+       missed_expirations[EXPIRATIONS_MISSED_ONE],
+       missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
+       missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
+
+  in_dump_stats = 0;
+}
 
 
 static int open_midi_device(config_t *cfg) {
@@ -322,12 +347,18 @@ static int open_midi_device(config_t *cfg) {
 //   if (!frames stream 2): commit, ensure ready, mmap
 // } while (running flag)
 
-static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
+//static void* read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
+static void* read_pcm_and_call_plugins(void *arg) {
+  struct sigaction signal_action;
   int timerfd_sample_clock;
   uint64_t expirations = 0;
   int frames_to_advance;
 
-  _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 };
+
+  signal_action.sa_handler = SIG_IGN;
+  sigaction(SIGHUP, &signal_action, NULL);
+  sigaction(SIGINT, &signal_action, NULL);
+  sigaction(SIGTERM, &signal_action, NULL);
 
 
   struct itimerspec itimerspec_sample_clock =
@@ -369,7 +400,7 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
   }
 
 
-  for (int blah = 0; blah < 38000; ++blah) {
+  for (int blah = 0; blah < 38000; ) {
 
     // Business Section
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
@@ -405,6 +436,7 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
 
     // downcast
     frames_to_advance = expirations > INT_MAX ? INT_MAX : expirations;
+    blah += frames_to_advance;
 
     // get new set of frames or advance sample pointers
     if (pcm_state[1]) {
@@ -420,4 +452,6 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
        missed_expirations[EXPIRATIONS_MISSED_ONE],
        missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
        missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
+
+  return NULL;
 }
