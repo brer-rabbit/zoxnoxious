@@ -67,6 +67,25 @@ struct alsa_pcm_state {
 struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num);
 
 
+/** alsa_start_stream
+ *
+ * Wrap calls to snd_pcm_state, snd_pcm_avail_update, snd_pcm_mmap_begin.
+ * Return zero for success, non-zero on failure.
+ */
+int alsa_start_stream(struct alsa_pcm_state *pcm_state);
+
+/** alsa_advance_stream_by_frames
+ *
+ * advance the samples pointers by frames...hopefully one.
+ * If the request is greater than current period the next
+ * period is requested.  There's likely a bug in there.
+ * This wraps calls to snd_pcm_mmap_commit, snd_pcm_state, snd_pcm_avail_update, snd_pcm_mmap_begin.
+ * Return zero for success, non-zero on failure.
+ */
+int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames);
+
+
+
 /** alsa_pcm_ensure_ready
  * check the state to make sure the pcm_handle is good then call snd_pcm_avail_update to make sure
  * available frames is updated.

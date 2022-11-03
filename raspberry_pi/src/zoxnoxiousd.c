@@ -20,6 +20,7 @@
 #include <alsa/asoundlib.h>
 #include <getopt.h>
 #include <libconfig.h>
+#include <limits.h>
 #include <pigpio.h>
 #include <signal.h>
 #include <stdio.h>
@@ -324,6 +325,8 @@ static int open_midi_device(config_t *cfg) {
 static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
   int timerfd_sample_clock;
   uint64_t expirations = 0;
+  int frames_to_advance;
+
   _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 };
 
 
@@ -348,19 +351,14 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
        pcm_state[0]->sampling_rate);
 
 
-  if ( alsa_pcm_ensure_ready(pcm_state[0]) ) {
+  if ( alsa_start_stream(pcm_state[0]) ) {
     ERROR("pcm0: error from alsa_pcm_ensure_ready");
   }
 
   if (pcm_state[1]) {
-    if ( alsa_pcm_ensure_ready(pcm_state[1]) ) {
+    if ( alsa_start_stream(pcm_state[1]) ) {
       ERROR("pcm1: error from alsa_pcm_ensure_ready");
     }
-  }
-
-  alsa_mmap_begin_with_step_calc(pcm_state[0]);
-  if (pcm_state[1]) {
-    alsa_mmap_begin_with_step_calc(pcm_state[1]);
   }
 
 
@@ -371,7 +369,7 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
   }
 
 
-  for (int blah = 0; blah < 3000; ++blah) {
+  for (int blah = 0; blah < 38000; ++blah) {
 
     // Business Section
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
@@ -405,52 +403,15 @@ static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa
     }
 
 
+    // downcast
+    frames_to_advance = expirations > INT_MAX ? INT_MAX : expirations;
+
     // get new set of frames or advance sample pointers
     if (pcm_state[1]) {
-
-      if (pcm_state[1]->frames_remaining > expirations) {
-        // advance sample pointer by expirations --
-        // TODO: error handling should use some DSP to smooth this if expirations > 1
-        for (int i = 0; i < pcm_state[1]->channels; ++i) {
-          pcm_state[1]->samples[i] += (expirations * pcm_state[1]->step_size_by_channel[i]);
-        }
-        pcm_state[1]->frames_remaining -= expirations;
-      }
-      else {
-        if ( alsa_mmap_end(pcm_state[1]) ) {
-          ERROR("alsa_mmap_end returned non-zero");
-        }
-
-        if ( alsa_pcm_ensure_ready(pcm_state[1]) ) {
-          ERROR("alsa_pcm_ensure_ready returned non-zero");
-        }
-
-        if ( alsa_mmap_begin(pcm_state[1]) ) {
-          ERROR("alsa_mmap_begin returned non-zero");
-        }
-      }
+      alsa_advance_stream_by_frames(pcm_state[1], frames_to_advance);
     }
 
-
-    if (pcm_state[0]->frames_remaining > expirations) {
-      for (int i = 0; i < pcm_state[0]->channels; ++i) {
-        pcm_state[0]->samples[i] += (expirations * pcm_state[0]->step_size_by_channel[i]);
-      }
-      pcm_state[0]->frames_remaining -= expirations;
-    }
-    else {
-      if ( alsa_mmap_end(pcm_state[0]) ) {
-        ERROR("alsa_mmap_end returned non-zero");
-      }
-
-      if ( alsa_pcm_ensure_ready(pcm_state[0]) ) {
-        ERROR("alsa_pcm_ensure_ready returned non-zero");
-      }
-
-      if ( alsa_mmap_begin(pcm_state[0]) ) {
-        ERROR("alsa_mmap_begin returned non-zero");
-      }
-    }
+    alsa_advance_stream_by_frames(pcm_state[0], frames_to_advance);
 
   }
 

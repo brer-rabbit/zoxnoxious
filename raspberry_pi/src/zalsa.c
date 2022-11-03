@@ -167,6 +167,52 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
 
 
 
+int alsa_start_stream(struct alsa_pcm_state *pcm_state) {
+  if ( alsa_pcm_ensure_ready(pcm_state) ) {
+    ERROR("zalsa: %s alsa_pcm_ensure_ready error", pcm_state->device_name);
+    return 1;
+  }
+
+  if ( alsa_mmap_begin_with_step_calc(pcm_state) ) {
+    ERROR("zalsa: %s alsa_pcm_mmap_begin error", pcm_state->device_name);
+    return 1;
+  }
+
+  return 0;
+}
+
+
+int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames) {
+  int retval = 0;
+
+  if (pcm_state->frames_remaining > frames) {
+    // advance sample pointer by frames --
+    // TODO: error handling should use some DSP to smooth this if frames > 1
+    for (int i = 0; i < pcm_state->channels; ++i) {
+      pcm_state->samples[i] += (frames * pcm_state->step_size_by_channel[i]);
+    }
+    pcm_state->frames_remaining -= frames;
+  }
+  else {
+    if ( alsa_mmap_end(pcm_state) ) {
+      ERROR("alsa_mmap_end returned non-zero");
+      retval = 1;
+    }
+
+    if ( alsa_pcm_ensure_ready(pcm_state) ) {
+      ERROR("alsa_pcm_ensure_ready returned non-zero");
+      retval += 2;
+    }
+
+    if ( alsa_mmap_begin(pcm_state) ) {
+      ERROR("alsa_mmap_begin returned non-zero");
+      retval += 4;
+    }
+  }
+
+  return retval;
+}
+
 
 
 /* alsa_pcm_ensure_ready
