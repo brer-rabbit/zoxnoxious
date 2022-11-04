@@ -22,7 +22,6 @@
 #include <libconfig.h>
 #include <pigpio.h>
 #include <stdlib.h>
-#include <zlog.h>
 
 #include "zoxnoxiousd.h"
 #include "card_manager.h"

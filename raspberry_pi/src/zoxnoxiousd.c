@@ -19,6 +19,7 @@
 
 #include <alsa/asoundlib.h>
 #include <getopt.h>
+#include <inttypes.h>
 #include <libconfig.h>
 #include <limits.h>
 #include <pigpio.h>
@@ -301,7 +302,7 @@ static void sig_dump_stats(int signum) {
   }
   in_dump_stats = 1;
 
-  INFO("requested stats: %ld.%.9ld / %llu idle sec/samples; %llu one-miss; %llu less than ten; %llu ten or more missed expirations",
+  INFO("requested stats: %ld.%.9ld / %" PRId64 " idle sec/samples; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
        sec_pcm_write_idle, nsec_pcm_write_idle,
        missed_expirations[EXPIRATIONS_ONTIME],
        missed_expirations[EXPIRATIONS_MISSED_ONE],
@@ -472,7 +473,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
   }
 
-  INFO("stats: %ld.%.9ld / %llu idle sec/samples; %llu one-miss; %llu less than ten; %llu ten or more missed expirations",
+  INFO("stats: %ld.%.9ld / %" PRId64 " idle sec/samples; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
        sec_pcm_write_idle, nsec_pcm_write_idle,
        missed_expirations[EXPIRATIONS_ONTIME],
        missed_expirations[EXPIRATIONS_MISSED_ONE],

@@ -17,6 +17,8 @@
 #ifndef ZOXNOXIOUSD_H
 #define ZOXNOXIOUSD_H
 
+#include <zlog.h>
+
 #include "zcard_plugin.h"
 
 

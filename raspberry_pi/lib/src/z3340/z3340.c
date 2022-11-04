@@ -13,17 +13,50 @@
  * limitations under the License.
  */
 
+#include <assert.h>
 #include <stdio.h>
 
 #include "zcard_plugin.h"
 
+#define PCA9555_I2C_ADDRESS 0x20
+
+struct z3340_card {
+  int slot;
+  int i2c_handle;
+};
+
 
 void* init_zcard(int slot) {
-  return NULL;
+  int i2c_addr = slot + PCA9555_I2C_ADDRESS;
+  assert(slot >= 0 && slot < 8);
+  struct z3340_card *z3340 = (struct z3340_card*)malloc(sizeof(struct z3340_card));
+  if (z3340 == NULL) {
+    return NULL;
+  }
+
+  z3340->slot = slot;
+  z3340->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
+  if (z3340->i2c_handle < 0) {
+    ERROR("z3340: unable to open i2c for address %d", i2c_addr);
+    return NULL;
+  }
+  
+  // TODO: turn on LED
+
+  return  z3340;
 }
 
 
 void free_zcard(void *zcard_plugin) {
+  struct z3340_card *z3340 = (struct z3340_card*)zcard_plugin;
+
+  if (zcard_plugin) {
+    if (z3340->i2c_handle >= 0) {
+      // TODO: turn off LED
+      i2cClose(z3340->i2c_handle);
+    }
+    free(z3340);
+  }
 }
 
 char* get_plugin_name() {

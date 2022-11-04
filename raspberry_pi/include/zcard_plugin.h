@@ -18,7 +18,9 @@
 
 #include <alsa/asoundlib.h>
 #include <pigpio.h>
+#include "zoxnoxiousd.h"
 
+#define I2C_BUS 1
 
 /* this is intended to be the interface for cards.  Library functions
  * available for card plugins are here as well.
