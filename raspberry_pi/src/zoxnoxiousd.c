@@ -63,7 +63,8 @@ static snd_rawmidi_t *midi_out = NULL;
 
 static _Atomic int alsa_thread_run = 1;
 static _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 };
-
+static _Atomic time_t sec_pcm_write_idle = 0;
+static _Atomic long nsec_pcm_write_idle = 0;
 
 // static functions
 static void sig_cleanup_and_exit(int signum);
@@ -260,6 +261,7 @@ int main(int argc, char **argv, char **envp) {
 // Signal handling
 static volatile sig_atomic_t in_aborting = 0;
 
+// this isn't a very safe signal handler...
 void sig_cleanup_and_exit(int signum) {
   if (in_aborting) {
     return;
@@ -288,8 +290,7 @@ void sig_cleanup_and_exit(int signum) {
 
   gpioTerminate();
 
-  // log and close anything relevant...which technically isn't safe to do
-  exit(EXIT_FAILURE);
+  _exit(EXIT_FAILURE);
 }
 
 
@@ -300,7 +301,8 @@ static void sig_dump_stats(int signum) {
   }
   in_dump_stats = 1;
 
-  INFO("stats on missed expirations: %llu ontime; %llu one-miss; %llu less than ten; %llu ten or more",
+  INFO("requested stats: %ld.%.9ld / %llu idle sec/samples; %llu one-miss; %llu less than ten; %llu ten or more missed expirations",
+       sec_pcm_write_idle, nsec_pcm_write_idle,
        missed_expirations[EXPIRATIONS_ONTIME],
        missed_expirations[EXPIRATIONS_MISSED_ONE],
        missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
@@ -336,6 +338,17 @@ static int open_midi_device(config_t *cfg) {
 }
 
 
+// add timespec in t1 to accumulator storing in accumulator
+static void timespec_accumulate(const struct timespec *t1, struct timespec *accumulator)
+{
+  accumulator->tv_sec += t1->tv_sec;
+  accumulator->tv_nsec += t1->tv_nsec;
+  if (accumulator->tv_nsec >= 1000000000) {
+    accumulator->tv_nsec -= 1000000000;
+    accumulator->tv_sec++;
+  }
+}
+
 
 // start timer
 // forever:
@@ -359,8 +372,10 @@ static void* read_pcm_and_call_plugins(void *arg) {
   uint64_t expirations = 0;
   int frames_to_advance;
 
-
-
+  // do a couple dumb things:
+  // compute timer dynamically... but this is really designed
+  // for 4khz.  Even worse, assume that pcm[0] and [1] have
+  // the same sampling rate.
   struct itimerspec itimerspec_sample_clock =
     {
       .it_interval.tv_sec = 0,
@@ -368,6 +383,10 @@ static void* read_pcm_and_call_plugins(void *arg) {
       .it_value.tv_sec = 0,
       .it_value.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
     };
+  struct itimerspec itimerspec_remaining_time;
+  struct timespec accumulated_idle_time;
+  int valid_gettime;
+
 
   if ( (timerfd_sample_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
     char error[256];
@@ -376,11 +395,10 @@ static void* read_pcm_and_call_plugins(void *arg) {
   }
   
 
-  // logging from here forward may be tricky / time sensitive
   INFO("starting timer %ld usec for sampling rate %d hz",
        itimerspec_sample_clock.it_interval.tv_nsec / 1000,
        pcm_state[0]->sampling_rate);
-
+  // logging from here forward may be tricky / time sensitive
 
   if ( alsa_start_stream(pcm_state[0]) ) {
     ERROR("pcm0: error from alsa_pcm_ensure_ready");
@@ -400,7 +418,6 @@ static void* read_pcm_and_call_plugins(void *arg) {
   }
 
 
-  //for (int blah = 0; blah < 38000; ) {
   while (alsa_thread_run) {
 
     // Business Section
@@ -420,9 +437,18 @@ static void* read_pcm_and_call_plugins(void *arg) {
     }
 
 
+    // check on remaining time-- though we don't know if it's remaining time until we check the expirations
+    valid_gettime = timerfd_gettime(timerfd_sample_clock, &itimerspec_remaining_time);
     read(timerfd_sample_clock, &expirations, sizeof(expirations));
+
     if (expirations == 1) {
       missed_expirations[EXPIRATIONS_ONTIME]++;
+      // the gettime ended up being remaining time
+      if (valid_gettime == 0) {
+        timespec_accumulate(&itimerspec_remaining_time.it_value, &accumulated_idle_time);
+        sec_pcm_write_idle = accumulated_idle_time.tv_sec;
+        nsec_pcm_write_idle = accumulated_idle_time.tv_nsec;
+      }
     }
     else if (expirations == 2) {
       missed_expirations[EXPIRATIONS_MISSED_ONE]++;
@@ -434,10 +460,8 @@ static void* read_pcm_and_call_plugins(void *arg) {
       missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]++;
     }
 
-
     // downcast
     frames_to_advance = expirations > INT_MAX ? INT_MAX : expirations;
-    //blah += frames_to_advance;
 
     // get new set of frames or advance sample pointers
     if (pcm_state[1]) {
@@ -448,7 +472,8 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
   }
 
-  INFO("missed expirations: %llu ontime; %llu one-miss; %llu less than ten; %llu ten or more",
+  INFO("stats: %ld.%.9ld / %llu idle sec/samples; %llu one-miss; %llu less than ten; %llu ten or more missed expirations",
+       sec_pcm_write_idle, nsec_pcm_write_idle,
        missed_expirations[EXPIRATIONS_ONTIME],
        missed_expirations[EXPIRATIONS_MISSED_ONE],
        missed_expirations[EXPIRATIONS_MISSED_LT_TEN],

@@ -48,7 +48,7 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
 
   if (device_name == NULL) {
     // lookup failed, report the previous index as the max the cfg file has
-    ERROR("max pcm device id " ZALSA_DEVICES_KEY "[%d]", device_num - 1);
+    INFO("Found %d pcm devices", device_num - 1);
     return NULL;
   }
 
