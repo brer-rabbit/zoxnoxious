@@ -41,6 +41,7 @@ struct zcard_properties* get_zcard_properties() {
 
 #define SPI_RATE 12000000
 
+// six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
 static const int channel_map[] = { 0, 1, 3, 4, 5, 7 };
 static int16_t previous_samples[6] = { 0 };
 
@@ -66,7 +67,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     }
 
   }
-
 
   spiClose(spi_channel);
 

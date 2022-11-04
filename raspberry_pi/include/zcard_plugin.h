@@ -22,12 +22,14 @@
 
 /* this is intended to be the interface for cards.  Library functions
  * available for card plugins are here as well.
- * typedef functions need to be implemented.
+ * typedef functions need to be implemented by the card driver (you)..
  */
 
 
-/* set_spi_interface
- * must be called by plugin prior to initial spiWrite() or where the spi mode changes
+/* get_spi_handle
+ * must be called by plugin prior any function's spiWrite() or when changing spi mode changes
+ * in a function.  Wraps/caches pigpio spiOpen and provides a return consistent with spiOpen.
+ * A valid handle can be used for pigpio's spiWrite.  Do not close the handle.
  */
 int set_spi_interface(int spi_mode, int slot);
 
