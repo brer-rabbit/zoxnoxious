@@ -318,15 +318,15 @@ struct PatchingMatrix : ZoxnoxiousModule {
         // hardware cardId, channelOffset (from zero), assignmentOwned
         // hardcoded/mocked data for now, later this ought to be received
         // via midi from the controlling board
-        zCommand_a.channelAssignments[1] = { 0x02, 2, 2, false };
-        zCommand_a.channelAssignments[0] = { 0x02, 8, 3, false };
+        zCommand_a.channelAssignments[0] = { 0x02, 0, 3, false };
+        zCommand_a.channelAssignments[1] = { 0x02, 8, 2, false };
         //zCommand_a.channelAssignments[2] = { 0x00, -1, -1, false };
-        zCommand_a.channelAssignments[2] = { 0x02, 14, 4, false };
+        zCommand_a.channelAssignments[2] = { 0x02, 15, 4, false };
         zCommand_a.channelAssignments[3] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[4] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[5] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[6] = { 0x00, -1, -1, false };
-        zCommand_a.channelAssignments[7] = { getHardwareId(), 0, 1, false };
+        zCommand_a.channelAssignments[7] = { getHardwareId(), 6, 1, false };
 
         // take ownership of our card
         processZoxnoxiousCommand(&zCommand_a);
