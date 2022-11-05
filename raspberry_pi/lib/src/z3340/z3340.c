@@ -39,11 +39,16 @@ void* init_zcard(struct zhost *zhost, int slot) {
   z3340->slot = slot;
   z3340->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
   if (z3340->i2c_handle < 0) {
-    ERROR("z3340: unable to open i2c for address %d", i2c_addr);
+    printf("z3340: unable to open i2c for address %d\n", i2c_addr);
     return NULL;
   }
   
   // TODO: turn on LED
+  char reg = 0x02;
+  char led = 0x08;
+  if (i2cWriteByteData(z3340->i2c_handle, reg, led)) {
+    printf("failed to write LED");
+  }
 
   return  z3340;
 }

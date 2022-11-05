@@ -38,6 +38,7 @@
 #include "zoxnoxiousd.h"
 #include "card_manager.h"
 #include "zalsa.h"
+#include "zcard_plugin.h"
 
 
 // number of stats to track and what they mean
@@ -220,7 +221,7 @@ int main(int argc, char **argv, char **envp) {
   // init all the plugin cards
   for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
     // the index isn't the slot num-- but we can look it up on the card
-    (card_mgr->card_update_order[card_num]->init_zcard_f)(zhost, card_mgr->cards[card_num]->slot);
+    (card_mgr->card_update_order[card_num]->init_zcard)(zhost, card_mgr->cards[card_num].slot);
   }
 
 
@@ -248,9 +249,31 @@ int main(int argc, char **argv, char **envp) {
   signal_action_stats.sa_handler = sig_dump_stats;
   sigaction(SIGUSR1, &signal_action_stats, NULL);
 
+  while (alsa_thread_run) {
+    sleep(1);
+  }
 
   int retval;
   pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
+
+  // close pcm handles
+  if (pcm_state[0] && pcm_state[0]->pcm_handle) {
+    snd_pcm_abort(pcm_state[0]->pcm_handle);
+    snd_pcm_close(pcm_state[0]->pcm_handle);
+  }
+
+  if (pcm_state[1] && pcm_state[1]->pcm_handle) {
+    snd_pcm_abort(pcm_state[1]->pcm_handle);
+    snd_pcm_close(pcm_state[1]->pcm_handle);
+  }
+
+  // card mgr closes all plugins
+  if (card_mgr) {
+    free_card_manager(card_mgr);
+  }
+
+  gpioTerminate();
+
 
   // fall through to exit
   zlog_fini();
@@ -279,29 +302,8 @@ void sig_cleanup_and_exit(int signum) {
   }
   in_aborting = 1;
 
-
   // message threads to abort
   alsa_thread_run = 0;
-
-  // close pcm handles
-  if (pcm_state[0] && pcm_state[0]->pcm_handle) {
-    snd_pcm_abort(pcm_state[0]->pcm_handle);
-    snd_pcm_close(pcm_state[0]->pcm_handle);
-  }
-
-  if (pcm_state[1] && pcm_state[1]->pcm_handle) {
-    snd_pcm_abort(pcm_state[1]->pcm_handle);
-    snd_pcm_close(pcm_state[1]->pcm_handle);
-  }
-
-  // card mgr closes all plugins
-  if (card_mgr) {
-    free_card_manager(card_mgr);
-  }
-
-  gpioTerminate();
-
-  _exit(EXIT_FAILURE);
 }
 
 

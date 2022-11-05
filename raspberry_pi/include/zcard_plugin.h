@@ -33,7 +33,7 @@
  * it out during process_samples_f or whatevz.
  */
 struct zhost;
-
+struct zhost* zhost_create();
 
 /* get_spi_handle
  * must be called by plugin prior any function's spiWrite() or when changing spi mode changes
