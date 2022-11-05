@@ -21,12 +21,13 @@
 #define PCA9555_I2C_ADDRESS 0x20
 
 struct z3340_card {
+  struct zhost *zhost;
   int slot;
   int i2c_handle;
 };
 
 
-void* init_zcard(int slot) {
+void* init_zcard(struct zhost *zhost, int slot) {
   int i2c_addr = slot + PCA9555_I2C_ADDRESS;
   assert(slot >= 0 && slot < 8);
   struct z3340_card *z3340 = (struct z3340_card*)malloc(sizeof(struct z3340_card));
@@ -34,6 +35,7 @@ void* init_zcard(int slot) {
     return NULL;
   }
 
+  z3340->zhost = zhost;
   z3340->slot = slot;
   z3340->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
   if (z3340->i2c_handle < 0) {

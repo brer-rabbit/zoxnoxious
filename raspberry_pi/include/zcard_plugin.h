@@ -28,12 +28,19 @@
  */
 
 
+/* passed in to the init_zcard_f, this object is needed to pass to
+ * some helper functions.  So store it during init, put it away, bring
+ * it out during process_samples_f or whatevz.
+ */
+struct zhost;
+
+
 /* get_spi_handle
  * must be called by plugin prior any function's spiWrite() or when changing spi mode changes
  * in a function.  Wraps/caches pigpio spiOpen and provides a return consistent with spiOpen.
  * A valid handle can be used for pigpio's spiWrite.  Do not close the handle.
  */
-int set_spi_interface(int spi_mode, int slot);
+int set_spi_interface(struct zhost *zhost, int spi_mode, int slot);
 
 
 
@@ -45,7 +52,7 @@ int set_spi_interface(int spi_mode, int slot);
  * (zcard_plugin in other calls).
  * Any i2cOpen calls should be done here with the handle cached.
  */
-typedef void* (*init_zcard_f)(int slot);
+typedef void* (*init_zcard_f)(struct zhost *zhost, int slot);
 
 /* free_zcard
  *

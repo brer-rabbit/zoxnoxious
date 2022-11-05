@@ -16,7 +16,7 @@
 #include "zcard_plugin.h"
 
 
-void* init_zcard(int slot) {
+void* init_zcard(struct zhost *zhost, int slot) {
   return NULL;
 }
 

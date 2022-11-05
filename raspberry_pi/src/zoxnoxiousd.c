@@ -48,10 +48,6 @@
 #define EXPIRATIONS_MISSED_GTE_TEN 3
 
 
-static void help() {
-  printf("Usage: zoxnoxiousd <options>\n"
-         "  -i <config_file>\n");
-}
 
 /* zlog loggin' */
 zlog_category_t *zlog_c = NULL;
@@ -68,6 +64,7 @@ static _Atomic time_t sec_pcm_write_idle = 0;
 static _Atomic long nsec_pcm_write_idle = 0;
 
 // static functions
+static void help();
 static void sig_cleanup_and_exit(int signum);
 static void sig_dump_stats(int signum);
 static int open_midi_device(config_t *cfg);
@@ -219,6 +216,14 @@ int main(int argc, char **argv, char **envp) {
   assign_update_order(card_mgr);
   assign_hw_audio_channels(card_mgr, num_hw_channels, 2);
 
+  struct zhost *zhost = zhost_create();
+  // init all the plugin cards
+  for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
+    // the index isn't the slot num-- but we can look it up on the card
+    (card_mgr->card_update_order[card_num]->init_zcard_f)(zhost, card_mgr->cards[card_num]->slot);
+  }
+
+
 
   sigemptyset(&signal_set);
   sigaddset(&signal_set, SIGUSR1);
@@ -257,6 +262,11 @@ int main(int argc, char **argv, char **envp) {
 
 
 
+
+static void help() {
+  printf("Usage: zoxnoxiousd <options>\n"
+         "  -i <config_file>\n");
+}
 
 
 // Signal handling
@@ -367,7 +377,6 @@ static void timespec_accumulate(const struct timespec *t1, struct timespec *accu
 //   if (!frames stream 2): commit, ensure ready, mmap
 // } while (running flag)
 
-//static void* read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
 static void* read_pcm_and_call_plugins(void *arg) {
   int timerfd_sample_clock;
   uint64_t expirations = 0;
