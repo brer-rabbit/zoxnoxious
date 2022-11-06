@@ -18,8 +18,12 @@
 
 #include "zcard_plugin.h"
 
+
+// GPIO: PCA9555
+#define PCA9555_BASE_I2C_ADDRESS 0x20
+
+// DAC: AD5328
 #define SPI_MODE 1
-#define PCA9555_I2C_ADDRESS 0x20
 
 struct z3340_card {
   struct zhost *zhost;
@@ -27,6 +31,7 @@ struct z3340_card {
   int i2c_handle;
   uint8_t pca9555_port0;
   uint8_t pca9555_port1;
+  int16_t previous_samples[6];
 };
 
 static const uint8_t port0_addr = 0x02;
@@ -35,10 +40,13 @@ static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
 
+// six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
+static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
+
 
 void* init_zcard(struct zhost *zhost, int slot) {
   int error = 0;
-  int i2c_addr = slot + PCA9555_I2C_ADDRESS;
+  int i2c_addr = slot + PCA9555_BASE_I2C_ADDRESS;
   assert(slot >= 0 && slot < 8);
   struct z3340_card *z3340 = (struct z3340_card*)calloc(1, sizeof(struct z3340_card));
   if (z3340 == NULL) {
@@ -102,11 +110,6 @@ struct zcard_properties* get_zcard_properties() {
 
 
 
-// six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
-static const int channel_map[] = { 0, 1, 3, 4, 5, 7 };
-static int16_t previous_samples[6] = { 0 };
-
-
 int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
   char samples_to_dac[2];
@@ -115,12 +118,10 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   spi_channel = set_spi_interface(zcard->zhost, SPI_MODE, zcard->slot);
 
   for (int i = 0; i < 6; ++i) {
-    if (previous_samples[i] != samples[i] ) {
-      previous_samples[i] = samples[i];
+    if (zcard->previous_samples[i] != samples[i] ) {
+      zcard->previous_samples[i] = samples[i];
 
-      samples_to_dac[0] = (channel_map[i] << 4) |
-        ((uint16_t) samples[i]) >> 11;
-
+      samples_to_dac[0] = dac_channel[i] | ((uint16_t) samples[i]) >> 11;
       samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
 
       spiWrite(spi_channel, samples_to_dac, 2);

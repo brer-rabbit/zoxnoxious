@@ -15,12 +15,68 @@
 
 #include "zcard_plugin.h"
 
-#define PCA9555_I2C_ADDRESS 0x20
 
-void* init_zcard(struct zhost *zhost, int slot) {
+// GPIO: PCA9555
+#define PCA9555_BASEI2C_ADDRESS 0x20
+
+// DAC: MCP4822
+#define SPI_MODE 0
+
+
+struct audio_out_card {
   struct zhost *zhost;
   int slot;
   int i2c_handle;
+  uint8_t pca9555_port0;
+  uint8_t pca9555_port1;
+  int16_t previous_samples[2];
+};
+
+static const uint8_t port0_addr = 0x02;
+static const uint8_t port1_addr = 0x03;
+static const uint8_t config_port0_addr = 0x06;
+static const uint8_t config_port1_addr = 0x07;
+static const uint8_t config_port_as_output = 0x00;
+static const uint8_t dac_channel[2] = { 0x90, 0x80 };
+
+
+void* init_zcard(struct zhost *zhost, int slot) {
+  int error = 0;
+  int i2c_addr = slot + PCA9555_BASE_I2C_ADDRESS;
+  assert(slot >= 0 && slot < 8);
+  struct audio_out_card *audio_out = (struct audio_out_card*)calloc(1, sizeof(struct audio_out_card));
+  if (audio_out == NULL) {
+    return NULL;
+  }
+
+  audio_out->zhost = zhost;
+  audio_out->slot = slot;
+  audio_out->pca9555_port0 = 0x00;
+  audio_out->pca9555_port1 = 0x00;
+
+  audio_out->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
+  if (audio_out->i2c_handle < 0) {
+    ERROR("audio_out: unable to open i2c for address %d\n", i2c_addr);
+    return NULL;
+  }
+  
+
+  // configure port0 and port1 as output;
+  // start with zero values.  This ought to
+  // turn everything "off", with the LED on.
+  error += i2cWriteByteData(audio_out->i2c_handle, config_port0_addr, config_port_as_output);
+  error += i2cWriteByteData(audio_out->i2c_handle, config_port1_addr, config_port_as_output);
+  error += i2cWriteByteData(audio_out->i2c_handle, port0_addr, audio_out->pca9555_port0);
+  error += i2cWriteByteData(audio_out->i2c_handle, port1_addr, audio_out->pca9555_port1);
+
+  if (error) {
+    ERROR("audio_out: error writing to I2C bus address %d\n", i2c_addr);
+    i2cClose(audio_out->i2c_handle);
+    free(audio_out);
+    return NULL;
+  }
+
+  return audio_out;
 }
 
 
@@ -41,6 +97,25 @@ struct zcard_properties* get_zcard_properties() {
 
 
 int process_samples(void *zcard_plugin, const int16_t *samples) {
+  struct audio_out_card *zcard = (struct audio_out_card*)zcard_plugin;
+  char samples_to_dac[2];
+  int spi_channel;
+
+  spi_channel = set_spi_interface(zcard->zhost, SPI_MODE, zcard->slot);
+
+  for (int i = 0; i < 2; ++i) {
+    if (zcard->previous_samples[i] != samples[i] ) {
+      zcard->previous_samples[i] = samples[i];
+
+      samples_to_dac[0] = (channel_map[i] << 4) |
+        ((uint16_t) samples[i]) >> 11;
+
+      samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+
+      spiWrite(spi_channel, samples_to_dac, 2);
+    }
+  }
+
   return 0;
 }
 
