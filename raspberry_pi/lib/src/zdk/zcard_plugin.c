@@ -19,12 +19,16 @@
 #define SPI_CHANNEL 0
 
 #define INITIAL_SPI_FLAGS 1
-#define INITIAL_SLOT 0
+#define INITIAL_SLOT 5
 
 // GPIOs 13, 19, 26 mux the chip select to the different cards
 #define MUXOUT_0 13
 #define MUXOUT_1 19
 #define MUXOUT_2 26
+
+
+/* zlog loggin' */
+zlog_category_t *zlog_c = NULL;
 
 
 struct zhost {
@@ -39,17 +43,16 @@ struct gpio_pin_value_tuple {
   unsigned int level;
 };
 
-static const struct gpio_pin_value_tuple pin_value_tuple[8][3] =
-  {
-    { { MUXOUT_0, 0 }, { MUXOUT_1, 0 }, { MUXOUT_2, 0 } },
-    { { MUXOUT_0, 0 }, { MUXOUT_1, 0 }, { MUXOUT_2, 1 } },
-    { { MUXOUT_0, 0 }, { MUXOUT_1, 1 }, { MUXOUT_2, 0 } },
-    { { MUXOUT_0, 0 }, { MUXOUT_1, 1 }, { MUXOUT_2, 1 } },
-    { { MUXOUT_0, 1 }, { MUXOUT_1, 0 }, { MUXOUT_2, 0 } },
-    { { MUXOUT_0, 1 }, { MUXOUT_1, 0 }, { MUXOUT_2, 1 } },
-    { { MUXOUT_0, 1 }, { MUXOUT_1, 1 }, { MUXOUT_2, 0 } },
-    { { MUXOUT_0, 1 }, { MUXOUT_1, 1 }, { MUXOUT_2, 1 } }
-  };
+static const struct gpio_pin_value_tuple pin_value_tuple[8][3] = {
+  { { MUXOUT_0, 0 }, { MUXOUT_1, 0 }, { MUXOUT_2, 0 } },
+  { { MUXOUT_0, 0 }, { MUXOUT_1, 0 }, { MUXOUT_2, 1 } },
+  { { MUXOUT_0, 0 }, { MUXOUT_1, 1 }, { MUXOUT_2, 0 } },
+  { { MUXOUT_0, 0 }, { MUXOUT_1, 1 }, { MUXOUT_2, 1 } },
+  { { MUXOUT_0, 1 }, { MUXOUT_1, 0 }, { MUXOUT_2, 0 } },
+  { { MUXOUT_0, 1 }, { MUXOUT_1, 0 }, { MUXOUT_2, 1 } },
+  { { MUXOUT_0, 1 }, { MUXOUT_1, 1 }, { MUXOUT_2, 0 } },
+  { { MUXOUT_0, 1 }, { MUXOUT_1, 1 }, { MUXOUT_2, 1 } }
+};
 
 
 struct zhost* zhost_create() {
@@ -59,16 +62,24 @@ struct zhost* zhost_create() {
     return NULL;
   }
 
-  if (gpioSetMode(MUXOUT_0, PI_OUTPUT) &&
-      gpioSetMode(MUXOUT_1, PI_OUTPUT) &&
+  if (gpioSetMode(MUXOUT_0, PI_OUTPUT) ||
+      gpioSetMode(MUXOUT_1, PI_OUTPUT) ||
       gpioSetMode(MUXOUT_2, PI_OUTPUT)) {
     ERROR("failed to open SPI");
     free(zhost);
     return NULL;
   }
 
-  if (gpioWrite(pin_value_tuple[INITIAL_SLOT][0].gpio, pin_value_tuple[INITIAL_SLOT][0].level) &&
-      gpioWrite(pin_value_tuple[INITIAL_SLOT][1].gpio, pin_value_tuple[INITIAL_SLOT][1].level) &&
+  if (gpioSetMode(pin_value_tuple[INITIAL_SLOT][0].gpio, PI_OUTPUT) ||
+      gpioSetMode(pin_value_tuple[INITIAL_SLOT][1].gpio, PI_OUTPUT) ||
+      gpioSetMode(pin_value_tuple[INITIAL_SLOT][2].gpio, PI_OUTPUT)) {
+    ERROR("gpio setMode failed");
+    free(zhost);
+    return NULL;
+  }
+
+  if (gpioWrite(pin_value_tuple[INITIAL_SLOT][0].gpio, pin_value_tuple[INITIAL_SLOT][0].level) ||
+      gpioWrite(pin_value_tuple[INITIAL_SLOT][1].gpio, pin_value_tuple[INITIAL_SLOT][1].level) ||
       gpioWrite(pin_value_tuple[INITIAL_SLOT][2].gpio, pin_value_tuple[INITIAL_SLOT][2].level)) {
     ERROR("gpio write failed");
     free(zhost);
@@ -91,8 +102,8 @@ int set_spi_interface(struct zhost *zhost, int spi_flags, int slot) {
 
   if (zhost->active_slot != slot) {
     // change GPIOs to the slot
-    if (gpioWrite(pin_value_tuple[slot][0].gpio, pin_value_tuple[slot][0].level) &&
-        gpioWrite(pin_value_tuple[slot][1].gpio, pin_value_tuple[slot][1].level) &&
+    if (gpioWrite(pin_value_tuple[slot][0].gpio, pin_value_tuple[slot][0].level) ||
+        gpioWrite(pin_value_tuple[slot][1].gpio, pin_value_tuple[slot][1].level) ||
         gpioWrite(pin_value_tuple[slot][2].gpio, pin_value_tuple[slot][2].level)) {
       ERROR("gpio write failed");
       return -1;  // valid spi handle is >= 0
@@ -103,8 +114,12 @@ int set_spi_interface(struct zhost *zhost, int spi_flags, int slot) {
 
   // get a SPI handle- return the existing one if it's a match
   if (zhost->spi_flags != spi_flags) {
-    spiClose(zhost->spi_handle);
-    zhost->spi_handle = spiOpen(SPI_CHANNEL, SPI_RATE, spi_flags);
+    if ( spiClose(zhost->spi_handle) != 0 ) {
+      ERROR("spiClose failed");
+    }
+    if ( (zhost->spi_handle = spiOpen(SPI_CHANNEL, SPI_RATE, spi_flags)) < 0) {
+      ERROR("spiOpen failed");
+    }
     zhost->spi_flags = spi_flags;
   }
   

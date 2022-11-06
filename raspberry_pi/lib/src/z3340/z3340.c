@@ -18,39 +18,61 @@
 
 #include "zcard_plugin.h"
 
+#define SPI_MODE 1
 #define PCA9555_I2C_ADDRESS 0x20
 
 struct z3340_card {
   struct zhost *zhost;
   int slot;
   int i2c_handle;
+  uint8_t pca9555_port0;
+  uint8_t pca9555_port1;
 };
+
+static const uint8_t port0_addr = 0x02;
+static const uint8_t port1_addr = 0x03;
+static const uint8_t config_port0_addr = 0x06;
+static const uint8_t config_port1_addr = 0x07;
+static const uint8_t config_port_as_output = 0x00;
 
 
 void* init_zcard(struct zhost *zhost, int slot) {
+  int error = 0;
   int i2c_addr = slot + PCA9555_I2C_ADDRESS;
   assert(slot >= 0 && slot < 8);
-  struct z3340_card *z3340 = (struct z3340_card*)malloc(sizeof(struct z3340_card));
+  struct z3340_card *z3340 = (struct z3340_card*)calloc(1, sizeof(struct z3340_card));
   if (z3340 == NULL) {
     return NULL;
   }
 
   z3340->zhost = zhost;
   z3340->slot = slot;
+  z3340->pca9555_port0 = 0x00;
+  z3340->pca9555_port1 = 0x00;
+
   z3340->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
   if (z3340->i2c_handle < 0) {
-    printf("z3340: unable to open i2c for address %d\n", i2c_addr);
+    ERROR("z3340: unable to open i2c for address %d\n", i2c_addr);
     return NULL;
   }
   
-  // TODO: turn on LED
-  char reg = 0x02;
-  char led = 0x08;
-  if (i2cWriteByteData(z3340->i2c_handle, reg, led)) {
-    printf("failed to write LED");
+
+  // configure port0 and port1 as output;
+  // start with zero values.  This ought to
+  // turn everything "off", with the LED on.
+  error += i2cWriteByteData(z3340->i2c_handle, config_port0_addr, config_port_as_output);
+  error += i2cWriteByteData(z3340->i2c_handle, config_port1_addr, config_port_as_output);
+  error += i2cWriteByteData(z3340->i2c_handle, port0_addr, z3340->pca9555_port0);
+  error += i2cWriteByteData(z3340->i2c_handle, port1_addr, z3340->pca9555_port1);
+
+  if (error) {
+    ERROR("z3340: error writing to I2C bus address %d\n", i2c_addr);
+    i2cClose(z3340->i2c_handle);
+    free(z3340);
+    return NULL;
   }
 
-  return  z3340;
+  return z3340;
 }
 
 
@@ -79,7 +101,6 @@ struct zcard_properties* get_zcard_properties() {
 }
 
 
-#define SPI_RATE 12000000
 
 // six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
 static const int channel_map[] = { 0, 1, 3, 4, 5, 7 };
@@ -87,12 +108,11 @@ static int16_t previous_samples[6] = { 0 };
 
 
 int process_samples(void *zcard_plugin, const int16_t *samples) {
+  struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
   char samples_to_dac[2];
   int spi_channel;
 
-  if ((spi_channel = spiOpen(0, SPI_RATE, 1)) < 0) {
-    return 1;
-  }
+  spi_channel = set_spi_interface(zcard->zhost, SPI_MODE, zcard->slot);
 
   for (int i = 0; i < 6; ++i) {
     if (previous_samples[i] != samples[i] ) {
@@ -108,15 +128,11 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 
   }
 
-  spiClose(spi_channel);
-
-
   /*
-    printf("z3340: samples: %p %5hd %5hd %5hd %5hd %5hd %5hd\n",
+    INFO("z3340: samples: %p %5hd %5hd %5hd %5hd %5hd %5hd\n",
            (void*) samples,
            samples[0], samples[1], samples[2],
            samples[3], samples[4], samples[5]);
-  }
   */
 
   return 0;

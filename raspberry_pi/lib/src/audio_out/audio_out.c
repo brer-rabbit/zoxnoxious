@@ -15,9 +15,12 @@
 
 #include "zcard_plugin.h"
 
+#define PCA9555_I2C_ADDRESS 0x20
 
 void* init_zcard(struct zhost *zhost, int slot) {
-  return NULL;
+  struct zhost *zhost;
+  int slot;
+  int i2c_handle;
 }
 
 

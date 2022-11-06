@@ -50,8 +50,6 @@
 
 
 
-/* zlog loggin' */
-zlog_category_t *zlog_c = NULL;
 
 /* globals-  mainly so they can be accessed by signal handler  */
 static struct card_manager *card_mgr = NULL;
@@ -217,11 +215,23 @@ int main(int argc, char **argv, char **envp) {
   assign_update_order(card_mgr);
   assign_hw_audio_channels(card_mgr, num_hw_channels, 2);
 
-  struct zhost *zhost = zhost_create();
+  struct zhost *zhost;
+  if ( (zhost = zhost_create()) == NULL) {
+    FATAL("zhost_create failed");
+    abort();
+  }
+
   // init all the plugin cards
   for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
+    // alias
+    struct plugin_card *this_card = card_mgr->card_update_order[card_num];
     // the index isn't the slot num-- but we can look it up on the card
-    (card_mgr->card_update_order[card_num]->init_zcard)(zhost, card_mgr->cards[card_num].slot);
+    INFO("init card slot %d", card_mgr->cards[card_num].slot);
+    this_card->plugin_object =
+      (this_card->init_zcard)(zhost, card_mgr->cards[card_num].slot);
+    if (this_card->plugin_object == NULL) {
+      WARN("plugin card slot %d returned NULL for init", card_mgr->cards[card_num].slot);
+    }
   }
 
 

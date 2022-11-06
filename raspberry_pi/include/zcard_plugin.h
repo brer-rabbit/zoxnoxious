@@ -18,9 +18,21 @@
 
 #include <alsa/asoundlib.h>
 #include <pigpio.h>
+#include <zlog.h>
 #include "zoxnoxiousd.h"
 
 #define I2C_BUS 1
+
+
+/* logging */
+#define DEBUG(...) zlog_debug(zlog_c, __VA_ARGS__)
+#define INFO(...)  zlog_info(zlog_c, __VA_ARGS__)
+#define WARN(...)  zlog_warn(zlog_c, __VA_ARGS__)
+#define ERROR(...) zlog_error(zlog_c, __VA_ARGS__)
+#define FATAL(...) zlog_fatal(zlog_c, __VA_ARGS__)
+extern zlog_category_t *zlog_c;
+
+
 
 /* this is intended to be the interface for cards.  Library functions
  * available for card plugins are here as well.
