@@ -17,7 +17,7 @@
 
 
 // GPIO: PCA9555
-#define PCA9555_BASEI2C_ADDRESS 0x20
+#define PCA9555_BASE_I2C_ADDRESS 0x20
 
 // DAC: MCP4822
 #define SPI_MODE 0
@@ -37,7 +37,7 @@ static const uint8_t port1_addr = 0x03;
 static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
-static const uint8_t dac_channel[2] = { 0x90, 0x80 };
+static const uint8_t dac_channel[2] = { 0x90, 0x10 };
 
 
 void* init_zcard(struct zhost *zhost, int slot) {
@@ -107,12 +107,16 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (zcard->previous_samples[i] != samples[i] ) {
       zcard->previous_samples[i] = samples[i];
 
-      samples_to_dac[0] = (channel_map[i] << 4) |
-        ((uint16_t) samples[i]) >> 11;
-
+      samples_to_dac[0] = dac_channel[i] | ((uint16_t) samples[i]) >> 11;
       samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
 
       spiWrite(spi_channel, samples_to_dac, 2);
+      /*
+      WARN("audio out: channel %d 0x%4X : 0x%2X 0x%2X",
+           i,
+           samples[i],
+           samples_to_dac[0], samples_to_dac[1]);
+      */
     }
   }
 

@@ -15,6 +15,8 @@
 
 /* main file for zoxnoxiousd server application.  Handle basic setup of components,
  * init, get things going.
+ * run it something like this with LD_LIBRARY_PATH set to /usr/local/zoxnoxiousd/lib
+ * sudo env LD_LIBRARY_PATH=$LD_LIBRARY_PATH chrt -f 40 ./zoxnoxiousd -i /home/kaf/git/zoxnoxious/raspberry_pi/etc/zoxnoxiousd.cfg
  */
 
 #include <alsa/asoundlib.h>
@@ -68,6 +70,7 @@ static void sig_cleanup_and_exit(int signum);
 static void sig_dump_stats(int signum);
 static int open_midi_device(config_t *cfg);
 static void* read_pcm_and_call_plugins(void *);
+static void* midi_in_to_plugins(void *);
 
 
 
@@ -75,8 +78,9 @@ int main(int argc, char **argv, char **envp) {
   config_t *cfg;
   char *midi_device_name = NULL;
   char config_filename[128] = { '\0' };
-  char *opt_string = "hi:m:v";
+  char *opt_string = "hi:v";
   pthread_t alsa_pcm_to_plugin_thread;
+  pthread_t midi_in_plugin_thread;
   sigset_t signal_set;
   struct sigaction signal_action_cleanup, signal_action_stats;
 
@@ -93,7 +97,6 @@ int main(int argc, char **argv, char **envp) {
   struct option long_option[] = {
     {"help", no_argument, NULL, 'h'},
     {"config", required_argument, NULL, 'i'},
-    {"mididevice", required_argument, NULL, 'm'},
     {"verbose", required_argument, NULL, 'v'},
     {NULL, 0, NULL, 0},
   };
@@ -112,9 +115,6 @@ int main(int argc, char **argv, char **envp) {
     case 'i':
       strncpy(config_filename, optarg, sizeof(config_filename) - 1);
       config_filename[127] = '\0';
-      break;
-    case 'm':
-      midi_device_name = strdup(optarg);
       break;
     default:
       printf("unknown option\n");
@@ -205,7 +205,10 @@ int main(int argc, char **argv, char **envp) {
 
 
   // init alsa midi device
-  open_midi_device(cfg);
+  if (open_midi_device(cfg) != 0) {
+    ERROR("fail to open MIDI device");
+    abort();
+  }
 
   
   // detect installed cards- get the card manager going
@@ -259,9 +262,13 @@ int main(int argc, char **argv, char **envp) {
   signal_action_stats.sa_handler = sig_dump_stats;
   sigaction(SIGUSR1, &signal_action_stats, NULL);
 
+  //midi_in_to_plugins(NULL);
+
   while (alsa_thread_run) {
     sleep(1);
   }
+
+
 
   int retval;
   pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
@@ -338,7 +345,7 @@ static void sig_dump_stats(int signum) {
 static int open_midi_device(config_t *cfg) {
   const char *midi_device_name;
   config_setting_t *midi_device_setting = config_lookup(cfg, MIDI_DEVICE_KEY);
-    
+
   if (midi_device_setting == NULL) {
     ERROR("cfg: no midi config value found for " MIDI_DEVICE_KEY);
     return 1;
@@ -351,7 +358,7 @@ static int open_midi_device(config_t *cfg) {
     return 1;
   }
 
-  if (snd_rawmidi_open(&midi_in, &midi_out, midi_device_name, SND_RAWMIDI_NONBLOCK) != 0) {
+  if (snd_rawmidi_open(&midi_in, &midi_out, midi_device_name, 0) != 0) {
     ERROR("failed to open midi device %s", midi_device_name);
     return 1;
   }
@@ -362,7 +369,7 @@ static int open_midi_device(config_t *cfg) {
 
 
 // add timespec in t1 to accumulator storing in accumulator
-static void timespec_accumulate(const struct timespec *t1, struct timespec *accumulator)
+static inline void timespec_accumulate(const struct timespec *t1, struct timespec *accumulator)
 {
   accumulator->tv_sec += t1->tv_sec;
   accumulator->tv_nsec += t1->tv_nsec;
@@ -415,7 +422,6 @@ static void* read_pcm_and_call_plugins(void *arg) {
     strerror_r(errno, error, 256);
     ERROR("failed to create timer: %s", error);
   }
-  
 
   INFO("starting timer %ld usec for sampling rate %d hz",
        itimerspec_sample_clock.it_interval.tv_nsec / 1000,
@@ -431,7 +437,6 @@ static void* read_pcm_and_call_plugins(void *arg) {
       ERROR("pcm1: error from alsa_pcm_ensure_ready");
     }
   }
-
 
   if ( (timerfd_settime(timerfd_sample_clock, 0, &itimerspec_sample_clock, 0) ) == -1) {
     char error[256];
@@ -457,7 +462,6 @@ static void* read_pcm_and_call_plugins(void *arg) {
         INFO("card error");
       }
     }
-
 
     // check on remaining time-- though we don't know if it's remaining time until we check the expirations
     valid_gettime = timerfd_gettime(timerfd_sample_clock, &itimerspec_remaining_time);
@@ -494,7 +498,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
   }
 
-  INFO("stats: %ld.%.9ld / %" PRId64 " idle sec/samples; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
+  INFO("stats: %ld.%.9ld / %" PRId64 " idle nsec/samples; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
        sec_pcm_write_idle, nsec_pcm_write_idle,
        missed_expirations[EXPIRATIONS_ONTIME],
        missed_expirations[EXPIRATIONS_MISSED_ONE],
@@ -502,4 +506,21 @@ static void* read_pcm_and_call_plugins(void *arg) {
        missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
 
   return NULL;
+}
+
+
+static void* midi_in_to_plugins(void *arg) {
+  int status = 0;
+  uint8_t buffer[128];
+
+  //while (1) {
+    status = snd_rawmidi_read(midi_in, buffer, sizeof(buffer));
+    if (status < 0) {
+      ERROR("Error reading MIDI input: %s", snd_strerror(status));
+      return NULL;
+    }
+
+    INFO("MIDI read received %d bytes", status);
+    //}
+
 }
