@@ -252,6 +252,11 @@ int main(int argc, char **argv, char **envp) {
     abort();
   }
 
+  if ( pthread_create(&midi_in_plugin_thread, NULL, midi_in_to_plugins, NULL) ) {
+    ERROR("failed to start thread for midi_in_to_plugins");
+    abort();
+  }
+
 
   // setup signal handling
   signal_action_cleanup.sa_handler = sig_cleanup_and_exit;
@@ -262,7 +267,7 @@ int main(int argc, char **argv, char **envp) {
   signal_action_stats.sa_handler = sig_dump_stats;
   sigaction(SIGUSR1, &signal_action_stats, NULL);
 
-  //midi_in_to_plugins(NULL);
+
 
   while (alsa_thread_run) {
     sleep(1);
@@ -272,6 +277,7 @@ int main(int argc, char **argv, char **envp) {
 
   int retval;
   pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
+  pthread_join(midi_in_plugin_thread, (void**)&retval);
 
   // close pcm handles
   if (pcm_state[0] && pcm_state[0]->pcm_handle) {
@@ -358,7 +364,8 @@ static int open_midi_device(config_t *cfg) {
     return 1;
   }
 
-  if (snd_rawmidi_open(&midi_in, &midi_out, midi_device_name, 0) != 0) {
+
+  if (snd_rawmidi_open(&midi_in, &midi_out, midi_device_name, SND_RAWMIDI_NONBLOCK) != 0) {
     ERROR("failed to open midi device %s", midi_device_name);
     return 1;
   }
@@ -405,13 +412,12 @@ static void* read_pcm_and_call_plugins(void *arg) {
   // compute timer dynamically... but this is really designed
   // for 4khz.  Even worse, assume that pcm[0] and [1] have
   // the same sampling rate.
-  struct itimerspec itimerspec_sample_clock =
-    {
-      .it_interval.tv_sec = 0,
-      .it_interval.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
-      .it_value.tv_sec = 0,
-      .it_value.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
-    };
+  struct itimerspec itimerspec_sample_clock = {
+    .it_interval.tv_sec = 0,
+    .it_interval.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
+    .it_value.tv_sec = 0,
+    .it_value.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
+  };
   struct itimerspec itimerspec_remaining_time;
   struct timespec accumulated_idle_time;
   int valid_gettime;
@@ -420,7 +426,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
   if ( (timerfd_sample_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
     char error[256];
     strerror_r(errno, error, 256);
-    ERROR("failed to create timer: %s", error);
+    ERROR("failed to create sample clock timer: %s", error);
   }
 
   INFO("starting timer %ld usec for sampling rate %d hz",
@@ -498,9 +504,8 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
   }
 
-  INFO("stats: %ld.%.9ld / %" PRId64 " idle nsec/samples; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
-       sec_pcm_write_idle, nsec_pcm_write_idle,
-       missed_expirations[EXPIRATIONS_ONTIME],
+  INFO("stats: %" PRId64 " idle usec/frame; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
+       (((int64_t)sec_pcm_write_idle * 1000000000LL + nsec_pcm_write_idle) / 1000LL) / ((int64_t)missed_expirations[EXPIRATIONS_ONTIME]),
        missed_expirations[EXPIRATIONS_MISSED_ONE],
        missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
        missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
@@ -509,18 +514,95 @@ static void* read_pcm_and_call_plugins(void *arg) {
 }
 
 
-static void* midi_in_to_plugins(void *arg) {
-  int status = 0;
-  uint8_t buffer[128];
+// this is all the first nibble stuff- 0xFx stuff is more complex, but it's to be ignored
+enum midi_status_byte {
+  MIDI_STATUS_NOT_SET = 0x00,
+  MIDI_NOTE_OFF = 0x80,
+  MIDI_NOTE_ON = 0x90,
+  MIDI_KEY_PRESSURE = 0xA0,
+  MIDI_CONTROLLER_CHANGE = 0xB0,
+  MIDI_PROGRAM_CHANGE = 0xC0,
+  MIDI_CHANNEL_PRESSURE = 0xD0,
+  MIDI_PITCH_BEND = 0xE0,
+  MIDI_SYSEX = 0xF0
+};
 
-  //while (1) {
-    status = snd_rawmidi_read(midi_in, buffer, sizeof(buffer));
-    if (status < 0) {
-      ERROR("Error reading MIDI input: %s", snd_strerror(status));
+struct midi_state {
+  enum midi_status_byte status;
+  uint8_t channel;
+  uint8_t bytes[2];
+};
+
+
+
+static void* midi_in_to_plugins(void *arg) {
+  int midi_read_status = 0;
+  uint8_t buffer[256];
+  // 1ms timer for polling midi
+  int timerfd_midi_clock;
+  struct itimerspec itimerspec_midi_clock = {
+    .it_interval.tv_sec = 0,
+    .it_interval.tv_nsec = 2000000,
+    .it_value.tv_sec = 0,
+    .it_value.tv_nsec = 2000000
+  };
+  uint64_t expirations;
+  struct midi_state midi_state = { 0 };
+
+
+  if ( (timerfd_midi_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to create midi timer: %s", error);
+  }
+
+  if ( (timerfd_settime(timerfd_midi_clock, 0, &itimerspec_midi_clock, 0) ) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to start midi timer: %s", error);
+  }
+
+  INFO("starting MIDI In event loop");
+
+  while (alsa_thread_run) {
+
+    // non-blocking read so we can periodically query the alsa_thread_run flag.
+    // try not to be too busy loop by only running this loop periodically (2.5 ms maybe?)
+    midi_read_status = snd_rawmidi_read(midi_in, buffer, sizeof(buffer));
+    if (midi_read_status == -EAGAIN || midi_read_status == -EBUSY) {
+    }
+    else if (midi_read_status < 0) { // non-EAGAIN non-EBUSY error
+      ERROR("Error reading MIDI input: %s", snd_strerror(midi_read_status));
       return NULL;
     }
+    else {
+      INFO("MIDI read received %d bytes", midi_read_status);
+      // read the midi stream. could be starting anywhere in the stream, so...
+      for (int i = 0; i < midi_read_status; ++i) {
+        if ( (buffer[i] & 0xF0) == MIDI_PROGRAM_CHANGE) {
+          midi_state.status = MIDI_PROGRAM_CHANGE;
+          midi_state.channel = buffer[i] & 0x0F;
+          midi_state.bytes[0] = 0;
+          midi_state.bytes[1] = 0;
+        }
+        else if (midi_state.status == MIDI_PROGRAM_CHANGE) {
+          // get program change and call plugin
+          midi_state.bytes[0] = buffer[i];
+          INFO("MIDI: channel 0x%X program change: 0x%X",
+               midi_state.channel,
+               midi_state.bytes[0]);
+          // then clear state
+          midi_state.status = MIDI_STATUS_NOT_SET;
+        }
+        else {  // future: check for other status messages
+          // ignore for now
+        }
+      }
 
-    INFO("MIDI read received %d bytes", status);
-    //}
+    }
 
+    read(timerfd_midi_clock, &expirations, sizeof(expirations));
+  }
+
+  return NULL;
 }
