@@ -121,12 +121,20 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (zcard->previous_samples[i] != samples[i] ) {
       zcard->previous_samples[i] = samples[i];
 
-      samples_to_dac[0] = dac_channel[i] | ((uint16_t) samples[i]) >> 11;
+      samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
       samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
 
       spiWrite(spi_channel, samples_to_dac, 2);
-    }
 
+#ifdef DAC_DEBUG
+      // test DAC channel is at 0x60; mirror dac channel 0x40 for test
+      if (i == 3) {
+        samples_to_dac[0] |= 0x20;
+        spiWrite(spi_channel, samples_to_dac, 2);
+      }
+#endif
+        
+    }
   }
 
   /*
