@@ -178,6 +178,9 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
                              prog_gpio_entry->gpio_reg,
                              zcard->pca9555_port[ prog_gpio_entry->port ]);
 
+    INFO("audio out: prog 0x%X: wrote 0x%X to port %d",
+         program_number, zcard->pca9555_port[ prog_gpio_entry->port ],
+         prog_gpio_entry->gpio_reg);
   }
   else {
     WARN("audio out: unexpected midi program number: 0x%X", program_number);

@@ -165,23 +165,23 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 0, port0_addr, 0b00010000, 0b11111111 }, // prog 1 - sync neg on
   { 1, port1_addr, 0b00000000, 0b11111101 }, // prog 2 - mix1 pulse off
   { 1, port1_addr, 0b00000010, 0b11111111 }, // prog 3 - mix1 pulse on
-  { 1, port1_addr, 0b00000001, 0b11111111 }, // prog 4 - mix1 comp on
-  { 1, port1_addr, 0b00000000, 0b11111110 }, // prog 5 - mix1 comp off
-  { 1, port1_addr, 0b01000000, 0b11111111 }, // prog 6 - mix2 pulse on
-  { 1, port1_addr, 0b00000000, 0b10111111 }, // prog 7 - mix2 pulse off
-  { 1, port1_addr, 0b10000000, 0b11111111 }, // prog 8 - ext mod pwm on
-  { 1, port1_addr, 0b00000000, 0b01111111 }, // prog 9 - ext mod pwm off
-  { 0, port0_addr, 0b00100000, 0b11111111 }, // prog 10 - ext mod to fm on
-  { 0, port0_addr, 0b00000000, 0b11011111 }, // prog 11 - ext mod to fm off
-  { 0, port0_addr, 0b10000000, 0b11111111 }, // prog 12 - linear fm on
-  { 0, port0_addr, 0b00000000, 0b01111111 }, // prog 13 - linear fm off
-  { 1, port1_addr, 0b00010000, 0b11111111 }, // prog 14 - mix2 saw on
-  { 1, port1_addr, 0b00000000, 0b11101111 }, // prog 15 - mix2 saw off
-  { 0, port0_addr, 0b01000000, 0b11111111 }, // prog 16 - sync pos on
-  { 0, port0_addr, 0b00000000, 0b10111111 }, // prog 17 - sync pos off
+  { 1, port1_addr, 0b00000000, 0b11111110 }, // prog 4 - mix1 comp off
+  { 1, port1_addr, 0b00000001, 0b11111111 }, // prog 5 - mix1 comp on
+  { 1, port1_addr, 0b00000000, 0b10111111 }, // prog 6 - mix2 pulse off
+  { 1, port1_addr, 0b01000000, 0b11111111 }, // prog 7 - mix2 pulse on
+  { 1, port1_addr, 0b00000000, 0b01111111 }, // prog 8 - ext mod pwm off
+  { 1, port1_addr, 0b10000000, 0b11111111 }, // prog 9 - ext mod pwm on
+  { 0, port0_addr, 0b00000000, 0b11011111 }, // prog 10 - ext mod to fm off
+  { 0, port0_addr, 0b00100000, 0b11111111 }, // prog 11 - ext mod to fm on
+  { 0, port0_addr, 0b00000000, 0b01111111 }, // prog 12 - linear fm off
+  { 0, port0_addr, 0b10000000, 0b11111111 }, // prog 13 - linear fm on
+  { 1, port1_addr, 0b00000000, 0b11101111 }, // prog 14 - mix2 saw off
+  { 1, port1_addr, 0b00010000, 0b11111111 }, // prog 15 - mix2 saw on
+  { 0, port0_addr, 0b00000000, 0b10111111 }, // prog 16 - sync pos off
+  { 0, port0_addr, 0b01000000, 0b11111111 }, // prog 17 - sync pos on
   { 1, port1_addr, 0b00000000, 0b11110011 }, // prog 18 - mix1 saw off
-  { 1, port1_addr, 0b00000100, 0b11110111 }, // prog 19 - mix1 saw low
-  { 1, port1_addr, 0b00001000, 0b11111011 }, // prog 20 - mix1 saw med
+  { 1, port1_addr, 0b00001000, 0b11111011 }, // prog 19 - mix1 saw low
+  { 1, port1_addr, 0b00000100, 0b11110111 }, // prog 20 - mix1 saw med
   { 1, port1_addr, 0b00001100, 0b11111111 }, // prog 21 - mix1 saw high
   { 0, port0_addr, 0b00000000, 0b11111000 }, // prog 22 - ext select card1 out1
   { 0, port0_addr, 0b00000100, 0b11111100 }, // prog 23 - ext select card1 out2
