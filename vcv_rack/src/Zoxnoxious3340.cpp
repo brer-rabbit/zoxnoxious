@@ -100,7 +100,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
           { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 14, 15 } },
           { SYNC_POS_BUTTON_PARAM, INT_MIN, { 16, 17 } },
           { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20, 21 } },
-          { EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 21, 22, 23, 24, 25, 26, 27, 28 } }
+          { EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 22, 23, 24, 25, 26, 27, 28, 29 } }
       };
 
     Zoxnoxious3340() :

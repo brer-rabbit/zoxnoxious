@@ -267,13 +267,9 @@ int main(int argc, char **argv, char **envp) {
   signal_action_stats.sa_handler = sig_dump_stats;
   sigaction(SIGUSR1, &signal_action_stats, NULL);
 
-
-
   while (alsa_thread_run) {
     sleep(1);
   }
-
-
 
   int retval;
   pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
@@ -504,7 +500,8 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
   }
 
-  INFO("stats: %" PRId64 " idle usec/frame; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
+  INFO("stats: %" PRId64 " frames @ %" PRId64 " idle usec/frame; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
+       missed_expirations[EXPIRATIONS_ONTIME],       
        (((int64_t)sec_pcm_write_idle * 1000000000LL + nsec_pcm_write_idle) / 1000LL) / ((int64_t)missed_expirations[EXPIRATIONS_ONTIME]),
        missed_expirations[EXPIRATIONS_MISSED_ONE],
        missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
@@ -534,6 +531,7 @@ struct midi_state {
 };
 
 
+// Discovered card number maps to MIDI channel number.  Not actual slot number.
 
 static void* midi_in_to_plugins(void *arg) {
   int midi_read_status = 0;
@@ -562,7 +560,8 @@ static void* midi_in_to_plugins(void *arg) {
     ERROR("failed to start midi timer: %s", error);
   }
 
-  INFO("starting MIDI In event loop");
+  INFO("starting MIDI In event loop: timing %" PRId64 " usec",
+       itimerspec_midi_clock.it_interval.tv_nsec * 1000LL);
 
   while (alsa_thread_run) {
 
@@ -591,6 +590,14 @@ static void* midi_in_to_plugins(void *arg) {
           INFO("MIDI: channel 0x%X program change: 0x%X",
                midi_state.channel,
                midi_state.bytes[0]);
+          // card numbering maps to midi channel.  So check we've got a valid
+          // midi channel against how many cards we've got to ensure we can
+          // dispatch the midi message.
+          if (midi_state.channel < card_mgr->num_cards) {
+            struct plugin_card *card = card_mgr->card_update_order[ midi_state.channel ];
+            card->process_midi_program_change(card->plugin_object, buffer[i]);
+          }
+
           // then clear state
           midi_state.status = MIDI_STATUS_NOT_SET;
         }

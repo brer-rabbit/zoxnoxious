@@ -29,8 +29,7 @@ struct z3340_card {
   struct zhost *zhost;
   int slot;
   int i2c_handle;
-  uint8_t pca9555_port0;
-  uint8_t pca9555_port1;
+  uint8_t pca9555_port[2];  // gpio registers
   int16_t previous_samples[6];
 };
 
@@ -55,8 +54,8 @@ void* init_zcard(struct zhost *zhost, int slot) {
 
   z3340->zhost = zhost;
   z3340->slot = slot;
-  z3340->pca9555_port0 = 0x00;
-  z3340->pca9555_port1 = 0x00;
+  z3340->pca9555_port[0] = 0x00;
+  z3340->pca9555_port[1] = 0x00;
 
   z3340->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
   if (z3340->i2c_handle < 0) {
@@ -70,8 +69,8 @@ void* init_zcard(struct zhost *zhost, int slot) {
   // turn everything "off", with the LED on.
   error += i2cWriteByteData(z3340->i2c_handle, config_port0_addr, config_port_as_output);
   error += i2cWriteByteData(z3340->i2c_handle, config_port1_addr, config_port_as_output);
-  error += i2cWriteByteData(z3340->i2c_handle, port0_addr, z3340->pca9555_port0);
-  error += i2cWriteByteData(z3340->i2c_handle, port1_addr, z3340->pca9555_port1);
+  error += i2cWriteByteData(z3340->i2c_handle, port0_addr, z3340->pca9555_port[0]);
+  error += i2cWriteByteData(z3340->i2c_handle, port1_addr, z3340->pca9555_port[1]);
 
   if (error) {
     ERROR("z3340: error writing to I2C bus address %d\n", i2c_addr);
@@ -153,7 +152,67 @@ int process_midi(void *zcard_plugin, uint8_t *midi_message, size_t size) {
 }
 
 
+struct midi_program_to_gpio {
+  int port;
+  uint8_t gpio_reg; // gpio register zero or one?
+  uint8_t set_bits;  // mask to OR
+  uint8_t clear_bits; // mask to AND
+};
+
+// array indexed by MIDI program number
+static const struct midi_program_to_gpio midi_program_to_gpio[] = {
+  { 0, port0_addr, 0b00000000, 0b11101111 }, // prog 0 - sync neg off
+  { 0, port0_addr, 0b00010000, 0b11111111 }, // prog 1 - sync neg on
+  { 1, port1_addr, 0b00000000, 0b11111101 }, // prog 2 - mix1 pulse off
+  { 1, port1_addr, 0b00000010, 0b11111111 }, // prog 3 - mix1 pulse on
+  { 1, port1_addr, 0b00000001, 0b11111111 }, // prog 4 - mix1 comp on
+  { 1, port1_addr, 0b00000000, 0b11111110 }, // prog 5 - mix1 comp off
+  { 1, port1_addr, 0b01000000, 0b11111111 }, // prog 6 - mix2 pulse on
+  { 1, port1_addr, 0b00000000, 0b10111111 }, // prog 7 - mix2 pulse off
+  { 1, port1_addr, 0b10000000, 0b11111111 }, // prog 8 - ext mod pwm on
+  { 1, port1_addr, 0b00000000, 0b01111111 }, // prog 9 - ext mod pwm off
+  { 0, port0_addr, 0b00100000, 0b11111111 }, // prog 10 - ext mod to fm on
+  { 0, port0_addr, 0b00000000, 0b11011111 }, // prog 11 - ext mod to fm off
+  { 0, port0_addr, 0b10000000, 0b11111111 }, // prog 12 - linear fm on
+  { 0, port0_addr, 0b00000000, 0b01111111 }, // prog 13 - linear fm off
+  { 1, port1_addr, 0b00010000, 0b11111111 }, // prog 14 - mix2 saw on
+  { 1, port1_addr, 0b00000000, 0b11101111 }, // prog 15 - mix2 saw off
+  { 0, port0_addr, 0b01000000, 0b11111111 }, // prog 16 - sync pos on
+  { 0, port0_addr, 0b00000000, 0b10111111 }, // prog 17 - sync pos off
+  { 1, port1_addr, 0b00000000, 0b11110011 }, // prog 18 - mix1 saw off
+  { 1, port1_addr, 0b00000100, 0b11110111 }, // prog 19 - mix1 saw low
+  { 1, port1_addr, 0b00001000, 0b11111011 }, // prog 20 - mix1 saw med
+  { 1, port1_addr, 0b00001100, 0b11111111 }, // prog 21 - mix1 saw high
+  { 0, port0_addr, 0b00000000, 0b11111000 }, // prog 22 - ext select card1 out1
+  { 0, port0_addr, 0b00000100, 0b11111100 }, // prog 23 - ext select card1 out2
+  { 0, port0_addr, 0b00000010, 0b11111010 }, // prog 24 - ext select card2 out1
+  { 0, port0_addr, 0b00000110, 0b11111110 }, // prog 25 - ext select card3 out1
+  { 0, port0_addr, 0b00000001, 0b11111001 }, // prog 26 - ext select card4 out1
+  { 0, port0_addr, 0b00000101, 0b11111101 }, // prog 27 - ext select card5 out1
+  { 0, port0_addr, 0b00000011, 0b11111011 }, // prog 28 - ext select card6 out1
+  { 0, port0_addr, 0b00000111, 0b11111111 }  // prog 29 - ext select card7 out1
+};
+
 int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
-  return 0;
+  int error = 0;
+  struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
+
+  INFO("Z3340: received program change to 0x%X", program_number);
+
+  if (program_number < ( sizeof(midi_program_to_gpio) / sizeof(struct midi_program_to_gpio) ) ) {
+    const struct midi_program_to_gpio *prog_gpio_entry = &midi_program_to_gpio[program_number];
+
+    zcard->pca9555_port[ prog_gpio_entry->port ] |= prog_gpio_entry->set_bits;
+    zcard->pca9555_port[ prog_gpio_entry->port ] &= prog_gpio_entry->clear_bits;
+    error = i2cWriteByteData(zcard->i2c_handle,
+                             prog_gpio_entry->gpio_reg,
+                             zcard->pca9555_port[ prog_gpio_entry->port ]);
+
+  }
+  else {
+    WARN("Z3340: unexpected midi program number: 0x%X", program_number);
+  }
+
+  return error;
 }
 

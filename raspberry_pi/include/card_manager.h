@@ -55,7 +55,8 @@ struct card_manager {
   uint8_t card_ids[MAX_SLOTS];
 
   // plugins- num_cards are used; index does not represent physical
-  // ordering of slots.  This is populated in load_card_plugins()
+  // ordering of slots.  This is populated in load_card_plugins().
+  // (elsewhere this ends up getting used as MIDI channel)
   struct plugin_card cards[MAX_SLOTS];
   int num_cards;
 
