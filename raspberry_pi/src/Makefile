@@ -1,6 +1,6 @@
 TARGET = "zoxnoxiousd"
 INCLUDE = -I../include
-LIBS = -lpigpio -lconfig -lasound -lpthread -lzlog -ldl
+LIBS = -lpigpio -lconfig -lasound -lpthread -lzlog -ldl -latomic -L/usr/local/zoxnoxious/lib -lzdk
 CC = gcc
 #CFLAGS = -g -O2 -Wall
 CFLAGS = -g -Wall

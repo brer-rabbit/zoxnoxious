@@ -15,11 +15,15 @@
 
 /* main file for zoxnoxiousd server application.  Handle basic setup of components,
  * init, get things going.
+ * run it something like this with LD_LIBRARY_PATH set to /usr/local/zoxnoxiousd/lib
+ * sudo env LD_LIBRARY_PATH=$LD_LIBRARY_PATH chrt -f 40 ./zoxnoxiousd -i /home/kaf/git/zoxnoxious/raspberry_pi/etc/zoxnoxiousd.cfg
  */
 
 #include <alsa/asoundlib.h>
 #include <getopt.h>
+#include <inttypes.h>
 #include <libconfig.h>
+#include <limits.h>
 #include <pigpio.h>
 #include <signal.h>
 #include <stdio.h>
@@ -27,6 +31,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <sys/timerfd.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
@@ -35,48 +40,63 @@
 #include "zoxnoxiousd.h"
 #include "card_manager.h"
 #include "zalsa.h"
+#include "zcard_plugin.h"
+
+
+// number of stats to track and what they mean
+#define NUM_MISSED_EXPIRATIONS_STATS 4
+#define EXPIRATIONS_ONTIME 0
+#define EXPIRATIONS_MISSED_ONE 1
+#define EXPIRATIONS_MISSED_LT_TEN 2
+#define EXPIRATIONS_MISSED_GTE_TEN 3
 
 
 
-static void help() {
-  printf("Usage: zoxnoxiousd <options>\n"
-         "  -i <config_file>\n");
-}
-
-
-
-
-/* Config keys */
-/* When needed go here */
-
-
-
-/* zlog loggin' */
-zlog_category_t *zlog_c = NULL;
 
 /* globals-  mainly so they can be accessed by signal handler  */
-struct card_manager *card_mgr = NULL;
-struct alsa_pcm_state *pcm_state[2] = { NULL, NULL };
+static struct card_manager *card_mgr = NULL;
+static struct alsa_pcm_state *pcm_state[2] = { NULL, NULL };
 static snd_rawmidi_t *midi_in = NULL;
 static snd_rawmidi_t *midi_out = NULL;
 
+static _Atomic int alsa_thread_run = 1;
+static _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 };
+static _Atomic time_t sec_pcm_write_idle = 0;
+static _Atomic long nsec_pcm_write_idle = 0;
 
 // static functions
+static void help();
 static void sig_cleanup_and_exit(int signum);
+static void sig_dump_stats(int signum);
 static int open_midi_device(config_t *cfg);
-static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]);
+static void* read_pcm_and_call_plugins(void *);
+static void* midi_in_to_plugins(void *);
+
 
 
 int main(int argc, char **argv, char **envp) {
   config_t *cfg;
   char *midi_device_name = NULL;
   char config_filename[128] = { '\0' };
-  char *opt_string = "hi:m:v";
+  char *opt_string = "hi:v";
+  pthread_t alsa_pcm_to_plugin_thread;
+  pthread_t midi_in_plugin_thread;
+  sigset_t signal_set;
+  struct sigaction signal_action_cleanup, signal_action_stats;
+
+  /* bookkeeping stuff before getting to the important stuff:
+   * + libconf opened, available
+   * + zlog enabled, logging
+   * + pigpio init, can start talking to hardware
+   * + load card plugins
+   * + midi opened
+   * + alsa init
+   */
+
 
   struct option long_option[] = {
     {"help", no_argument, NULL, 'h'},
     {"config", required_argument, NULL, 'i'},
-    {"mididevice", required_argument, NULL, 'm'},
     {"verbose", required_argument, NULL, 'v'},
     {NULL, 0, NULL, 0},
   };
@@ -95,9 +115,6 @@ int main(int argc, char **argv, char **envp) {
     case 'i':
       strncpy(config_filename, optarg, sizeof(config_filename) - 1);
       config_filename[127] = '\0';
-      break;
-    case 'm':
-      midi_device_name = strdup(optarg);
       break;
     default:
       printf("unknown option\n");
@@ -160,15 +177,6 @@ int main(int argc, char **argv, char **envp) {
   }
 #endif
 
-  /* Basic initialization done:
-   * + libconf opened, available
-   * + zlog enabled, logging available
-   * + pigpio init, can start talking to hardware
-   *
-   * what's not done:
-   * - load card plugins
-   * - alsa init
-   */
 
 
   // init alsa pcm devices
@@ -187,11 +195,20 @@ int main(int argc, char **argv, char **envp) {
       num_hw_channels[1] = pcm_state[1]->channels;
     }
 
+    if (pcm_state[1] && pcm_state[0]->channels != pcm_state[1]->channels) {
+      FATAL("devices must have same number of channels: %s (%d) and %s (%d)",
+            pcm_state[0]->device_name, pcm_state[0]->channels,
+            pcm_state[1]->device_name, pcm_state[1]->channels);
+      abort();
+    }
   }
 
 
   // init alsa midi device
-  open_midi_device(cfg);
+  if (open_midi_device(cfg) != 0) {
+    ERROR("fail to open MIDI device");
+    abort();
+  }
 
   
   // detect installed cards- get the card manager going
@@ -201,41 +218,62 @@ int main(int argc, char **argv, char **envp) {
   assign_update_order(card_mgr);
   assign_hw_audio_channels(card_mgr, num_hw_channels, 2);
 
+  struct zhost *zhost;
+  if ( (zhost = zhost_create()) == NULL) {
+    FATAL("zhost_create failed");
+    abort();
+  }
 
-  // setup signal handling
-  signal(SIGHUP, sig_cleanup_and_exit);
-  signal(SIGINT, sig_cleanup_and_exit);
-  signal(SIGTERM, sig_cleanup_and_exit);
+  // init all the plugin cards
+  for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
+    // alias
+    struct plugin_card *this_card = card_mgr->card_update_order[card_num];
+    // the index isn't the slot num-- but we can look it up on the card
+    INFO("init card slot %d", card_mgr->cards[card_num].slot);
+    this_card->plugin_object =
+      (this_card->init_zcard)(zhost, card_mgr->cards[card_num].slot);
+    if (this_card->plugin_object == NULL) {
+      WARN("plugin card slot %d returned NULL for init", card_mgr->cards[card_num].slot);
+    }
+  }
 
+
+
+  sigemptyset(&signal_set);
+  sigaddset(&signal_set, SIGUSR1);
+  sigaddset(&signal_set, SIGHUP);
+  sigaddset(&signal_set, SIGINT);
+  sigaddset(&signal_set, SIGTERM);
+  pthread_sigmask(SIG_BLOCK, &signal_set, NULL);
 
   // start threads
-  read_pcm_and_call_plugins(card_mgr, pcm_state);
-
-
-
-  zlog_fini();
-  config_destroy(cfg);
-  free(cfg);
-
-  return 0;
-}
-
-
-
-
-
-// Signal handling
-static volatile sig_atomic_t in_aborting = 0;
-
-void sig_cleanup_and_exit(int signum) {
-  if (in_aborting) {
-    return;
+  if ( pthread_create(&alsa_pcm_to_plugin_thread, NULL, read_pcm_and_call_plugins, NULL) ) {
+    ERROR("failed to start thread for read_pcm_and_call_plugins");
+    abort();
   }
-  in_aborting = 1;
+
+  if ( pthread_create(&midi_in_plugin_thread, NULL, midi_in_to_plugins, NULL) ) {
+    ERROR("failed to start thread for midi_in_to_plugins");
+    abort();
+  }
 
 
-  // message threads to abort
+  // setup signal handling
+  signal_action_cleanup.sa_handler = sig_cleanup_and_exit;
+  sigaction(SIGHUP, &signal_action_cleanup, NULL);
+  sigaction(SIGINT, &signal_action_cleanup, NULL);
+  sigaction(SIGTERM, &signal_action_cleanup, NULL);
 
+  signal_action_stats.sa_handler = sig_dump_stats;
+  sigaction(SIGUSR1, &signal_action_stats, NULL);
+
+  while (alsa_thread_run) {
+    sleep(1);
+  }
+
+  int retval;
+  pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
+  pthread_join(midi_in_plugin_thread, (void**)&retval);
 
   // close pcm handles
   if (pcm_state[0] && pcm_state[0]->pcm_handle) {
@@ -255,16 +293,61 @@ void sig_cleanup_and_exit(int signum) {
 
   gpioTerminate();
 
-  // log and close anything relevant
-  exit(0);
+
+  // fall through to exit
+  zlog_fini();
+  config_destroy(cfg);
+  free(cfg);
+
+  return 0;
 }
 
+
+
+
+static void help() {
+  printf("Usage: zoxnoxiousd <options>\n"
+         "  -i <config_file>\n");
+}
+
+
+// Signal handling
+static volatile sig_atomic_t in_aborting = 0;
+
+// this isn't a very safe signal handler...
+void sig_cleanup_and_exit(int signum) {
+  if (in_aborting) {
+    return;
+  }
+  in_aborting = 1;
+
+  // message threads to abort
+  alsa_thread_run = 0;
+}
+
+
+static volatile sig_atomic_t in_dump_stats = 0;
+static void sig_dump_stats(int signum) {
+  if (in_dump_stats) {
+    return;
+  }
+  in_dump_stats = 1;
+
+  INFO("requested stats: %ld.%.9ld / %" PRId64 " idle sec/samples; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
+       sec_pcm_write_idle, nsec_pcm_write_idle,
+       missed_expirations[EXPIRATIONS_ONTIME],
+       missed_expirations[EXPIRATIONS_MISSED_ONE],
+       missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
+       missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
+
+  in_dump_stats = 0;
+}
 
 
 static int open_midi_device(config_t *cfg) {
   const char *midi_device_name;
   config_setting_t *midi_device_setting = config_lookup(cfg, MIDI_DEVICE_KEY);
-    
+
   if (midi_device_setting == NULL) {
     ERROR("cfg: no midi config value found for " MIDI_DEVICE_KEY);
     return 1;
@@ -277,6 +360,7 @@ static int open_midi_device(config_t *cfg) {
     return 1;
   }
 
+
   if (snd_rawmidi_open(&midi_in, &midi_out, midi_device_name, SND_RAWMIDI_NONBLOCK) != 0) {
     ERROR("failed to open midi device %s", midi_device_name);
     return 1;
@@ -287,8 +371,245 @@ static int open_midi_device(config_t *cfg) {
 }
 
 
+// add timespec in t1 to accumulator storing in accumulator
+static inline void timespec_accumulate(const struct timespec *t1, struct timespec *accumulator)
+{
+  accumulator->tv_sec += t1->tv_sec;
+  accumulator->tv_nsec += t1->tv_nsec;
+  if (accumulator->tv_nsec >= 1000000000) {
+    accumulator->tv_nsec -= 1000000000;
+    accumulator->tv_sec++;
+  }
+}
 
 
-static void read_pcm_and_call_plugins(struct card_manager *card_mgr, struct alsa_pcm_state *pcm_state[]) {
+// start timer
+// forever:
+// foreach pcm stream
+//   alsa_pcm_ensure_ready
+//   snd_pcm_mmap_begin
+//   calc samples[channelnum]
+// 
+// do {
+//   call each plugin on stream 1
+//   if stream 2 call each plugin on stream 1
+//   read timer
+//   advance samples pointer
+//   if (!frames stream 1): commit, ensure ready, mmap
+//   if (!frames stream 2): commit, ensure ready, mmap
+// } while (running flag)
 
+static void* read_pcm_and_call_plugins(void *arg) {
+  int timerfd_sample_clock;
+  uint64_t expirations = 0;
+  int frames_to_advance;
+
+  // do a couple dumb things:
+  // compute timer dynamically... but this is really designed
+  // for 4khz.  Even worse, assume that pcm[0] and [1] have
+  // the same sampling rate.
+  struct itimerspec itimerspec_sample_clock = {
+    .it_interval.tv_sec = 0,
+    .it_interval.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
+    .it_value.tv_sec = 0,
+    .it_value.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
+  };
+  struct itimerspec itimerspec_remaining_time;
+  struct timespec accumulated_idle_time;
+  int valid_gettime;
+
+
+  if ( (timerfd_sample_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to create sample clock timer: %s", error);
+  }
+
+  INFO("starting timer %ld usec for sampling rate %d hz",
+       itimerspec_sample_clock.it_interval.tv_nsec / 1000,
+       pcm_state[0]->sampling_rate);
+  // logging from here forward may be tricky / time sensitive
+
+  if ( alsa_start_stream(pcm_state[0]) ) {
+    ERROR("pcm0: error from alsa_pcm_ensure_ready");
+  }
+
+  if (pcm_state[1]) {
+    if ( alsa_start_stream(pcm_state[1]) ) {
+      ERROR("pcm1: error from alsa_pcm_ensure_ready");
+    }
+  }
+
+  if ( (timerfd_settime(timerfd_sample_clock, 0, &itimerspec_sample_clock, 0) ) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to start timer: %s", error);
+  }
+
+
+  while (alsa_thread_run) {
+
+    // Business Section
+    for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
+      // alias a couple big redirects here:
+      // lookup the card offset
+      int channel_offset = card_mgr->card_update_order[card_num]->channel_offset;
+
+      // the samples relevant for this card are at the offset on the approp pcm device
+      const int16_t *samples = (const int16_t*) ( card_mgr->card_update_order[card_num]->pcm_device_num == 0 ?
+                                                  pcm_state[0]->samples[channel_offset] : pcm_state[1]->samples[channel_offset] );
+
+      // then call the card's plugin with the samples via function pointer
+      if ( (card_mgr->card_update_order[card_num]->process_samples)(card_mgr->card_update_order[card_num]->plugin_object, samples) != 0) {
+        INFO("card error");
+      }
+    }
+
+    // check on remaining time-- though we don't know if it's remaining time until we check the expirations
+    valid_gettime = timerfd_gettime(timerfd_sample_clock, &itimerspec_remaining_time);
+    read(timerfd_sample_clock, &expirations, sizeof(expirations));
+
+    if (expirations == 1) {
+      missed_expirations[EXPIRATIONS_ONTIME]++;
+      // the gettime ended up being remaining time
+      if (valid_gettime == 0) {
+        timespec_accumulate(&itimerspec_remaining_time.it_value, &accumulated_idle_time);
+        sec_pcm_write_idle = accumulated_idle_time.tv_sec;
+        nsec_pcm_write_idle = accumulated_idle_time.tv_nsec;
+      }
+    }
+    else if (expirations == 2) {
+      missed_expirations[EXPIRATIONS_MISSED_ONE]++;
+    }
+    else if (expirations < 10) {
+      missed_expirations[EXPIRATIONS_MISSED_LT_TEN]++;
+    }
+    else {
+      missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]++;
+    }
+
+    // downcast
+    frames_to_advance = expirations > INT_MAX ? INT_MAX : expirations;
+
+    // get new set of frames or advance sample pointers
+    if (pcm_state[1]) {
+      alsa_advance_stream_by_frames(pcm_state[1], frames_to_advance);
+    }
+
+    alsa_advance_stream_by_frames(pcm_state[0], frames_to_advance);
+
+  }
+
+  INFO("stats: %" PRId64 " frames @ %" PRId64 " idle usec/frame; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
+       missed_expirations[EXPIRATIONS_ONTIME],       
+       (((int64_t)sec_pcm_write_idle * 1000000000LL + nsec_pcm_write_idle) / 1000LL) / ((int64_t)missed_expirations[EXPIRATIONS_ONTIME]),
+       missed_expirations[EXPIRATIONS_MISSED_ONE],
+       missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
+       missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
+
+  return NULL;
+}
+
+
+// this is all the first nibble stuff- 0xFx stuff is more complex, but it's to be ignored
+enum midi_status_byte {
+  MIDI_STATUS_NOT_SET = 0x00,
+  MIDI_NOTE_OFF = 0x80,
+  MIDI_NOTE_ON = 0x90,
+  MIDI_KEY_PRESSURE = 0xA0,
+  MIDI_CONTROLLER_CHANGE = 0xB0,
+  MIDI_PROGRAM_CHANGE = 0xC0,
+  MIDI_CHANNEL_PRESSURE = 0xD0,
+  MIDI_PITCH_BEND = 0xE0,
+  MIDI_SYSEX = 0xF0
+};
+
+struct midi_state {
+  enum midi_status_byte status;
+  uint8_t channel;
+  uint8_t bytes[2];
+};
+
+
+// Discovered card number maps to MIDI channel number.  Not actual slot number.
+
+static void* midi_in_to_plugins(void *arg) {
+  int midi_read_status = 0;
+  uint8_t buffer[256];
+  // 1ms timer for polling midi
+  int timerfd_midi_clock;
+  struct itimerspec itimerspec_midi_clock = {
+    .it_interval.tv_sec = 0,
+    .it_interval.tv_nsec = 2000000,
+    .it_value.tv_sec = 0,
+    .it_value.tv_nsec = 2000000
+  };
+  uint64_t expirations;
+  struct midi_state midi_state = { 0 };
+
+
+  if ( (timerfd_midi_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to create midi timer: %s", error);
+  }
+
+  if ( (timerfd_settime(timerfd_midi_clock, 0, &itimerspec_midi_clock, 0) ) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to start midi timer: %s", error);
+  }
+
+  INFO("starting MIDI In event loop: timing %" PRId64 " usec",
+       itimerspec_midi_clock.it_interval.tv_nsec * 1000LL);
+
+  while (alsa_thread_run) {
+
+    // non-blocking read so we can periodically query the alsa_thread_run flag.
+    // try not to be too busy loop by only running this loop periodically (2.5 ms maybe?)
+    midi_read_status = snd_rawmidi_read(midi_in, buffer, sizeof(buffer));
+    if (midi_read_status == -EAGAIN || midi_read_status == -EBUSY) {
+    }
+    else if (midi_read_status < 0) { // non-EAGAIN non-EBUSY error
+      ERROR("Error reading MIDI input: %s", snd_strerror(midi_read_status));
+      return NULL;
+    }
+    else {
+      INFO("MIDI read received %d bytes", midi_read_status);
+      // read the midi stream. could be starting anywhere in the stream, so...
+      for (int i = 0; i < midi_read_status; ++i) {
+        if ( (buffer[i] & 0xF0) == MIDI_PROGRAM_CHANGE) {
+          midi_state.status = MIDI_PROGRAM_CHANGE;
+          midi_state.channel = buffer[i] & 0x0F;
+          midi_state.bytes[0] = 0;
+          midi_state.bytes[1] = 0;
+        }
+        else if (midi_state.status == MIDI_PROGRAM_CHANGE) {
+          // get program change and call plugin
+          midi_state.bytes[0] = buffer[i];
+          INFO("MIDI: channel 0x%X program change: 0x%X",
+               midi_state.channel,
+               midi_state.bytes[0]);
+          // card numbering maps to midi channel.  So check we've got a valid
+          // midi channel against how many cards we've got to ensure we can
+          // dispatch the midi message.
+          if (midi_state.channel < card_mgr->num_cards) {
+            struct plugin_card *card = card_mgr->card_update_order[ midi_state.channel ];
+            card->process_midi_program_change(card->plugin_object, buffer[i]);
+          }
+
+          // then clear state
+          midi_state.status = MIDI_STATUS_NOT_SET;
+        }
+        else {  // future: check for other status messages
+          // ignore for now
+        }
+      }
+
+    }
+
+    read(timerfd_midi_clock, &expirations, sizeof(expirations));
+  }
+
+  return NULL;
 }

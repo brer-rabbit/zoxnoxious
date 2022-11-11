@@ -20,17 +20,16 @@
 #include "zoxnoxiousd.h"
 #include "zalsa.h"
 
+#define INVALID_CHANNEL_STEP_SIZE -1
 
 static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err);
-static int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state);
-
 
 static const snd_pcm_format_t default_snd_pcm_format = SND_PCM_FORMAT_S16_LE;
 
 
 
 struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
-  struct alsa_pcm_state *alsa_state;
+  struct alsa_pcm_state *pcm_state;
   snd_pcm_hw_params_t *hw_params;
   int err;
   int cfg_int_value;
@@ -45,47 +44,51 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
   }
 
   device_name = config_setting_get_string_elem(devices_setting, device_num);
+  
 
   if (device_name == NULL) {
-    INFO("max pcm device id " ZALSA_DEVICES_KEY "[%d]", device_num - 1);
+    // lookup failed, report the previous index as the max the cfg file has
+    INFO("Found %d pcm devices", device_num - 1);
     return NULL;
   }
 
   // pretty sure we've now got a device name, so initialize it
-  alsa_state = (struct alsa_pcm_state*) malloc(sizeof(struct alsa_pcm_state));
-  alsa_state->cfg = cfg;
-  alsa_state->device_name = strdup(device_name);
+  pcm_state = (struct alsa_pcm_state*) calloc(1, sizeof(struct alsa_pcm_state));
+  pcm_state->cfg = cfg;
+  pcm_state->device_name = strdup(device_name);
+  pcm_state->device_num = device_num;
+  pcm_state->channel_step_size = INVALID_CHANNEL_STEP_SIZE;
 
 
   // Params from config file:
   if (config_lookup_int(cfg, ZALSA_BUFFER_SIZE_KEY, &cfg_int_value) == CONFIG_FALSE) {
     INFO("cfg: %s: no buffer size specified, defaulting to %d",
-         alsa_state->device_name, ZALSA_DEFAULT_BUFFER_SIZE);
-    alsa_state->buffer_size = ZALSA_DEFAULT_BUFFER_SIZE;
+         pcm_state->device_name, ZALSA_DEFAULT_BUFFER_SIZE);
+    pcm_state->buffer_size = ZALSA_DEFAULT_BUFFER_SIZE;
   }
   else {
-    alsa_state->buffer_size = cfg_int_value;
+    pcm_state->buffer_size = cfg_int_value;
   }
 
   if (config_lookup_int(cfg, ZALSA_PERIOD_SIZE_KEY, &cfg_int_value) == CONFIG_FALSE) {
     INFO("cfg: %s:no period size specified, defaulting to %d",
-         alsa_state->device_name, ZALSA_DEFAULT_PERIOD_SIZE);
-    alsa_state->period_size = ZALSA_DEFAULT_PERIOD_SIZE;
+         pcm_state->device_name, ZALSA_DEFAULT_PERIOD_SIZE);
+    pcm_state->period_size = ZALSA_DEFAULT_PERIOD_SIZE;
   }
   else {
-    alsa_state->period_size = cfg_int_value;
+    pcm_state->period_size = cfg_int_value;
 
   }
 
-  // Hardcoded defaults:
-  alsa_state->format = default_snd_pcm_format;
-  alsa_state->first_period = 1;
+  // Hardcoded non-zero defaults:
+  pcm_state->format = default_snd_pcm_format;
+  pcm_state->first_period = 1;
 
 
 
   // Now open the actual stream
-  if ((err = snd_pcm_open(&alsa_state->pcm_handle, alsa_state->device_name, SND_PCM_STREAM_CAPTURE, 0)) < 0) {
-    ERROR("cannot open audio device %s (%s)",  alsa_state->device_name, snd_strerror(err));
+  if ((err = snd_pcm_open(&pcm_state->pcm_handle, pcm_state->device_name, SND_PCM_STREAM_CAPTURE, 0)) < 0) {
+    ERROR("cannot open audio device %s (%s)",  pcm_state->device_name, snd_strerror(err));
     return NULL;
   }
 
@@ -94,87 +97,130 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
     return NULL;
   }
 				 
-  if ((err = snd_pcm_hw_params_any(alsa_state->pcm_handle, hw_params)) < 0) {
+  if ((err = snd_pcm_hw_params_any(pcm_state->pcm_handle, hw_params)) < 0) {
     ERROR("cannot initialize hardware parameter structure (%s)", snd_strerror(err));
     return NULL;
   }
 
-  if ((err = snd_pcm_hw_params_set_access(alsa_state->pcm_handle, hw_params, SND_PCM_ACCESS_MMAP_INTERLEAVED)) < 0) {
+  if ((err = snd_pcm_hw_params_set_access(pcm_state->pcm_handle, hw_params, SND_PCM_ACCESS_MMAP_INTERLEAVED)) < 0) {
     ERROR("cannot set access type (%s)", snd_strerror(err));
     return NULL;
   }
 
-  if ((err = snd_pcm_hw_params_set_format(alsa_state->pcm_handle, hw_params, alsa_state->format)) < 0) {
+  if ((err = snd_pcm_hw_params_set_format(pcm_state->pcm_handle, hw_params, pcm_state->format)) < 0) {
     ERROR("cannot set sample format (%s)", snd_strerror (err));
     return NULL;
   }
 
   // get min sampling rate and set based on that
-  if ((err = snd_pcm_hw_params_get_rate_min(hw_params, &alsa_state->sampling_rate, 0)) < 0) {
+  if ((err = snd_pcm_hw_params_get_rate_min(hw_params, &pcm_state->sampling_rate, 0)) < 0) {
     ERROR("cannot get min sampling rate (%s)", snd_strerror(err));
     return NULL;
   }
-  if ((err = snd_pcm_hw_params_set_rate_near(alsa_state->pcm_handle, hw_params, &alsa_state->sampling_rate, 0)) < 0) {
-    ERROR("cannot set sample rate to %d (%s)", alsa_state->sampling_rate, snd_strerror(err));
+  if ((err = snd_pcm_hw_params_set_rate_near(pcm_state->pcm_handle, hw_params, &pcm_state->sampling_rate, 0)) < 0) {
+    ERROR("cannot set sample rate to %d (%s)", pcm_state->sampling_rate, snd_strerror(err));
     return NULL;
   }
-  INFO("set %s sampling rate to %d Hz", alsa_state->device_name, alsa_state->sampling_rate);
+  INFO("set %s sampling rate to %d Hz", pcm_state->device_name, pcm_state->sampling_rate);
 	
-  if ((err = snd_pcm_hw_params_set_period_size(alsa_state->pcm_handle, hw_params, alsa_state->period_size, 0)) < 0) {
+  if ((err = snd_pcm_hw_params_set_period_size(pcm_state->pcm_handle, hw_params, pcm_state->period_size, 0)) < 0) {
     ERROR("cannot set period size (%s)", snd_strerror(err));
     return NULL;
   }
 
-  if ((err = snd_pcm_hw_params_set_buffer_size_near(alsa_state->pcm_handle, hw_params, &alsa_state->buffer_size)) < 0) {
+  if ((err = snd_pcm_hw_params_set_buffer_size_near(pcm_state->pcm_handle, hw_params, &pcm_state->buffer_size)) < 0) {
     ERROR("cannot set buffer size (%s)", snd_strerror(err));
     return NULL;
   }
 
   // pull in the maximum channels
-  if ((err = snd_pcm_hw_params_get_channels_max(hw_params, &alsa_state->channels)) < 0) {
-    ERROR("cannot get channel count on %s (%s)", alsa_state->device_name, snd_strerror(err));
+  if ((err = snd_pcm_hw_params_get_channels_max(hw_params, &pcm_state->channels)) < 0) {
+    ERROR("cannot get channel count on %s (%s)", pcm_state->device_name, snd_strerror(err));
   }
-  if ((err = snd_pcm_hw_params_set_channels(alsa_state->pcm_handle, hw_params, alsa_state->channels)) < 0) {
-    ERROR("cannot set channel count on %s to %d (%s)", alsa_state->device_name,
-          alsa_state->channels, snd_strerror(err));
+  if ((err = snd_pcm_hw_params_set_channels(pcm_state->pcm_handle, hw_params, pcm_state->channels)) < 0) {
+    ERROR("cannot set channel count on %s to %d (%s)", pcm_state->device_name,
+          pcm_state->channels, snd_strerror(err));
     return NULL;
   }
-  INFO("set %s : maximum %d channels set", alsa_state->device_name, alsa_state->channels);
+  INFO("set %s : maximum %d channels set", pcm_state->device_name, pcm_state->channels);
+
+  pcm_state->samples = (const char**)calloc(pcm_state->channels, sizeof(char*));
 
 
-  if ((err = snd_pcm_hw_params(alsa_state->pcm_handle, hw_params)) < 0) {
+  if ((err = snd_pcm_hw_params(pcm_state->pcm_handle, hw_params)) < 0) {
     ERROR("cannot set parameters (%s)", snd_strerror(err));
     return NULL;
   }
 
-  INFO("alsa_init: %s hardware params set", alsa_state->device_name);
+  INFO("alsa_init: %s (device num %d) hardware params set", pcm_state->device_name, pcm_state->device_num);
 	
   snd_pcm_hw_params_free(hw_params);
 
-  if ((err = snd_pcm_prepare(alsa_state->pcm_handle)) < 0) {
+  if ((err = snd_pcm_prepare(pcm_state->pcm_handle)) < 0) {
     ERROR("cannot prepare audio interface for use (%s)", snd_strerror(err));
     return NULL;
   }
 
-  INFO("alsa_init: %s prepared", alsa_state->device_name);
+  INFO("alsa_init: %s prepared", pcm_state->device_name);
 
-  return alsa_state;
+  return pcm_state;
 }
 
 
 
 
+int alsa_start_stream(struct alsa_pcm_state *pcm_state) {
+  if ( alsa_pcm_ensure_ready(pcm_state) ) {
+    ERROR("zalsa: %s alsa_pcm_ensure_ready error", pcm_state->device_name);
+    return 1;
+  }
+
+  if ( alsa_mmap_begin_with_step_calc(pcm_state) ) {
+    ERROR("zalsa: %s alsa_pcm_mmap_begin error", pcm_state->device_name);
+    return 1;
+  }
+
+  return 0;
+}
 
 
-/* internal static stuff */
+int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames) {
+  int retval = 0;
+
+  if (pcm_state->frames_remaining > frames) {
+    // advance sample pointer by frames --
+    // TODO: error handling should use some DSP to smooth this if frames > 1
+    for (int i = 0; i < pcm_state->channels; ++i) {
+      pcm_state->samples[i] += (frames * pcm_state->channel_step_size);
+    }
+    pcm_state->frames_remaining -= frames;
+  }
+  else {
+    if ( alsa_mmap_end(pcm_state) ) {
+      ERROR("alsa_mmap_end returned non-zero");
+      retval = 1;
+    }
+
+    if ( alsa_pcm_ensure_ready(pcm_state) ) {
+      ERROR("alsa_pcm_ensure_ready returned non-zero");
+      retval += 2;
+    }
+
+    if ( alsa_mmap_begin(pcm_state) ) {
+      ERROR("alsa_mmap_begin returned non-zero");
+      retval += 4;
+    }
+  }
+
+  return retval;
+}
+
 
 
 /* alsa_pcm_ensure_ready
- * check the state to make sure the pcm_handle is good then call snd_pcm_avail_update to make sure
- * available frames is updated.
- * on return the pcm stream should be in a good state for snd_pcm_mmap_begin()
+ * get things ready for a snd_pcm_mmap_begin() call
  */
-static int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
+int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
   int ret, snd_state;
   snd_pcm_sframes_t avail;
 
@@ -213,7 +259,7 @@ static int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
         pcm_state->first_period = 0;
         ret = snd_pcm_start(pcm_state->pcm_handle);
         if (ret < 0) {
-          fprintf(stdout, "snd_pcm_start: %s\n", snd_strerror(errno));
+          ERROR("snd_pcm_start: %s\n", snd_strerror(errno));
           return ret;
         }
       }
@@ -235,6 +281,100 @@ static int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
   }
 
   return 0;
+}
+
+
+
+
+int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
+  int ret;
+  // some asserts that ought to happen:
+  assert(pcm_state != NULL);
+
+  // request period_size of frames
+  pcm_state->frames_provided = pcm_state->period_size;
+  ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_provided);
+  pcm_state->frames_remaining = pcm_state->frames_provided;
+
+  INFO("alsa mmap begin requested %ld frames received %ld frames", pcm_state->period_size, pcm_state->frames_provided);
+
+  if (ret < 0) {
+    ret = xrun_recovery(pcm_state, -ret);
+    if (ret < 0) {
+      ERROR("alsa: mmap begin avail error: %s", snd_strerror(ret));
+      return ret;
+    }
+  }
+
+
+  // calculate the base address for each channelnum and step size
+  for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
+    if (pcm_state->channel_step_size == INVALID_CHANNEL_STEP_SIZE) {
+      pcm_state->channel_step_size = pcm_state->mmap_area[channelnum].step / 8;
+    }
+    else if (pcm_state->channel_step_size != pcm_state->mmap_area[channelnum].step / 8) {
+      ERROR("expected consistent channel step size: %d != %d unexpected",
+            pcm_state->channel_step_size,
+            pcm_state->mmap_area[channelnum].step / 8);
+    }
+
+    // locate samples for this channel
+    pcm_state->samples[channelnum] =
+      pcm_state->mmap_area[channelnum].addr +
+      pcm_state->mmap_area[channelnum].first / 8 +
+      pcm_state->offset * pcm_state->channel_step_size;
+  }
+
+
+  return 0;
+}
+
+
+
+int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
+  int ret;
+  // some asserts that ought to happen:
+  assert(pcm_state != NULL);
+
+  // request period_size of frames
+  pcm_state->frames_provided = pcm_state->period_size;
+  ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_provided);
+  pcm_state->frames_remaining = pcm_state->frames_provided;
+
+  if (ret < 0) {
+    ret = xrun_recovery(pcm_state, -ret);
+    if (ret < 0) {
+      ERROR("alsa: mmap begin avail error: %s", snd_strerror(ret));
+      return ret;
+    }
+  }
+
+  // calculate samples address for each channel
+  for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
+    pcm_state->samples[channelnum] =
+      pcm_state->mmap_area[channelnum].addr +
+      pcm_state->mmap_area[channelnum].first / 8 +
+      pcm_state->offset * pcm_state->channel_step_size;
+  }
+
+  return 0;
+}
+
+
+
+
+int alsa_mmap_end(struct alsa_pcm_state *pcm_state) {
+  int ret = 0;
+  snd_pcm_sframes_t committed;
+
+  committed = snd_pcm_mmap_commit(pcm_state->pcm_handle, pcm_state->offset, pcm_state->frames_provided);
+  if (committed < 0 || committed != pcm_state->frames_provided) {
+    ret = xrun_recovery(pcm_state, committed >= 0 ? EPIPE : -committed);
+    if (ret < 0) {
+      return ret;
+    }
+  }
+  return ret;
 }
 
 

@@ -23,9 +23,48 @@
 #define MAX_SLOTS 8
 
 
-struct card_manager;
+/* properties of a plugin_card */
+struct plugin_card {
+  int slot;
+  int card_id;
+  char *plugin_name;
 
-struct plugin_card;
+  // find this card's channels in the stream via offset
+  int pcm_device_num;
+  int channel_offset;
+  int num_channels;
+  
+  // plugin interface function pointers:
+  void *dl_plugin_lib;
+  init_zcard_f init_zcard;
+  get_zcard_properties_f get_zcard_properties;
+  process_samples_f process_samples;
+  process_midi_f process_midi;
+  process_midi_program_change_f process_midi_program_change;
+  free_zcard_f free_zcard;
+  void *plugin_object;
+};
+
+
+/* card manager which holds all the fun stuff */
+struct card_manager {
+  // libconfig handle
+  config_t *cfg;
+
+  // 8-bit Id of cards, indexed by physical slot, or zero if no card present:
+  uint8_t card_ids[MAX_SLOTS];
+
+  // plugins- num_cards are used; index does not represent physical
+  // ordering of slots.  This is populated in load_card_plugins().
+  // (elsewhere this ends up getting used as MIDI channel)
+  struct plugin_card cards[MAX_SLOTS];
+  int num_cards;
+
+  // update order for cards: order the cards to minimize latency- group cards by rules
+  // such as their spi mode
+  struct plugin_card *card_update_order[MAX_SLOTS];
+};
+
 
 
 /** init_card_manager

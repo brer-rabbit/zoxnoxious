@@ -18,18 +18,41 @@
 
 #include <alsa/asoundlib.h>
 #include <pigpio.h>
+#include <zlog.h>
+#include "zoxnoxiousd.h"
+
+#define I2C_BUS 1
+
+
+/* logging */
+#define DEBUG(...) zlog_debug(zlog_c, __VA_ARGS__)
+#define INFO(...)  zlog_info(zlog_c, __VA_ARGS__)
+#define WARN(...)  zlog_warn(zlog_c, __VA_ARGS__)
+#define ERROR(...) zlog_error(zlog_c, __VA_ARGS__)
+#define FATAL(...) zlog_fatal(zlog_c, __VA_ARGS__)
+extern zlog_category_t *zlog_c;
+
 
 
 /* this is intended to be the interface for cards.  Library functions
  * available for card plugins are here as well.
- * typedef functions need to be implemented.
+ * typedef functions need to be implemented by the card driver (you)..
  */
 
 
-/* set_spi_interface
- * must be called by plugin prior to initial spiWrite() or where the spi mode changes
+/* passed in to the init_zcard_f, this object is needed to pass to
+ * some helper functions.  So store it during init, put it away, bring
+ * it out during process_samples_f or whatevz.
  */
-int set_spi_interface(int spi_mode, int slot);
+struct zhost;
+struct zhost* zhost_create();
+
+/* get_spi_handle
+ * must be called by plugin prior any function's spiWrite() or when changing spi mode changes
+ * in a function.  Wraps/caches pigpio spiOpen and provides a return consistent with spiOpen.
+ * A valid handle can be used for pigpio's spiWrite.  Do not close the handle.
+ */
+int set_spi_interface(struct zhost *zhost, int spi_mode, int slot);
 
 
 
@@ -41,7 +64,7 @@ int set_spi_interface(int spi_mode, int slot);
  * (zcard_plugin in other calls).
  * Any i2cOpen calls should be done here with the handle cached.
  */
-typedef void* (*init_zcard_f)(int slot);
+typedef void* (*init_zcard_f)(struct zhost *zhost, int slot);
 
 /* free_zcard
  *
@@ -85,7 +108,7 @@ typedef struct zcard_properties* (*get_zcard_properties_f)();
  * channel.  This method should call set_spi_interface() prior to sending
  * any samples or changing spi mode.
  */
-typedef int (*process_samples_f)(void *zcard_plugin, int16_t *samples);
+typedef int (*process_samples_f)(void *zcard_plugin, const int16_t *samples);
 
 
 

@@ -17,15 +17,9 @@
 #ifndef ZOXNOXIOUSD_H
 #define ZOXNOXIOUSD_H
 
+
 #include "zcard_plugin.h"
 
-
-#define DEBUG(...) zlog_debug(zlog_c, __VA_ARGS__)
-#define INFO(...)  zlog_info(zlog_c, __VA_ARGS__)
-#define WARN(...)  zlog_warn(zlog_c, __VA_ARGS__)
-#define ERROR(...) zlog_error(zlog_c, __VA_ARGS__)
-#define FATAL(...) zlog_fatal(zlog_c, __VA_ARGS__)
-extern zlog_category_t *zlog_c;
 
 #define ZOXNOXIOUS_DIR_ENV_VAR_NAME "ZOXNOXIOUS_DIR"
 #define DEFAULT_ZOXNOXIOUS_DIRECTORY "/usr/local/zoxnoxious"
