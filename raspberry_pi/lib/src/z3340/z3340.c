@@ -43,9 +43,15 @@ static const uint8_t config_port_as_output = 0x00;
 static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
 
 
+
 void* init_zcard(struct zhost *zhost, int slot) {
   int error = 0;
   int i2c_addr = slot + PCA9555_BASE_I2C_ADDRESS;
+  int spi_channel;
+  char dac_ctrl0_reg[2] = { 0b10000000, 0b00000000 };  // power on, straight binary
+  char dac_ctrl1_reg[2] = { 0b10010000, 0b00000000 };  // DAC on, slow mode
+
+
   assert(slot >= 0 && slot < 8);
   struct z3340_card *z3340 = (struct z3340_card*)calloc(1, sizeof(struct z3340_card));
   if (z3340 == NULL) {
@@ -62,7 +68,6 @@ void* init_zcard(struct zhost *zhost, int slot) {
     ERROR("z3340: unable to open i2c for address %d\n", i2c_addr);
     return NULL;
   }
-  
 
   // configure port0 and port1 as output;
   // start with zero values.  This ought to
@@ -78,6 +83,12 @@ void* init_zcard(struct zhost *zhost, int slot) {
     free(z3340);
     return NULL;
   }
+
+  // configure DAC
+  spi_channel = set_spi_interface(zhost, SPI_MODE, slot);
+  spiWrite(spi_channel, dac_ctrl0_reg, 2);
+  spiWrite(spi_channel, dac_ctrl1_reg, 2);
+
 
   return z3340;
 }

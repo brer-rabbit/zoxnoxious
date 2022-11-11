@@ -137,6 +137,7 @@ struct midi_program_to_gpio {
 
 // array indexed by MIDI program number
 static const struct midi_program_to_gpio midi_program_to_gpio[] = {
+// reg, reg addr,   or-mask,    and-mask
   { 0, port0_addr, 0b00000000, 0b11011111 }, // prog 0 - card A mix1 off
   { 0, port0_addr, 0b00100000, 0b11111111 }, // prog 1 - card A mix1 on
   { 0, port0_addr, 0b00000000, 0b11110111 }, // prog 2 - card B mix1 off 
@@ -153,13 +154,22 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 0, port0_addr, 0b01000000, 0b11111111 }, // prog 13 - MIX1 VCA Right
   { 0, port0_addr, 0b00000000, 0b01111111 }, // prog 14 - MIX2 VCA Left
   { 0, port0_addr, 0b10000000, 0b11111111 }, // prog 15 - MIX1 VCA Left
-  { 1, port1_addr, 0b00000000, 0b11101111 }, // prog 16 - Mix2 off
-  { 1, port1_addr, 0b10010000, 0b10011111 }, // prog 17 - card A mix 2
-  { 1, port1_addr, 0b10110000, 0b10111111 }, // prog 18 - card B mix 2
-  { 1, port1_addr, 0b00110000, 0b00111111 }, // prog 19 - card C mix 2
-  { 1, port1_addr, 0b01010000, 0b01011111 }, // prog 20 - card D mix 2
-  { 1, port1_addr, 0b01110000, 0b01111111 }, // prog 21 - card E mix 2
-  { 1, port1_addr, 0b10010000, 0b10011111 } // prog 22 - card F mix 2
+  { 1, port1_addr, 0b01000000, 0b01111100 }, // prog 16 - card A mix 2
+  { 1, port1_addr, 0b11000000, 0b11111100 }, // prog 16 - card A mix 2
+  { 1, port1_addr, 0b01000001, 0b01111101 }, // prog 16 - card A mix 2
+  { 1, port1_addr, 0b11000001, 0b11111101 }, // prog 16 - card A mix 2
+  { 1, port1_addr, 0b01000010, 0b01111110 }, // prog 16 - card A mix 2
+  { 1, port1_addr, 0b11000010, 0b11111110 }, // prog 16 - card A mix 2
+  { 1, port1_addr, 0b00000000, 0b00111100 } // prog 16 - card A mix 2
+  /*
+  { 1, port1_addr, 0b10010000, 0b10011111 }, // prog 16 - card A mix 2
+  { 1, port1_addr, 0b10110000, 0b10111111 }, // prog 17 - card B mix 2
+  { 1, port1_addr, 0b00010000, 0b00011111 }, // prog 18 - card C mix 2
+  { 1, port1_addr, 0b00110000, 0b00111111 }, // prog 19 - card D mix 2
+  { 1, port1_addr, 0b01010000, 0b01011111 }, // prog 20 - card E mix 2
+  { 1, port1_addr, 0b01110000, 0b01111111 }, // prog 21 - card F mix 2
+  { 1, port1_addr, 0b00000000, 0b11101111 }  // prog 22 - Mix2 off
+  */
 };
 
 
