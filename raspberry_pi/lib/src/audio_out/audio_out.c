@@ -155,13 +155,13 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 0, port0_addr, 0b00000000, 0b01111111 }, // prog 14 - MIX2 VCA Left
   { 0, port0_addr, 0b10000000, 0b11111111 }, // prog 15 - MIX1 VCA Left
   // V0.2:
-  { 1, port1_addr, 0b00000000, 0b00111100 }, // prog 16 - Mix2 off
-  { 1, port1_addr, 0b00000001, 0b01111101 }, // prog 17 - card C mix 2
-  { 1, port1_addr, 0b10000001, 0b11111101 }, // prog 18 - card D mix 2
-  { 1, port1_addr, 0b00000010, 0b01111110 }, // prog 19 - card E mix 2
-  { 1, port1_addr, 0b10000010, 0b11111110 }, // prog 20 - card F mix 2
-  { 1, port1_addr, 0b00000000, 0b01111100 }, // prog 21 - card A mix 2
-  { 1, port1_addr, 0b10000000, 0b11111100 }, // prog 22 - card B mix 2
+  { 1, port1_addr, 0b00000001, 0b01111101 }, // prog 16 - card C mix 2
+  { 1, port1_addr, 0b10000001, 0b11111101 }, // prog 17 - card D mix 2
+  { 1, port1_addr, 0b00000010, 0b01111110 }, // prog 18 - card E mix 2
+  { 1, port1_addr, 0b10000010, 0b11111110 }, // prog 19 - card F mix 2
+  { 1, port1_addr, 0b00000000, 0b01111100 }, // prog 20 - card A mix 2
+  { 1, port1_addr, 0b10000000, 0b11111100 }, // prog 21 - card B mix 2
+  { 1, port1_addr, 0b00000000, 0b00111100 }, // prog 22 - Mix2 off
   /*
   V0.3 data:
   { 1, port1_addr, 0b10010000, 0b10011111 }, // prog 16 - card A mix 2
