@@ -92,13 +92,13 @@ struct PatchingMatrix : ZoxnoxiousModule {
           { CARD_D_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 6, 7 } },
           { CARD_E_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 8, 9 } },
           { CARD_F_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 10, 11 } },
-          { MIX_LEFT_SELECT_PARAM, INT_MIN, { 12, 13 } },
-          { MIX_RIGHT_SELECT_PARAM, INT_MIN, { 14, 15 } },
+          { MIX_RIGHT_SELECT_PARAM, INT_MIN, { 12, 13 } },
+          { MIX_LEFT_SELECT_PARAM, INT_MIN, { 14, 15 } },
           { CARD_A_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 16, 17, 18, 19, 20, 21, 22 } }
       };
     // index to above array
-    const static int MIX_LEFT_SELECT_PARAM_index = 6;
-    const static int MIX_RIGHT_SELECT_PARAM_index = 7;
+    const static int MIX_RIGHT_SELECT_PARAM_index = 6;
+    const static int MIX_LEFT_SELECT_PARAM_index = 7;
     const static int CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index = 8;
 
     PatchingMatrix() : audioPort(this),
@@ -319,13 +319,13 @@ struct PatchingMatrix : ZoxnoxiousModule {
         // hardcoded/mocked data for now, later this ought to be received
         // via midi from the controlling board
         zCommand_a.channelAssignments[0] = { 0x02, 0, 0, false };
-        zCommand_a.channelAssignments[1] = { 0x02, 8, 2, false };
-        zCommand_a.channelAssignments[2] = { 0x02, 15, 3, false };
+        zCommand_a.channelAssignments[1] = { 0x00, -1, -1, false };
+        zCommand_a.channelAssignments[2] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[3] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[4] = { 0x00, -1, -1, false };
-        zCommand_a.channelAssignments[5] = { 0x00, -1, -1, false };
+        zCommand_a.channelAssignments[5] = { 0x02, 6, 1, false };
         zCommand_a.channelAssignments[6] = { 0x00, -1, -1, false };
-        zCommand_a.channelAssignments[7] = { getHardwareId(), 6, 1, false };
+        zCommand_a.channelAssignments[7] = { getHardwareId(), 12, 2, false };
 
         // take ownership of our card
         processZoxnoxiousCommand(&zCommand_a);
@@ -354,7 +354,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         cardEOutput2NameString = getCardOutputName(zCommand_a.channelAssignments[4].cardId, 2, 4);
 
         cardFOutput1NameString = getCardOutputName(zCommand_a.channelAssignments[5].cardId, 1, 5);
-        cardFOutput2NameString = getCardOutputName(zCommand_a.channelAssignments[5].cardId, 2, 6);
+        cardFOutput2NameString = getCardOutputName(zCommand_a.channelAssignments[5].cardId, 2, 5);
 
     }
 
