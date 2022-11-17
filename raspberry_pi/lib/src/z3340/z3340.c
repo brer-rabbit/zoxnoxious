@@ -22,7 +22,8 @@
 // GPIO: PCA9555
 #define PCA9555_BASE_I2C_ADDRESS 0x20
 
-// DAC: AD5328
+// DAC: Analog Devices AD5328
+// https://www.analog.com/media/en/technical-documentation/data-sheets/ad5308_5318_5328.pdf
 #define SPI_MODE 1
 
 struct z3340_card {
@@ -48,9 +49,9 @@ void* init_zcard(struct zhost *zhost, int slot) {
   int error = 0;
   int i2c_addr = slot + PCA9555_BASE_I2C_ADDRESS;
   int spi_channel;
-  char dac_ctrl0_reg[2] = { 0b10000000, 0b00000000 };  // power on, straight binary
-  char dac_ctrl1_reg[2] = { 0b10010000, 0b00000000 };  // DAC on, slow mode
-
+  // AD5328: control register
+  char dac_ctrl0_reg[2] = { 0b11110000, 0b00000000 };  // full reset, data and control
+  char dac_ctrl1_reg[2] = { 0b10000000, 0b00000000 };  // power on, gain 1x, unbuffered Vref input
 
   assert(slot >= 0 && slot < 8);
   struct z3340_card *z3340 = (struct z3340_card*)calloc(1, sizeof(struct z3340_card));
@@ -131,8 +132,20 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (zcard->previous_samples[i] != samples[i] ) {
       zcard->previous_samples[i] = samples[i];
 
-      samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
-      samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+      // DAC write:
+      // bits 15-0:
+      // 0 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0
+      // MSB zero specifies DAC data.  Next three bits are DAC address.  Final 12 are data.
+      // Given a 16-bit signed input, write it to a 12-bit signed values.
+      // Any negative value clips to zero.
+      if (samples[i] >= 0) {
+        samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
+        samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+      }
+      else {
+        samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
+        samples_to_dac[1] = (uint16_t) 0;
+      }
 
       spiWrite(spi_channel, samples_to_dac, 2);
 

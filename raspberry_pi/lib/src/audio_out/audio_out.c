@@ -106,9 +106,14 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (zcard->previous_samples[i] != samples[i] ) {
       zcard->previous_samples[i] = samples[i];
 
-      samples_to_dac[0] = dac_channel[i] | ((uint16_t) samples[i]) >> 11;
-      samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
-
+      if (samples[i] < 0) {
+        samples_to_dac[0] = dac_channel[i] | (uint16_t) 0;
+        samples_to_dac[1] = (uint16_t) 0;
+      }
+      else {
+        samples_to_dac[0] = dac_channel[i] | ((uint16_t) samples[i]) >> 11;
+        samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+      }
       spiWrite(spi_channel, samples_to_dac, 2);
       /*
       WARN("audio out: channel %d 0x%4X : 0x%2X 0x%2X",
