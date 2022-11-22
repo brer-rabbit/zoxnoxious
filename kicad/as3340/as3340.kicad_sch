@@ -3151,7 +3151,6 @@
     )
   )
 
-
   (junction (at 279.4 67.31) (diameter 0) (color 0 0 0 0)
     (uuid 014e94ea-ef70-4dea-999c-3a23653ba8ae)
   )
@@ -4529,12 +4528,12 @@
     (uuid 2d17cecf-69c3-4d69-b8cb-3cb1588cc955)
   )
   (text "MAX333A: MAX333AEWP+ or MAX333ACWP+\nDG333A(DW) may substitue (not DG333AL)"
-    (at 115.57 265.43 0)
+    (at 111.76 265.43 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 317ffece-d34b-4b73-8947-ac10b03834c0)
   )
   (text "DG442: Ensure part is spec’d for +/- 12V. LE is not"
-    (at 161.29 265.43 0)
+    (at 165.1 264.16 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 3be6803a-080c-4bea-b34b-5b106115ad54)
   )
@@ -4545,6 +4544,11 @@
   (text "AS3340" (at 180.34 163.83 0)
     (effects (font (size 5.0038 5.0038)) (justify left bottom))
     (uuid 82b13aba-ba80-4df2-adae-a7141616e6db)
+  )
+  (text "PS508W : SOIC; Ron ~200 ohms\nalso works:\nDG508A\nADG508A\nTI MUX508ID"
+    (at 240.03 75.565 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 9797de66-7346-4b92-9b02-2cea58b3e4e7)
   )
   (text "Output Levels\nand Mixing" (at 290.83 166.37 0)
     (effects (font (size 5.0038 5.0038)) (justify left bottom))
@@ -5508,6 +5512,9 @@
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "https://www.diodes.com/assets/Datasheets/PS508-509.pdf" (id 3) (at 276.86 45.72 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "LCSC Part" "C2673104" (id 4) (at 276.86 45.72 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid a07fac0c-66e3-40ac-bb1a-36d877d9165e))
@@ -7707,16 +7714,16 @@
       (reference "R5") (unit 1) (value "47k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000626f5ab4"
-      (reference "R6") (unit 1) (value "62k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R6") (unit 1) (value "91k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000626f5b03"
-      (reference "R7") (unit 1) (value "120k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R7") (unit 1) (value "180k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000626f5ae9"
       (reference "R8") (unit 1) (value "47k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000626f5a6b"
-      (reference "R9") (unit 1) (value "91k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R9") (unit 1) (value "120k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-000062aaefbc"
       (reference "R10") (unit 1) (value "1k") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -7893,16 +7900,16 @@
       (reference "R71") (unit 1) (value "47k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-00006320991a"
-      (reference "R72") (unit 1) (value "39k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R72") (unit 1) (value "56k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-000062f4c5eb"
       (reference "R73") (unit 1) (value "47k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-00006319a98e"
-      (reference "R74") (unit 1) (value "47k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R74") (unit 1) (value "62k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000631d7235"
-      (reference "R75") (unit 1) (value "75k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R75") (unit 1) (value "110k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-0000620f7724"
       (reference "RV1") (unit 1) (value "10K") (footprint "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical")
@@ -7965,16 +7972,16 @@
       (reference "U4") (unit 1) (value "PS508") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000631a62bb"
-      (reference "U5") (unit 1) (value "MAX333A") (footprint "")
+      (reference "U5") (unit 1) (value "MAX333A") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000631ebb8a"
-      (reference "U5") (unit 2) (value "MAX333A") (footprint "")
+      (reference "U5") (unit 2) (value "MAX333A") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-000063219ef0"
-      (reference "U5") (unit 3) (value "MAX333A") (footprint "")
+      (reference "U5") (unit 3) (value "MAX333A") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-00006314a6df"
-      (reference "U5") (unit 4) (value "MAX333A") (footprint "")
+      (reference "U5") (unit 4) (value "MAX333A") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-0000630bcd26"
       (reference "U5") (unit 5) (value "MAX333A") (footprint "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm")

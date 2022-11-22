@@ -125,7 +125,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         configSwitch(MIX2_PULSE_BUTTON_PARAM, 0.f, 1.f, 0.f, "Mix2 Pulse", {"Off", "On"});
         configSwitch(MIX2_SAW_BUTTON_PARAM, 0.f, 1.f, 0.f, "Mix2 Saw", {"Off", "On"});
 
-        configSwitch(EXT_MOD_SELECT_SWITCH_PARAM, 0.f, 7.f, 0.f, "Ext Signal", {"A1", "A2", "B1", "B2", "C1", "C2", "D1", "D2" });
+        configSwitch(EXT_MOD_SELECT_SWITCH_PARAM, 0.f, 7.f, 0.f, "Ext Signal", {"A1", "A2", "B1", "C1", "D1", "E1", "F1", "G1" });
         configParam(EXT_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 1.f, "External Mod Level", "%", 0.f, 100.f);
         configSwitch(EXT_MOD_PWM_BUTTON_PARAM, 0.f, 1.f, 0.f, "Ext Mod to PWM", {"Off", "On"});
         configSwitch(EXP_FM_BUTTON_PARAM, 0.f, 1.f, 0.f, "Ext Mod to Exp FM", {"Off", "On"});
