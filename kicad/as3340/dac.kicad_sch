@@ -1222,7 +1222,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid f103b9e2-e0f3-4ee8-9c38-269f5cf4af17)
   )
-  (text "DAC: 2.5V Reference Voltage\nB, C, D grades of LM4040 are likely acceptable"
+  (text "DAC: 2.5V Reference Voltage\nB, C, D grades of LM4040 are likely good 'nuff"
     (at 49.53 38.1 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid f9cdf5da-db86-4b3a-a169-cee2874bc0ff)
@@ -2038,7 +2038,7 @@
     (property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm4040-n.pdf" (id 3) (at 67.31 77.47 0)
       (effects (font (size 1.27 1.27) italic) hide)
     )
-    (property "LCSC Part" "C131939" (id 4) (at 67.31 77.47 90)
+    (property "LCSC Part" "C460725" (id 4) (at 67.31 77.47 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 3dbeb293-266f-4fa4-8a8b-638231f7924c))

@@ -3223,7 +3223,7 @@
     (property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm4040-n.pdf" (id 3) (at 70.485 33.02 0)
       (effects (font (size 1.27 1.27) italic) hide)
     )
-    (property "LCSC Part" "C131939" (id 4) (at 70.485 33.02 90)
+    (property "LCSC Part" "C460725" (id 4) (at 70.485 33.02 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid c608b93f-d5a9-4632-8a83-4be99e04e548))
