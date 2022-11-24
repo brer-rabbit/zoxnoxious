@@ -7666,6 +7666,9 @@
     (path "/00000000-0000-0000-0000-000061ff2290/dd7978ed-1b92-4291-9451-70eeedf21baa"
       (reference "C44") (unit 1) (value "10n") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
+    (path "/00000000-0000-0000-0000-000061e1d4ae/f855d9d2-a8fd-4e93-ade8-6cd70c2d4eac"
+      (reference "C45") (unit 1) (value "100n") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-0000633044cc"
       (reference "D1") (unit 1) (value "1N4148W") (footprint "Diode_SMD:D_SOD-123")
     )
