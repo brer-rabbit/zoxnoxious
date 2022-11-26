@@ -3151,7 +3151,6 @@
     )
   )
 
-
   (junction (at 279.4 67.31) (diameter 0) (color 0 0 0 0)
     (uuid 014e94ea-ef70-4dea-999c-3a23653ba8ae)
   )
@@ -4577,7 +4576,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid e756e6ac-73b3-4a18-b2b7-329ff1dc4334)
   )
-  (text "Interface: As Osc1, this module will drive:\nOSC1_MIX1, OSC1_MIX2, and OSC1_CV\nThe GPIO_PI_DRIVER is used as a chip select.\nThe GPIO_MODULE_DRIVEN output is ours as well,\nintended to be used for VCO tuning, if I get to it.\nA module can tap into other lines for pulling signals in, but should not drive any other lines."
+  (text "Interface: Zoxnoxious bus interface.\nDigital on one side, power in the middle,\nanalog on the other.\nThis card will drive THIS_OUT1 and THIS_OUT2 and GPIO_MODULE_DRIVEN.\nThe other lines are tapped into for various functionality."
     (at 31.75 106.68 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid ed952801-c3ea-4060-bb73-3ec5940d39de)
