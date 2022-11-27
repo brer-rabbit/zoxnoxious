@@ -1,0 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html">
+<TITLE>Zoxnoxious Synthesizer Expansion Card</TITLE>
+</HEAD>
+<BODY  DIR="LTR">
+<P>This project template is the basis of an expansion board for the
+<A HREF="http://www.raspberrypi.org/" TARGET="blank">Raspberry Pi $25
+ARM board.</A> <BR><BR>This base project includes a PCB edge defined
+as the same size as the Raspberry-Pi PCB with the connectors placed
+correctly to align the two boards. All IO present on the Raspberry-Pi
+board is connected to the project through the 0.1&quot; expansion
+headers. <BR><BR>The board outline looks like the following:
+</P>
+<P><IMG SRC="brd.png" NAME="brd" ALIGN=BOTTOM WIDTH=680 HEIGHT=378 BORDER=0><BR><BR><BR><BR>
+</P>
+<P>(c)2022 Kyle Farrell</P>
+</BODY>
+</HTML>
