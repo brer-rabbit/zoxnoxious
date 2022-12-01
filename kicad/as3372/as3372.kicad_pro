@@ -364,7 +364,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "as3340.kicad_pro",
+    "filename": "as3372.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -449,6 +449,10 @@
     [
       "00000000-0000-0000-0000-000061ff2290",
       "DAC"
+    ],
+    [
+      "06519ee5-e3f7-4c1d-97d6-a8703fead30d",
+      "filter_as3372"
     ]
   ],
   "text_variables": {}

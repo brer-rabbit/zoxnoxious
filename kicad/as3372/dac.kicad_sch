@@ -5,8 +5,8 @@
   (paper "B")
 
   (title_block
-    (title "Zoxnoxious 3340 Oscillator")
-    (rev "0.4")
+    (title "Z3372 Signal Processing")
+    (rev "0.1")
     (company "Zoxnoxious Engineering")
   )
 

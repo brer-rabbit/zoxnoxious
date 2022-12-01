@@ -511,6 +511,9 @@ static void* read_pcm_and_call_plugins(void *arg) {
 }
 
 
+
+// Stuff for midi_in_to_plugins.  Parse the midi stream and determine what to send to the cards.
+
 // this is all the first nibble stuff- 0xFx stuff is more complex, but it's to be ignored
 enum midi_status_byte {
   MIDI_STATUS_NOT_SET = 0x00,
@@ -530,9 +533,9 @@ struct midi_state {
   uint8_t bytes[2];
 };
 
-
 // Discovered card number maps to MIDI channel number.  Not actual slot number.
 
+// read the midi stream, pass along to cards.  To be called as a thread.
 static void* midi_in_to_plugins(void *arg) {
   int midi_read_status = 0;
   uint8_t buffer[256];
@@ -612,4 +615,47 @@ static void* midi_in_to_plugins(void *arg) {
   }
 
   return NULL;
+}
+
+
+
+// thread function for transmitting which slots contain which card ids.
+// grab a mutex for the midi out, dump the data, sleep for 1 second, repeat.
+// quit if we get a flag set that the data is acknowledged or system quit.
+
+static void* midi_out_card_discovery(void *arg) {
+    // midi out sysex format:
+    // sysex start, test id, Zonoxious card discovery message,
+    // card ids for each card A - H, starting at index 3
+    // end sysex
+    uint8_t midi_out_sysex[12] = {
+        0xF0, 0x7D, 0x01,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0xF7
+    };
+
+    // 1ms timer for polling midi
+    int timerfd_midi_clock;
+    struct itimerspec itimerspec_discovery_broadcast_clock = {
+        .it_interval.tv_sec = 1,
+        .it_interval.tv_nsec = 0,
+        .it_value.tv_sec = 1,
+        .it_value.tv_nsec = 0
+    };
+
+
+    // complete the midi_out_sysex message: get the card ids from the card_mgr
+    for (int i = 0; i < MAX_SLOTS; ++i) {
+        midi_out_sysex[i + 3] = card_mgr->card_ids[i];
+    }
+
+
+    printf("midi out sysex: ");
+    for (int i = 0; i < sizeof(midi_out_sysex) / sizeof(uint8_t); ++i_) {
+        printf("0x%2X ", midi_out_sysex[i]);
+    }
+    printf("\n");
+
+
+    return NULL;
 }
