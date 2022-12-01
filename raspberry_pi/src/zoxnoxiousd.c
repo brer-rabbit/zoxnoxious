@@ -58,8 +58,10 @@ static struct card_manager *card_mgr = NULL;
 static struct alsa_pcm_state *pcm_state[2] = { NULL, NULL };
 static snd_rawmidi_t *midi_in = NULL;
 static snd_rawmidi_t *midi_out = NULL;
+static pthread_mutex_t midi_out_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static _Atomic int alsa_thread_run = 1;
+static _Atomic int midi_discovery_thread_run = 1;
 static _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 };
 static _Atomic time_t sec_pcm_write_idle = 0;
 static _Atomic long nsec_pcm_write_idle = 0;
@@ -71,6 +73,7 @@ static void sig_dump_stats(int signum);
 static int open_midi_device(config_t *cfg);
 static void* read_pcm_and_call_plugins(void *);
 static void* midi_in_to_plugins(void *);
+static void* midi_out_card_discovery(void *arg);
 
 
 
@@ -81,8 +84,10 @@ int main(int argc, char **argv, char **envp) {
   char *opt_string = "hi:v";
   pthread_t alsa_pcm_to_plugin_thread;
   pthread_t midi_in_plugin_thread;
+  pthread_t midi_out_discovery_thread;
   sigset_t signal_set;
   struct sigaction signal_action_cleanup, signal_action_stats;
+
 
   /* bookkeeping stuff before getting to the important stuff:
    * + libconf opened, available
@@ -238,6 +243,7 @@ int main(int argc, char **argv, char **envp) {
   }
 
 
+  //midi_out_card_discovery(NULL);
 
   sigemptyset(&signal_set);
   sigaddset(&signal_set, SIGUSR1);
@@ -257,6 +263,12 @@ int main(int argc, char **argv, char **envp) {
     abort();
   }
 
+  if ( pthread_create(&midi_out_discovery_thread, NULL, midi_out_card_discovery, NULL) ) {
+    ERROR("failed to start thread for midi_in_to_plugins");
+    abort();
+  }
+
+
 
   // setup signal handling
   signal_action_cleanup.sa_handler = sig_cleanup_and_exit;
@@ -274,6 +286,7 @@ int main(int argc, char **argv, char **envp) {
   int retval;
   pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
   pthread_join(midi_in_plugin_thread, (void**)&retval);
+  pthread_join(midi_out_discovery_thread, (void**)&retval);
 
   // close pcm handles
   if (pcm_state[0] && pcm_state[0]->pcm_handle) {
@@ -608,6 +621,70 @@ static void* midi_in_to_plugins(void *arg) {
 
     }
 
+    read(timerfd_midi_clock, &expirations, sizeof(expirations));
+  }
+
+  return NULL;
+}
+
+// thread function for transmitting which slots contain which card ids.
+// grab a mutex for the midi out, dump the data, sleep for 1 second, repeat.
+// quit if we get a flag set that the data is acknowledged or system quit.
+
+static void* midi_out_card_discovery(void *arg) {
+  // midi out sysex format:
+  // sysex start, test id, Zonoxious card discovery message,
+  // card ids for each card A - H, starting at index 3
+  // end sysex
+  uint8_t midi_out_sysex[12] = {
+    0xF0, 0x7D, 0x01,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xF7
+  };
+  int midi_write_status;
+  // 1ms timer for polling midi
+  int timerfd_midi_clock;
+  struct itimerspec itimerspec_discovery_broadcast_clock = {
+    .it_interval.tv_sec = 1,
+    .it_interval.tv_nsec = 0,
+    .it_value.tv_sec = 1,
+    .it_value.tv_nsec = 0
+  };
+  uint64_t expirations;
+
+  // complete the midi_out_sysex message: get the card ids from the card_mgr.
+  // Once constructed, it's static for life.
+  for (int i = 0; i < MAX_SLOTS; ++i) {
+    midi_out_sysex[i + 3] = card_mgr->card_ids[i];
+  }
+
+  if ( (timerfd_midi_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to create midi timer: %s", error);
+  }
+
+  if ( (timerfd_settime(timerfd_midi_clock, 0, &itimerspec_discovery_broadcast_clock, 0) ) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("failed to start midi out discovery broadcast timer: %s", error);
+    return (void*)1;
+  }
+
+  INFO("starting MIDI Out discovery broadcast");
+
+  while (midi_discovery_thread_run && alsa_thread_run) {
+    pthread_mutex_lock(&midi_out_mutex);
+    if (midi_out != NULL) {
+      midi_write_status = snd_rawmidi_write(midi_out, midi_out_sysex, sizeof(midi_out_sysex) / sizeof(uint8_t));
+    }
+
+    pthread_mutex_unlock(&midi_out_mutex);
+
+    if (midi_write_status < 0) {
+      ERROR("Error writing to midi output: %s", snd_strerror(midi_write_status));
+    }
+      
     read(timerfd_midi_clock, &expirations, sizeof(expirations));
   }
 
