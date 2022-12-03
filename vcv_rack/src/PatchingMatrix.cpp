@@ -438,12 +438,22 @@ private:
     }
 
 
-    void processMidiMessage(const midi::Message& msg) {
-        if (msg.getStatus() == 0xf) {
-            INFO("received midi message: size %d  channel %d  note %d  value %d",
-                 msg.getSize(), msg.getChannel(), msg.getNote(), msg.getValue());
+    const uint8_t midiManufacturerId = 0x7d;
+    const uint8_t midiSysexDiscoveryReport = 0x01;
+
+    void processMidiMessage(const midi::Message &msg) {
+        // sysex test
+        if (msg.getStatus() == 0xf && msg.getSize() > 3 && msg.bytes[1] == midiManufacturerId) {
+            if (msg.bytes[2] == midiSysexDiscoveryReport) {
+                processDiscoveryReport(msg);
+            }
         }
     }
+
+    void processDiscoveryReport(const midi::Message &msg) {
+        
+    }
+
 
 };
 

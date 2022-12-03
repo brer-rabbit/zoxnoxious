@@ -636,8 +636,9 @@ static void* midi_out_card_discovery(void *arg) {
   // sysex start, test id, Zonoxious card discovery message,
   // card ids for each card A - H, starting at index 3
   // end sysex
-  uint8_t midi_out_sysex[12] = {
+  uint8_t midi_out_sysex[20] = {
     0xF0, 0x7D, 0x01,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0xF7
   };
@@ -654,8 +655,12 @@ static void* midi_out_card_discovery(void *arg) {
 
   // complete the midi_out_sysex message: get the card ids from the card_mgr.
   // Once constructed, it's static for life.
+  // need to send the card id followed by its channel offset.
+  // Magic number three is the offset for midi sysex status, manufac id, discovery command.
+  // Times two to give a slot for the card id and consecutive byte for channel offset.
   for (int i = 0; i < MAX_SLOTS; ++i) {
-    midi_out_sysex[i + 3] = card_mgr->card_ids[i];
+    midi_out_sysex[3 + card_mgr->cards[i].slot * 2] = card_mgr->cards[i].card_id;
+    midi_out_sysex[4 + card_mgr->cards[i].slot * 2] = card_mgr->cards[i].channel_offset;
   }
 
   if ( (timerfd_midi_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
