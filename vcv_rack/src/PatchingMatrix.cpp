@@ -57,6 +57,8 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
     ZoxnoxiousAudioPort audioPort;
     ZoxnoxiousMidiOutput midiOutput;
+    midi::InputQueue midiInput;
+
 
     dsp::ClockDivider lightDivider;
     float leftLevelClipTimer;
@@ -167,6 +169,11 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
     void process(const ProcessArgs& args) override {
         processExpander(args);
+
+        midi::Message msg;
+        while (midiInput.tryPop(&msg, args.frame)) {
+            processMidiMessage(msg);
+        }
 
         if (lightDivider.process()) {
             // slower moving stuff here
@@ -430,6 +437,14 @@ private:
         return 0;
     }
 
+
+    void processMidiMessage(const midi::Message& msg) {
+        if (msg.getStatus() == 0xf) {
+            INFO("received midi message: size %d  channel %d  note %d  value %d",
+                 msg.getSize(), msg.getChannel(), msg.getNote(), msg.getValue());
+        }
+    }
+
 };
 
 
@@ -555,14 +570,18 @@ struct PatchingMatrixWidget : ModuleWidget {
     }
 
 
-
     void appendContextMenu(Menu *menu) override {
         PatchingMatrix *module = dynamic_cast<PatchingMatrix*>(this->module);
 
         menu->addChild(new MenuSeparator);
-        menu->addChild(createSubmenuItem("MIDI Device", "",
+        menu->addChild(createSubmenuItem("MIDI Out Device", "",
                                          [=](Menu* menu) {
                                              appendMidiMenu(menu, &module->midiOutput);
+                                         }));
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createSubmenuItem("MIDI In Device", "",
+                                         [=](Menu* menu) {
+                                             appendMidiMenu(menu, &module->midiInput);
                                          }));
         menu->addChild(new MenuSeparator);
         menu->addChild(createSubmenuItem("Audio Device", "",
