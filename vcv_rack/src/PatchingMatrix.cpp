@@ -450,8 +450,61 @@ private:
         }
     }
 
+    /** processDiscoveryReport
+     *
+     * read the report on which cards are present in the system.  The
+     * MIDI sysex format for this is 20 bytes:
+     * 0xF0
+     * 0x7D
+     * 0x01 -- discovery report
+     * 0x?? -- cardA id
+     * 0x?? -- cardA channel offset
+     * 0x?? -- cardB id
+     * 0x?? -- cardB channel offset
+     * 0x?? -- cardC id
+     * 0x?? -- cardC channel offset
+     * 0x?? -- cardD id
+     * 0x?? -- cardD channel offset
+     * 0x?? -- cardE id
+     * 0x?? -- cardE channel offset
+     * 0x?? -- cardF id
+     * 0x?? -- cardF channel offset
+     * 0x?? -- cardG id
+     * 0x?? -- cardG channel offset
+     * 0x?? -- cardH id
+     * 0x?? -- cardH channel offset
+     * 0xF7
+     * if the card Id isn't 0x00 or 0xFF then process it
+     */
     void processDiscoveryReport(const midi::Message &msg) {
-        
+        const int bytesOffset = 3; // actual data starts at this offset
+        int midiChannel = 0;
+        // which message to update?
+        ZoxnoxiousCommandMsg *leProducerMessage =
+            leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
+
+        INFO("creating Discovery Report:");
+        for (int i = 0; i < maxCards; ++i) {
+            if (msg.bytes[i * 2 + bytesOffset] != 0 && msg.bytes[i * 2 + bytesOffset] != 0xFF) {
+                leProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 2 + bytesOffset];
+                leProducerMessage->channelAssignments[i].cvChannelOffset = msg.bytes[i * 2 + bytesOffset + 1];
+                leProducerMessage->channelAssignments[i].midiChannel = midiChannel++;
+                leProducerMessage->channelAssignments[i].assignmentOwned = false;
+                INFO("  Discovery Report: card 0x%X offset %d midi %d",
+                     leProducerMessage->channelAssignments[i].cardId,
+                     leProducerMessage->channelAssignments[i].cvChannelOffset,
+                     leProducerMessage->channelAssignments[i].midiChannel);
+            }
+            else {
+                leProducerMessage->channelAssignments[i].cardId = 0x00;
+                leProducerMessage->channelAssignments[i].cvChannelOffset = invalidCvChannelOffset;
+                leProducerMessage->channelAssignments[i].midiChannel = invalidMidiChannel;
+                leProducerMessage->channelAssignments[i].assignmentOwned = false;
+            }
+        }
+
+        processZoxnoxiousCommand(leProducerMessage);
+        leftExpander.messageFlipRequested = true;
     }
 
 

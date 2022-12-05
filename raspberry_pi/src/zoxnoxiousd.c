@@ -607,7 +607,8 @@ static void* midi_in_to_plugins(void *arg) {
           // midi channel against how many cards we've got to ensure we can
           // dispatch the midi message.
           if (midi_state.channel < card_mgr->num_cards) {
-            struct plugin_card *card = card_mgr->card_update_order[ midi_state.channel ];
+            // THIS MAY BE IN ERROR: is card_update_order correct and not cards?
+            struct plugin_card *card = card_mgr->cards[ midi_state.channel ];
             card->process_midi_program_change(card->plugin_object, buffer[i]);
           }
 
