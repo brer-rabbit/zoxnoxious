@@ -103,6 +103,12 @@ struct PatchingMatrix : ZoxnoxiousModule {
     const static int MIX_LEFT_SELECT_PARAM_index = 7;
     const static int CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index = 8;
 
+    // Discovery related variables
+    bool receivedPluginList = false;
+    bool requestedPluginList = false;
+    dsp::ClockDivider discoveryDivider;
+
+
     PatchingMatrix() : audioPort(this),
                        mix2ButtonsPreviousState{false},
                        cardAOutput1NameString(invalidCardOutputName),
@@ -148,6 +154,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         onReset();
 
         lightDivider.setDivision(512);
+        discoveryDivider.setDivision(APP->engine->getSampleRate());  // once per second
     }
 
 
@@ -173,6 +180,14 @@ struct PatchingMatrix : ZoxnoxiousModule {
         midi::Message msg;
         while (midiInput.tryPop(&msg, args.frame)) {
             processMidiMessage(msg);
+        }
+
+        if (!receivedPluginList && discoveryDivider.process()) {
+            if (!requestedPluginList) {
+                // midi request for plugin list
+                // TODO: generate request
+                requestedPluginList = true;
+            }
         }
 
         if (lightDivider.process()) {
@@ -480,30 +495,34 @@ private:
         const int bytesOffset = 3; // actual data starts at this offset
         int midiChannel = 0;
         // which message to update?
-        ZoxnoxiousCommandMsg *leProducerMessage =
+        ZoxnoxiousCommandMsg *leftExpanderProducerMessage =
             leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
 
         INFO("creating Discovery Report:");
         for (int i = 0; i < maxCards; ++i) {
             if (msg.bytes[i * 2 + bytesOffset] != 0 && msg.bytes[i * 2 + bytesOffset] != 0xFF) {
-                leProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 2 + bytesOffset];
-                leProducerMessage->channelAssignments[i].cvChannelOffset = msg.bytes[i * 2 + bytesOffset + 1];
-                leProducerMessage->channelAssignments[i].midiChannel = midiChannel++;
-                leProducerMessage->channelAssignments[i].assignmentOwned = false;
+                leftExpanderProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 2 + bytesOffset];
+                leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = msg.bytes[i * 2 + bytesOffset + 1];
+                leftExpanderProducerMessage->channelAssignments[i].midiChannel = midiChannel++;
+                leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
                 INFO("  Discovery Report: card 0x%X offset %d midi %d",
-                     leProducerMessage->channelAssignments[i].cardId,
-                     leProducerMessage->channelAssignments[i].cvChannelOffset,
-                     leProducerMessage->channelAssignments[i].midiChannel);
+                     leftExpanderProducerMessage->channelAssignments[i].cardId,
+                     leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset,
+                     leftExpanderProducerMessage->channelAssignments[i].midiChannel);
             }
             else {
-                leProducerMessage->channelAssignments[i].cardId = 0x00;
-                leProducerMessage->channelAssignments[i].cvChannelOffset = invalidCvChannelOffset;
-                leProducerMessage->channelAssignments[i].midiChannel = invalidMidiChannel;
-                leProducerMessage->channelAssignments[i].assignmentOwned = false;
+                leftExpanderProducerMessage->channelAssignments[i].cardId = 0x00;
+                leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = invalidCvChannelOffset;
+                leftExpanderProducerMessage->channelAssignments[i].midiChannel = invalidMidiChannel;
+                leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
             }
         }
 
-        processZoxnoxiousCommand(leProducerMessage);
+        // note to self that we need not request a report and note that one received
+        receivedPluginList = true;
+        requestedPluginList = true;
+
+        processZoxnoxiousCommand(leftExpanderProducerMessage);
         leftExpander.messageFlipRequested = true;
     }
 
