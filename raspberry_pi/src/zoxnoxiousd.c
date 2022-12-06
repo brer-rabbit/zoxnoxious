@@ -608,7 +608,7 @@ static void* midi_in_to_plugins(void *arg) {
           // dispatch the midi message.
           if (midi_state.channel < card_mgr->num_cards) {
             // THIS MAY BE IN ERROR: is card_update_order correct and not cards?
-            struct plugin_card *card = card_mgr->cards[ midi_state.channel ];
+            struct plugin_card *card = &card_mgr->cards[ midi_state.channel ];
             card->process_midi_program_change(card->plugin_object, buffer[i]);
           }
 
@@ -659,7 +659,7 @@ static void* midi_out_card_discovery(void *arg) {
   // need to send the card id followed by its channel offset.
   // Magic number three is the offset for midi sysex status, manufac id, discovery command.
   // Times two to give a slot for the card id and consecutive byte for channel offset.
-  for (int i = 0; i < MAX_SLOTS; ++i) {
+  for (int i = 0; i < card_mgr->num_cards; ++i) {
     midi_out_sysex[3 + card_mgr->cards[i].slot * 2] = card_mgr->cards[i].card_id;
     midi_out_sysex[4 + card_mgr->cards[i].slot * 2] = card_mgr->cards[i].channel_offset;
   }
@@ -678,6 +678,11 @@ static void* midi_out_card_discovery(void *arg) {
   }
 
   INFO("starting MIDI Out discovery broadcast");
+
+  INFO("midi out discovery sysex: 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX 0x%hhX",
+       midi_out_sysex[0], midi_out_sysex[1], midi_out_sysex[2], midi_out_sysex[3], midi_out_sysex[4], midi_out_sysex[5], midi_out_sysex[6], midi_out_sysex[7], midi_out_sysex[8], midi_out_sysex[9],
+       midi_out_sysex[10], midi_out_sysex[11], midi_out_sysex[12], midi_out_sysex[13], midi_out_sysex[14], midi_out_sysex[15], midi_out_sysex[16], midi_out_sysex[17], midi_out_sysex[18], midi_out_sysex[19]);
+
 
   while (midi_discovery_thread_run && alsa_thread_run) {
     pthread_mutex_lock(&midi_out_mutex);

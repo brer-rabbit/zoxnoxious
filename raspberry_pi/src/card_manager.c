@@ -136,9 +136,9 @@ int discover_cards(struct card_manager *card_mgr) {
       else {
         INFO("Found card in slot %d (I2C 0x%x) with id 0x%x",
              slot_num, i2c_base_address + slot_num, i2c_read);
-        card_mgr->card_ids[slot_num] = i2c_read;
         card_mgr->num_cards++;
       }
+      card_mgr->card_ids[slot_num] = i2c_read;
 
     }
     else {
@@ -168,7 +168,8 @@ int load_card_plugins(struct card_manager *card_mgr) {
 
 
   for (int slot_num = 0; slot_num < MAX_SLOTS; ++slot_num) {
-    if (card_mgr->card_ids[slot_num] != 0) {
+
+    if (card_mgr->card_ids[slot_num] != 0) { // if the Id is not zero
       card = &card_mgr->cards[card_num++]; // alias
       card->slot = slot_num;
       // card_id ends up getting stored twice
@@ -236,6 +237,7 @@ int load_card_plugins(struct card_manager *card_mgr) {
       card->plugin_name = (*get_plugin_name)();
       INFO("loaded plugin for %s", card->plugin_name);
     }
+
   }
 
 
