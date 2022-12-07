@@ -192,89 +192,6 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
         if (lightDivider.process()) {
             // slower moving stuff here
-
-            // MIX1 buttons to midi programs
-            //
-            // check for any MIX1 buttons changing state and send midi
-            // messages for them.  Toggle light if so.  Do this by
-            // indexing the enums -- just don't re-order the enums
-
-            for (int i = 0; i < 6; ++i) {
-                int buttonParam = CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i;
-                int lightParam = CARD_A_MIX1_OUTPUT_BUTTON_LIGHT + i;
-                
-                if (params[buttonParam].getValue() !=
-                    buttonParamToMidiProgramList[i].previousValue) {
-
-                    buttonParamToMidiProgramList[i].previousValue =
-                        params[buttonParam].getValue();
-
-                    int buttonParamValue = (params[buttonParam].getValue() > 0.f);
-                    lights[lightParam].setBrightness(buttonParamValue);
-                    int midiProgram = buttonParamToMidiProgramList[i].midiProgram[buttonParamValue];
-                    sendMidiProgramChangeMessage(midiProgram);
-                }
-            }
-
-
-            // MIX2 buttons to midi programs
-            // implement radio-button functionality for the six MIX2 outputs.
-            // Unlike typical radio buttons, allow for zero buttons to
-            // be depressed: detect button up for the single pressed button.
-            {
-                int changed;
-
-                // find if one changed (either pressed to de-pressed. depressed?)
-                for (changed = 0; changed < 6; ++changed) {
-                    if ( (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f) != mix2ButtonsPreviousState[changed]) {
-
-                        mix2ButtonsPreviousState[changed] =
-                            (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f);
-                        lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + changed].setBrightness(mix2ButtonsPreviousState[changed]);
-
-                        // send the approp program change-
-                        // if no buttons are now pressed it's poorly
-                        // hardcoded to be the the last entry in  the
-                        // midiProgram array
-                        sendMidiProgramChangeMessage(mix2ButtonsPreviousState[changed] == 0 ?
-                                                     buttonParamToMidiProgramList[CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index].midiProgram[6] :
-                                                     buttonParamToMidiProgramList[CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index].midiProgram[changed] );
-                        break;
-                    }
-                }
-
-                // if we've set something, unset everything else
-                if (mix2ButtonsPreviousState[changed] && changed < 6) {
-                    // turn everything else off
-                    for (int i = 0; i < changed; ++i) {
-                        mix2ButtonsPreviousState[i] = 0;
-                        params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].setValue(0.f);
-                        lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + i].setBrightness(0.f);
-                    }
-
-                    for (int i = changed + 1; i < 6; ++i) {
-                        mix2ButtonsPreviousState[i] = 0;
-                        params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].setValue(0.f);
-                        lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + i].setBrightness(0.f);
-                    }
-                }
-            }
-
-
-            // LEFT / RIGHT SELECT
-            int value = (params[MIX_LEFT_SELECT_PARAM].getValue() > 0.f);
-            if (value != buttonParamToMidiProgramList[MIX_LEFT_SELECT_PARAM_index].previousValue) {
-                buttonParamToMidiProgramList[MIX_LEFT_SELECT_PARAM_index].previousValue = value;
-                sendMidiProgramChangeMessage(buttonParamToMidiProgramList[MIX_LEFT_SELECT_PARAM_index].midiProgram[value]);
-            }
-
-            value = (params[MIX_RIGHT_SELECT_PARAM].getValue() > 0.f);
-            if (value != buttonParamToMidiProgramList[MIX_RIGHT_SELECT_PARAM_index].previousValue) {
-                buttonParamToMidiProgramList[MIX_RIGHT_SELECT_PARAM_index].previousValue = value;
-                sendMidiProgramChangeMessage(buttonParamToMidiProgramList[MIX_RIGHT_SELECT_PARAM_index].midiProgram[value]);
-            }
-
-
             // LEDs: clipping and expander connections
             const float lightTime = args.sampleTime * lightDivider.getDivision();
             const float brightnessDeltaTime = 1 / lightTime;
@@ -287,6 +204,91 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
             setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
             setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
+
+            // only do midi stuff if we have an assigned channel
+            if (hasChannelAssignment) { 
+                // MIX1 buttons to midi programs
+                //
+                // check for any MIX1 buttons changing state and send midi
+                // messages for them.  Toggle light if so.  Do this by
+                // indexing the enums -- just don't re-order the enums
+
+                for (int i = 0; i < 6; ++i) {
+                    int buttonParam = CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i;
+                    int lightParam = CARD_A_MIX1_OUTPUT_BUTTON_LIGHT + i;
+
+                    if (params[buttonParam].getValue() !=
+                        buttonParamToMidiProgramList[i].previousValue) {
+
+                        buttonParamToMidiProgramList[i].previousValue =
+                            params[buttonParam].getValue();
+
+                        int buttonParamValue = (params[buttonParam].getValue() > 0.f);
+                        lights[lightParam].setBrightness(buttonParamValue);
+                        int midiProgram = buttonParamToMidiProgramList[i].midiProgram[buttonParamValue];
+                        sendMidiProgramChangeMessage(midiProgram);
+                    }
+                }
+
+
+                // MIX2 buttons to midi programs
+                // implement radio-button functionality for the six MIX2 outputs.
+                // Unlike typical radio buttons, allow for zero buttons to
+                // be depressed: detect button up for the single pressed button.
+                {
+                    int changed;
+
+                    // find if one changed (either pressed to de-pressed. depressed?)
+                    for (changed = 0; changed < 6; ++changed) {
+                        if ( (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f) != mix2ButtonsPreviousState[changed]) {
+
+                            mix2ButtonsPreviousState[changed] =
+                                (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + changed].getValue() > 0.f);
+                            lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + changed].setBrightness(mix2ButtonsPreviousState[changed]);
+
+                            // send the approp program change-
+                            // if no buttons are now pressed it's poorly
+                            // hardcoded to be the the last entry in  the
+                            // midiProgram array
+                            sendMidiProgramChangeMessage(mix2ButtonsPreviousState[changed] == 0 ?
+                                                         buttonParamToMidiProgramList[CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index].midiProgram[6] :
+                                                         buttonParamToMidiProgramList[CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index].midiProgram[changed] );
+                            break;
+                        }
+                    }
+
+                    // if we've set something, unset everything else
+                    if (mix2ButtonsPreviousState[changed] && changed < 6) {
+                        // turn everything else off
+                        for (int i = 0; i < changed; ++i) {
+                            mix2ButtonsPreviousState[i] = 0;
+                            params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].setValue(0.f);
+                            lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + i].setBrightness(0.f);
+                        }
+
+                        for (int i = changed + 1; i < 6; ++i) {
+                            mix2ButtonsPreviousState[i] = 0;
+                            params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].setValue(0.f);
+                            lights[CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + i].setBrightness(0.f);
+                        }
+                    }
+                }
+
+
+                // LEFT / RIGHT SELECT
+                int value = (params[MIX_LEFT_SELECT_PARAM].getValue() > 0.f);
+                if (value != buttonParamToMidiProgramList[MIX_LEFT_SELECT_PARAM_index].previousValue) {
+                    buttonParamToMidiProgramList[MIX_LEFT_SELECT_PARAM_index].previousValue = value;
+                    sendMidiProgramChangeMessage(buttonParamToMidiProgramList[MIX_LEFT_SELECT_PARAM_index].midiProgram[value]);
+                }
+
+                value = (params[MIX_RIGHT_SELECT_PARAM].getValue() > 0.f);
+                if (value != buttonParamToMidiProgramList[MIX_RIGHT_SELECT_PARAM_index].previousValue) {
+                    buttonParamToMidiProgramList[MIX_RIGHT_SELECT_PARAM_index].previousValue = value;
+                    sendMidiProgramChangeMessage(buttonParamToMidiProgramList[MIX_RIGHT_SELECT_PARAM_index].midiProgram[value]);
+                }
+            }
+
         }
 
     }
@@ -335,19 +337,21 @@ struct PatchingMatrix : ZoxnoxiousModule {
      */
     void initCommandMsgState() override {
         zCommand_a.authoritativeSource = true;
-        // TODO: this is hardcoded for now.  Figure out discovery.
         // channelAssignment data:
         // hardware cardId, channelOffset (from zero), midiChannel, assignmentOwned
-        // hardcoded/mocked data for now, later this ought to be received
-        // via midi from the controlling board
-        zCommand_a.channelAssignments[0] = { 0x02, 0, 0, false };
+        zCommand_a.channelAssignments[0] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[1] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[2] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[3] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[4] = { 0x00, -1, -1, false };
-        zCommand_a.channelAssignments[5] = { 0x02, 6, 1, false };
+        zCommand_a.channelAssignments[5] = { 0x00, -1, -1, false };
         zCommand_a.channelAssignments[6] = { 0x00, -1, -1, false };
-        zCommand_a.channelAssignments[7] = { getHardwareId(), 12, 2, false };
+        zCommand_a.channelAssignments[7] = { 0x00, -1, -1, false };
+
+        // to hardcode assignments:
+        //zCommand_a.channelAssignments[0] = { 0x02, 0, 0, false };
+        //zCommand_a.channelAssignments[5] = { 0x02, 6, 1, false };
+        //zCommand_a.channelAssignments[7] = { getHardwareId(), 12, 2, false };
 
         // take ownership of our card
         processZoxnoxiousCommand(&zCommand_a);
@@ -526,6 +530,31 @@ private:
         leftExpander.messageFlipRequested = true;
     }
 
+
+    json_t* dataToJson() override {
+        json_t* rootJ = json_object();
+        json_object_set_new(rootJ, "midiInput", midiInput.toJson());
+        json_object_set_new(rootJ, "midiOutput", midiOutput.toJson());
+        json_object_set_new(rootJ, "audioPort", audioPort.toJson());
+        return rootJ;
+    }
+
+    void dataFromJson(json_t* rootJ) override {
+        json_t* midiInputJ = json_object_get(rootJ, "midiInput");
+        if (midiInputJ) {
+            midiInput.fromJson(midiInputJ);
+        }
+
+        json_t* midiOutputJ = json_object_get(rootJ, "midiOutput");
+        if (midiOutputJ) {
+            midiOutput.fromJson(midiOutputJ);
+        }
+
+        json_t* audioPortJ = json_object_get(rootJ, "audioPort");
+        if (audioPortJ) {
+            audioPort.fromJson(audioPortJ);
+        }
+    }
 
 };
 
