@@ -74,6 +74,8 @@ static int open_midi_device(config_t *cfg);
 static void* read_pcm_and_call_plugins(void *);
 static void* midi_in_to_plugins(void *);
 static void* midi_out_card_discovery(void *arg);
+static void generate_discovery_report(uint8_t discovery_report_sysex[]);
+static int z_midi_write(uint8_t *buffer, int buffer_size);
 
 
 
@@ -534,13 +536,22 @@ enum midi_status_byte {
   MIDI_PROGRAM_CHANGE = 0xC0,
   MIDI_CHANNEL_PRESSURE = 0xD0,
   MIDI_PITCH_BEND = 0xE0,
-  MIDI_SYSEX = 0xF0
+  MIDI_SYSEX_START = 0xF0,
+  MIDI_SYSEX_END = 0xF7
+};
+
+enum sysex_message_type {
+  TYPE_UNSET = 0,
+  DISCOVERY_RESPONSE = 0x01,
+  DISCOVERY_REQUEST = 0x02
 };
 
 struct midi_state {
   enum midi_status_byte status;
   uint8_t channel;
-  uint8_t bytes[2];
+  enum sysex_message_type sysex_message_type;
+  int sysex_buffer_size;
+  uint8_t sysex_buffer[32];
 };
 
 
@@ -559,6 +570,9 @@ static void* midi_in_to_plugins(void *arg) {
   };
   uint64_t expirations;
   struct midi_state midi_state = { 0 };
+  uint8_t discovery_report_sysex[20];
+
+  generate_discovery_report(discovery_report_sysex);
 
 
   if ( (timerfd_midi_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
@@ -589,30 +603,50 @@ static void* midi_in_to_plugins(void *arg) {
     }
     else {
       INFO("MIDI read received %d bytes", midi_read_status);
-      // read the midi stream. could be starting anywhere in the stream, so...
+      // read the midi stream. could be starting anywhere in the stream,
+      // account for that by tracking stream state. This makes the stream parsing a
+      // bit obtuse but we need to account for fragmented reads and such.
       for (int i = 0; i < midi_read_status; ++i) {
+
         if ( (buffer[i] & 0xF0) == MIDI_PROGRAM_CHANGE) {
           midi_state.status = MIDI_PROGRAM_CHANGE;
           midi_state.channel = buffer[i] & 0x0F;
-          midi_state.bytes[0] = 0;
-          midi_state.bytes[1] = 0;
         }
         else if (midi_state.status == MIDI_PROGRAM_CHANGE) {
           // get program change and call plugin
-          midi_state.bytes[0] = buffer[i];
           INFO("MIDI: channel 0x%X program change: 0x%X",
                midi_state.channel,
-               midi_state.bytes[0]);
+               buffer[i]);
           // card numbering maps to midi channel.  So check we've got a valid
           // midi channel against how many cards we've got to ensure we can
           // dispatch the midi message.
           if (midi_state.channel < card_mgr->num_cards) {
-            // THIS MAY BE IN ERROR: is card_update_order correct and not cards?
             struct plugin_card *card = &card_mgr->cards[ midi_state.channel ];
+            // leap of faith into the function
             card->process_midi_program_change(card->plugin_object, buffer[i]);
+          }
+          else {
+            WARN("Expected midi message on channel 0x%X to map to a user card",
+                 midi_state.channel);
           }
 
           // then clear state
+          midi_state.status = MIDI_STATUS_NOT_SET;
+        }
+        else if (buffer[i] == MIDI_SYSEX_START) {  // no channel for sysex
+          midi_state.status = MIDI_SYSEX_START;
+          midi_state.channel = 0;
+          midi_state.sysex_message_type = TYPE_UNSET;
+          midi_state.sysex_buffer_size = 0;
+        }
+        else if (midi_state.status == MIDI_SYSEX_START &&
+                 midi_state.sysex_message_type == TYPE_UNSET) {
+          if (buffer[i] == DISCOVERY_REQUEST) {
+            // no additional data required for a discovery request
+            // action is to send a discovery response
+            z_midi_write(discovery_report_sysex, sizeof(discovery_report_sysex) / sizeof(uint8_t));
+          }
+
           midi_state.status = MIDI_STATUS_NOT_SET;
         }
         else {  // future: check for other status messages
@@ -627,6 +661,42 @@ static void* midi_in_to_plugins(void *arg) {
 
   return NULL;
 }
+
+
+// simple function to produce the static discovery report in midi sysex.
+// makes assumption that 20 bytes are available in the buffer.
+static void generate_discovery_report(uint8_t discovery_report_sysex[]) {
+  discovery_report_sysex[0] = 0xF0; // sysex start
+  discovery_report_sysex[1] = 0x7D; // test manufacturer
+  discovery_report_sysex[2] = 0x01; // sysex discovery report
+  discovery_report_sysex[19] = 0xF7; // end sysex
+
+  for (int i = 0; i < card_mgr->num_cards; ++i) {
+    discovery_report_sysex[3 + card_mgr->cards[i].slot * 2] = card_mgr->cards[i].card_id;
+    discovery_report_sysex[4 + card_mgr->cards[i].slot * 2] = card_mgr->cards[i].channel_offset;
+  }
+
+}
+
+
+
+// z_midi_write
+static int z_midi_write(uint8_t *buffer, int buffer_size) {
+  int midi_write_status = -1;
+  pthread_mutex_lock(&midi_out_mutex);
+  if (midi_out != NULL) {
+    midi_write_status = snd_rawmidi_write(midi_out, buffer, buffer_size);
+  }
+
+  pthread_mutex_unlock(&midi_out_mutex);
+
+  if (midi_write_status < 0) {
+    ERROR("Error writing to midi output: %s", snd_strerror(midi_write_status));
+  }
+
+  return midi_write_status;
+}
+
 
 // thread function for transmitting which slots contain which card ids.
 // grab a mutex for the midi out, dump the data, sleep for 1 second, repeat.
