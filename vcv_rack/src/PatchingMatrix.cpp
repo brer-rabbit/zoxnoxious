@@ -158,9 +158,9 @@ struct PatchingMatrix : ZoxnoxiousModule {
         // see Zoxnoxious MIDI spec for details
         MIDI_DISCOVERY_REQUEST_SYSEX.setSize(4);
         MIDI_DISCOVERY_REQUEST_SYSEX.bytes[0] = 0xF0;
-        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[0] = 0x7D;
-        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[0] = 0x02;
-        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[0] = 0xF7;
+        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[1] = 0x7D;
+        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[2] = 0x02;
+        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[3] = 0xF7;
 
     }
 
