@@ -104,9 +104,9 @@ struct PatchingMatrix : ZoxnoxiousModule {
     const static int CARD_A_MIX2_OUTPUT_BUTTON_PARAM_index = 8;
 
     // Discovery related variables
+    midi::Message MIDI_DISCOVERY_REQUEST_SYSEX; // this should be const static
     bool receivedPluginList = false;
-    bool requestedPluginList = false;
-    dsp::ClockDivider discoveryDivider;
+    dsp::ClockDivider discoveryRequestClockDivider;
 
 
     PatchingMatrix() : audioPort(this),
@@ -154,7 +154,14 @@ struct PatchingMatrix : ZoxnoxiousModule {
         onReset();
 
         lightDivider.setDivision(512);
-        discoveryDivider.setDivision(APP->engine->getSampleRate());  // once per second
+        discoveryRequestClockDivider.setDivision(APP->engine->getSampleRate());  // once per second
+        // see Zoxnoxious MIDI spec for details
+        MIDI_DISCOVERY_REQUEST_SYSEX.setSize(4);
+        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[0] = 0xF0;
+        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[0] = 0x7D;
+        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[0] = 0x02;
+        MIDI_DISCOVERY_REQUEST_SYSEX.bytes[0] = 0xF7;
+
     }
 
 
@@ -182,13 +189,11 @@ struct PatchingMatrix : ZoxnoxiousModule {
             processMidiMessage(msg);
         }
 
-        if (!receivedPluginList && discoveryDivider.process()) {
-            if (!requestedPluginList) {
-                // midi request for plugin list
-                // TODO: generate request
-                requestedPluginList = true;
-            }
+        if (receivedPluginList == false && discoveryRequestClockDivider.process()) {
+            INFO("Sending MIDI message discovery request");
+            midiOutput.sendMidiMessage(MIDI_DISCOVERY_REQUEST_SYSEX);
         }
+
 
         if (lightDivider.process()) {
             // slower moving stuff here
@@ -502,7 +507,7 @@ private:
         ZoxnoxiousCommandMsg *leftExpanderProducerMessage =
             leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
 
-        INFO("creating Discovery Report:");
+        INFO("received discovery report:");
         for (int i = 0; i < maxCards; ++i) {
             if (msg.bytes[i * 2 + bytesOffset] != 0 && msg.bytes[i * 2 + bytesOffset] != 0xFF) {
                 leftExpanderProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 2 + bytesOffset];
@@ -522,10 +527,8 @@ private:
             }
         }
 
-        // note to self that we need not request a report and note that one received
+        // note to self that we need not request a report.  Pass it along to any expanded modules.
         receivedPluginList = true;
-        requestedPluginList = true;
-
         processZoxnoxiousCommand(leftExpanderProducerMessage);
         leftExpander.messageFlipRequested = true;
     }

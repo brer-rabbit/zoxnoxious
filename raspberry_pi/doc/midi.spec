@@ -3,13 +3,11 @@ Zoxnoxious Raspberry Pi MIDI Spec
 Transmit Data
 -------------
 
-Discovery Report On startup, a discovery report is transmitted
-identifying which cards are present in the system.  The report is
-transmitted every second.  If a Report Acknowledge is received the
-Discovery Report is discontinued.  Cards are not hot pluggable so the
-message should be the same every time.  MIDI channel for each card is
-not transmitted.  MIDI channel is determined by starting at channel 0
-for the first card present and incrementing for each card present
+Discovery Report is transmitted on request from a client.  Cards are
+not hot pluggable so the message should be the same every time.  MIDI
+channel for each card is not transmitted.  MIDI channel is determined
+by starting at channel 0 (user 1) for the first card present and
+incrementing for each card present
 
 #  byte  desc
 -- ----  ----
@@ -40,8 +38,8 @@ Receive Data
 ------------
 
 
-Discovery Acknowledge
-Send this when you've had enough of the discovery report.
+Discovery Request
+Client requests the above Discovery Report.
 
 #  byte  desc
 -- ----  ----
