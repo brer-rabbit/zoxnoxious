@@ -265,11 +265,12 @@ int main(int argc, char **argv, char **envp) {
     abort();
   }
 
+  /*
   if ( pthread_create(&midi_out_discovery_thread, NULL, midi_out_card_discovery, NULL) ) {
     ERROR("failed to start thread for midi_in_to_plugins");
     abort();
   }
-
+  */
 
 
   // setup signal handling
@@ -288,7 +289,7 @@ int main(int argc, char **argv, char **envp) {
   int retval;
   pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
   pthread_join(midi_in_plugin_thread, (void**)&retval);
-  pthread_join(midi_out_discovery_thread, (void**)&retval);
+  //pthread_join(midi_out_discovery_thread, (void**)&retval);
 
   // close pcm handles
   if (pcm_state[0] && pcm_state[0]->pcm_handle) {
@@ -543,7 +544,8 @@ enum midi_status_byte {
 enum sysex_message_type {
   TYPE_UNSET = 0,
   DISCOVERY_RESPONSE = 0x01,
-  DISCOVERY_REQUEST = 0x02
+  DISCOVERY_REQUEST = 0x02,
+  VALID_MANUFACTURER_ID = 0x7D
 };
 
 struct midi_state {
@@ -635,16 +637,31 @@ static void* midi_in_to_plugins(void *arg) {
         }
         else if (buffer[i] == MIDI_SYSEX_START) {  // no channel for sysex
           midi_state.status = MIDI_SYSEX_START;
+          INFO("MIDI: sysex start received");
           midi_state.channel = 0;
           midi_state.sysex_message_type = TYPE_UNSET;
           midi_state.sysex_buffer_size = 0;
         }
         else if (midi_state.status == MIDI_SYSEX_START &&
                  midi_state.sysex_message_type == TYPE_UNSET) {
+          if (buffer[i] == VALID_MANUFACTURER_ID) {
+            midi_state.sysex_message_type = VALID_MANUFACTURER_ID;
+            INFO("MIDI: sysex manufacturer message correct");
+          }
+          else {
+            midi_state.status = MIDI_STATUS_NOT_SET;
+          }
+        }
+        else if (midi_state.status == MIDI_SYSEX_START &&
+                 midi_state.sysex_message_type == VALID_MANUFACTURER_ID) {
           if (buffer[i] == DISCOVERY_REQUEST) {
             // no additional data required for a discovery request
             // action is to send a discovery response
+            INFO("MIDI: discovery sysex request received");
             z_midi_write(discovery_report_sysex, sizeof(discovery_report_sysex) / sizeof(uint8_t));
+          }
+          else {
+            INFO("MIDI: sysex unknown request received");
           }
 
           midi_state.status = MIDI_STATUS_NOT_SET;
