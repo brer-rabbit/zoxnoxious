@@ -43,15 +43,16 @@ struct gpio_pin_value_tuple {
   unsigned int level;
 };
 
+// mind bit ordering here vs usage...MSB is a thing
 static const struct gpio_pin_value_tuple pin_value_tuple[8][3] = {
-  { { MUXOUT_0, 0 }, { MUXOUT_1, 0 }, { MUXOUT_2, 0 } },
-  { { MUXOUT_0, 0 }, { MUXOUT_1, 0 }, { MUXOUT_2, 1 } },
-  { { MUXOUT_0, 0 }, { MUXOUT_1, 1 }, { MUXOUT_2, 0 } },
-  { { MUXOUT_0, 0 }, { MUXOUT_1, 1 }, { MUXOUT_2, 1 } },
-  { { MUXOUT_0, 1 }, { MUXOUT_1, 0 }, { MUXOUT_2, 0 } },
-  { { MUXOUT_0, 1 }, { MUXOUT_1, 0 }, { MUXOUT_2, 1 } },
-  { { MUXOUT_0, 1 }, { MUXOUT_1, 1 }, { MUXOUT_2, 0 } },
-  { { MUXOUT_0, 1 }, { MUXOUT_1, 1 }, { MUXOUT_2, 1 } }
+  { { MUXOUT_2, 0 }, { MUXOUT_1, 0 }, { MUXOUT_0, 0 } },
+  { { MUXOUT_2, 0 }, { MUXOUT_1, 0 }, { MUXOUT_0, 1 } },
+  { { MUXOUT_2, 0 }, { MUXOUT_1, 1 }, { MUXOUT_0, 0 } },
+  { { MUXOUT_2, 0 }, { MUXOUT_1, 1 }, { MUXOUT_0, 1 } },
+  { { MUXOUT_2, 1 }, { MUXOUT_1, 0 }, { MUXOUT_0, 0 } },
+  { { MUXOUT_2, 1 }, { MUXOUT_1, 0 }, { MUXOUT_0, 1 } },
+  { { MUXOUT_2, 1 }, { MUXOUT_1, 1 }, { MUXOUT_0, 0 } },
+  { { MUXOUT_2, 1 }, { MUXOUT_1, 1 }, { MUXOUT_0, 1 } }
 };
 
 
