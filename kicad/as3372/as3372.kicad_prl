@@ -3,7 +3,13 @@
     "active_layer": 0,
     "active_layer_preset": "",
     "auto_track_width": true,
-    "hidden_nets": [],
+    "hidden_nets": [
+      "GND",
+      "-12V",
+      "+12V",
+      "+5V",
+      "-5V"
+    ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
     "opacity": {
