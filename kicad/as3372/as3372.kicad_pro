@@ -116,11 +116,12 @@
         "min_through_hole_diameter": 0.3,
         "min_track_width": 0.19999999999999998,
         "min_via_annular_width": 0.049999999999999996,
-        "min_via_diameter": 0.39999999999999997,
+        "min_via_diameter": 0.3,
         "use_height_for_length_calcs": true
       },
       "track_widths": [
         0.0,
+        0.2,
         0.3,
         0.4,
         0.5,

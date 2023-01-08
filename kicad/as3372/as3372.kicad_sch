@@ -4346,7 +4346,7 @@
       (reference "R56") (unit 1) (value "2k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/c20d60ba-77b8-43fa-a693-fdf66cecc299"
-      (reference "R61") (unit 1) (value "47k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R61") (unit 1) (value "22k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/c71cd95d-00cc-41e2-b980-54ccced393b7"
       (reference "R62") (unit 1) (value "1k") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -4438,25 +4438,25 @@
     (path "/093ff183-340a-4127-98f1-080eef143f56"
       (reference "U3") (unit 3) (value "NE5532") (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-000061ff2290/85ded23c-ae0b-4fff-a308-73642c219bdc"
+    (path "/00000000-0000-0000-0000-000061ff2290/569525ba-af7e-436e-a6cd-1178af75d537"
       (reference "U4") (unit 1) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-000061ff2290/243d7f9f-ac0b-454d-956d-0d2470e15fa6"
+    (path "/00000000-0000-0000-0000-000061ff2290/81188bc0-eca6-49b3-a0d8-2a2a4a9f025f"
       (reference "U4") (unit 2) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-000061ff2290/569525ba-af7e-436e-a6cd-1178af75d537"
+    (path "/00000000-0000-0000-0000-000061ff2290/243d7f9f-ac0b-454d-956d-0d2470e15fa6"
       (reference "U4") (unit 3) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-000061ff2290/81188bc0-eca6-49b3-a0d8-2a2a4a9f025f"
+    (path "/00000000-0000-0000-0000-000061ff2290/85ded23c-ae0b-4fff-a308-73642c219bdc"
       (reference "U4") (unit 4) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061ff2290/0f877a2a-20a6-4e9b-864b-75340442dd5c"
       (reference "U4") (unit 5) (value "TL074") (footprint "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm")
     )
-    (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/c193283a-15a7-40b6-8c1e-5126a41edc84"
+    (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/0c5961d6-bfd0-4730-a8ae-616a4289975c"
       (reference "U5") (unit 1) (value "TL072") (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm")
     )
-    (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/0c5961d6-bfd0-4730-a8ae-616a4289975c"
+    (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/c193283a-15a7-40b6-8c1e-5126a41edc84"
       (reference "U5") (unit 2) (value "TL072") (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm")
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/2006c92b-88a6-4615-abf6-b70a31a2c46d"

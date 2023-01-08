@@ -6,8 +6,7 @@
     "hidden_nets": [
       "GND",
       "-12V",
-      "+12V",
-      "+5V"
+      "+12V"
     ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
