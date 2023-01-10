@@ -1336,6 +1336,11 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid 0288fdc7-8a61-4637-8dbc-a3ee62ec5609)
   )
+
+  (wire (pts (xy 191.77 156.21) (xy 229.87 156.21))
+    (stroke (width 0) (type default) (color 0 0 0 0))
+    (uuid 02bf3a3e-5864-4501-9124-91297bbb2cdf)
+  )
   (polyline (pts (xy 306.07 20.32) (xy 306.07 74.93))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid 0394480b-38e7-464d-a703-614cdb177856)
@@ -1944,7 +1949,7 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid aa4617c8-7764-4b35-816f-5e78abb7565f)
   )
-  (wire (pts (xy 220.98 157.48) (xy 229.87 157.48))
+  (wire (pts (xy 220.98 162.56) (xy 229.87 162.56))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid aa9a7f58-a4f9-42f5-bceb-8cb491b0fbfa)
   )
@@ -2050,7 +2055,7 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid cc054124-7adc-4469-8f3f-a641c1e6cdfb)
   )
-  (wire (pts (xy 220.98 160.02) (xy 229.87 160.02))
+  (wire (pts (xy 220.98 165.1) (xy 229.87 165.1))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid cc0838cc-c0ce-4a41-8750-925cb938a118)
   )
@@ -2509,7 +2514,7 @@
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid d517827c-6e2d-4d0c-8f14-65dce99d253f)
   )
-  (label "VCF_FM_CTRL" (at 220.98 157.48 180)
+  (label "VCF_FM_CTRL" (at 220.98 162.56 180)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid d56edf8c-9ae0-43f6-b743-6c899371bf81)
   )
@@ -2565,7 +2570,7 @@
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid f6115e2c-08bd-4832-af23-bcdd4dc4a16f)
   )
-  (label "VCA_FM_CTRL" (at 220.98 160.02 180)
+  (label "VCA_FM_CTRL" (at 220.98 165.1 180)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid f85e2079-aa83-4ec2-a89f-6f62275e7fa1)
   )
@@ -3798,6 +3803,10 @@
       (effects (font (size 1.27 1.27)) (justify right))
       (uuid 9fc15bd9-c7d2-4344-bd66-d0907c1693a2)
     )
+    (pin "NOISE_CONTROL_CV" output (at 191.77 156.21 0)
+      (effects (font (size 1.27 1.27)) (justify right))
+      (uuid 6a235c9c-d5e2-452a-9e6b-d91008e90415)
+    )
   )
 
   (sheet (at 229.87 128.27) (size 64.77 44.45) (fields_autoplaced)
@@ -3822,11 +3831,11 @@
       (effects (font (size 1.27 1.27)) (justify left))
       (uuid d5b110bf-41ef-47ff-988b-3f107f7f831d)
     )
-    (pin "VCF_FM_CTRL" input (at 229.87 157.48 180)
+    (pin "VCF_FM_CTRL" input (at 229.87 162.56 180)
       (effects (font (size 1.27 1.27)) (justify left))
       (uuid f407f074-364e-4114-bfc0-ae07b39e8e5f)
     )
-    (pin "VCA_FM_CTRL" input (at 229.87 160.02 180)
+    (pin "VCA_FM_CTRL" input (at 229.87 165.1 180)
       (effects (font (size 1.27 1.27)) (justify left))
       (uuid f0ff0c40-57e6-4f1d-8c4e-eb8f711df453)
     )
@@ -3861,6 +3870,10 @@
     (pin "NOISE_CTRL" input (at 229.87 135.89 180)
       (effects (font (size 1.27 1.27)) (justify left))
       (uuid a031f487-305e-46d0-aa65-8a134b49a910)
+    )
+    (pin "NOISE_CV" input (at 229.87 156.21 180)
+      (effects (font (size 1.27 1.27)) (justify left))
+      (uuid 6a417ba5-51d5-42c5-b4c5-76b5962afdff)
     )
   )
 
@@ -3966,6 +3979,9 @@
     )
     (path "/00000000-0000-0000-0000-000061fc54f5"
       (reference "#PWR028") (unit 1) (value "GND") (footprint "")
+    )
+    (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/6ee86ae3-2656-4f63-9de6-e42b5b322983"
+      (reference "#PWR029") (unit 1) (value "GND") (footprint "")
     )
     (path "/00000000-0000-0000-0000-000061ff2290/00000000-0000-0000-0000-0000622965dc"
       (reference "#PWR031") (unit 1) (value "+5V") (footprint "")
@@ -4264,6 +4280,9 @@
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/f36a2b19-4e5d-4e1b-9c12-3daf931e623b"
       (reference "Q2") (unit 1) (value "MMBT3904") (footprint "Package_TO_SOT_SMD:SOT-23")
     )
+    (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/55e53c3f-c971-4f19-922b-002bf51246f9"
+      (reference "Q3") (unit 1) (value "MMBT3904") (footprint "Package_TO_SOT_SMD:SOT-23")
+    )
     (path "/48ba0279-7271-4ec0-ba38-a30055ac9f59"
       (reference "R1") (unit 1) (value "100k") (footprint "Resistor_SMD:R_0402_1005Metric")
     )
@@ -4308,6 +4327,9 @@
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/f83152a9-de61-41c8-aa3c-d5ef810781e2"
       (reference "R15") (unit 1) (value "36k") (footprint "Resistor_SMD:R_0603_1608Metric")
+    )
+    (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/a9d46dee-3686-4e76-af83-0df79a10f957"
+      (reference "R16") (unit 1) (value "1k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/64293c9e-1637-4502-9e62-b413bb4bd05d"
       (reference "R18") (unit 1) (value "68k") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -4416,9 +4438,6 @@
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/66a9fb97-901e-45e4-ae8b-2b00e9946b12"
       (reference "TP13") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
-    )
-    (path "/00000000-0000-0000-0000-000061ff2290/a3ab1928-335f-4dcb-9beb-d7ee33a5ecd6"
-      (reference "TP14") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/802ac57d-6976-435d-bbe0-454dcb59ad4a"
       (reference "TP15") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
