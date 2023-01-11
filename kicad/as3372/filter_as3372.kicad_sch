@@ -4295,7 +4295,7 @@
     (property "Datasheet" "~" (id 3) (at 106.68 102.108 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "C1815" (id 4) (at 106.68 102.108 0)
+    (property "LCSC Part" "C694185" (id 4) (at 106.68 102.108 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 859079bb-e148-4b22-b509-ee23776dd0a0))
