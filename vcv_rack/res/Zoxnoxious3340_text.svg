@@ -7,7 +7,7 @@
    viewBox="0 0 76.199997 128.5"
    version="1.1"
    id="svg26"
-   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    sodipodi:docname="Zoxnoxious3340_text.svg"
    inkscape:export-filename="/home/kaf/Downloads/Zoxnoxious3340_text.png"
    inkscape:export-xdpi="150.02802"
@@ -41,13 +41,13 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="1.0932235"
-     inkscape:cx="186.14675"
-     inkscape:cy="220.44897"
-     inkscape:window-width="1297"
-     inkscape:window-height="828"
-     inkscape:window-x="259"
-     inkscape:window-y="28"
+     inkscape:zoom="1.5460515"
+     inkscape:cx="77.617078"
+     inkscape:cy="307.55767"
+     inkscape:window-width="1389"
+     inkscape:window-height="940"
+     inkscape:window-x="476"
+     inkscape:window-y="56"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer2"
      width="71.12mm"
@@ -731,8 +731,8 @@
        sodipodi:nodetypes="ccc"
        inkscape:connector-curvature="0" />
     <path
-       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.253446px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.253446, 0.253446;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 14.184209,81.958701 V 102.90398"
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.275535px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.275535, 0.275535;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 14.184209,81.958701 V 106.71406"
        id="path32674" />
     <text
        xml:space="preserve"
@@ -761,8 +761,8 @@
          x="64.982971"
          y="113.43462">SAW</tspan></text>
     <path
-       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.253446px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.253446, 0.253446;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 39.480352,81.958704 V 102.90398"
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.275535px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.275535, 0.275535;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 39.480352,81.958705 V 106.71406"
        id="path32682" />
     <text
        xml:space="preserve"
@@ -844,12 +844,12 @@
          x="5.5799932"
          y="11.883859">VCO</tspan></text>
     <path
-       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.2645px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.2645, 0.2645;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 27.020266,17.143477 V 39.955612"
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 27.020266,17.143477 V 43.086942"
        id="path32393" />
     <path
-       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.2645px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.2645, 0.2645;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 43.275742,17.143477 V 39.955612"
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 43.275742,17.143477 V 43.086942"
        id="path32405" />
     <text
        xml:space="preserve"
@@ -865,8 +865,8 @@
          x="53.158531"
          y="11.883859">OUT1</tspan></text>
     <path
-       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.2645px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.2645, 0.2645;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 9.7834175,17.143477 V 39.955612"
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 9.7834175,17.143477 V 43.086942"
        id="path29740" />
     <path
        style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.253446px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.253446, 0.253446;stroke-dashoffset:0;stroke-opacity:1"
@@ -881,8 +881,8 @@
     <circle
        id="circle32676"
        data-name="In03#PJ301MPort"
-       cx="12.845516"
-       cy="99.725861"
+       cx="12.813533"
+       cy="102.10621"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="EXT_MOD_AMOUNT_INPUT"
@@ -1024,8 +1024,8 @@
     <circle
        id="circle17206"
        data-name="In03#PJ301MPort"
-       cx="9.2908564"
-       cy="36.724052"
+       cx="9.2731247"
+       cy="38.043736"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="FREQ_INPUT"
@@ -1053,8 +1053,8 @@
     <circle
        id="circle32395"
        data-name="In03#PJ301MPort"
-       cx="26.526148"
-       cy="36.955635"
+       cx="26.508415"
+       cy="38.275318"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="LINEAR_INPUT"
@@ -1082,8 +1082,8 @@
     <circle
        id="circle32407"
        data-name="In03#PJ301MPort"
-       cx="42.780159"
-       cy="37.174034"
+       cx="42.762428"
+       cy="38.493717"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="PULSE_WIDTH_INPUT"
@@ -1146,8 +1146,8 @@
     <circle
        id="circle32684"
        data-name="In03#PJ301MPort"
-       cx="38.139378"
-       cy="100.06573"
+       cx="38.107395"
+       cy="102.44608"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="SYNC_PHASE_INPUT"
