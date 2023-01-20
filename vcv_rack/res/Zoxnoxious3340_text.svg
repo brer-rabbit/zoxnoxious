@@ -7,7 +7,7 @@
    viewBox="0 0 76.199997 128.5"
    version="1.1"
    id="svg26"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
    sodipodi:docname="Zoxnoxious3340_text.svg"
    inkscape:export-filename="/home/kaf/Downloads/Zoxnoxious3340_text.png"
    inkscape:export-xdpi="150.02802"
@@ -42,12 +42,12 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="1.5460515"
-     inkscape:cx="77.617078"
-     inkscape:cy="307.55767"
+     inkscape:cx="49.804292"
+     inkscape:cy="260.66402"
      inkscape:window-width="1389"
      inkscape:window-height="940"
-     inkscape:window-x="476"
-     inkscape:window-y="56"
+     inkscape:window-x="286"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer2"
      width="71.12mm"
@@ -881,32 +881,29 @@
     <circle
        id="circle32676"
        data-name="In03#PJ301MPort"
-       cx="12.813533"
-       cy="102.10621"
+       cx="14.184207"
+       cy="101.92484"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="EXT_MOD_AMOUNT_INPUT"
-       transform="rotate(-0.76981148)"
        inkscape:transform-center-x="-0.12594097"
        inkscape:transform-center-y="12.007235" />
     <circle
        id="circle32678"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="87.501648"
-       cy="-14.184208"
+       cx="14.184208"
+       cy="87.501648"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="EXT_MOD_AMOUNT_KNOB"
-       transform="rotate(90)" />
+       inkscape:label="EXT_MOD_AMOUNT_KNOB" />
     <circle
        id="circle32680"
        data-name="RGreen1#RedLight"
-       cx="93.501572"
-       cy="-18.184444"
+       cx="18.184444"
+       cy="93.501572"
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="EXT_MOD_AMOUNT_CLIP"
-       transform="rotate(90)" />
+       inkscape:label="EXT_MOD_AMOUNT_CLIP" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97"
        data-name="Tempo#RoundLargeBlackKnob"
@@ -1002,7 +999,7 @@
        cy="8.2185383"
        r="0.79374999"
        style="display:inline;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LEFT_EXPANDER_LIGHT" />
+       inkscape:label="RIGHT_EXPANDER_LIGHT" />
     <rect
        id="f9b09e17-fc78-4216-9b09-40d2874876ff-0-4"
        data-name="Screen"
@@ -1024,90 +1021,81 @@
     <circle
        id="circle17206"
        data-name="In03#PJ301MPort"
-       cx="9.2731247"
-       cy="38.043736"
+       cx="9.7834177"
+       cy="37.915714"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="FREQ_INPUT"
-       transform="rotate(-0.76981148)"
        inkscape:transform-center-x="-0.12594097"
        inkscape:transform-center-y="12.007235" />
     <circle
        id="circle17212"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="24.553286"
-       cy="-9.7834167"
+       cx="9.7834167"
+       cy="24.553286"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="FREQ_KNOB"
-       transform="rotate(90)" />
+       inkscape:label="FREQ_KNOB" />
     <circle
        id="circle17214"
        data-name="RGreen1#RedLight"
-       cx="30.553207"
-       cy="-13.783653"
+       cx="13.783653"
+       cy="30.553207"
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="FREQ_CLIP"
-       transform="rotate(90)" />
+       inkscape:label="FREQ_CLIP" />
     <circle
        id="circle32395"
        data-name="In03#PJ301MPort"
-       cx="26.508415"
-       cy="38.275318"
+       cx="27.020264"
+       cy="37.915714"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="LINEAR_INPUT"
-       transform="rotate(-0.76981148)"
        inkscape:transform-center-x="-0.12594097"
        inkscape:transform-center-y="12.007235" />
     <circle
        id="circle32397"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="24.553286"
-       cy="-27.020266"
+       cx="27.020266"
+       cy="24.553286"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="LINEAR_KNOB"
-       transform="rotate(90)" />
+       inkscape:label="LINEAR_KNOB" />
     <circle
        id="circle32403"
        data-name="RGreen1#RedLight"
-       cx="30.553207"
-       cy="-31.02075"
+       cx="31.02075"
+       cy="30.553207"
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LINEAR_CLIP"
-       transform="rotate(90)" />
+       inkscape:label="LINEAR_CLIP" />
     <circle
        id="circle32407"
        data-name="In03#PJ301MPort"
-       cx="42.762428"
-       cy="38.493717"
+       cx="43.275745"
+       cy="37.915714"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="PULSE_WIDTH_INPUT"
-       transform="rotate(-0.76981148)"
        inkscape:transform-center-x="-0.12594097"
        inkscape:transform-center-y="12.007235" />
     <circle
        id="circle32409"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="24.553286"
-       cy="-43.275742"
+       cx="43.275742"
+       cy="24.553286"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="PULSE_WIDTH_KNOB"
-       transform="rotate(90)" />
+       inkscape:label="PULSE_WIDTH_KNOB" />
     <circle
        id="circle32415"
        data-name="RGreen1#RedLight"
-       cx="30.553207"
-       cy="-47.793751"
+       cx="47.793751"
+       cy="30.553207"
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="PULSE_WIDTH_CLIP"
-       transform="rotate(90)" />
+       inkscape:label="PULSE_WIDTH_CLIP" />
     <rect
        id="rect12599"
        data-name="Screen"
@@ -1117,89 +1105,77 @@
        x="6.3096628"
        style="display:inline;fill:#ffff00;stroke-width:0.0733187"
        inkscape:label="MODULATION_TEXT" />
-    <g
-       id="g35624"
-       transform="translate(4.6486166,5.8900579)">
-      <circle
-         id="circle12603"
-         data-name="Tempo#RoundLargeBlackKnob"
-         cx="-7.6093802"
-         cy="57.798542"
-         r="1.3229166"
-         style="display:inline;fill:#ff0000;stroke-width:0.264583"
-         inkscape:label="EXT_MOD_SELECT_SWITCH_UP"
-         inkscape:transform-center-x="13.076671"
-         inkscape:transform-center-y="0.10405832"
-         transform="scale(-1,1)" />
-      <circle
-         id="circle12610"
-         data-name="Tempo#RoundLargeBlackKnob"
-         cx="-14.712712"
-         cy="57.798542"
-         r="1.3229166"
-         style="display:inline;fill:#ff0000;stroke-width:0.264583"
-         inkscape:label="EXT_MOD_SELECT_SWITCH_DOWN"
-         inkscape:transform-center-x="13.076671"
-         inkscape:transform-center-y="0.10405832"
-         transform="scale(-1,1)" />
-    </g>
+    <circle
+       id="circle12603"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="10.129205"
+       cy="63.688602"
+       r="1.3229166"
+       style="display:inline;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="EXT_MOD_SELECT_SWITCH_UP"
+       inkscape:transform-center-x="13.076671"
+       inkscape:transform-center-y="0.10405832" />
+    <circle
+       id="circle12610"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="21.490122"
+       cy="63.688602"
+       r="1.3229166"
+       style="display:inline;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="EXT_MOD_SELECT_SWITCH_DOWN"
+       inkscape:transform-center-x="13.076671"
+       inkscape:transform-center-y="0.10405832" />
     <circle
        id="circle32684"
        data-name="In03#PJ301MPort"
-       cx="38.107395"
-       cy="102.44608"
+       cx="39.480354"
+       cy="101.92485"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="SYNC_PHASE_INPUT"
-       transform="rotate(-0.76981148)"
        inkscape:transform-center-x="-0.12594097"
        inkscape:transform-center-y="12.007235" />
     <circle
        id="circle32686"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="87.501656"
-       cy="-39.480354"
+       cx="39.480354"
+       cy="87.501656"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="SYNC_PHASE_KNOB"
-       transform="rotate(90)" />
+       inkscape:label="SYNC_PHASE_KNOB" />
     <circle
        id="circle32688"
        data-name="RGreen1#RedLight"
-       cx="93.501579"
-       cy="-43.480591"
+       cx="43.480591"
+       cy="93.501579"
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="SYNC_PHASE_CLIP"
-       transform="rotate(90)" />
+       inkscape:label="SYNC_PHASE_CLIP" />
     <circle
        id="circle32718"
        data-name="In03#PJ301MPort"
-       cx="61.583065"
-       cy="54.787308"
+       cx="62.313591"
+       cy="53.954975"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
        inkscape:label="MIX1_TRIANGLE_VCA_INPUT"
-       transform="rotate(-0.76981148)"
        inkscape:transform-center-x="-0.12594097"
        inkscape:transform-center-y="12.007235" />
     <circle
        id="circle32720"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="41.91235"
-       cy="-62.313595"
+       cx="62.313595"
+       cy="41.91235"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="MIX1_TRIANGLE_KNOB"
-       transform="rotate(90)" />
+       inkscape:label="MIX1_TRIANGLE_KNOB" />
     <circle
        id="circle32722"
        data-name="RGreen1#RedLight"
-       cx="47.912273"
-       cy="-66.313828"
+       cx="66.313828"
+       cy="47.912273"
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="MIX1_TRIANGLE_VCA_CLIP"
-       transform="rotate(90)" />
+       inkscape:label="MIX1_TRIANGLE_VCA_CLIP" />
   </g>
 </svg>
