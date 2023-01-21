@@ -102,9 +102,11 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
           { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 12, 13 } },
           { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 14, 15 } },
           { SYNC_POS_BUTTON_PARAM, INT_MIN, { 16, 17 } },
-          { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20, 21 } }
-          //,{ EXT_MOD_SELECT_SWITCH_PARAM, INT_MIN, { 22, 23, 24, 25, 26, 27, 28, 29 } }
+          { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20, 21 } },
+          { EXT_MOD_SELECT_SWITCH_UP_PARAM, INT_MIN, { 22, 23, 24, 25, 26, 27, 28, 29 } }
       };
+
+    int ext_mod_select_switch_value = 0;
 
     Zoxnoxious3340() :
         freqClipTimer(0.f), pulseWidthClipTimer(0.f), linearClipTimer(0.f),
@@ -228,7 +230,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
             if (modulationParam != modulationInputParamPrevValue) {
                 modulationInputNameString = cardOutputNames[modulationParam];
-                // send midi command
+                // sending midi command is handled in processZoxnoxiousControl
             }
         }
     }
@@ -254,6 +256,18 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             midiMessageQueue.pop_front();
         }
 
+
+        // add/subtract the up/down buttons
+        ext_mod_select_switch_value = ext_mod_select_switch_value +
+            ((int) params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].getValue() + 0.5f) -
+            ((int) params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].getValue() + 0.5f);
+        if (ext_mod_select_switch_value > 7) {
+            ext_mod_select_switch_value = 0;
+        } else if (ext_mod_select_switch_value < 0) {
+            ext_mod_select_switch_value = 7;
+        }
+        // hack for below logic: set the value of EXT_MOD_SELECT_SWITCH_UP_PARAM
+        params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(ext_mod_select_switch_value);
 
         // Any buttons params pushed need to send midi events.  Send directly or queue.
         for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {

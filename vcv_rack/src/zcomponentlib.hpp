@@ -13,6 +13,7 @@ struct ZButton : app::SvgSwitch {
 	}
 };
 
+
 struct ZLatch : ZButton {
 	ZLatch() {
 		momentary = false;
@@ -44,6 +45,11 @@ struct ZLightLatch : ZLightButton<TLight> {
 		this->latch = true;
 	}
 };
+
+
+
+
+
 
 
 /** TriangleLeftLight

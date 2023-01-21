@@ -42,14 +42,14 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="1.5460515"
-     inkscape:cx="49.804292"
-     inkscape:cy="260.66402"
+     inkscape:cx="237.05549"
+     inkscape:cy="217.97463"
      inkscape:window-width="1389"
      inkscape:window-height="940"
      inkscape:window-x="286"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer3"
      width="71.12mm"
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#cfdee6"
@@ -346,7 +346,7 @@
        x="-0.27284041"
        y="-0.031160831" />
     <path
-       style="display:inline;fill:#aeb7ab;fill-opacity:1;stroke:#980000;stroke-width:0.157904"
+       style="display:inline;fill:#aeb7ab;fill-opacity:1;stroke:#000000;stroke-width:0.157904;stroke-opacity:1"
        id="rect1316-4"
        width="44.846672"
        height="76.332794"
@@ -356,7 +356,7 @@
        d="M 7.0747855,46.4823 H 46.629791 a 2.6458333,2.6458333 45 0 1 2.645833,2.645833 v 71.041127 a 2.6458333,2.6458333 135 0 1 -2.645833,2.64583 H 7.0747855 A 2.6458333,2.6458333 45 0 1 4.4289522,120.16926 V 49.128133 A 2.6458333,2.6458333 135 0 1 7.0747855,46.4823 Z"
        sodipodi:type="rect" />
     <path
-       style="display:inline;fill:#c7b89b;fill-opacity:1;stroke:#980000;stroke-width:0.158;stroke-dasharray:none"
+       style="display:inline;fill:#c7b89b;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
        id="rect1316-8"
        width="20.225365"
        height="82.788086"
@@ -366,7 +366,7 @@
        d="M 54.885652,9.0953436 H 69.81935 a 2.6458333,2.6458333 45 0 1 2.645833,2.6458334 V 89.237596 A 2.6458333,2.6458333 135 0 1 69.81935,91.88343 H 54.885652 A 2.6458333,2.6458333 45 0 1 52.239819,89.237596 V 11.741177 a 2.6458333,2.6458333 135 0 1 2.645833,-2.6458334 z"
        sodipodi:type="rect" />
     <path
-       style="display:inline;fill:#ada9b9;fill-opacity:1;stroke:#980000;stroke-width:0.158;stroke-dasharray:none"
+       style="display:inline;fill:#ada9b9;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
        id="rect1316-8-9"
        width="20.278248"
        height="27.356386"
@@ -778,7 +778,7 @@
          x="53.158531"
          y="99.305878">OUT2</tspan></text>
     <path
-       style="display:inline;opacity:0.99;fill:#cc9696;fill-opacity:1;stroke:#980000;stroke-width:0.158;stroke-dasharray:none"
+       style="display:inline;opacity:0.99;fill:#cc9696;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
        id="rect1316"
        width="44.887402"
        height="35.238853"
