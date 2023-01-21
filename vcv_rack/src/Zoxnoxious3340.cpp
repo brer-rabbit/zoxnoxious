@@ -106,7 +106,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
           { EXT_MOD_SELECT_SWITCH_UP_PARAM, INT_MIN, { 22, 23, 24, 25, 26, 27, 28, 29 } }
       };
 
-    int ext_mod_select_switch_value = 0;
+    int extModSelectSwitchValue;
 
     Zoxnoxious3340() :
         freqClipTimer(0.f), pulseWidthClipTimer(0.f), linearClipTimer(0.f),
@@ -115,7 +115,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         output1NameString(invalidCardOutputName),
         output2NameString(invalidCardOutputName),
         modulationInputNameString(invalidCardOutputName),
-        modulationInputParamPrevValue(-1) {
+        modulationInputParamPrevValue(-1),
+        extModSelectSwitchValue(0) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
@@ -130,8 +131,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         configSwitch(MIX2_PULSE_BUTTON_PARAM, 0.f, 1.f, 0.f, "Mix2 Pulse", {"Off", "On"});
         configSwitch(MIX2_SAW_BUTTON_PARAM, 0.f, 1.f, 0.f, "Mix2 Saw", {"Off", "On"});
 
-        configSwitch(EXT_MOD_SELECT_SWITCH_UP_PARAM, 0.f, 1.f, 0.f, "Inc", {"Inc", "" });
-        configSwitch(EXT_MOD_SELECT_SWITCH_DOWN_PARAM, 0.f, 1.f, 0.f, "Dec", {"Dec", "" });
+        configButton(EXT_MOD_SELECT_SWITCH_UP_PARAM, "Next");
+        configButton(EXT_MOD_SELECT_SWITCH_DOWN_PARAM, "Previous");
         configParam(EXT_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 1.f, "External Mod Level", "%", 0.f, 100.f);
         configSwitch(EXT_MOD_PWM_BUTTON_PARAM, 0.f, 1.f, 0.f, "Ext Mod to PWM", {"Off", "On"});
         configSwitch(EXP_FM_BUTTON_PARAM, 0.f, 1.f, 0.f, "Ext Mod to Exp FM", {"Off", "On"});
@@ -188,6 +189,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             bool mix2_saw = params[MIX2_SAW_BUTTON_PARAM].getValue() > 0.f;
             lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
 
+            lights[EXT_MOD_SELECT_SWITCH_UP_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_UP_PARAM].getValue());
+            lights[EXT_MOD_SELECT_SWITCH_DOWN_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_DOWN_PARAM].getValue());
 
             // clipping light timer
             const float lightTime = args.sampleTime * lightDivider.getDivision();
@@ -222,7 +225,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             // oddly (well, by design) this is how the mux is wired up:
             // CardA_Out1, CardA_Out2, CardB_Out1, CardC_Out1,
             // CardD_Out1, CardE_Out1, CardF_Out1, CardG_Out1,
-            int modulationParam = 0; //static_cast<int>(params[EXT_MOD_SELECT_SWITCH_PARAM].getValue());
+            int modulationParam = extModSelectSwitchValue;
             // this handles the cases 0-7 for the mux
             if (modulationParam > 2) {
                 modulationParam = (modulationParam - 1) * 2;
@@ -258,19 +261,30 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
 
         // add/subtract the up/down buttons
-        ext_mod_select_switch_value = ext_mod_select_switch_value +
-            ((int) params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].getValue() + 0.5f) -
-            ((int) params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].getValue() + 0.5f);
-        if (ext_mod_select_switch_value > 7) {
-            ext_mod_select_switch_value = 0;
-        } else if (ext_mod_select_switch_value < 0) {
-            ext_mod_select_switch_value = 7;
+        int prev = extModSelectSwitchValue;
+        if (params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].getValue()) {
+            params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(0);
+            extModSelectSwitchValue++;
         }
+        if (params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].getValue()) {
+            params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].setValue(0);
+            extModSelectSwitchValue--;
+        }
+        if (extModSelectSwitchValue > 7) {
+            extModSelectSwitchValue = 0;
+        } else if (extModSelectSwitchValue < 0) {
+            extModSelectSwitchValue = 7;
+        }
+
+        if (prev != extModSelectSwitchValue) {
+            INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d", APP->engine->getFrame(), extModSelectSwitchValue);
+        }
+
         // hack for below logic: set the value of EXT_MOD_SELECT_SWITCH_UP_PARAM
-        params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(ext_mod_select_switch_value);
+        //params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(extModSelectSwitchValue);
 
         // Any buttons params pushed need to send midi events.  Send directly or queue.
-        for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
+        for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram) - 1); ++i) {
             int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
 
             if (buttonParamToMidiProgramList[i].previousValue != newValue) {
@@ -399,8 +413,8 @@ struct Zoxnoxious3340Widget : ModuleWidget {
 
         addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(62.487, 69.011)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
 
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(9.994, 63.689)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(21.625, 63.689)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_LIGHT));
+        addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(9.994, 63.689)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_LIGHT));
+        addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(21.625, 63.689)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_LIGHT));
 
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(62.487, 87.388)), module, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_PARAM, Zoxnoxious3340::MIX1_COMPARATOR_BUTTON_LIGHT));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.184, 87.501)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));

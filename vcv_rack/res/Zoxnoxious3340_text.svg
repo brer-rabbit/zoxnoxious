@@ -7,7 +7,7 @@
    viewBox="0 0 76.199997 128.5"
    version="1.1"
    id="svg26"
-   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    sodipodi:docname="Zoxnoxious3340_text.svg"
    inkscape:export-filename="/home/kaf/Downloads/Zoxnoxious3340_text.png"
    inkscape:export-xdpi="150.02802"
@@ -42,12 +42,12 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="1.5460515"
-     inkscape:cx="237.05549"
-     inkscape:cy="217.97463"
+     inkscape:cx="185.63418"
+     inkscape:cy="218.29803"
      inkscape:window-width="1389"
      inkscape:window-height="940"
      inkscape:window-x="286"
-     inkscape:window-y="25"
+     inkscape:window-y="27"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer3"
      width="71.12mm"
@@ -374,6 +374,16 @@
        y="95.462234"
        inkscape:path-effect="#path-effect147"
        d="m 54.757104,95.462234 h 14.986581 a 2.6458333,2.6458333 45 0 1 2.645834,2.645834 v 22.064722 a 2.6458333,2.6458333 135 0 1 -2.645834,2.64583 H 54.757104 a 2.6458333,2.6458333 45 0 1 -2.645833,-2.64583 V 98.108068 a 2.6458333,2.6458333 135 0 1 2.645833,-2.645834 z"
+       sodipodi:type="rect" />
+    <path
+       style="display:inline;opacity:0.99;fill:#cc9696;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1316"
+       width="44.887402"
+       height="35.238853"
+       x="4.4064178"
+       y="9.0937443"
+       inkscape:path-effect="#path-effect143"
+       d="M 7.0522511,9.0937443 H 46.647986 a 2.6458333,2.6458333 45 0 1 2.645833,2.6458337 v 29.947186 a 2.6458333,2.6458333 135 0 1 -2.645833,2.645834 H 7.0522511 A 2.6458333,2.6458333 45 0 1 4.4064178,41.686764 V 11.739578 A 2.6458333,2.6458333 135 0 1 7.0522511,9.0937443 Z"
        sodipodi:type="rect" />
   </g>
   <g
@@ -777,16 +787,6 @@
          id="tspan43626"
          x="53.158531"
          y="99.305878">OUT2</tspan></text>
-    <path
-       style="display:inline;opacity:0.99;fill:#cc9696;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
-       id="rect1316"
-       width="44.887402"
-       height="35.238853"
-       x="4.4064178"
-       y="9.0937443"
-       inkscape:path-effect="#path-effect143"
-       d="M 7.0522511,9.0937443 H 46.647986 a 2.6458333,2.6458333 45 0 1 2.645833,2.6458337 v 29.947186 a 2.6458333,2.6458333 135 0 1 -2.645833,2.645834 H 7.0522511 A 2.6458333,2.6458333 45 0 1 4.4064178,41.686764 V 11.739578 A 2.6458333,2.6458333 135 0 1 7.0522511,9.0937443 Z"
-       sodipodi:type="rect" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
