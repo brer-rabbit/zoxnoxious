@@ -14,6 +14,7 @@
    inkscape:export-ydpi="150.02802"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -42,12 +43,12 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="1.0932235"
-     inkscape:cx="117.5423"
-     inkscape:cy="250.17757"
+     inkscape:cx="99.247775"
+     inkscape:cy="243.77449"
      inkscape:window-width="1590"
      inkscape:window-height="940"
-     inkscape:window-x="174"
-     inkscape:window-y="155"
+     inkscape:window-x="212"
+     inkscape:window-y="134"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer2"
      width="71.12mm"
@@ -472,6 +473,38 @@
          d="m 40.608498,-31.298707 c 0.08455,0.741996 -0.422587,1.399562 -1.163682,1.508865 -0.741097,0.1093 -1.466073,-0.366547 -1.663542,-1.091891 -0.197472,-0.725343 0.11189,-1.410398 0.822898,-1.630221 l 0.38952,1.296386 z"
          sodipodi:nodetypes="cssccc" />
     </clipPath>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient25631"
+       id="linearGradient25633"
+       x1="55.91848"
+       y1="82.516106"
+       x2="116.15801"
+       y2="81.872856"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="rotate(180,94.102688,82.535711)" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient25631">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop25627" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop25629" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient25631"
+       id="linearGradient25721"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.91857843,0,0,-0.90420551,4.1060482,159.03469)"
+       x1="55.918686"
+       y1="82.535713"
+       x2="114.67928"
+       y2="83.574646" />
   </defs>
   <g
      inkscape:groupmode="layer"
@@ -1062,7 +1095,7 @@
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
-         id="tspan14724">OUTPUT PAN</tspan></text>
+         id="tspan28369">OUTPUT</tspan></text>
     <rect
        id="rect13931"
        data-name="Screen"
@@ -1084,15 +1117,53 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="56.489822"
-       y="79.94268"
+       x="54.07198"
+       y="93.19278"
        id="text14927"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
-         id="tspan14967"
-         x="56.489822"
-         y="79.94268">OUT1   OUT2</tspan></text>
+         id="tspan27990"
+         x="54.07198"
+         y="93.19278">OUT1</tspan></text>
+    <g
+       id="g27855"
+       transform="matrix(0.23130242,0,0,0.23130242,43.04114,64.446816)"
+       style="stroke:none">
+      <path
+         style="opacity:0.89;fill:none;stroke-width:0.377953;paint-order:markers fill stroke;stroke:none"
+         id="path21766"
+         sodipodi:type="arc"
+         sodipodi:cx="65.867836"
+         sodipodi:cy="78.199486"
+         sodipodi:rx="5.6843896"
+         sodipodi:ry="4.5252867"
+         sodipodi:start="1.2415557"
+         sodipodi:end="4.3612985"
+         sodipodi:open="true"
+         sodipodi:arc-type="arc"
+         d="M 67.705739,82.481711 A 5.6843896,4.5252867 0 0 1 60.509165,79.709317 5.6843896,4.5252867 0 0 1 63.91285,73.95025" />
+      <path
+         id="path21940"
+         style="opacity:0.89;fill:url(#linearGradient25633);fill-opacity:1;stroke:none;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="m 132.17878,101.96137 -0.003,-0.0393 h -0.003 c 0.002,0.0131 0.004,0.0261 0.005,0.0393 z m -0.005,-0.0393 C 129.45039,79.86046 115.57037,63.387723 92.736193,63.149263 71.260366,63.141263 55.116626,79.776939 55.437186,101.87352 h 0.007 c 0.819469,-4.175113 1.348064,-5.385084 2.3589,-9.517278 1.887269,-7.714956 8.060586,-16.36965 16.568798,-20.735904 10.925115,-6.307571 24.052708,-6.549012 34.977826,-0.241441 10.9109,6.300676 16.693,17.940133 16.70773,30.539583 z"
+         sodipodi:nodetypes="cccccccccscccc" />
+      <path
+         id="path25719"
+         style="opacity:0.89;fill:url(#linearGradient25721);fill-opacity:1;stroke:none;stroke-width:0.182273;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="m 55.570872,101.97023 a 38.056224,37.460759 0 0 1 0.0027,-0.0355 h 0.0027 c -0.0018,0.0118 -0.0037,0.0236 -0.0046,0.0355 z m 0.0046,-0.0355 C 58.07715,81.986496 70.827038,67.091759 91.802023,66.87614 c 19.727227,-0.0072 34.556517,15.034836 34.262067,35.01468 h -0.006 a 32.43564,31.92812 0 0 0 -16.21299,-27.571204 32.43564,31.92812 0 0 0 -32.435464,0 32.43564,31.92812 0 0 0 -16.215363,27.611854 z" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="69.150711"
+       y="93.19278"
+       id="text27994"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan28014">OUT2</tspan></text>
   </g>
 </svg>
