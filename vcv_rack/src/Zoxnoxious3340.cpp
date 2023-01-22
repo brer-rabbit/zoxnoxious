@@ -93,6 +93,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         uint8_t midiProgram[8];
     } buttonParamToMidiProgramList[11] =
       {
+          { EXT_MOD_SELECT_SWITCH_UP_PARAM, INT_MIN, { 22, 23, 24, 25, 26, 27, 28, 29 } }, //  this entry is an oddball
           { SYNC_NEG_BUTTON_PARAM, INT_MIN, { 0, 1 } },
           { MIX1_PULSE_BUTTON_PARAM, INT_MIN, { 2, 3 } },
           { MIX1_COMPARATOR_BUTTON_PARAM, INT_MIN, { 4, 5 } },
@@ -102,8 +103,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
           { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 12, 13 } },
           { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 14, 15 } },
           { SYNC_POS_BUTTON_PARAM, INT_MIN, { 16, 17 } },
-          { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20, 21 } },
-          { EXT_MOD_SELECT_SWITCH_UP_PARAM, INT_MIN, { 22, 23, 24, 25, 26, 27, 28, 29 } }
+          { MIX1_SAW_LEVEL_SELECTOR_PARAM, INT_MIN, { 18, 19, 20, 21 } }
       };
 
     int extModSelectSwitchValue;
@@ -260,15 +260,18 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         }
 
 
+        // the zero-th entry of buttonParamToMidiProgramList is handled here (and rather poorly)
         // add/subtract the up/down buttons
-        int prev = extModSelectSwitchValue;
+        bool extModSelectChanged = false;
         if (params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].getValue()) {
             params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(0);
             extModSelectSwitchValue++;
+            extModSelectChanged = true;
         }
         if (params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].getValue()) {
             params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].setValue(0);
             extModSelectSwitchValue--;
+            extModSelectChanged = true;
         }
         if (extModSelectSwitchValue > 7) {
             extModSelectSwitchValue = 0;
@@ -276,40 +279,17 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             extModSelectSwitchValue = 7;
         }
 
-        if (prev != extModSelectSwitchValue) {
+        if (extModSelectChanged) {
             INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d", APP->engine->getFrame(), extModSelectSwitchValue);
+            sendOrQueueMidiMessage(controlMsg, extModSelectSwitchValue, 0);
         }
 
-        // hack for below logic: set the value of EXT_MOD_SELECT_SWITCH_UP_PARAM
-        //params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(extModSelectSwitchValue);
+        // all other entries in buttonParamToMidiProgramList are handled here (almost as poorly)
 
         // Any buttons params pushed need to send midi events.  Send directly or queue.
-        for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram) - 1); ++i) {
+        for (int i = 1; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
             int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
-
-            if (buttonParamToMidiProgramList[i].previousValue != newValue) {
-                buttonParamToMidiProgramList[i].previousValue = newValue;
-                if (controlMsg->midiMessageSet == false) {
-                    // send direct
-                    controlMsg->midiMessage.setSize(2);
-                    controlMsg->midiMessage.setChannel(midiChannel);
-                    controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
-                    controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
-                    controlMsg->midiMessageSet = true;
-                    INFO("zoxnoxious3340: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
-                }
-                else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
-                    midi::Message queuedMessage;
-                    queuedMessage.setSize(2);
-                    queuedMessage.setChannel(midiChannel);
-                    queuedMessage.setStatus(midiProgramChangeStatus);
-                    queuedMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
-                    midiMessageQueue.push_back(queuedMessage);
-                }
-                else {
-                    INFO("Zoxnoxioius3340: dropping MIDI message, bus full and queue full");
-                }
-            }
+            sendOrQueueMidiMessage(controlMsg, newValue, i);
         }
 
         float v;
@@ -358,6 +338,32 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         }
     }
 
+
+    void sendOrQueueMidiMessage(ZoxnoxiousControlMsg *controlMsg, int newValue, int index) {
+        if (buttonParamToMidiProgramList[index].previousValue != newValue) {
+            buttonParamToMidiProgramList[index].previousValue = newValue;
+            if (controlMsg->midiMessageSet == false) {
+                // send direct
+                controlMsg->midiMessage.setSize(2);
+                controlMsg->midiMessage.setChannel(midiChannel);
+                controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
+                controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[index].midiProgram[newValue]);
+                controlMsg->midiMessageSet = true;
+                INFO("zoxnoxious3340: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
+            }
+            else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
+                midi::Message queuedMessage;
+                queuedMessage.setSize(2);
+                queuedMessage.setChannel(midiChannel);
+                queuedMessage.setStatus(midiProgramChangeStatus);
+                queuedMessage.setNote(buttonParamToMidiProgramList[index].midiProgram[newValue]);
+                midiMessageQueue.push_back(queuedMessage);
+            }
+            else {
+                INFO("Zoxnoxioius3340: dropping MIDI message, bus full and queue full");
+            }
+        }
+    }
 
 
     /** getCardHardwareId

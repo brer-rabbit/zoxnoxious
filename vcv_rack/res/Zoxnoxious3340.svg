@@ -7,7 +7,7 @@
    viewBox="0 0 76.199997 128.5"
    version="1.1"
    id="svg26"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
    sodipodi:docname="Zoxnoxious3340.svg"
    inkscape:export-filename="/home/kaf/Downloads/Zoxnoxious3340_text.png"
    inkscape:export-xdpi="150.02802"
@@ -42,12 +42,12 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="2.0117807"
-     inkscape:cx="88.975901"
-     inkscape:cy="186.15349"
+     inkscape:cx="82.513964"
+     inkscape:cy="185.90495"
      inkscape:window-width="1389"
      inkscape:window-height="940"
-     inkscape:window-x="232"
-     inkscape:window-y="88"
+     inkscape:window-x="138"
+     inkscape:window-y="40"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg26"
      width="71.12mm"
@@ -1330,7 +1330,7 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="components"
-     style="display:inline;opacity:0.99">
+     style="display:none;opacity:0.99">
     <circle
        id="circle32676"
        data-name="In03#PJ301MPort"
@@ -1672,8 +1672,7 @@
        id="path2251" />
   </g>
   <g
-     aria-label="PULSE
-WIDTH"
+     aria-label="PULSE WIDTH"
      id="text92-2-39-8"
      style="font-size:2.46944px;line-height:1.25;-inkscape-font-specification:'sans-serif, Normal';display:inline;opacity:0.99;stroke-width:0.0932689">
     <path
