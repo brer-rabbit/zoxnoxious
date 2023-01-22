@@ -42,14 +42,14 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="1.5460515"
-     inkscape:cx="185.63418"
+     inkscape:cx="185.31077"
      inkscape:cy="218.29803"
-     inkscape:window-width="1389"
-     inkscape:window-height="940"
-     inkscape:window-x="286"
+     inkscape:window-width="1920"
+     inkscape:window-height="1136"
+     inkscape:window-x="0"
      inkscape:window-y="27"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="layer3"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2"
      width="71.12mm"
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#cfdee6"
@@ -1112,7 +1112,7 @@
        cy="63.688602"
        r="1.3229166"
        style="display:inline;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="EXT_MOD_SELECT_SWITCH_UP"
+       inkscape:label="EXT_MOD_SELECT_SWITCH_DOWN"
        inkscape:transform-center-x="13.076671"
        inkscape:transform-center-y="0.10405832" />
     <circle
@@ -1122,7 +1122,7 @@
        cy="63.688602"
        r="1.3229166"
        style="display:inline;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="EXT_MOD_SELECT_SWITCH_DOWN"
+       inkscape:label="EXT_MOD_SELECT_SWITCH_UP"
        inkscape:transform-center-x="13.076671"
        inkscape:transform-center-y="0.10405832" />
     <circle
