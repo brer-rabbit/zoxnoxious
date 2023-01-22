@@ -14,20 +14,29 @@
   "changelogUrl": "",
   "modules": [
     {
+      "slug": "PatchingMatrix",
+      "name": "Patching Matrix",
+      "description": "Audio Out for Zonoxious components",
+      "tags": [
+        "Hardware"
+      ]
+    },
+    {
       "slug": "Zoxnoxious3340",
       "name": "Zoxnoxious3340",
-      "description": "Hardware 3340",
+      "description": "Hardware 3340 VCO",
       "tags": [
         "VCO",
         "Hardware"
       ]
     },
     {
-      "slug": "PatchingMatrix",
-      "name": "Patching Matrix",
-      "description": "Patching matrix for Zonoxious components",
+      "slug": "Zoxnoxious3372",
+      "name": "Zoxnoxious3372",
+      "description": "Hardware 3372 VCF",
       "tags": [
-        "hardware"
+        "Hardware",
+        "VCF"
       ]
     }
   ]

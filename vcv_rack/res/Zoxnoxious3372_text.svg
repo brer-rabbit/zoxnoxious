@@ -7,7 +7,7 @@
    viewBox="0 0 81.279999 128.5"
    version="1.1"
    id="svg26"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
    sodipodi:docname="Zoxnoxious3372_text.svg"
    inkscape:export-filename="/home/kaf/Downloads/Zoxnoxious3340_text.png"
    inkscape:export-xdpi="150.02802"
@@ -42,13 +42,13 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="1.0932235"
-     inkscape:cx="99.247775"
-     inkscape:cy="243.77449"
+     inkscape:zoom="1.365545"
+     inkscape:cx="73.230836"
+     inkscape:cy="226.28328"
      inkscape:window-width="1590"
      inkscape:window-height="940"
-     inkscape:window-x="212"
-     inkscape:window-y="134"
+     inkscape:window-x="33"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer2"
      width="71.12mm"
@@ -255,7 +255,7 @@
        inkscape:stockid="Arrow1Lend"
        inkscape:isstock="true"
        viewBox="0 0 17.773854 10.156488"
-       markerWidth="8.7740002"
+       markerWidth="8.7739992"
        markerHeight="5.0137138"
        preserveAspectRatio="xMidYMid">
       <path
@@ -392,7 +392,11 @@
        refY="0"
        orient="auto"
        inkscape:stockid="Arrow1Lend"
-       inkscape:isstock="true">
+       inkscape:isstock="true"
+       viewBox="0 0 17.773854 10.156488"
+       markerWidth="17.773853"
+       markerHeight="10.156487"
+       preserveAspectRatio="xMidYMid">
       <path
          inkscape:connector-curvature="0"
          transform="matrix(-0.8,0,0,-0.8,-10,0)"
@@ -482,7 +486,7 @@
        x2="116.15801"
        y2="81.872856"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="rotate(180,94.102688,82.535711)" />
+       gradientTransform="matrix(-0.23130242,0,0,-0.23130242,86.573499,102.62824)" />
     <linearGradient
        inkscape:collect="always"
        id="linearGradient25631">
@@ -500,7 +504,7 @@
        xlink:href="#linearGradient25631"
        id="linearGradient25721"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.91857843,0,0,-0.90420551,4.1060482,159.03469)"
+       gradientTransform="matrix(0.21246941,0,0,-0.19908901,43.990879,100.65305)"
        x1="55.918686"
        y1="82.535713"
        x2="114.67928"
@@ -518,6 +522,46 @@
        height="129.31491"
        x="-0.26925582"
        y="-0.71211571" />
+    <path
+       style="display:inline;opacity:0.99;fill:#aeb7ab;fill-opacity:1;stroke:#000000;stroke-width:0.157904;stroke-opacity:1"
+       id="path12499"
+       width="23.393"
+       height="61.31332"
+       x="53.168072"
+       y="9.132453"
+       inkscape:path-effect="#path-effect12503"
+       sodipodi:type="rect"
+       d="m 55.813905,9.132453 h 18.101333 a 2.6458333,2.6458333 45 0 1 2.645833,2.645833 V 67.79994 a 2.6458333,2.6458333 135 0 1 -2.645833,2.645833 H 55.813905 A 2.6458333,2.6458333 45 0 1 53.168072,67.79994 V 11.778286 a 2.6458333,2.6458333 135 0 1 2.645833,-2.645833 z" />
+    <path
+       style="display:inline;opacity:0.99;fill:#ada9b9;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
+       id="path13261"
+       width="45.979"
+       height="47.643349"
+       x="4.8320289"
+       y="72.795517"
+       sodipodi:type="rect"
+       inkscape:path-effect="#path-effect13273"
+       d="M 7.4778622,72.795517 H 48.165196 a 2.6458333,2.6458333 45 0 1 2.645833,2.645833 v 42.35168 a 2.6458333,2.6458333 135 0 1 -2.645833,2.64584 H 7.4778622 A 2.6458333,2.6458333 45 0 1 4.8320289,117.79303 V 75.44135 a 2.6458333,2.6458333 135 0 1 2.6458333,-2.645833 z" />
+    <path
+       style="display:inline;opacity:0.99;fill:#c7b89b;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
+       id="path13647"
+       width="23.21459"
+       height="47.475967"
+       x="53.233379"
+       y="72.884727"
+       inkscape:path-effect="#path-effect13651"
+       sodipodi:type="rect"
+       d="m 55.879213,72.884727 h 17.922923 a 2.6458333,2.6458333 45 0 1 2.645833,2.645834 v 42.184299 a 2.6458333,2.6458333 135 0 1 -2.645833,2.64583 H 55.879213 a 2.6458333,2.6458333 45 0 1 -2.645834,-2.64583 V 75.530561 a 2.6458333,2.6458333 135 0 1 2.645834,-2.645834 z" />
+    <path
+       style="display:inline;opacity:0.99;fill:#cc9696;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
+       id="path12385"
+       width="45.986877"
+       height="61.312901"
+       x="4.7189741"
+       y="9.129899"
+       sodipodi:type="rect"
+       inkscape:path-effect="#path-effect12389"
+       d="M 7.3648074,9.129899 H 48.060018 a 2.6458333,2.6458333 45 0 1 2.645834,2.645833 V 67.796966 A 2.6458333,2.6458333 135 0 1 48.060018,70.4428 H 7.3648074 A 2.6458333,2.6458333 45 0 1 4.7189741,67.796966 V 11.775732 A 2.6458333,2.6458333 135 0 1 7.3648074,9.129899 Z" />
   </g>
   <g
      inkscape:label="Layer 1"
@@ -591,248 +635,9 @@
          id="tspan1314"
          x="10.298297"
          y="-78.614716">CONNECTION TO AUDIO OUT</tspan></text>
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="components"
-     style="display:inline;opacity:0.99">
-    <circle
-       id="b9452edd-6f79-47c8-a395-da97cf0e28c9-8"
-       data-name="RGreen1#RedLight"
-       cx="2.0200911"
-       cy="8.2185383"
-       r="0.79374999"
-       style="display:inline;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LEFT_EXPANDER_LIGHT" />
-    <circle
-       id="circle1254"
-       data-name="RGreen1#RedLight"
-       cx="79.506989"
-       cy="8.2185383"
-       r="0.79374999"
-       style="display:inline;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="RIGHT_EXPANDER_LIGHT" />
-    <path
-       style="display:inline;opacity:0.99;fill:#cc9696;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
-       id="path12385"
-       width="45.986877"
-       height="61.312901"
-       x="4.7189741"
-       y="9.129899"
-       sodipodi:type="rect"
-       inkscape:path-effect="#path-effect12389" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="6.3330846"
-       y="11.883859"
-       id="text32419"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan12233"
-         x="6.3330846"
-         y="11.883859">SOURCE ONE</tspan></text>
-    <path
-       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 16.284202,43.297112 V 69.240577"
-       id="path12315" />
-    <path
-       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 38.872819,43.297112 V 69.240577"
-       id="path12371" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="12.194544"
-       y="41.305008"
-       id="text12395"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan12415"
-         x="12.194544"
-         y="41.305008">LEVEL</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="34.783161"
-       y="41.305008"
-       id="text12419"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan12417"
-         x="34.783161"
-         y="41.305008">LEVEL</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="12.225559"
-       y="28.875277"
-       id="text12423"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan12443"
-         x="12.225559"
-         y="28.875277">NOISE</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="29.20318"
-       y="11.928716"
-       id="text12207"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan12351"
-         x="29.20318"
-         y="11.928716">SOURCE TWO</tspan></text>
-    <g
-       id="g12326"
-       transform="translate(0.75309126)">
-      <rect
-         id="rect11484"
-         data-name="Screen"
-         y="14.029161"
-         width="19"
-         height="3.6367228"
-         x="6.0311112"
-         style="display:inline;fill:#ffff00;stroke-width:0.0733187"
-         inkscape:label="MODULATION_TEXT" />
-      <circle
-         id="circle11486"
-         data-name="Tempo#RoundLargeBlackKnob"
-         cx="9.8506536"
-         cy="21.598318"
-         r="1.3229166"
-         style="display:inline;fill:#ff0000;stroke-width:0.264583"
-         inkscape:label="EXT_MOD_SELECT_SWITCH_UP"
-         inkscape:transform-center-x="13.076671"
-         inkscape:transform-center-y="0.10405832" />
-      <circle
-         id="circle11488"
-         data-name="Tempo#RoundLargeBlackKnob"
-         cx="21.211571"
-         cy="21.598318"
-         r="1.3229166"
-         style="display:inline;fill:#ff0000;stroke-width:0.264583"
-         inkscape:label="EXT_MOD_SELECT_SWITCH_DOWN"
-         inkscape:transform-center-x="13.076671"
-         inkscape:transform-center-y="0.10405832" />
-    </g>
-    <g
-       id="g12331"
-       transform="translate(0.02492985,-4.1066837)">
-      <rect
-         id="rect12209"
-         data-name="Screen"
-         y="18.135845"
-         width="19"
-         height="3.6367228"
-         x="29.347889"
-         style="display:inline;fill:#ffff00;stroke-width:0.0733187"
-         inkscape:label="MODULATION_TEXT" />
-      <circle
-         id="circle12211"
-         data-name="Tempo#RoundLargeBlackKnob"
-         cx="33.167431"
-         cy="25.705002"
-         r="1.3229166"
-         style="display:inline;fill:#ff0000;stroke-width:0.264583"
-         inkscape:label="EXT_MOD_SELECT_SWITCH_UP"
-         inkscape:transform-center-x="13.076671"
-         inkscape:transform-center-y="0.10405832" />
-      <circle
-         id="circle12213"
-         data-name="Tempo#RoundLargeBlackKnob"
-         cx="44.528351"
-         cy="25.705002"
-         r="1.3229166"
-         style="display:inline;fill:#ff0000;stroke-width:0.264583"
-         inkscape:label="EXT_MOD_SELECT_SWITCH_DOWN"
-         inkscape:transform-center-x="13.076671"
-         inkscape:transform-center-y="0.10405832" />
-    </g>
-    <circle
-       id="circle12317"
-       data-name="In03#PJ301MPort"
-       cx="16.284203"
-       cy="64.069351"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="LINEAR_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <circle
-       id="circle12319"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="16.284203"
-       cy="50.706917"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="LINEAR_KNOB" />
-    <circle
-       id="circle12321"
-       data-name="RGreen1#RedLight"
-       cx="20.246841"
-       cy="56.706841"
-       r="0.79374999"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LINEAR_CLIP" />
-    <circle
-       id="circle12373"
-       data-name="In03#PJ301MPort"
-       cx="38.872818"
-       cy="64.069351"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="LINEAR_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <circle
-       id="circle12375"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="38.872818"
-       cy="50.706917"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="LINEAR_KNOB" />
-    <circle
-       id="circle12377"
-       data-name="RGreen1#RedLight"
-       cx="42.918678"
-       cy="56.706841"
-       r="0.79374999"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LINEAR_CLIP" />
-    <circle
-       id="circle12391"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="16.284203"
-       cy="34.017174"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="LINEAR_KNOB" />
-    <path
-       style="display:inline;fill:#aeb7ab;fill-opacity:1;stroke:#000000;stroke-width:0.157904;stroke-opacity:1"
-       id="path12499"
-       width="23.393"
-       height="61.31332"
-       x="53.168072"
-       y="9.132453"
-       inkscape:path-effect="#path-effect12503"
-       sodipodi:type="rect" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        x="54.417068"
        y="11.928716"
        id="text12507"
@@ -849,7 +654,7 @@
        id="path12445" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        x="59.114616"
        y="13.333556"
        id="text12544"
@@ -859,7 +664,7 @@
          sodipodi:role="line"
          id="tspan12564"
          x="59.114616"
-         y="13.333556"></tspan><tspan
+         y="13.333556" /><tspan
          sodipodi:role="line"
          id="tspan12566"
          x="59.114616"
@@ -890,79 +695,92 @@
          id="tspan12877"
          x="59.202599"
          y="61.429947">AMP/PAN</tspan></text>
-    <circle
-       id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3-9-2-5"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="64.864571"
-       cy="66.519112"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="MIX2_SAW_BUTTON" />
-    <circle
-       id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3-9-2-5-1"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="64.864571"
-       cy="53.776421"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="MIX2_PULSE_BUTTON" />
-    <circle
-       id="circle12451"
-       data-name="In03#PJ301MPort"
-       cx="64.864571"
-       cy="39.462578"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="LINEAR_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <circle
-       id="circle12453"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="64.864571"
-       cy="26.100142"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="LINEAR_KNOB" />
-    <circle
-       id="circle12455"
-       data-name="RGreen1#RedLight"
-       cx="68.373581"
-       cy="32.100067"
-       r="0.79374999"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LINEAR_CLIP" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="6.3330846"
+       y="11.883859"
+       id="text32419"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan12233"
+         x="6.3330846"
+         y="11.883859">SOURCE ONE</tspan></text>
     <path
-       style="display:inline;fill:none;stroke:#000000;stroke-width:0.184658;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.184658, 0.369317;stroke-dashoffset:0;stroke-opacity:1"
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 16.284202,43.297112 V 69.240577"
+       id="path12315" />
+    <path
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 38.872819,43.297112 V 69.240577"
+       id="path12371" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="12.194544"
+       y="41.305008"
+       id="text12395"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan12415"
+         x="12.194544"
+         y="41.305008">LEVEL</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="34.783161"
+       y="41.305008"
+       id="text12419"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan12417"
+         x="34.783161"
+         y="41.305008">LEVEL</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="12.225559"
+       y="28.875277"
+       id="text12423"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan12443"
+         x="12.225559"
+         y="28.875277">NOISE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="29.20318"
+       y="11.928716"
+       id="text12207"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan12351"
+         x="29.20318"
+         y="11.928716">SOURCE TWO</tspan></text>
+    <path
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.184658;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.184658, 0.369317;stroke-dashoffset:0;stroke-opacity:1"
        d="m 27.522342,11.082988 0.380741,58.620637"
        id="path3554-4-6"
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0" />
-    <path
-       style="display:inline;opacity:0.99;fill:#ada9b9;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
-       id="path13261"
-       width="45.979"
-       height="47.643349"
-       x="4.8320289"
-       y="72.795517"
-       sodipodi:type="rect"
-       inkscape:path-effect="#path-effect13273" />
-    <path
-       style="display:inline;opacity:0.99;fill:#c7b89b;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
-       id="path13647"
-       width="23.21459"
-       height="47.475967"
-       x="53.233379"
-       y="72.884727"
-       inkscape:path-effect="#path-effect13651"
-       sodipodi:type="rect" />
     <path
        style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
        d="M 16.260257,84.567779 V 110.51124"
        id="path13379" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        x="11.1053"
        y="82.575676"
        id="text13383"
@@ -986,39 +804,13 @@
          id="tspan13377"
          x="5.7655468"
          y="76.525421">FILTER</tspan></text>
-    <circle
-       id="circle13385"
-       data-name="In03#PJ301MPort"
-       cx="16.260256"
-       cy="105.34002"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="LINEAR_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <circle
-       id="circle13387"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="16.260256"
-       cy="91.977585"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="LINEAR_KNOB" />
-    <circle
-       id="circle13389"
-       data-name="RGreen1#RedLight"
-       cx="20.222895"
-       cy="97.977509"
-       r="0.79374999"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LINEAR_CLIP" />
     <path
        style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
        d="M 38.848873,84.567779 V 110.51124"
        id="path13594" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        x="30.691076"
        y="82.575676"
        id="text13598"
@@ -1029,62 +821,6 @@
          id="tspan13641"
          x="30.691076"
          y="82.575676">RESONANCE</tspan></text>
-    <circle
-       id="circle13600"
-       data-name="In03#PJ301MPort"
-       cx="38.848869"
-       cy="105.34002"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="LINEAR_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <circle
-       id="circle13602"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="38.848869"
-       cy="91.977585"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="LINEAR_KNOB" />
-    <circle
-       id="circle13604"
-       data-name="RGreen1#RedLight"
-       cx="42.811508"
-       cy="97.977509"
-       r="0.79374999"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LINEAR_CLIP" />
-    <path
-       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 64.840675,80.995056 V 106.93852"
-       id="path13899" />
-    <circle
-       id="circle13901"
-       data-name="In03#PJ301MPort"
-       cx="64.840675"
-       cy="101.7673"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="LINEAR_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <circle
-       id="circle13903"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="64.840675"
-       cy="88.404861"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="LINEAR_KNOB" />
-    <circle
-       id="circle13905"
-       data-name="RGreen1#RedLight"
-       cx="68.608635"
-       cy="94.404785"
-       r="0.79374999"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="LINEAR_CLIP" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
@@ -1095,7 +831,315 @@
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
-         id="tspan28369">OUTPUT</tspan></text>
+         id="tspan28369"
+         x="54.404434"
+         y="76.525421">OUTPUT</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="54.07198"
+       y="93.19278"
+       id="text14927"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan27990"
+         x="54.07198"
+         y="93.19278">OUT1</tspan></text>
+    <g
+       id="g11320"
+       transform="translate(0,-0.39548149)"
+       style="display:inline;opacity:0.99">
+      <path
+         id="path21940"
+         style="opacity:0.89;fill:url(#linearGradient25633);fill-opacity:1;stroke:none;stroke-width:0.0462605;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="m 73.614412,88.030728 -6.94e-4,-0.0091 h -6.94e-4 c 4.62e-4,0.003 9.25e-4,0.006 0.0012,0.0091 z m -0.0012,-0.0091 c -0.629927,-5.102903 -3.840409,-8.913087 -9.122009,-8.968244 -4.967411,-0.0019 -8.701497,3.846022 -8.627351,8.957015 h 0.0016 c 0.189546,-0.965714 0.311811,-1.245583 0.54562,-2.20137 0.43653,-1.784488 1.864433,-3.786339 3.832403,-4.796264 2.527005,-1.458957 5.563449,-1.514803 8.090456,-0.05585 2.523717,1.457361 3.861131,4.149596 3.864538,7.063879 z"
+         sodipodi:nodetypes="cccccccccscccc" />
+      <path
+         id="path25719"
+         style="opacity:0.89;fill:url(#linearGradient25721);fill-opacity:1;stroke:none;stroke-width:0.0411342;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="m 55.894817,88.088533 a 8.8024967,8.248153 0 0 1 6.25e-4,-0.0078 h 6.24e-4 c -4.16e-4,0.0026 -8.56e-4,0.0052 -0.0011,0.0078 z m 0.0011,-0.0078 c 0.578644,-4.392225 3.527724,-7.671766 8.379289,-7.719241 4.562955,-0.0016 7.993006,3.310388 7.924899,7.709572 h -0.0014 a 7.502442,7.0299702 0 0 0 -3.750104,-6.070659 7.502442,7.0299702 0 0 0 -7.502401,0 7.502442,7.0299702 0 0 0 -3.750653,6.07961 z" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="69.150711"
+       y="93.19278"
+       id="text27994"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan28014"
+         x="69.150711"
+         y="93.19278">OUT2</tspan></text>
+    <path
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 64.840675,80.995056 V 106.93852"
+       id="path13899" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="components"
+     style="display:inline;opacity:0.99">
+    <circle
+       id="b9452edd-6f79-47c8-a395-da97cf0e28c9-8"
+       data-name="RGreen1#RedLight"
+       cx="2.0200911"
+       cy="8.2185383"
+       r="0.79374999"
+       style="display:inline;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="LEFT_EXPANDER_LIGHT" />
+    <circle
+       id="circle1254"
+       data-name="RGreen1#RedLight"
+       cx="79.506989"
+       cy="8.2185383"
+       r="0.79374999"
+       style="display:inline;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="RIGHT_EXPANDER_LIGHT" />
+    <rect
+       id="rect11484"
+       data-name="Screen"
+       y="13.838066"
+       width="18"
+       height="3.6367228"
+       x="6.7842026"
+       style="display:inline;fill:#ffff00;stroke-width:0.0713632"
+       inkscape:label="SOURCE_ONE_TEXT" />
+    <circle
+       id="circle11486"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="10.603745"
+       cy="21.598318"
+       r="1.3229166"
+       style="display:inline;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="SOURCE_ONE_DOWN_BUTTON"
+       inkscape:transform-center-x="13.076671"
+       inkscape:transform-center-y="0.10405832" />
+    <circle
+       id="circle11488"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="21.964663"
+       cy="21.598318"
+       r="1.3229166"
+       style="display:inline;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="SOURCE_ONE_UP_BUTTON"
+       inkscape:transform-center-x="13.076671"
+       inkscape:transform-center-y="0.10405832" />
+    <rect
+       id="rect12209"
+       data-name="Screen"
+       y="14.029161"
+       width="18"
+       height="3.6367228"
+       x="29.372818"
+       style="display:inline;fill:#ffff00;stroke-width:0.0713632"
+       inkscape:label="SOURCE_TWO_TEXT" />
+    <ellipse
+       id="circle12211"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="32.991333"
+       cy="21.598318"
+       style="display:inline;fill:#ff0000;stroke-width:0.257526"
+       inkscape:label="SOURCE_TWO_DOWN_BUTTON"
+       inkscape:transform-center-x="13.076671"
+       inkscape:transform-center-y="0.10405832"
+       rx="1.2532895"
+       ry="1.3229166" />
+    <ellipse
+       id="circle12213"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="43.754311"
+       cy="21.598318"
+       style="display:inline;fill:#ff0000;stroke-width:0.257526"
+       inkscape:label="SOURCE_TWO_UP_BUTTON"
+       inkscape:transform-center-x="13.076671"
+       inkscape:transform-center-y="0.10405832"
+       rx="1.2532895"
+       ry="1.3229166" />
+    <circle
+       id="circle12317"
+       data-name="In03#PJ301MPort"
+       cx="16.284203"
+       cy="64.069351"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="SOURCE_ONE_LEVEL_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <circle
+       id="circle12319"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="16.284203"
+       cy="50.706917"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="SOURCE_ONE_LEVEL_KNOB" />
+    <circle
+       id="circle12321"
+       data-name="RGreen1#RedLight"
+       cx="20.246841"
+       cy="56.706841"
+       r="0.79374999"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="SOURCE_ONE_LEVEL_CLIP" />
+    <circle
+       id="circle12373"
+       data-name="In03#PJ301MPort"
+       cx="38.872818"
+       cy="64.069351"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="SOURCE_TWO_LEVEL_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <circle
+       id="circle12375"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="38.872818"
+       cy="50.706917"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="SOURCE_TWO_LEVEL_KNOB" />
+    <circle
+       id="circle12377"
+       data-name="RGreen1#RedLight"
+       cx="42.918678"
+       cy="56.706841"
+       r="0.79374999"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="SOURCE_TWO_LEVEL_CLIP" />
+    <circle
+       id="circle12391"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="16.284203"
+       cy="34.017174"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="NOISE_KNOB" />
+    <circle
+       id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3-9-2-5"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="64.864571"
+       cy="66.519112"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="VCA_MOD_SWITCH" />
+    <circle
+       id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3-9-2-5-1"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="64.864571"
+       cy="53.776421"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="FILTER_MOD_SWITCH" />
+    <circle
+       id="circle12451"
+       data-name="In03#PJ301MPort"
+       cx="64.864571"
+       cy="39.462578"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="MOD_AMOUNT_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <circle
+       id="circle12453"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="64.864571"
+       cy="26.100142"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="MOD_AMOUNT_KNOB" />
+    <circle
+       id="circle12455"
+       data-name="RGreen1#RedLight"
+       cx="68.373581"
+       cy="32.100067"
+       r="0.79374999"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="MOD_AMOUNT_CLIP" />
+    <circle
+       id="circle13385"
+       data-name="In03#PJ301MPort"
+       cx="16.260256"
+       cy="105.34002"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="CUTOFF_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <circle
+       id="circle13387"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="16.260256"
+       cy="91.977585"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="CUTOFF_KNOB" />
+    <circle
+       id="circle13389"
+       data-name="RGreen1#RedLight"
+       cx="20.222895"
+       cy="97.977509"
+       r="0.79374999"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="CUTOFF_CLIP" />
+    <circle
+       id="circle13600"
+       data-name="In03#PJ301MPort"
+       cx="38.848869"
+       cy="105.34002"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="RESONANCE_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <circle
+       id="circle13602"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="38.848869"
+       cy="91.977585"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="RESONANCE_KNOB" />
+    <circle
+       id="circle13604"
+       data-name="RGreen1#RedLight"
+       cx="42.811508"
+       cy="97.977509"
+       r="0.79374999"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="RESONANCE_CLIP" />
+    <circle
+       id="circle13901"
+       data-name="In03#PJ301MPort"
+       cx="64.840675"
+       cy="101.7673"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="OUTPUT_PAN_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <circle
+       id="circle13903"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="64.840675"
+       cy="88.404861"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="OUTPUT_PAN_KNOB" />
+    <circle
+       id="circle13905"
+       data-name="RGreen1#RedLight"
+       cx="68.608635"
+       cy="94.404785"
+       r="0.79374999"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="OUTPUT_PAN_CLIP" />
     <rect
        id="rect13931"
        data-name="Screen"
@@ -1113,57 +1157,19 @@
        height="3.636193"
        x="55.840675"
        style="display:inline;fill:#ffff00;stroke-width:0.0713581"
-       inkscape:label="OUT1_TEXT" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="54.07198"
-       y="93.19278"
-       id="text14927"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan27990"
-         x="54.07198"
-         y="93.19278">OUT1</tspan></text>
-    <g
-       id="g27855"
-       transform="matrix(0.23130242,0,0,0.23130242,43.04114,64.446816)"
-       style="stroke:none">
-      <path
-         style="opacity:0.89;fill:none;stroke-width:0.377953;paint-order:markers fill stroke;stroke:none"
-         id="path21766"
-         sodipodi:type="arc"
-         sodipodi:cx="65.867836"
-         sodipodi:cy="78.199486"
-         sodipodi:rx="5.6843896"
-         sodipodi:ry="4.5252867"
-         sodipodi:start="1.2415557"
-         sodipodi:end="4.3612985"
-         sodipodi:open="true"
-         sodipodi:arc-type="arc"
-         d="M 67.705739,82.481711 A 5.6843896,4.5252867 0 0 1 60.509165,79.709317 5.6843896,4.5252867 0 0 1 63.91285,73.95025" />
-      <path
-         id="path21940"
-         style="opacity:0.89;fill:url(#linearGradient25633);fill-opacity:1;stroke:none;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
-         d="m 132.17878,101.96137 -0.003,-0.0393 h -0.003 c 0.002,0.0131 0.004,0.0261 0.005,0.0393 z m -0.005,-0.0393 C 129.45039,79.86046 115.57037,63.387723 92.736193,63.149263 71.260366,63.141263 55.116626,79.776939 55.437186,101.87352 h 0.007 c 0.819469,-4.175113 1.348064,-5.385084 2.3589,-9.517278 1.887269,-7.714956 8.060586,-16.36965 16.568798,-20.735904 10.925115,-6.307571 24.052708,-6.549012 34.977826,-0.241441 10.9109,6.300676 16.693,17.940133 16.70773,30.539583 z"
-         sodipodi:nodetypes="cccccccccscccc" />
-      <path
-         id="path25719"
-         style="opacity:0.89;fill:url(#linearGradient25721);fill-opacity:1;stroke:none;stroke-width:0.182273;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
-         d="m 55.570872,101.97023 a 38.056224,37.460759 0 0 1 0.0027,-0.0355 h 0.0027 c -0.0018,0.0118 -0.0037,0.0236 -0.0046,0.0355 z m 0.0046,-0.0355 C 58.07715,81.986496 70.827038,67.091759 91.802023,66.87614 c 19.727227,-0.0072 34.556517,15.034836 34.262067,35.01468 h -0.006 a 32.43564,31.92812 0 0 0 -16.21299,-27.571204 32.43564,31.92812 0 0 0 -32.435464,0 32.43564,31.92812 0 0 0 -16.215363,27.611854 z" />
-    </g>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="69.150711"
-       y="93.19278"
-       id="text27994"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan28014">OUT2</tspan></text>
+       inkscape:label="OUT2_TEXT" />
+    <path
+       style="opacity:0.89;fill:none;stroke:none;stroke-width:0.0874214;paint-order:markers fill stroke"
+       id="path21766"
+       sodipodi:type="arc"
+       sodipodi:cx="58.276531"
+       sodipodi:cy="82.534546"
+       sodipodi:rx="1.314813"
+       sodipodi:ry="1.0467098"
+       sodipodi:start="1.2415557"
+       sodipodi:end="4.3612985"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="m 58.701643,83.525035 a 1.314813,1.0467098 0 0 1 -1.664585,-0.641262 1.314813,1.0467098 0 0 1 0.78728,-1.332086" />
   </g>
 </svg>
