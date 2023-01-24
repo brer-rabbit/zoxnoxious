@@ -4,6 +4,27 @@
 
 const static int midiMessageQueueMaxSize = 16;
 
+// map wired mux inputs to signal from cardOutputNames array
+// (card(N-1) * 2 + (out(N-1))
+// card7 out1
+// card6 out2
+// card5 out1
+// card4 out2
+// card3 out1
+// card2 out2
+// card1 out2
+// card1 out1
+const static int sourceOneToSignalMap[8] = { 12, 11, 8, 7, 4, 3, 1, 0 };
+
+// card6 out1
+// card5 out2
+// card4 out1
+// card3 out2
+// card2 out2
+// card2 out1
+// card1 out2
+// card1 out1
+const static int sourceTwoToSignalMap[8] = { 10, 9, 6, 5, 3, 2, 1, 0 };
 
 struct Zoxnoxious3372 : ZoxnoxiousModule {
     enum ParamId {
@@ -67,15 +88,15 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
 
     std::string source1NameString;
     std::string source2NameString;
-    std::string out1NameString;
-    std::string out2NameString;
+    std::string output1NameString;
+    std::string output2NameString;
 
 
     Zoxnoxious3372() :
         modAmountClipTimer(0.f), sourceOneLevelClipTimer(0.f), sourceTwoLevelClipTimer(0.f),
         outputPanClipTimer(0.f), cutoffClipTimer(0.f), resonanceClipTimer(0.f),
         source1NameString(invalidCardOutputName), source2NameString(invalidCardOutputName),
-        out1NameString(invalidCardOutputName), out2NameString(invalidCardOutputName) {
+        output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configButton(SOURCE_ONE_DOWN_BUTTON_PARAM, "Previous");
@@ -91,8 +112,8 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         configParam(CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff");
         configParam(RESONANCE_KNOB_PARAM, 0.f, 1.f, 0.f, "Resonance");
 
-        configSwitch(FILTER_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, {"Off", "On"});
-        configSwitch(VCA_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, {"Off", "On"});
+        configSwitch(FILTER_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Filter Mod", {"Off", "On"});
+        configSwitch(VCA_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "VCA Mod", {"Off", "On"});
 
         configInput(MOD_AMOUNT_INPUT, "Modulation Amount");
         configInput(SOURCE_ONE_LEVEL_INPUT, "Source One Level");
@@ -100,6 +121,10 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         configInput(OUTPUT_PAN_INPUT, "Pan");
         configInput(CUTOFF_INPUT, "Cutoff");
         configInput(RESONANCE_INPUT, "Resonance");
+
+        // no UI elements for these
+        configSwitch(SOURCE_ONE_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source One", {"0", "1", "2", "3", "4", "5", "6", "7"} );
+        configSwitch(SOURCE_TWO_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source Two", {"0", "1", "2", "3", "4", "5", "6", "7"} );
 
         lightDivider.setDivision(512);
     }
@@ -143,6 +168,16 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
             setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
             setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
 
+            // set string names to make available to ui
+            int source1Index = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
+            source1NameString = source1Index >= 0 && source1Index < 8 ?
+              cardOutputNames[ sourceOneToSignalMap[source1Index] ] : invalidCardOutputName;
+
+            int source2Index = static_cast<int>(params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue());
+            source2NameString = source2Index >= 0 && source2Index < 8 ?
+              cardOutputNames[ sourceTwoToSignalMap[source2Index] ] : invalidCardOutputName;
+
+
         }
 
     }
@@ -164,6 +199,19 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
     static const uint8_t hardwareId = 0x03;
     uint8_t getHardwareId() override {
         return hardwareId;
+    }
+
+
+    void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) override {
+        ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
+        output1NameString = getCardOutputName(hardwareId, 1, slot);
+        output2NameString = getCardOutputName(hardwareId, 2, slot);
+    }
+
+    void onChannelAssignmentLost() override {
+        ZoxnoxiousModule::onChannelAssignmentLost();
+        output1NameString = invalidCardOutputName;
+        output2NameString = invalidCardOutputName;
     }
 
 
