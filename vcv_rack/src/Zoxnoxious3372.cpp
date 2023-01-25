@@ -91,6 +91,19 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
     std::string output1NameString;
     std::string output2NameString;
 
+    // detect state changes so we can send a MIDI event.
+    struct buttonParamMidiProgram {
+        enum ParamId button;
+        int previousValue;
+        uint8_t midiProgram[8];
+    } buttonParamToMidiProgramList[4] =
+      {
+          { FILTER_MOD_SWITCH_PARAM, INT_MIN, { 0, 1 } },
+          { VCA_MOD_SWITCH_PARAM, INT_MIN, { 2, 3 } },
+          { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 4, 5, 6, 7, 8, 9, 10, 11 } },
+          { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 12, 13, 14, 15, 16, 17, 18, 19 } }
+      };
+
 
     Zoxnoxious3372() :
         modAmountClipTimer(0.f), sourceOneLevelClipTimer(0.f), sourceTwoLevelClipTimer(0.f),
@@ -190,6 +203,112 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
      *
      */
     void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
+
+        if (!hasChannelAssignment) {
+            return;
+        }
+
+        // if we have any queued midi messages, send them if possible
+        if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
+            //INFO("z3372: clock %" PRId64 " : bus is open, popping MIDI message from queue", APP->engine->getFrame());
+            controlMsg->midiMessageSet = true;
+            controlMsg->midiMessage = midiMessageQueue.front();
+            midiMessageQueue.pop_front();
+        }
+
+
+        // add/subtract the up/down buttons
+        if (params[ SOURCE_ONE_UP_BUTTON_PARAM ].getValue()) {
+            params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0);
+            params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue() + 1  % 8);
+        }
+        if (params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].getValue()) {
+            params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].setValue(0);
+            params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue() - 1  % 8);
+        }
+
+        if (params[ SOURCE_TWO_UP_BUTTON_PARAM ].getValue()) {
+            params[ SOURCE_TWO_UP_BUTTON_PARAM ].setValue(0);
+            params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue() + 1  % 8);
+        }
+        if (params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].getValue()) {
+            params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].setValue(0);
+            params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue() - 1  % 8);
+        }
+
+
+        for (int i = 1; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
+            int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
+
+            if (buttonParamToMidiProgramList[i].previousValue != newValue) {
+                buttonParamToMidiProgramList[i].previousValue = newValue;
+                if (controlMsg->midiMessageSet == false) {
+                    // send direct
+                    controlMsg->midiMessage.setSize(2);
+                    controlMsg->midiMessage.setChannel(midiChannel);
+                    controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
+                    controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
+                    controlMsg->midiMessageSet = true;
+                    INFO("zoxnoxious3340: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
+                }
+                else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
+                    midi::Message queuedMessage;
+                    queuedMessage.setSize(2);
+                    queuedMessage.setChannel(midiChannel);
+                    queuedMessage.setStatus(midiProgramChangeStatus);
+                    queuedMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
+                    midiMessageQueue.push_back(queuedMessage);
+                }
+                else {
+                    INFO("Zoxnoxioius3340: dropping MIDI message, bus full and queue full");
+                }
+            }
+        }
+
+        float v;
+        const float clipTime = 0.25f;
+
+        // cutoff
+        v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 0] != v) {
+            cutoffClipTimer = clipTime;
+        }
+
+        v = params[OUTPUT_PAN_KNOB_PARAM].getValue() + inputs[OUTPUT_PAN_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 1] != v) {
+            outputPanClipTimer = clipTime;
+        }
+
+        v = params[NOISE_KNOB_PARAM].getValue();
+        controlMsg->frame[cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
+
+        v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 3] != v) {
+            modAmountClipTimer = clipTime;
+        }
+
+        v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 4] != v) {
+            sourceOneLevelClipTimer = clipTime;
+        }
+
+        v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 5] != v) {
+            sourceTwoLevelClipTimer = clipTime;
+        }
+
+        v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 6] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 6] != v) {
+            resonanceClipTimer = clipTime;
+        }
+
+
     }
 
 
