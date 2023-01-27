@@ -14,7 +14,6 @@ const static int midiMessageQueueMaxSize = 16;
 // card2 out2
 // card1 out2
 // card1 out1
-const static int sourceOneToSignalMap[8] = { 12, 11, 8, 7, 4, 3, 1, 0 };
 
 // card6 out1
 // card5 out2
@@ -24,7 +23,7 @@ const static int sourceOneToSignalMap[8] = { 12, 11, 8, 7, 4, 3, 1, 0 };
 // card2 out1
 // card1 out2
 // card1 out1
-const static int sourceTwoToSignalMap[8] = { 10, 9, 6, 5, 3, 2, 1, 0 };
+
 
 struct Zoxnoxious3372 : ZoxnoxiousModule {
     enum ParamId {
@@ -184,11 +183,11 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
             // set string names to make available to ui
             int source1Index = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
             source1NameString = source1Index >= 0 && source1Index < 8 ?
-              cardOutputNames[ sourceOneToSignalMap[source1Index] ] : invalidCardOutputName;
+              cardOutputNames[source1Index] : invalidCardOutputName;
 
             int source2Index = static_cast<int>(params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue());
             source2NameString = source2Index >= 0 && source2Index < 8 ?
-              cardOutputNames[ sourceTwoToSignalMap[source2Index] ] : invalidCardOutputName;
+              cardOutputNames[source2Index] : invalidCardOutputName;
 
 
         }
@@ -267,44 +266,51 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
 
         float v;
         const float clipTime = 0.25f;
+        int channel = 0;
 
         // cutoff
         v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 0] != v) {
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
             cutoffClipTimer = clipTime;
         }
 
+        channel++;
         v = params[OUTPUT_PAN_KNOB_PARAM].getValue() + inputs[OUTPUT_PAN_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 1] != v) {
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
             outputPanClipTimer = clipTime;
         }
 
+        channel++;
         v = params[NOISE_KNOB_PARAM].getValue();
-        controlMsg->frame[cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
 
+        channel++;
         v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 3] != v) {
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
             modAmountClipTimer = clipTime;
         }
 
+        channel++;
         v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 4] != v) {
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
             sourceOneLevelClipTimer = clipTime;
         }
 
+        channel++;
         v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 5] != v) {
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
             sourceTwoLevelClipTimer = clipTime;
         }
 
+        channel++;
         v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 6] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 6] != v) {
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
             resonanceClipTimer = clipTime;
         }
 

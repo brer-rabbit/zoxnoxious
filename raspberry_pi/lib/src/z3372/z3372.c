@@ -1,4 +1,4 @@
-/* Copyright 2022 Kyle Farrell
+/* Copyright 2023 Kyle Farrell
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License.  You may
@@ -26,6 +26,9 @@
 // https://www.analog.com/media/en/technical-documentation/data-sheets/ad5308_5318_5328.pdf
 #define SPI_MODE 1
 
+#define NUM_CHANNELS 7
+
+
 struct z3372_card {
   struct zhost *zhost;
   int slot;
@@ -40,8 +43,8 @@ static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
 
-// six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
-static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
+// seven audio channels mapped
+static const int channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
 
 
 
@@ -51,37 +54,37 @@ void* init_zcard(struct zhost *zhost, int slot) {
   int spi_channel;
   // AD5328: control register
   char dac_ctrl0_reg[2] = { 0b11110000, 0b00000000 };  // full reset, data and control
-  char dac_ctrl1_reg[2] = { 0b10000000, 0b00000000 };  // power on, gain 1x, unbuffered Vref input
+  char dac_ctrl1_reg[2] = { 0b10000000, 0b00110000 };  // power on, gain 2x, unbuffered Vref input
 
   assert(slot >= 0 && slot < 8);
-  struct z3340_card *z3340 = (struct z3340_card*)calloc(1, sizeof(struct z3340_card));
-  if (z3340 == NULL) {
+  struct z3372_card *z3372 = (struct z3372_card*)calloc(1, sizeof(struct z3372_card));
+  if (z3372 == NULL) {
     return NULL;
   }
 
-  z3340->zhost = zhost;
-  z3340->slot = slot;
-  z3340->pca9555_port[0] = 0x00;
-  z3340->pca9555_port[1] = 0x00;
+  z3372->zhost = zhost;
+  z3372->slot = slot;
+  z3372->pca9555_port[0] = 0x40;
+  z3372->pca9555_port[1] = 0x00;
 
-  z3340->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
-  if (z3340->i2c_handle < 0) {
-    ERROR("z3340: unable to open i2c for address %d\n", i2c_addr);
+  z3372->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
+  if (z3372->i2c_handle < 0) {
+    ERROR("z3372: unable to open i2c for address %d\n", i2c_addr);
     return NULL;
   }
 
   // configure port0 and port1 as output;
   // start with zero values.  This ought to
   // turn everything "off", with the LED on.
-  error += i2cWriteByteData(z3340->i2c_handle, config_port0_addr, config_port_as_output);
-  error += i2cWriteByteData(z3340->i2c_handle, config_port1_addr, config_port_as_output);
-  error += i2cWriteByteData(z3340->i2c_handle, port0_addr, z3340->pca9555_port[0]);
-  error += i2cWriteByteData(z3340->i2c_handle, port1_addr, z3340->pca9555_port[1]);
+  error += i2cWriteByteData(z3372->i2c_handle, config_port0_addr, config_port_as_output);
+  error += i2cWriteByteData(z3372->i2c_handle, config_port1_addr, config_port_as_output);
+  error += i2cWriteByteData(z3372->i2c_handle, port0_addr, z3372->pca9555_port[0]);
+  error += i2cWriteByteData(z3372->i2c_handle, port1_addr, z3372->pca9555_port[1]);
 
   if (error) {
-    ERROR("z3340: error writing to I2C bus address %d\n", i2c_addr);
-    i2cClose(z3340->i2c_handle);
-    free(z3340);
+    ERROR("z3372: error writing to I2C bus address %d\n", i2c_addr);
+    i2cClose(z3372->i2c_handle);
+    free(z3372);
     return NULL;
   }
 
@@ -91,30 +94,30 @@ void* init_zcard(struct zhost *zhost, int slot) {
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
 
-  return z3340;
+  return z3372;
 }
 
 
 void free_zcard(void *zcard_plugin) {
-  struct z3340_card *z3340 = (struct z3340_card*)zcard_plugin;
+  struct z3372_card *z3372 = (struct z3372_card*)zcard_plugin;
 
   if (zcard_plugin) {
-    if (z3340->i2c_handle >= 0) {
+    if (z3372->i2c_handle >= 0) {
       // TODO: turn off LED
-      i2cClose(z3340->i2c_handle);
+      i2cClose(z3372->i2c_handle);
     }
-    free(z3340);
+    free(z3372);
   }
 }
 
 char* get_plugin_name() {
-  return "Zoxnoxious 3340";
+  return "Zoxnoxious 3372 VCF";
 }
 
 
 struct zcard_properties* get_zcard_properties() {
   struct zcard_properties *props = (struct zcard_properties*) malloc(sizeof(struct zcard_properties));
-  props->num_channels = 6;
+  props->num_channels = NUM_CHANNELS;
   props->spi_mode = 0;
   return props;
 }
@@ -122,13 +125,13 @@ struct zcard_properties* get_zcard_properties() {
 
 
 int process_samples(void *zcard_plugin, const int16_t *samples) {
-  struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
+  struct z3372_card *zcard = (struct z3372_card*)zcard_plugin;
   char samples_to_dac[2];
   int spi_channel;
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_MODE, zcard->slot);
 
-  for (int i = 0; i < 6; ++i) {
+  for (int i = 0; i < NUM_CHANNELS; ++i) {
     if (zcard->previous_samples[i] != samples[i] ) {
       zcard->previous_samples[i] = samples[i];
 
@@ -147,25 +150,9 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         samples_to_dac[1] = (uint16_t) 0;
       }
 
-      spiWrite(spi_channel, samples_to_dac, 2);
-
-#ifdef DAC_DEBUG
-      // test DAC channel is at 0x60; mirror dac channel 0x40 for test
-      if (i == 3) {
-        samples_to_dac[0] |= 0x20;
-        spiWrite(spi_channel, samples_to_dac, 2);
-      }
-#endif
-        
+      spiWrite(spi_channel, samples_to_dac, 2);        
     }
   }
-
-  /*
-    INFO("z3340: samples: %p %5hd %5hd %5hd %5hd %5hd %5hd\n",
-           (void*) samples,
-           samples[0], samples[1], samples[2],
-           samples[3], samples[4], samples[5]);
-  */
 
   return 0;
 }
@@ -185,21 +172,20 @@ struct midi_program_to_gpio {
 
 // array indexed by MIDI program number
 static const struct midi_program_to_gpio midi_program_to_gpio[] = {
-  { 0, port0_addr, 0b00000000, 0b11101111 }, // prog 0 - sync neg off
-  { 0, port0_addr, 0b00010000, 0b11111111 }, // prog 1 - sync neg on
-  { 1, port1_addr, 0b00000000, 0b11111101 }, // prog 2 - mix1 pulse off
-  { 1, port1_addr, 0b00000010, 0b11111111 }, // prog 3 - mix1 pulse on
-  { 1, port1_addr, 0b00000000, 0b11111110 }, // prog 4 - mix1 comp off
-  { 1, port1_addr, 0b00000001, 0b11111111 }, // prog 5 - mix1 comp on
-  { 1, port1_addr, 0b00000000, 0b10111111 }, // prog 6 - mix2 pulse off
-  { 1, port1_addr, 0b01000000, 0b11111111 }, // prog 7 - mix2 pulse on
-  { 1, port1_addr, 0b00000000, 0b01111111 }, // prog 8 - ext mod pwm off
-  { 1, port1_addr, 0b10000000, 0b11111111 }, // prog 9 - ext mod pwm on
-  { 0, port0_addr, 0b00000000, 0b11011111 }, // prog 10 - ext mod to fm off
-  { 0, port0_addr, 0b00100000, 0b11111111 }, // prog 11 - ext mod to fm on
-  { 0, port0_addr, 0b00000000, 0b01111111 }, // prog 12 - linear fm off
-  { 0, port0_addr, 0b10000000, 0b11111111 }, // prog 13 - linear fm on
-  { 1, port1_addr, 0b00000000, 0b11101111 }, // prog 14 - mix2 saw off
+  { 0, port0_addr, 0b00000000, 0b11111110 }, // prog 0 - filter fm off
+  { 0, port0_addr, 0b00000001, 0b11111111 }, // prog 1 - filter fm on
+  { 0, port0_addr, 0b00000000, 0b11111101 }, // prog 2 - vca mod off
+  { 0, port0_addr, 0b00000010, 0b11111111 }, // prog 3 - vca mod on
+
+  { 1, port1_addr, 0b00001111, 0b11111111 }, // prog 4 - card 1/ out1
+  { 1, port1_addr, 0b00001101, 0b11111101 }, // prog 5 - 1/2
+  { 1, port1_addr, 0b00001011, 0b11111011 }, // prog 6 - 2/2
+  { 1, port1_addr, 0b00001001, 0b11111001 }, // prog 7 - 3/1
+  { 1, port1_addr, 0b00000111, 0b11110111 }, // prog 8 - 4/2
+  { 1, port1_addr, 0b00000101, 0b11110101 }, // prog 9 - 5/1
+  { 1, port1_addr, 0b00000011, 0b11110011 }, // prog 10 - 6/2
+  { 1, port1_addr, 0b00000001, 0b11110001 }, // prog 11 - 7/1
+
   { 1, port1_addr, 0b00010000, 0b11111111 }, // prog 15 - mix2 saw on
   { 0, port0_addr, 0b00000000, 0b10111111 }, // prog 16 - sync pos off
   { 0, port0_addr, 0b01000000, 0b11111111 }, // prog 17 - sync pos on
@@ -219,9 +205,9 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
 
 int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
   int error = 0;
-  struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
+  struct z3372_card *zcard = (struct z3372_card*)zcard_plugin;
 
-  INFO("Z3340: received program change to 0x%X", program_number);
+  INFO("Z3372: received program change to 0x%X", program_number);
 
   if (program_number < ( sizeof(midi_program_to_gpio) / sizeof(struct midi_program_to_gpio) ) ) {
     const struct midi_program_to_gpio *prog_gpio_entry = &midi_program_to_gpio[program_number];
@@ -234,7 +220,7 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
 
   }
   else {
-    WARN("Z3340: unexpected midi program number: 0x%X", program_number);
+    WARN("Z3372: unexpected midi program number: 0x%X", program_number);
   }
 
   return error;
