@@ -47,6 +47,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
     enum InputId {
         CUTOFF_INPUT,
         OUTPUT_PAN_INPUT,
+        NOISE_LEVEL_INPUT,
         MOD_AMOUNT_INPUT,
         SOURCE_ONE_LEVEL_INPUT,
         SOURCE_TWO_LEVEL_INPUT,
@@ -57,8 +58,6 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         OUTPUTS_LEN
     };
     enum LightId {
-        LEFT_EXPANDER_LIGHT,
-        RIGHT_EXPANDER_LIGHT,
         MOD_AMOUNT_CLIP_LIGHT,
         SOURCE_ONE_LEVEL_CLIP_LIGHT,
         SOURCE_TWO_LEVEL_CLIP_LIGHT,
@@ -71,6 +70,8 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         SOURCE_ONE_UP_BUTTON_LIGHT,
         SOURCE_TWO_DOWN_BUTTON_LIGHT,
         SOURCE_TWO_UP_BUTTON_LIGHT,
+        ENUMS(LEFT_EXPANDER_LIGHT, 3),
+        ENUMS(RIGHT_EXPANDER_LIGHT, 3),
         LIGHTS_LEN
     };
 
@@ -128,6 +129,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         configSwitch(VCA_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "VCA Mod", {"Off", "On"});
 
         configInput(MOD_AMOUNT_INPUT, "Modulation Amount");
+        configInput(NOISE_LEVEL_INPUT, "Noise Level");
         configInput(SOURCE_ONE_LEVEL_INPUT, "Source One Level");
         configInput(SOURCE_TWO_LEVEL_INPUT, "Source Two Level");
         configInput(OUTPUT_PAN_INPUT, "Pan");
@@ -283,8 +285,9 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         }
 
         channel++;
-        v = params[NOISE_KNOB_PARAM].getValue();
+        v = params[NOISE_KNOB_PARAM].getValue() + inputs[NOISE_LEVEL_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        // no clip LED for noise level
 
         channel++;
         v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
@@ -359,7 +362,7 @@ struct Zoxnoxious3372Widget : ModuleWidget {
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.754, 21.598)), module, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_PARAM, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_LIGHT));
 
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.865, 26.1)), module, Zoxnoxious3372::MOD_AMOUNT_KNOB_PARAM));
-        addParam(createParamCentered<Trimpot>(mm2px(Vec(16.284, 34.017)), module, Zoxnoxious3372::NOISE_KNOB_PARAM));
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(21.965, 34.017)), module, Zoxnoxious3372::NOISE_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.284, 50.707)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(38.873, 50.707)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.841, 88.405)), module, Zoxnoxious3372::OUTPUT_PAN_KNOB_PARAM));
@@ -371,6 +374,7 @@ struct Zoxnoxious3372Widget : ModuleWidget {
 
 
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.865, 39.463)), module, Zoxnoxious3372::MOD_AMOUNT_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.604, 34.017)), module, Zoxnoxious3372::NOISE_LEVEL_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.284, 64.069)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.873, 64.069)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.841, 101.767)), module, Zoxnoxious3372::OUTPUT_PAN_INPUT));

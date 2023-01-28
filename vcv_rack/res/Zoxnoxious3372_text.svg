@@ -7,7 +7,7 @@
    viewBox="0 0 81.279999 128.5"
    version="1.1"
    id="svg26"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
    sodipodi:docname="Zoxnoxious3372_text.svg"
    inkscape:export-filename="/home/kaf/Downloads/Zoxnoxious3340_text.png"
    inkscape:export-xdpi="150.02802"
@@ -42,15 +42,15 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="1.365545"
-     inkscape:cx="73.596989"
-     inkscape:cy="226.64943"
+     inkscape:zoom="1.2619504"
+     inkscape:cx="129.16514"
+     inkscape:cy="257.53786"
      inkscape:window-width="1590"
      inkscape:window-height="940"
-     inkscape:window-x="159"
-     inkscape:window-y="83"
+     inkscape:window-x="23"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer2"
      width="71.12mm"
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#cfdee6"
@@ -745,16 +745,16 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="12.225559"
+       x="7.4902673"
        y="28.875277"
        id="text12423"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
-         id="tspan12443"
-         x="12.225559"
-         y="28.875277">NOISE</tspan></text>
+         id="tspan3306"
+         x="7.4902673"
+         y="28.875277">NOISE LEVEL</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
@@ -878,6 +878,10 @@
        style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
        d="M 64.840675,80.995056 V 106.93852"
        id="path13899" />
+    <path
+       style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.24714px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.24714, 0.24714;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 25.870399,34.051815 H 5.9544136"
+       id="path3321" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -1012,14 +1016,6 @@
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
        inkscape:label="SOURCE_TWO_LEVEL_CLIP" />
-    <circle
-       id="circle12391"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="16.284203"
-       cy="34.017174"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="NOISE_KNOB" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3-9-2-5"
        data-name="Tempo#RoundLargeBlackKnob"
@@ -1171,5 +1167,23 @@
        sodipodi:open="true"
        sodipodi:arc-type="arc"
        d="m 58.701643,83.525035 a 1.314813,1.0467098 0 0 1 -1.664585,-0.641262 1.314813,1.0467098 0 0 1 0.78728,-1.332086" />
+    <circle
+       id="circle12391"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="21.964663"
+       cy="34.017174"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="NOISE_KNOB" />
+    <circle
+       id="circle2168"
+       data-name="In03#PJ301MPort"
+       cx="10.603745"
+       cy="34.017174"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="NOISE_LEVEL_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
   </g>
 </svg>
