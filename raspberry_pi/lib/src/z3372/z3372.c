@@ -64,7 +64,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
 
   z3372->zhost = zhost;
   z3372->slot = slot;
-  z3372->pca9555_port[0] = 0x40;
+  z3372->pca9555_port[0] = 0x40; // TODO: change this to 0x00; noise is always enabled for now
   z3372->pca9555_port[1] = 0x00;
 
   z3372->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
@@ -186,21 +186,15 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 1, port1_addr, 0b00000011, 0b11110011 }, // prog 10 - 6/2
   { 1, port1_addr, 0b00000001, 0b11110001 }, // prog 11 - 7/1
 
-  { 1, port1_addr, 0b00010000, 0b11111111 }, // prog 15 - mix2 saw on
-  { 0, port0_addr, 0b00000000, 0b10111111 }, // prog 16 - sync pos off
-  { 0, port0_addr, 0b01000000, 0b11111111 }, // prog 17 - sync pos on
-  { 1, port1_addr, 0b00000000, 0b11110011 }, // prog 18 - mix1 saw off
-  { 1, port1_addr, 0b00001000, 0b11111011 }, // prog 19 - mix1 saw low
-  { 1, port1_addr, 0b00000100, 0b11110111 }, // prog 20 - mix1 saw med
-  { 1, port1_addr, 0b00001100, 0b11111111 }, // prog 21 - mix1 saw high
-  { 0, port0_addr, 0b00000000, 0b11111000 }, // prog 22 - ext select card1 out1
-  { 0, port0_addr, 0b00000100, 0b11111100 }, // prog 23 - ext select card1 out2
-  { 0, port0_addr, 0b00000010, 0b11111010 }, // prog 24 - ext select card2 out1
-  { 0, port0_addr, 0b00000110, 0b11111110 }, // prog 25 - ext select card3 out1
-  { 0, port0_addr, 0b00000001, 0b11111001 }, // prog 26 - ext select card4 out1
-  { 0, port0_addr, 0b00000101, 0b11111101 }, // prog 27 - ext select card5 out1
-  { 0, port0_addr, 0b00000011, 0b11111011 }, // prog 28 - ext select card6 out1
-  { 0, port0_addr, 0b00000111, 0b11111111 }  // prog 29 - ext select card7 out1
+  { 1, port1_addr, 0b11110000, 0b11111111 }, // prog 12 - card 1 / out 1
+  { 1, port1_addr, 0b11010000, 0b11011111 }, // prog 13 - 1/2
+  { 1, port1_addr, 0b10110000, 0b10111111 }, // prog 14 - 2/1
+  { 1, port1_addr, 0b10010000, 0b10011111 }, // prog 15 - 2/2
+  { 1, port1_addr, 0b01110000, 0b01111111 }, // prog 16 - 3/2
+  { 1, port1_addr, 0b01010000, 0b01011111 }, // prog 17 - 4/1
+  { 1, port1_addr, 0b00110000, 0b00111111 }, // prog 18 - 5/2
+  { 1, port1_addr, 0b00010000, 0b00011111 } // prog 19 - 6/1
+
 };
 
 int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
