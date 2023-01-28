@@ -14,6 +14,7 @@ const static int midiMessageQueueMaxSize = 16;
 // card2 out2
 // card1 out2
 // card1 out1
+int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 
 // card6 out1
 // card5 out2
@@ -23,6 +24,7 @@ const static int midiMessageQueueMaxSize = 16;
 // card2 out1
 // card1 out2
 // card1 out1
+int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
 
 
 struct Zoxnoxious3372 : ZoxnoxiousModule {
@@ -182,16 +184,35 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
             setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
             setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
 
-            // set string names to make available to ui
-            int source1Index = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
-            source1NameString = source1Index >= 0 && source1Index < 8 ?
-              cardOutputNames[source1Index] : invalidCardOutputName;
 
-            int source2Index = static_cast<int>(params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue());
-            source2NameString = source2Index >= 0 && source2Index < 8 ?
-              cardOutputNames[source2Index] : invalidCardOutputName;
+            // add/subtract the up/down buttons and set a string
+            // that the UI can use
+            if (params[ SOURCE_ONE_UP_BUTTON_PARAM ].getValue()) {
+                params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0);
+                params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue() + 1  % 8);
+                int index = static_cast<int>(std::round(params[SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
+                source1NameString = cardOutputNames[ source1Sources[ index ] ];
+            }
+            if (params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].getValue()) {
+                params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].setValue(0);
+                params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue() - 1  % 8);
+                int index = static_cast<int>(std::round(params[SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
+                source1NameString = cardOutputNames[ source1Sources[ index ] ];
+            }
 
 
+            if (params[ SOURCE_TWO_UP_BUTTON_PARAM ].getValue()) {
+                params[ SOURCE_TWO_UP_BUTTON_PARAM ].setValue(0);
+                params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue() + 1  % 8);
+                int index = static_cast<int>(std::round(params[SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
+                source2NameString = cardOutputNames[ source2Sources[ index ] ];
+            }
+            if (params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].getValue()) {
+                params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].setValue(0);
+                params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue() - 1  % 8);
+                int index = static_cast<int>(std::round(params[SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
+                source2NameString = cardOutputNames[ source2Sources[ index ] ];
+            }
         }
 
     }
@@ -218,28 +239,8 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         }
 
 
-        // add/subtract the up/down buttons
-        if (params[ SOURCE_ONE_UP_BUTTON_PARAM ].getValue()) {
-            params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0);
-            params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue() + 1  % 8);
-        }
-        if (params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].getValue()) {
-            params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].setValue(0);
-            params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue() - 1  % 8);
-        }
-
-        if (params[ SOURCE_TWO_UP_BUTTON_PARAM ].getValue()) {
-            params[ SOURCE_TWO_UP_BUTTON_PARAM ].setValue(0);
-            params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue() + 1  % 8);
-        }
-        if (params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].getValue()) {
-            params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].setValue(0);
-            params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue() - 1  % 8);
-        }
-
-
         for (int i = 1; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
-            int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
+            int newValue = static_cast<int>(std::round(params[ buttonParamToMidiProgramList[i].button ].getValue()));
 
             if (buttonParamToMidiProgramList[i].previousValue != newValue) {
                 buttonParamToMidiProgramList[i].previousValue = newValue;
