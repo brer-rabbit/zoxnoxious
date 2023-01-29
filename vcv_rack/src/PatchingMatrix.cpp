@@ -573,114 +573,114 @@ struct PatchingMatrixWidget : ModuleWidget {
         addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(40.177, 38.587)), module, PatchingMatrix::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(51.729, 43.278)), module, PatchingMatrix::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(40.177, 51.648)), module, PatchingMatrix::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(51.729, 56.835)), module, PatchingMatrix::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(40.177, 64.71)), module, PatchingMatrix::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(51.729, 69.897)), module, PatchingMatrix::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(40.177, 77.771)), module, PatchingMatrix::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(51.729, 82.958)), module, PatchingMatrix::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(40.177, 90.833)), module, PatchingMatrix::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(51.729, 96.02)), module, PatchingMatrix::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(40.177, 103.894)), module, PatchingMatrix::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
-        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(51.729, 109.081)), module, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(32.88792, 36.586681)), module, PatchingMatrix::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(44.440456, 41.278122)), module, PatchingMatrix::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(32.88792, 49.648178)), module, PatchingMatrix::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(44.440456, 54.834808)), module, PatchingMatrix::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(32.888, 62.710)), module, PatchingMatrix::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(44.440456, 67.896301)), module, PatchingMatrix::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(32.888, 75.771)), module, PatchingMatrix::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(44.440456, 80.957809)), module, PatchingMatrix::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(32.888, 88.833)), module, PatchingMatrix::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(44.440456, 94.019302)), module, PatchingMatrix::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(32.888, 101.894)), module, PatchingMatrix::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
+        addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(44.440456, 107.0808)), module, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
 
-//        ParamWidget *cardFMix2Output = createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(125.017, 109.081)), module, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT);
+//        ParamWidget *cardFMix2Output = createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(44.440456, 107.0808)), module, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, PatchingMatrix::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT);
 //        addChild(cardFMix2Output);
 //        cardFMix2Output->setVisible(false);
         
 
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(74.312, 47.501)), module, PatchingMatrix::LEFT_LEVEL_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(74.312, 89.669)), module, PatchingMatrix::RIGHT_LEVEL_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(67.023308, 40.788826)), module, PatchingMatrix::LEFT_LEVEL_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(67.023308, 86.996422)), module, PatchingMatrix::RIGHT_LEVEL_KNOB_PARAM));
 
 
-        addParam(createParamCentered<CKSS>(mm2px(Vec(66.373, 17.478)), module, PatchingMatrix::MIX_LEFT_SELECT_PARAM));
-        addParam(createParamCentered<CKSS>(mm2px(Vec(66.373, 117.692)), module, PatchingMatrix::MIX_RIGHT_SELECT_PARAM));
+        addParam(createParamCentered<CKSS>(mm2px(Vec(59.084, 17.478)), module, PatchingMatrix::MIX_LEFT_SELECT_PARAM));
+        addParam(createParamCentered<CKSS>(mm2px(Vec(59.084, 115.692)), module, PatchingMatrix::MIX_RIGHT_SELECT_PARAM));
 
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(74.312, 57.166)), module, PatchingMatrix::LEFT_LEVEL_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(74.312, 99.334)), module, PatchingMatrix::RIGHT_LEVEL_INPUT));
-
-
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(74.312, 38.417)), module, PatchingMatrix::LEFT_LEVEL_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(74.312, 80.585)), module, PatchingMatrix::RIGHT_LEVEL_CLIP_LIGHT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(67.023308, 54.151253)), module, PatchingMatrix::LEFT_LEVEL_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(67.023308, 100.35885)), module, PatchingMatrix::RIGHT_LEVEL_INPUT));
 
 
-        // mm2px(Vec(27.171, 3.636))
-        cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 36.769)));
-        cardAOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(72.108772, 47.035465)), module, PatchingMatrix::LEFT_LEVEL_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(72.108772, 93.243065)), module, PatchingMatrix::RIGHT_LEVEL_CLIP_LIGHT));
+
+
+        // mm2px(Vec(19.0, 3.636))
+        cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 34.769)));
+        cardAOutput1TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardAOutput1TextField->setText(module ? &module->cardAOutput1NameString : NULL);
         addChild(cardAOutput1TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardAOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 41.46)));
-        cardAOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardAOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 39.460)));
+        cardAOutput2TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardAOutput2TextField->setText(module ? &module->cardAOutput2NameString : NULL);
         addChild(cardAOutput2TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardBOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 49.83)));
-        cardBOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardBOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 47.830)));
+        cardBOutput1TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardBOutput1TextField->setText(module ? &module->cardBOutput1NameString : NULL);
         addChild(cardBOutput1TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardBOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 55.017)));
-        cardBOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardBOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 53.017)));
+        cardBOutput2TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardBOutput2TextField->setText(module ? &module->cardBOutput2NameString : NULL);
         addChild(cardBOutput2TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardCOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 62.892)));
-        cardCOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardCOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 60.892)));
+        cardCOutput1TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardCOutput1TextField->setText(module ? &module->cardCOutput1NameString : NULL);
         addChild(cardCOutput1TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardCOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 68.078)));
-        cardCOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardCOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 66.078)));
+        cardCOutput2TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardCOutput2TextField->setText(module ? &module->cardCOutput2NameString : NULL);
         addChild(cardCOutput2TextField);
 
 
-        // mm2px(Vec(27.171, 3.636))
-        cardDOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 75.953)));
-        cardDOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardDOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 73.953)));
+        cardDOutput1TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardDOutput1TextField->setText(module ? &module->cardDOutput1NameString : NULL);
         addChild(cardDOutput1TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardDOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 81.14)));
-        cardDOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardDOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 79.140)));
+        cardDOutput2TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardDOutput2TextField->setText(module ? &module->cardDOutput2NameString : NULL);
         addChild(cardDOutput2TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardEOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 89.015)));
-        cardEOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardEOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 87.015)));
+        cardEOutput1TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardEOutput1TextField->setText(module ? &module->cardEOutput1NameString : NULL);
         addChild(cardEOutput1TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardEOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 94.201)));
-        cardEOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardEOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 92.201)));
+        cardEOutput2TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardEOutput2TextField->setText(module ? &module->cardEOutput2NameString : NULL);
         addChild(cardEOutput2TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardFOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 102.076)));
-        cardFOutput1TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardFOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 100.076)));
+        cardFOutput1TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardFOutput1TextField->setText(module ? &module->cardFOutput1NameString : NULL);
         addChild(cardFOutput1TextField);
 
-        // mm2px(Vec(27.171, 3.636))
-        cardFOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 107.263)));
-        cardFOutput2TextField->box.size = (mm2px(Vec(27.171, 3.636)));
+        // mm2px(Vec(19.0, 3.636))
+        cardFOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 105.263)));
+        cardFOutput2TextField->box.size = (mm2px(Vec(19.0, 3.636)));
         cardFOutput2TextField->setText(module ? &module->cardFOutput2NameString : NULL);
         addChild(cardFOutput2TextField);
 
-        addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.02, 8.219)), module, PatchingMatrix::LEFT_EXPANDER_LIGHT));
-        addChild(createLightCentered<MediumLight<RedGreenBlueLight>>(mm2px(Vec(88.4, 8.219)), module, PatchingMatrix::RIGHT_EXPANDER_LIGHT));
+        addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.0200968, 8.21875)), module, PatchingMatrix::LEFT_EXPANDER_LIGHT));
+        addChild(createLightCentered<MediumLight<RedGreenBlueLight>>(mm2px(Vec(79.054451, 8.21875)), module, PatchingMatrix::RIGHT_EXPANDER_LIGHT));
     }
 
 
