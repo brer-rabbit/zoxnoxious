@@ -188,30 +188,42 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
             // add/subtract the up/down buttons and set a string
             // that the UI can use
             if (params[ SOURCE_ONE_UP_BUTTON_PARAM ].getValue()) {
-                params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0);
-                params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue() + 1  % 8);
-                int index = static_cast<int>(std::round(params[SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-                source1NameString = cardOutputNames[ source1Sources[ index ] ];
+                params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0.f);
+                int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
+                sourceOneInt = (sourceOneInt + 1)  % 8;
+                params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
+                source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
+                INFO("z3372: source1 idx %d param %f string %s",
+                     sourceOneInt,
+                     params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue(),
+                     source1NameString.c_str());
             }
             if (params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].getValue()) {
                 params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].setValue(0);
-                params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue() - 1  % 8);
-                int index = static_cast<int>(std::round(params[SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-                source1NameString = cardOutputNames[ source1Sources[ index ] ];
+                int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
+                sourceOneInt = (sourceOneInt - 1)  % 8;
+                params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
+                source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
+                INFO("z3372: source1 idx %d param %f string %s",
+                     sourceOneInt,
+                     params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue(),
+                     source1NameString.c_str());
             }
 
 
             if (params[ SOURCE_TWO_UP_BUTTON_PARAM ].getValue()) {
                 params[ SOURCE_TWO_UP_BUTTON_PARAM ].setValue(0);
-                params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue() + 1  % 8);
-                int index = static_cast<int>(std::round(params[SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-                source2NameString = cardOutputNames[ source2Sources[ index ] ];
+                int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
+                sourceTwoInt = (sourceTwoInt + 1)  % 8;
+                params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
+                source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
             }
             if (params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].getValue()) {
                 params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].setValue(0);
-                params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue( params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue() - 1  % 8);
-                int index = static_cast<int>(std::round(params[SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-                source2NameString = cardOutputNames[ source2Sources[ index ] ];
+                int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
+                sourceTwoInt = (sourceTwoInt - 1)  % 8;
+                params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
+                source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
             }
         }
 
@@ -239,7 +251,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         }
 
 
-        for (int i = 1; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
+        for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
             int newValue = static_cast<int>(std::round(params[ buttonParamToMidiProgramList[i].button ].getValue()));
 
             if (buttonParamToMidiProgramList[i].previousValue != newValue) {
