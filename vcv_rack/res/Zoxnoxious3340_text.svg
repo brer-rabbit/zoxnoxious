@@ -7,7 +7,7 @@
    viewBox="0 0 76.199997 128.5"
    version="1.1"
    id="svg26"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
    sodipodi:docname="Zoxnoxious3340_text.svg"
    inkscape:export-filename="/home/kaf/Downloads/Zoxnoxious3340_text.png"
    inkscape:export-xdpi="150.02802"
@@ -41,13 +41,13 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="2.1264697"
-     inkscape:cx="130.49798"
-     inkscape:cy="69.834054"
+     inkscape:zoom="1.1626013"
+     inkscape:cx="115.68885"
+     inkscape:cy="254.60147"
      inkscape:window-width="1366"
      inkscape:window-height="832"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-x="111"
+     inkscape:window-y="38"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer3"
      width="71.12mm"
@@ -626,16 +626,16 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="31.006403"
+       x="29.747894"
        y="68.95787"
        id="text92-2-5-97-8"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
-         id="tspan2274"
-         x="31.006403"
-         y="68.95787">POS</tspan></text>
+         id="tspan1290"
+         x="29.747894"
+         y="68.95787">HARD</tspan></text>
     <text
        inkscape:export-ydpi="600.01202"
        inkscape:export-xdpi="600.01202"
@@ -655,13 +655,13 @@
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        id="text2270"
        y="68.95787"
-       x="42.509106"
+       x="41.635403"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        xml:space="preserve"><tspan
          sodipodi:role="line"
-         id="tspan2272"
-         x="42.509106"
-         y="68.95787">NEG</tspan></text>
+         id="tspan1292"
+         x="41.635403"
+         y="68.95787">SOFT</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
@@ -725,19 +725,19 @@
     <path
        id="path38916"
        style="display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.222;stroke-miterlimit:4;stroke-dasharray:none;marker-end:url(#Arrow1Lend-2-3)"
-       d="m 18.607968,53.023726 c 0.945427,-0.115767 10.159456,-3.695217 18.554106,-3.810599 5.306355,0.134062 6.809917,2.412951 6.040467,5.779294 l -1.007839,5.945662"
+       d="m 26.745088,57.451475 c 0.945427,-0.115767 7.994675,-2.993195 13.527579,-2.85973 4.435389,-0.114785 7.320847,1.502516 5.556007,3.749045 l -2.49587,3.343835"
        sodipodi:nodetypes="cccc"
        inkscape:connector-curvature="0" />
     <path
        id="path38924"
        style="display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.222;stroke-miterlimit:4;stroke-dasharray:none;marker-end:url(#Arrow1Lend-2-3)"
-       d="m 18.621287,52.910343 c 8.183392,-2.129103 12.30426,-5.192561 20.838247,-5.205639 8.281155,0.256241 11.637128,1.531069 13.622712,4.894369 4.381827,7.422198 -5.379299,14.665859 -4.281263,20.955862 0.942451,5.398744 0.693857,3.231294 5.39199,7.459613"
+       d="m 26.768516,57.522201 c 8.419238,-2.131996 6.59184,-2.933681 15.125827,-2.946759 4.175171,0.256241 8.5802,1.130366 8.823852,3.995971 0.730217,8.588144 -3.015248,8.693519 -1.917212,14.983522 0.942451,5.398744 0.693857,3.231294 5.39199,7.459613"
        sodipodi:nodetypes="ccssc"
        inkscape:connector-curvature="0" />
     <path
        id="path38936"
        style="display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.222;stroke-miterlimit:4;stroke-dasharray:none;marker-end:url(#Arrow1Lend-2-3)"
-       d="m 18.704472,52.988061 c 3.379843,-1.707501 10.611665,-1.922226 9.206433,4.041924 -0.162809,3.582414 -8.614378,15.959287 -10.558135,18.701858"
+       d="m 26.836538,57.470442 c 6.117165,-0.214417 7.669053,3.934834 5.533406,5.864721 -2.371148,3.104936 -5.607992,4.552735 -15.017174,12.39668"
        sodipodi:nodetypes="ccc"
        inkscape:connector-curvature="0" />
     <path
@@ -872,6 +872,19 @@
        style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.253446px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.253446, 0.253446;stroke-dashoffset:0;stroke-opacity:1"
        d="M 62.313593,36.369401 V 57.31468"
        id="path32716" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="28.619839"
+       y="54.296452"
+       id="text1286"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan1288"
+         x="28.619839"
+         y="54.296452">DESTINATIONS</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"

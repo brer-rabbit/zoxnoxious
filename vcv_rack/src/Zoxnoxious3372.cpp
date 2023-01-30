@@ -371,34 +371,34 @@ struct Zoxnoxious3372Widget : ModuleWidget {
 
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(10.604, 21.598)), module, Zoxnoxious3372::SOURCE_ONE_DOWN_BUTTON_PARAM, Zoxnoxious3372::SOURCE_ONE_DOWN_BUTTON_LIGHT));
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(21.965, 21.598)), module, Zoxnoxious3372::SOURCE_ONE_UP_BUTTON_PARAM, Zoxnoxious3372::SOURCE_ONE_UP_BUTTON_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(32.991, 21.598)), module, Zoxnoxious3372::SOURCE_TWO_DOWN_BUTTON_PARAM, Zoxnoxious3372::SOURCE_TWO_DOWN_BUTTON_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.754, 21.598)), module, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_PARAM, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.185, 21.598)), module, Zoxnoxious3372::SOURCE_TWO_DOWN_BUTTON_PARAM, Zoxnoxious3372::SOURCE_TWO_DOWN_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(70.545, 21.598)), module, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_PARAM, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_LIGHT));
 
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.865, 26.1)), module, Zoxnoxious3372::MOD_AMOUNT_KNOB_PARAM));
-        addParam(createParamCentered<Trimpot>(mm2px(Vec(21.965, 34.017)), module, Zoxnoxious3372::NOISE_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(38.873, 50.869)), module, Zoxnoxious3372::MOD_AMOUNT_KNOB_PARAM));
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(70.917, 34.017)), module, Zoxnoxious3372::NOISE_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.284, 50.707)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(38.873, 50.707)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.865, 50.706)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.841, 88.405)), module, Zoxnoxious3372::OUTPUT_PAN_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.26, 91.978)), module, Zoxnoxious3372::CUTOFF_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.260, 91.977)), module, Zoxnoxious3372::CUTOFF_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(38.849, 91.978)), module, Zoxnoxious3372::RESONANCE_KNOB_PARAM));
 
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(64.865, 53.776)), module, Zoxnoxious3372::FILTER_MOD_SWITCH_PARAM, Zoxnoxious3372::FILTER_MOD_ENABLE_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(64.865, 66.519)), module, Zoxnoxious3372::VCA_MOD_SWITCH_PARAM, Zoxnoxious3372::VCA_MOD_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(38.873, 21.557)), module, Zoxnoxious3372::FILTER_MOD_SWITCH_PARAM, Zoxnoxious3372::FILTER_MOD_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(38.873, 34.016)), module, Zoxnoxious3372::VCA_MOD_SWITCH_PARAM, Zoxnoxious3372::VCA_MOD_ENABLE_LIGHT));
 
 
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.865, 39.463)), module, Zoxnoxious3372::MOD_AMOUNT_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.604, 34.017)), module, Zoxnoxious3372::NOISE_LEVEL_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.873, 64.232)), module, Zoxnoxious3372::MOD_AMOUNT_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.556, 34.017)), module, Zoxnoxious3372::NOISE_LEVEL_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.284, 64.069)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.873, 64.069)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.865, 64.069)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.841, 101.767)), module, Zoxnoxious3372::OUTPUT_PAN_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.26, 105.34)), module, Zoxnoxious3372::CUTOFF_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.260, 105.340)), module, Zoxnoxious3372::CUTOFF_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.849, 105.34)), module, Zoxnoxious3372::RESONANCE_INPUT));
 
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(68.374, 32.1)), module, Zoxnoxious3372::MOD_AMOUNT_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42.348, 56.869)), module, Zoxnoxious3372::MOD_AMOUNT_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(20.247, 56.707)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42.919, 56.707)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(69.133, 56.706)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(68.609, 94.405)), module, Zoxnoxious3372::OUTPUT_PAN_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(20.223, 97.978)), module, Zoxnoxious3372::CUTOFF_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(20.222, 97.977)), module, Zoxnoxious3372::CUTOFF_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42.812, 97.978)), module, Zoxnoxious3372::RESONANCE_CLIP_LIGHT));
 
         addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.02, 8.219)), module, Zoxnoxious3372::LEFT_EXPANDER_LIGHT));
@@ -409,7 +409,7 @@ struct Zoxnoxious3372Widget : ModuleWidget {
         source1NameTextField->setText(module ? &module->source1NameString : NULL);
         addChild(source1NameTextField);
 
-        source2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(29.373, 13.838)));
+        source2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(55.865, 13.838)));
         source2NameTextField->box.size = mm2px(Vec(18.0, 3.636));
         source2NameTextField->setText(module ? &module->source2NameString : NULL);
         addChild(source2NameTextField);
