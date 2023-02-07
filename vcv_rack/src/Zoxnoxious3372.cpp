@@ -185,43 +185,36 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
             setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
 
 
-            // add/subtract the up/down buttons and set a string
-            // that the UI can use
+            // add/subtract the up/down buttons and set a string that
+            // the UI can use.  There ought to be some todos here to
+            // make/fix this.
             if (params[ SOURCE_ONE_UP_BUTTON_PARAM ].getValue()) {
                 params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0.f);
                 int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-                sourceOneInt = (sourceOneInt + 1)  % 8;
+                sourceOneInt = sourceOneInt == 7 ? 0 : sourceOneInt + 1;
                 params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
                 source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
-                INFO("z3372: source1 idx %d param %f string %s",
-                     sourceOneInt,
-                     params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue(),
-                     source1NameString.c_str());
             }
             if (params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].getValue()) {
                 params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].setValue(0);
                 int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-                sourceOneInt = (sourceOneInt - 1)  % 8;
+                sourceOneInt = sourceOneInt == 0 ? 7 : sourceOneInt - 1;
                 params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
                 source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
-                INFO("z3372: source1 idx %d param %f string %s",
-                     sourceOneInt,
-                     params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue(),
-                     source1NameString.c_str());
             }
 
 
             if (params[ SOURCE_TWO_UP_BUTTON_PARAM ].getValue()) {
                 params[ SOURCE_TWO_UP_BUTTON_PARAM ].setValue(0);
                 int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-                sourceTwoInt = (sourceTwoInt + 1)  % 8;
+                sourceTwoInt = sourceTwoInt == 7 ? 0 : sourceTwoInt + 1;
                 params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
                 source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
             }
             if (params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].getValue()) {
                 params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].setValue(0);
                 int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-                sourceTwoInt = (sourceTwoInt - 1)  % 8;
+                sourceTwoInt = sourceTwoInt == 0 ? 7 : sourceTwoInt - 1;
                 params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
                 source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
             }
@@ -347,12 +340,20 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
         output1NameString = getCardOutputName(hardwareId, 1, slot);
         output2NameString = getCardOutputName(hardwareId, 2, slot);
+        int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
+        source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
+        int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
+        source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
     }
 
     void onChannelAssignmentLost() override {
         ZoxnoxiousModule::onChannelAssignmentLost();
         output1NameString = invalidCardOutputName;
         output2NameString = invalidCardOutputName;
+        // should do something better with source{1,2}NameString here since
+        // user can still click on the buttons to change them
+        source1NameString = invalidCardOutputName;
+        source2NameString = invalidCardOutputName;
     }
 
 
