@@ -6,7 +6,7 @@
 
   (title_block
     (title "Z3372 Signal Processing")
-    (rev "0.1")
+    (rev "0.2")
     (company "Zoxnoxious Engineering")
   )
 
@@ -645,7 +645,7 @@
     (uuid fac57177-cbaa-40ce-8ce7-7beaff221ed3)
   )
 
-  (no_connect (at 91.44 67.31) (uuid ce93be39-ee82-43fe-b3bf-179b24d06331))
+  (no_connect (at 91.44 64.77) (uuid 83cb25c4-0c29-4eea-b09c-1d78dc19b276))
 
   (wire (pts (xy 247.015 81.28) (xy 247.015 82.55))
     (stroke (width 0) (type default) (color 0 0 0 0))
@@ -655,7 +655,7 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid 057a82cd-1bac-44ff-aebf-c556b8d53f9d)
   )
-  (wire (pts (xy 91.44 57.15) (xy 105.41 57.15))
+  (wire (pts (xy 91.44 67.31) (xy 105.41 67.31))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid 07813dd7-891b-42a0-bb6f-16ac48557580)
   )
@@ -1085,7 +1085,7 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid ccce4d59-5302-4dad-808c-15d85f881239)
   )
-  (wire (pts (xy 91.44 64.77) (xy 105.41 64.77))
+  (wire (pts (xy 91.44 57.15) (xy 105.41 57.15))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid cdce6574-7cc5-47d5-a70a-cebfe74beb3d)
   )
@@ -1239,7 +1239,7 @@
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 4e856185-c76a-451a-a1a6-b26377a12a99)
   )
-  (label "RESONANCE_DAC" (at 105.41 64.77 0)
+  (label "RESONANCE_DAC" (at 105.41 57.15 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 50a5eff4-c401-4395-b4a5-ba61585ba3d1)
   )
@@ -1267,7 +1267,7 @@
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 9e8b59f4-a76c-4510-828a-b91582de2059)
   )
-  (label "MOD_AMOUNT_VCA3_DAC" (at 105.41 57.15 0)
+  (label "MOD_AMOUNT_VCA3_DAC" (at 105.41 67.31 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid cea9016f-589d-4cb4-a163-3c2dafe1f037)
   )
@@ -1693,7 +1693,7 @@
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 1772d9c8-e549-4d2a-aaf9-4902b3e4b1d3)
     (property "Reference" "R11" (id 0) (at 263.525 49.8942 90))
-    (property "Value" "3.3k" (id 1) (at 263.525 52.4311 90))
+    (property "Value" "3k3" (id 1) (at 263.525 52.4311 90))
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (id 2) (at 263.525 56.388 90)
       (effects (font (size 1.27 1.27)) hide)
     )

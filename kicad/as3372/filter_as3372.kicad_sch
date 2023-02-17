@@ -6,7 +6,7 @@
 
   (title_block
     (title "Z3372 Signal Processing")
-    (rev "0.1")
+    (rev "0.2")
     (company "Zoxnoxious Engineering")
   )
 
@@ -1870,11 +1870,6 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid 15937c5b-96c2-453f-a108-83da07fdbc68)
   )
-  (polyline (pts (xy 384.175 182.245) (xy 414.655 182.245))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 16efd36c-5102-4108-ab04-76d422870fca)
-  )
-
   (wire (pts (xy 214.63 220.98) (xy 214.63 223.52))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid 1735c483-c1be-433e-b53c-2aa76f846bae)
@@ -2235,11 +2230,6 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid 74a26ea5-f4ed-4663-9326-267c7db15455)
   )
-  (polyline (pts (xy 384.175 182.245) (xy 384.175 230.505))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 7684e60c-05b8-42fb-8917-9b9bc702f076)
-  )
-
   (wire (pts (xy 54.61 226.06) (xy 58.42 226.06))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid 7797c405-6655-48b2-ad81-cf1ed6b3406b)
@@ -2706,11 +2696,6 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid df2ad65d-8866-4f79-91b1-d9dfc31e1b75)
   )
-  (polyline (pts (xy 414.655 182.245) (xy 414.655 230.505))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid e0643c54-7ebb-437b-ada3-5b8cf7771981)
-  )
-
   (wire (pts (xy 170.18 102.235) (xy 170.18 111.76))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid e2da88ab-2a03-480e-9421-21c8704b547f)
@@ -2831,21 +2816,12 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid ff30e65f-d653-43fd-a425-a3818032a3d4)
   )
-  (polyline (pts (xy 414.655 230.505) (xy 384.175 230.505))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid ff5d6780-5341-4683-a39a-29b460901d3a)
-  )
-
   (wire (pts (xy 170.18 111.76) (xy 170.18 119.38))
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid ff61cc57-f901-4a8d-9281-2e35b1c5dd0b)
   )
 
-  (text "Spares" (at 387.985 186.055 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 12c9f51b-9d88-4f5f-9b0c-f5ccc39a6507)
-  )
-  (text "Resonance modulation:\ninvert with gain of 1.0\nIdea being that if one modulates filter cutoff and resonance,\nyou want res high while cutoff is low and vice versa."
+  (text "Resonance modulation:\ninvert with gain of 1.0\nIdea being that if one modulates filter cutoff _and_ resonance,\nyou want res high while cutoff is low and vice versa."
     (at 217.17 29.21 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 183efb34-4f00-448b-9bbd-cbb4373f378d)
