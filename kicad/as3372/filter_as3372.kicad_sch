@@ -1599,7 +1599,6 @@
     )
   )
 
-
   (junction (at 166.37 226.06) (diameter 0) (color 0 0 0 0)
     (uuid 075ab95f-2b76-4c48-89bf-7ec2e6390189)
   )
@@ -3521,7 +3520,7 @@
     (property "Datasheet" "~" (id 3) (at 243.84 113.665 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "" (id 4) (at 243.84 113.665 0)
+    (property "LCSC Part" "C107115" (id 4) (at 243.84 113.665 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 69ee7263-a1d8-431c-ad2f-276236523707))
@@ -4966,7 +4965,7 @@
     (property "Datasheet" "~" (id 3) (at 242.57 82.55 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "" (id 4) (at 242.57 82.55 0)
+    (property "LCSC Part" "C107115" (id 4) (at 242.57 82.55 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 621d52ec-3a04-49ba-9819-9924704569db))
