@@ -1,12 +1,10 @@
 {
   "board": {
-    "active_layer": 31,
+    "active_layer": 36,
     "active_layer_preset": "",
     "auto_track_width": false,
     "hidden_nets": [
-      "GND",
-      "-12V",
-      "+12V"
+      "GND"
     ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
