@@ -44,7 +44,16 @@ static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
 
 // seven audio channels mapped
-static const int channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
+// signal / audio channel / dac channel
+// VCF cutoff CV / 0 / 0x00
+// Pan / 1 / 0x01
+// Noise level / 2 / 0x02
+// Resonance Level / 3 / 0x03
+// Source One Level / 4 / 0x04
+// Source Two Level / 5 / 0x05
+// Mod Amount / 6 / 0x07 (yes, channel 0x06 is skipped)
+// DAC channel is the upper 4 bits of the SPI byte, so set the map up as such
+static const uint8_t channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x70 };
 
 
 

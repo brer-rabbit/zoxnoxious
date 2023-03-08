@@ -309,10 +309,10 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         // no clip LED for noise level
 
         channel++;
-        v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
+        v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            modAmountClipTimer = clipTime;
+            resonanceClipTimer = clipTime;
         }
 
         channel++;
@@ -330,12 +330,11 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         }
 
         channel++;
-        v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
+        v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            resonanceClipTimer = clipTime;
+            modAmountClipTimer = clipTime;
         }
-
 
     }
 
