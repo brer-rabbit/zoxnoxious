@@ -44,7 +44,16 @@ static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
 
 // seven audio channels mapped
-static const int channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
+// signal / audio channel / dac channel
+// VCF cutoff CV / 0 / 0x00
+// Pan / 1 / 0x01
+// Noise level / 2 / 0x02
+// Resonance Level / 3 / 0x03
+// Source One Level / 4 / 0x04
+// Source Two Level / 5 / 0x05
+// Mod Amount / 6 / 0x07 (yes, channel 0x06 is skipped)
+// DAC channel is the upper 4 bits of the SPI byte, so set the map up as such
+static const uint8_t channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x70 };
 
 
 
@@ -174,8 +183,8 @@ struct midi_program_to_gpio {
 static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 0, port0_addr, 0b00000000, 0b11111110 }, // prog 0 - filter fm off
   { 0, port0_addr, 0b00000001, 0b11111111 }, // prog 1 - filter fm on
-  { 0, port0_addr, 0b00000000, 0b11111101 }, // prog 2 - vca mod off
-  { 0, port0_addr, 0b00000010, 0b11111111 }, // prog 3 - vca mod on
+  { 0, port0_addr, 0b00000000, 0b11101111 }, // prog 2 - vca mod off
+  { 0, port0_addr, 0b00010000, 0b11111111 }, // prog 3 - vca mod on
 
   { 1, port1_addr, 0b00001111, 0b11111111 }, // prog 4 - card 1/ out1
   { 1, port1_addr, 0b00001101, 0b11111101 }, // prog 5 - 1/2
@@ -193,7 +202,10 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 1, port1_addr, 0b01110000, 0b01111111 }, // prog 16 - 3/2
   { 1, port1_addr, 0b01010000, 0b01011111 }, // prog 17 - 4/1
   { 1, port1_addr, 0b00110000, 0b00111111 }, // prog 18 - 5/2
-  { 1, port1_addr, 0b00010000, 0b00011111 } // prog 19 - 6/1
+  { 1, port1_addr, 0b00010000, 0b00011111 }, // prog 19 - 6/1
+
+  { 0, port0_addr, 0b00000000, 0b11111101 }, // prog 20 - rez mod off
+  { 0, port0_addr, 0b00000010, 0b11111111 }  // prog 21 - rez mod on
 
 };
 
