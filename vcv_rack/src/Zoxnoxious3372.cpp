@@ -44,6 +44,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         SOURCE_TWO_VALUE_HIDDEN_PARAM,
         SOURCE_TWO_DOWN_BUTTON_PARAM,
         SOURCE_TWO_UP_BUTTON_PARAM,
+        REZ_MOD_SWITCH_PARAM,
         PARAMS_LEN
     };
     enum InputId {
@@ -68,6 +69,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         RESONANCE_CLIP_LIGHT,
         VCA_MOD_ENABLE_LIGHT,
         FILTER_MOD_ENABLE_LIGHT,
+        REZ_MOD_ENABLE_LIGHT,
         SOURCE_ONE_DOWN_BUTTON_LIGHT,
         SOURCE_ONE_UP_BUTTON_LIGHT,
         SOURCE_TWO_DOWN_BUTTON_LIGHT,
@@ -98,12 +100,13 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         enum ParamId button;
         int previousValue;
         uint8_t midiProgram[8];
-    } buttonParamToMidiProgramList[4] =
+    } buttonParamToMidiProgramList[5] =
       {
           { FILTER_MOD_SWITCH_PARAM, INT_MIN, { 0, 1 } },
           { VCA_MOD_SWITCH_PARAM, INT_MIN, { 2, 3 } },
           { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 4, 5, 6, 7, 8, 9, 10, 11 } },
-          { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 12, 13, 14, 15, 16, 17, 18, 19 } }
+          { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 12, 13, 14, 15, 16, 17, 18, 19 } },
+          { REZ_MOD_SWITCH_PARAM, INT_MIN, { 20, 21 } },
       };
 
 
@@ -119,16 +122,17 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         configButton(SOURCE_TWO_DOWN_BUTTON_PARAM, "Previous");
         configButton(SOURCE_TWO_UP_BUTTON_PARAM, "Next");
 
-        configParam(MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Modulation Amount");
-        configParam(NOISE_KNOB_PARAM, 0.f, 1.f, 0.f, "White Noise");
-        configParam(SOURCE_ONE_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Level");
-        configParam(SOURCE_TWO_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Level");
-        configParam(OUTPUT_PAN_KNOB_PARAM, 0.f, 1.f, 0.5f, "Pan");
-        configParam(CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff");
-        configParam(RESONANCE_KNOB_PARAM, 0.f, 1.f, 0.f, "Resonance");
+        configParam(MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Modulation Amount", "%", 0.f, 100.f);
+        configParam(NOISE_KNOB_PARAM, 0.f, 1.f, 0.f, "White Noise", "%", 0.f, 100.f);
+        configParam(SOURCE_ONE_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Level", "%", 0.f, 100.f);
+        configParam(SOURCE_TWO_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Level", "%", 0.f, 100.f);
+        configParam(OUTPUT_PAN_KNOB_PARAM, 0.f, 1.f, 0.5f, "Pan", "%", 0.f, 200.f, -100.f);
+        configParam(CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff", "%", 0.f, 100.f);
+        configParam(RESONANCE_KNOB_PARAM, 0.f, 1.f, 0.f, "Resonance", "%", 0.f, 100.f);
 
         configSwitch(FILTER_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Filter Mod", {"Off", "On"});
         configSwitch(VCA_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "VCA Mod", {"Off", "On"});
+        configSwitch(REZ_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Rez Mod", {"Off", "On"});
 
         configInput(MOD_AMOUNT_INPUT, "Modulation Amount");
         configInput(NOISE_LEVEL_INPUT, "Noise Level");
@@ -153,6 +157,8 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
             // buttons
             lights[VCA_MOD_ENABLE_LIGHT].setBrightness( params[VCA_MOD_SWITCH_PARAM].getValue() > 0.f );
             lights[FILTER_MOD_ENABLE_LIGHT].setBrightness( params[FILTER_MOD_SWITCH_PARAM].getValue() > 0.f );
+            lights[REZ_MOD_ENABLE_LIGHT].setBrightness( params[REZ_MOD_SWITCH_PARAM].getValue() > 0.f );
+
 
             lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
             lights[SOURCE_ONE_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_UP_BUTTON_PARAM].getValue());
@@ -256,7 +262,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
                     controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
                     controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
                     controlMsg->midiMessageSet = true;
-                    INFO("zoxnoxious3340: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
+                    INFO("zoxnoxious3372: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
                 }
                 else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
                     midi::Message queuedMessage;
@@ -296,10 +302,10 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         // no clip LED for noise level
 
         channel++;
-        v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
+        v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            modAmountClipTimer = clipTime;
+            resonanceClipTimer = clipTime;
         }
 
         channel++;
@@ -317,12 +323,11 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         }
 
         channel++;
-        v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
+        v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            resonanceClipTimer = clipTime;
+            modAmountClipTimer = clipTime;
         }
-
 
     }
 
@@ -372,58 +377,58 @@ struct Zoxnoxious3372Widget : ModuleWidget {
 
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(10.604, 21.598)), module, Zoxnoxious3372::SOURCE_ONE_DOWN_BUTTON_PARAM, Zoxnoxious3372::SOURCE_ONE_DOWN_BUTTON_LIGHT));
         addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(21.965, 21.598)), module, Zoxnoxious3372::SOURCE_ONE_UP_BUTTON_PARAM, Zoxnoxious3372::SOURCE_ONE_UP_BUTTON_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(59.185, 21.598)), module, Zoxnoxious3372::SOURCE_TWO_DOWN_BUTTON_PARAM, Zoxnoxious3372::SOURCE_TWO_DOWN_BUTTON_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(70.545, 21.598)), module, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_PARAM, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(10.796, 71.655)), module, Zoxnoxious3372::SOURCE_TWO_DOWN_BUTTON_PARAM, Zoxnoxious3372::SOURCE_TWO_DOWN_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(22.157, 71.655)), module, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_PARAM, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_LIGHT));
 
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(38.873, 50.869)), module, Zoxnoxious3372::MOD_AMOUNT_KNOB_PARAM));
-        addParam(createParamCentered<Trimpot>(mm2px(Vec(70.917, 34.017)), module, Zoxnoxious3372::NOISE_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.284, 50.707)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.865, 50.706)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.841, 88.405)), module, Zoxnoxious3372::OUTPUT_PAN_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.260, 91.977)), module, Zoxnoxious3372::CUTOFF_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(38.849, 91.978)), module, Zoxnoxious3372::RESONANCE_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(38.9018, 26.0712)), module, Zoxnoxious3372::MOD_AMOUNT_KNOB_PARAM));
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(23.4843, 117.3152)), module, Zoxnoxious3372::NOISE_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.4844, 37.8604)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.4767, 88.2485)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(54.3714, 103.3061)), module, Zoxnoxious3372::OUTPUT_PAN_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(39.1350, 69.9388)), module, Zoxnoxious3372::CUTOFF_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.4240, 70.2092)), module, Zoxnoxious3372::RESONANCE_KNOB_PARAM));
 
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(38.873, 21.557)), module, Zoxnoxious3372::FILTER_MOD_SWITCH_PARAM, Zoxnoxious3372::FILTER_MOD_ENABLE_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(38.873, 34.016)), module, Zoxnoxious3372::VCA_MOD_SWITCH_PARAM, Zoxnoxious3372::VCA_MOD_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(64.424, 21.475)), module, Zoxnoxious3372::FILTER_MOD_SWITCH_PARAM, Zoxnoxious3372::FILTER_MOD_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(64.424, 33.934)), module, Zoxnoxious3372::REZ_MOD_SWITCH_PARAM, Zoxnoxious3372::REZ_MOD_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(64.424, 45.839)), module, Zoxnoxious3372::VCA_MOD_SWITCH_PARAM, Zoxnoxious3372::VCA_MOD_ENABLE_LIGHT));
 
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.9018, 39.4336)), module, Zoxnoxious3372::MOD_AMOUNT_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.1233, 117.3152)), module, Zoxnoxious3372::NOISE_LEVEL_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.4844, 51.2228)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.4767, 101.6110)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.3714, 116.6685)), module, Zoxnoxious3372::OUTPUT_PAN_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.135, 83.401)), module, Zoxnoxious3372::CUTOFF_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.424, 83.401)), module, Zoxnoxious3372::RESONANCE_INPUT));
 
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.873, 64.232)), module, Zoxnoxious3372::MOD_AMOUNT_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.556, 34.017)), module, Zoxnoxious3372::NOISE_LEVEL_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.284, 64.069)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.865, 64.069)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.841, 101.767)), module, Zoxnoxious3372::OUTPUT_PAN_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.260, 105.340)), module, Zoxnoxious3372::CUTOFF_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.849, 105.34)), module, Zoxnoxious3372::RESONANCE_INPUT));
-
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42.348, 56.869)), module, Zoxnoxious3372::MOD_AMOUNT_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(20.247, 56.707)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(69.133, 56.706)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(68.609, 94.405)), module, Zoxnoxious3372::OUTPUT_PAN_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(20.222, 97.977)), module, Zoxnoxious3372::CUTOFF_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42.812, 97.978)), module, Zoxnoxious3372::RESONANCE_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42.8644, 32.0711)), module, Zoxnoxious3372::MOD_AMOUNT_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(20.4471, 43.8603)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(20.2754, 94.2484)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(58.1394, 109.3060)), module, Zoxnoxious3372::OUTPUT_PAN_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(43.0976, 75.9387)), module, Zoxnoxious3372::CUTOFF_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(68.3866, 76.2091)), module, Zoxnoxious3372::RESONANCE_CLIP_LIGHT));
 
         addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.02, 8.219)), module, Zoxnoxious3372::LEFT_EXPANDER_LIGHT));
         addChild(createLightCentered<TriangleRightLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(79.507, 8.219)), module, Zoxnoxious3372::RIGHT_EXPANDER_LIGHT));
 
-        source1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(6.784, 13.838)));
+        source1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(6.8842, 13.838)));
         source1NameTextField->box.size = mm2px(Vec(18.0, 3.636));
         source1NameTextField->setText(module ? &module->source1NameString : NULL);
         addChild(source1NameTextField);
 
-        source2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(55.865, 13.838)));
+        source2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(7.477, 63.895)));
         source2NameTextField->box.size = mm2px(Vec(18.0, 3.636));
         source2NameTextField->setText(module ? &module->source2NameString : NULL);
         addChild(source2NameTextField);
 
         // mm2px(Vec(18.0, 3.636))
-        output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(55.841, 108.573)));
+        output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(58.827, 111.088)));
         output1NameTextField->box.size = mm2px(Vec(18.0, 3.636));
         output1NameTextField->setText(module ? &module->output1NameString : NULL);
         addChild(output1NameTextField);
 
 
         // mm2px(Vec(18.0, 3.636))
-        output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(55.841, 114.334)));
+        output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(32.619, 111.088)));
         output2NameTextField->box.size = mm2px(Vec(18.0, 3.636));
         output2NameTextField->setText(module ? &module->output2NameString : NULL);
         addChild(output2NameTextField);
