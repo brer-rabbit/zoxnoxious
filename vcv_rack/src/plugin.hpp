@@ -21,3 +21,4 @@ extern Plugin* pluginInstance;
 extern Model* modelZoxnoxious3340;
 extern Model* modelZoxnoxious3372;
 extern Model* modelPatchingMatrix;
+extern Model* modelLegacy3372;

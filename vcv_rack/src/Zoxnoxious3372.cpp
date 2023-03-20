@@ -14,7 +14,7 @@ const static int midiMessageQueueMaxSize = 16;
 // card2 out2
 // card1 out2
 // card1 out1
-int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
+const static int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 
 // card6 out1
 // card5 out2
@@ -24,7 +24,7 @@ int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 // card2 out1
 // card1 out2
 // card1 out1
-int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
+const static int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
 
 
 struct Zoxnoxious3372 : ZoxnoxiousModule {
@@ -340,7 +340,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
 
 
     /** getCardHardwareId
-     * return the hardware Id of the 3340 card
+     * return the hardware Id of the 3372 card
      */
     static const uint8_t hardwareId = 0x03;
     uint8_t getHardwareId() override {
@@ -352,12 +352,20 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
         output1NameString = getCardOutputName(hardwareId, 1, slot);
         output2NameString = getCardOutputName(hardwareId, 2, slot);
+        int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
+        source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
+        int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
+        source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
     }
 
     void onChannelAssignmentLost() override {
         ZoxnoxiousModule::onChannelAssignmentLost();
         output1NameString = invalidCardOutputName;
         output2NameString = invalidCardOutputName;
+        // should do something better with source{1,2}NameString here since
+        // user can still click on the buttons to change them
+        source1NameString = invalidCardOutputName;
+        source2NameString = invalidCardOutputName;
     }
 
 

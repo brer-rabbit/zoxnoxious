@@ -38,6 +38,15 @@
         "Hardware",
         "VCF"
       ]
+    },
+    {
+      "slug": "Legacy3372",
+      "name": "Legacy3372",
+      "description": "Hardware 3372 VCF",
+      "tags": [
+        "Hardware",
+        "VCF"
+      ]
     }
   ]
 }
