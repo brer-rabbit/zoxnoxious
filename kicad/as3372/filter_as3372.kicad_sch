@@ -1599,7 +1599,6 @@
     )
   )
 
-
   (junction (at 166.37 226.06) (diameter 0) (color 0 0 0 0)
     (uuid 075ab95f-2b76-4c48-89bf-7ec2e6390189)
   )
@@ -2987,7 +2986,7 @@
     (property "Reference" "R64" (id 0) (at 221.488 94.4153 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Value" "24k" (id 1) (at 221.488 96.9522 0)
+    (property "Value" "20k" (id 1) (at 221.488 96.9522 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (id 2) (at 221.488 95.25 90)
@@ -2996,7 +2995,7 @@
     (property "Datasheet" "~" (id 3) (at 219.71 95.25 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "C23352" (id 4) (at 219.71 95.25 0)
+    (property "LCSC Part" "C4184" (id 4) (at 219.71 95.25 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 2eaeab28-136e-42b6-a7eb-1e093590df7c))

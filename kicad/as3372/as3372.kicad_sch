@@ -3465,7 +3465,7 @@
     (property "Datasheet" "~" (id 3) (at 203.2 227.33 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "" (id 4) (at 203.2 227.33 90)
+    (property "LCSC Part" "C21190" (id 4) (at 203.2 227.33 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid c3bc60ec-4614-44ef-badf-46711d3a74a5))
@@ -4059,7 +4059,7 @@
     (property "Datasheet" "~" (id 3) (at 237.49 232.41 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "" (id 4) (at 237.49 232.41 0)
+    (property "LCSC Part" "C21122" (id 4) (at 237.49 232.41 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 5db66ef5-4470-409c-b1e1-e003473f1c6e))
@@ -4295,7 +4295,7 @@
     (property "Datasheet" "~" (id 3) (at 220.98 213.36 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "" (id 4) (at 220.98 213.36 90)
+    (property "LCSC Part" "C17414" (id 4) (at 220.98 213.36 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid f500d6b1-57de-4d5f-86ce-39ba79bc72d3))
@@ -4334,7 +4334,7 @@
     (property "Datasheet" "~" (id 3) (at 237.49 223.52 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "" (id 4) (at 237.49 223.52 90)
+    (property "LCSC Part" "C17513" (id 4) (at 237.49 223.52 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid f473bd53-7a99-4a58-b532-1041c13da271))
@@ -4856,7 +4856,7 @@
       (reference "C25") (unit 1) (value "0.1u") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061ff2290/c9734da3-f09f-402e-88b8-007d0ca02300"
-      (reference "C26") (unit 1) (value "33n") (footprint "Capacitor_SMD:C_0603_1608Metric")
+      (reference "C26") (unit 1) (value "33n") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/de1c368d-832c-4946-b463-01deb9275f62"
       (reference "C30") (unit 1) (value "0.1u") (footprint "Capacitor_SMD:C_0603_1608Metric")
@@ -5057,7 +5057,7 @@
       (reference "R63") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/03e97adb-387d-4cc8-b9f9-aedff9d4157b"
-      (reference "R64") (unit 1) (value "24k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R64") (unit 1) (value "20k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/06519ee5-e3f7-4c1d-97d6-a8703fead30d/235a9c2e-5120-4a85-b60b-1e91be5d58aa"
       (reference "R65") (unit 1) (value "33k") (footprint "Resistor_SMD:R_0603_1608Metric")
