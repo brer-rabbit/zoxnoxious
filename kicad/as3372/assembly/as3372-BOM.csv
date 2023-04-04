@@ -1,15 +1,17 @@
 Comment,Designator,Footprint,LCSC Part #
 0.1u Unpolarized capacitor,"C1,C2,C3,C4,C5,C6,C7,C8,C13,C20,C21,C22,C25,C30,C31,C32,C33,C36,C37,C39,C45,C46",C_0603_1608Metric,C14663
 68n Unpolarized capacitor,C9,C_0603_1608Metric,C31658
-8.2p Unpolarized capacitor,C10,C_0603_1608Metric,C1685
+10n Unpolarized capacitor,"C10,C41,C42,C43,C44",C_0603_1608Metric,C57112
 33n Unpolarized capacitor,"C11,C12,C17",C_0805_2012Metric,C342800
-4.7u Polarized capacitor,C14,CP_Radial_D4.0mm_P1.50mm,
+2.2u Unpolarized capacitor,"C14,C16",C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2,
 330p Unpolarized capacitor,C15,C_0805_2012Metric,C694185
-2.2u Polarized capacitor,C16,CP_Radial_D4.0mm_P1.50mm,
-33p Unpolarized capacitor,"C18,C19",C_0805_2012Metric,
-4.7u Unpolarized capacitor,"C24,C38,C40",C_0805_2012Metric,C1779
+33p Unpolarized capacitor,"C18,C19",C_0603_1608Metric,C1663
+2.2u Polarized capacitor,C23,CP_Radial_D4.0mm_P1.50mm,
+4.7u Unpolarized capacitor,"C24,C40",C_0805_2012Metric,C1779
+22n Unpolarized capacitor,C26,C_0805_2012Metric,C21122
 1u Unpolarized capacitor,"C34,C35",C_0805_2012Metric,C28323
-10n Unpolarized capacitor,"C41,C42,C43,C44",C_0603_1608Metric,C57112
+22u Unpolarized capacitor,C38,C_1206_3216Metric,C12891
+"1N4148W 75V 0.15A Fast Switching Diode, SOD-123",D1,D_SOD-123,C81598
 LED Light emitting diode,D4,LED_0603_1608Metric,C2286
 MountingHole Mounting Hole without connection,"H1,H2,H3,H4",MountingHole_3.2mm_M3,
 "Conn_01x01 Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)",J1,PinHeader_1x01_P2.54mm_Vertical,
@@ -17,29 +19,32 @@ MountingHole Mounting Hole without connection,"H1,H2,H3,H4",MountingHole_3.2mm_M
 "Conn_02x20_Odd_Even Generic connector, double row, 02x20, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)",J3,PinHeader_2x20_P2.54mm_Horizontal,
 "MMBT3904 0.2A Ic, 40V Vce, Small Signal NPN Transistor, SOT-23","Q1,Q2,Q3,Q4",SOT-23,C20526
 100k Resistor,"R1,R2,R72",R_0402_1005Metric,C25741
-1k Resistor,"R3,R4",R_0805_2012Metric,C17513
+4k7 Resistor,"R3,R20,R70",R_0603_1608Metric,C23162
+10k Resistor,"R4,R23,R63",R_0603_1608Metric,C25804
 2k4 Resistor,R5,R_0603_1608Metric,C22940
-20k Resistor,"R6,R8,R10,R12,R14",R_0603_1608Metric,C4184
+20k Resistor,"R6,R8,R10,R12,R14,R64",R_0603_1608Metric,C4184
 8k2 Resistor,R7,R_0603_1608Metric,C25981
 120k Resistor,R9,R_0603_1608Metric,C25808
-3.3k Resistor,R11,R_0603_1608Metric,C22978
-47k Resistor,"R13,R27,R28,R30",R_0603_1608Metric,C25819
+3k3 Resistor,R11,R_0603_1608Metric,C22978
+82k Resistor,R13,R_0603_1608Metric,C23254
 36k Resistor,R15,R_0603_1608Metric,C23147
-1k Resistor,"R16,R21,R25,R26,R33,R62,R67,R68,R71",R_0603_1608Metric,C21190
+18k Resistor,R16,R_0603_1608Metric,C25810
+100k Resistor,R17,R_0603_1608Metric,C25803
 68k Resistor,"R18,R19",R_0603_1608Metric,C23231
-5k1 Resistor,R20,R_0603_1608Metric,C23186
+1k Resistor,"R21,R25,R26,R33,R62,R67,R68,R71",R_0603_1608Metric,C21190
 22k Resistor,"R22,R61",R_0603_1608Metric,C31850
-10k Resistor,"R23,R63",R_0603_1608Metric,C25804
-24k Resistor,"R24,R32,R64",R_0603_1608Metric,C23352
+24k Resistor,R24,R_0603_1608Metric,C23352
+47k Resistor,"R27,R28,R30,R31",R_0603_1608Metric,C25819
+9k1 Resistor,R29,R_0603_1608Metric,C23260
+27k Resistor,R32,R_0603_1608Metric,C22967
 4k7 Resistor,R47,R_1206_3216Metric,C17936
 2k Resistor,"R56,R73",R_0603_1608Metric,C22975
 33k Resistor,"R65,R66",R_0603_1608Metric,C4216
 680k Resistor,R69,R_0603_1608Metric,C25822
-4k7 Resistor,R70,R_0603_1608Metric,C23162
 15k Resistor,"R74,R75,R76,R77",R_0603_1608Metric,C22809
-TestPoint test point,"TP1,TP2,TP3,TP4,TP5,TP6,TP7,TP12,TP13,TP15",TestPoint_Pad_2.0x2.0mm,
+TestPoint test point,"TP1,TP2,TP3,TP4,TP5,TP6,TP7,TP8,TP9,TP12,TP13,TP15",TestPoint_Pad_2.0x2.0mm,
 MUX508 ,"U1,U2",SOIC-16_3.9x9.9mm_P1.27mm,C2673104
-"TL074 Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14","U3,U4",SOIC-14_3.9x8.7mm_P1.27mm,C6963
+"TL074 Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14","U3,U4",SOIC-14_3.9x8.7mm_P1.27mm,C12594
 "TL072 Dual Low-Noise JFET-Input Operational Amplifiers, DIP-8/SOIC-8",U5,SOIC-8_3.9x4.9mm_P1.27mm,C6961
 "CAT9555YI-T2 IO expander 16 GPIO, I2C 400kHz, Interrupt, 2.3 - 5.5V, SOIC-24",U7,TSSOP-24_4.4x7.8mm_P0.65mm,C83265
 AS3372 AS 3372 Signal Processor,U8,SOIC-24W_7.5x15.4mm_P1.27mm,
@@ -48,4 +53,4 @@ AD5328 Octal Voltage Output DAC,U9,TSSOP-16_4.4x5mm_P0.65mm,C29162
 "LM4040AIM3-2.5 2.500V Precision Micropower Shunt Voltage Reference, SOT-23",U13,SOT-23,C460725
 "M24C02-WMN 2Kb (256x8) I2C Serial EEPROM, 2.5-5.5V, SOIC-8",U15,SOIC-8_3.9x4.9mm_P1.27mm,C7562
 "NE5532 Dual Low-Noise Operational Amplifiers, DIP-8/SOIC-8",U18,SOIC-8_3.9x4.9mm_P1.27mm,C7426
-"L79L05_TO92 Negative 100mA -30V Linear Regulator, Fixed Output -5V, TO-92",U19,TO-92_Inline,
+"L79L05_TO92 Negative 100mA -30V Linear Regulator, Fixed Output -5V, TO-92",U19,TO-92_Inline_Wide,

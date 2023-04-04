@@ -6,7 +6,7 @@
 
   (title_block
     (title "Z3372 Signal Processing")
-    (rev "0.2")
+    (rev "0.3")
     (company "Zoxnoxious Engineering")
   )
 
@@ -1598,6 +1598,7 @@
       )
     )
   )
+
 
   (junction (at 166.37 226.06) (diameter 0) (color 0 0 0 0)
     (uuid 075ab95f-2b76-4c48-89bf-7ec2e6390189)
