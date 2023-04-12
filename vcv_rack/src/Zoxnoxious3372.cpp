@@ -106,9 +106,15 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
           { VCA_MOD_SWITCH_PARAM, INT_MIN, { 2, 3 } },
           { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 4, 5, 6, 7, 8, 9, 10, 11 } },
           { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 12, 13, 14, 15, 16, 17, 18, 19 } },
-          { REZ_MOD_SWITCH_PARAM, INT_MIN, { 20, 21 } },
+          { REZ_MOD_SWITCH_PARAM, INT_MIN, { 20, 21 } }
       };
 
+    // midi program changes for enable/disable noise are not mapped to switches
+    // these follow sequentially from the end of the buttonParamToMidiProgramList
+    static const int disable_noise_switch = 22;
+    static const int enable_noise_switch = 23;
+    bool noise_enabled_prev_state = false;
+    bool noise_enabled = false;
 
     Zoxnoxious3372() :
         modAmountClipTimer(0.f), sourceOneLevelClipTimer(0.f), sourceTwoLevelClipTimer(0.f),
@@ -241,12 +247,78 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
             return;
         }
 
+
+        float v;
+        const float clipTime = 0.25f;
+        int channel = 0;
+
+        // cutoff
+        v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
+            cutoffClipTimer = clipTime;
+        }
+
+        channel++;
+        v = params[OUTPUT_PAN_KNOB_PARAM].getValue() + inputs[OUTPUT_PAN_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
+            outputPanClipTimer = clipTime;
+        }
+
+        channel++;
+        v = params[NOISE_KNOB_PARAM].getValue() + inputs[NOISE_LEVEL_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        noise_enabled = controlMsg->frame[cvChannelOffset + channel] > 0.005f ? true : false;
+        // no clip LED for noise level
+
+        channel++;
+        v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
+            resonanceClipTimer = clipTime;
+        }
+
+        channel++;
+        v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
+            sourceOneLevelClipTimer = clipTime;
+        }
+
+        channel++;
+        v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
+            sourceTwoLevelClipTimer = clipTime;
+        }
+
+        channel++;
+        v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + channel] != v) {
+            modAmountClipTimer = clipTime;
+        }
+
+
+
         // if we have any queued midi messages, send them if possible
-        if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
-            //INFO("z3372: clock %" PRId64 " : bus is open, popping MIDI message from queue", APP->engine->getFrame());
-            controlMsg->midiMessageSet = true;
-            controlMsg->midiMessage = midiMessageQueue.front();
-            midiMessageQueue.pop_front();
+        if (controlMsg->midiMessageSet == false) {
+            if (midiMessageQueue.size() > 0) {
+                //INFO("z3372: clock %" PRId64 " : bus is open, popping MIDI message from queue", APP->engine->getFrame());
+                controlMsg->midiMessageSet = true;
+                controlMsg->midiMessage = midiMessageQueue.front();
+                midiMessageQueue.pop_front();
+            }
+            else if (noise_enabled != noise_enabled_prev_state) {
+                controlMsg->midiMessage.setSize(2);
+                controlMsg->midiMessage.setChannel(midiChannel);
+                controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
+                controlMsg->midiMessage.setNote(noise_enabled ? enable_noise_switch : disable_noise_switch);
+                controlMsg->midiMessageSet = true;
+                INFO("zoxnoxious3372: clock %" PRId64 " :  noise switch toggle MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
+                noise_enabled_prev_state = noise_enabled;
+            }
         }
 
 
@@ -276,57 +348,6 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
                     INFO("Zoxnoxioius3340: dropping MIDI message, bus full and queue full");
                 }
             }
-        }
-
-        float v;
-        const float clipTime = 0.25f;
-        int channel = 0;
-
-        // cutoff
-        v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            cutoffClipTimer = clipTime;
-        }
-
-        channel++;
-        v = params[OUTPUT_PAN_KNOB_PARAM].getValue() + inputs[OUTPUT_PAN_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            outputPanClipTimer = clipTime;
-        }
-
-        channel++;
-        v = params[NOISE_KNOB_PARAM].getValue() + inputs[NOISE_LEVEL_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        // no clip LED for noise level
-
-        channel++;
-        v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            resonanceClipTimer = clipTime;
-        }
-
-        channel++;
-        v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            sourceOneLevelClipTimer = clipTime;
-        }
-
-        channel++;
-        v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            sourceTwoLevelClipTimer = clipTime;
-        }
-
-        channel++;
-        v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + channel] != v) {
-            modAmountClipTimer = clipTime;
         }
 
     }
