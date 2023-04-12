@@ -205,9 +205,12 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 1, port1_addr, 0b00010000, 0b00011111 }, // prog 19 - 6/1
 
   { 0, port0_addr, 0b00000000, 0b11111101 }, // prog 20 - rez mod off
-  { 0, port0_addr, 0b00000010, 0b11111111 }  // prog 21 - rez mod on
+  { 0, port0_addr, 0b00000010, 0b11111111 }, // prog 21 - rez mod on
+  { 0, port0_addr, 0b00000000, 0b10111111 }, // prog 22 - noise off
+  { 0, port0_addr, 0b01000000, 0b11111111 }  // prog 23 - noise on
 
 };
+
 
 int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
   int error = 0;
