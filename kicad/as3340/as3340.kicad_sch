@@ -5761,14 +5761,14 @@
     (in_bom yes) (on_board yes)
     (uuid 00000000-0000-0000-0000-00006305e977)
     (property "Reference" "R26" (id 0) (at 309.7022 203.2 90))
-    (property "Value" "?" (id 1) (at 312.0136 203.2 90))
+    (property "Value" "10k" (id 1) (at 312.0136 203.2 90))
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (id 2) (at 316.738 203.2 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 314.96 203.2 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "" (id 4) (at 314.96 203.2 0)
+    (property "LCSC Part" "C25804" (id 4) (at 314.96 203.2 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 16d7cf70-6edc-4085-8c04-d998b08e68a5))
@@ -6713,7 +6713,7 @@
     (in_bom yes) (on_board yes)
     (uuid 00000000-0000-0000-0000-0000655e9a01)
     (property "Reference" "R4" (id 0) (at 299.72 210.6422 90))
-    (property "Value" "?" (id 1) (at 299.72 212.9536 90))
+    (property "Value" "300k" (id 1) (at 299.72 212.9536 90))
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (id 2) (at 299.72 217.678 90)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -7807,11 +7807,11 @@
     (path "/00000000-0000-0000-0000-00006238dc2a"
       (reference "J3") (unit 1) (value "Conn_02x20_Odd_Even") (footprint "Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Horizontal")
     )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/72c8a104-c9af-4233-8795-434f9a5c2cef"
-      (reference "J4") (unit 1) (value "Conn_01x01") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical")
+    (path "/00000000-0000-0000-0000-000061e1d4ae/d0fdae0d-e8fc-4808-b923-97d60d9d8660"
+      (reference "J5") (unit 1) (value "Conn_01x03") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical")
     )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/e5c2362e-3f07-4d91-9229-1dafcc54d5d8"
-      (reference "J5") (unit 1) (value "Conn_01x01") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical")
+    (path "/00000000-0000-0000-0000-000061e1d4ae/9b10b09f-b471-417b-a418-29c56aa99c54"
+      (reference "J6") (unit 1) (value "Conn_01x02") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
     (path "/9d07a887-e365-4436-b93a-6867889c52e8"
       (reference "Q1") (unit 1) (value "MMBT3904") (footprint "Package_TO_SOT_SMD:SOT-23")
@@ -7826,7 +7826,7 @@
       (reference "R3") (unit 1) (value "20k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-0000655e9a01"
-      (reference "R4") (unit 1) (value "?") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R4") (unit 1) (value "300k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-00006269dd41/00000000-0000-0000-0000-0000626f5b96"
       (reference "R5") (unit 1) (value "47k") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -7892,7 +7892,7 @@
       (reference "R25") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/00000000-0000-0000-0000-00006305e977"
-      (reference "R26") (unit 1) (value "?") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R26") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-00006251ae25"
       (reference "R27") (unit 1) (value "1M") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -8028,9 +8028,6 @@
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-0000621fdf35"
       (reference "RV2") (unit 1) (value "20k") (footprint "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical")
-    )
-    (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-00006327ef87"
-      (reference "TP1") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
     )
     (path "/00000000-0000-0000-0000-000061e1d4ae/00000000-0000-0000-0000-000062ffad5f"
       (reference "TP2") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_2.0x2.0mm")
