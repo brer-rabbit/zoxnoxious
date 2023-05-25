@@ -970,11 +970,6 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 521fad1d-c460-44ad-87e1-ef963668cd51)
   )
-  (text "LM4040 resistor rough calc:\nIlm4040 min:  70uA\nRdacref = 100k ==> I = 25uA\nopamp will swing about 0 ~{50} uA\nfor roughly 150uA ==> 16kR min\nLower to 5k, call it good\n"
-    (at 40.64 91.44 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 59d29de9-2636-4d13-8919-71dd80e6cc5c)
-  )
   (text "CV for AS3364 VCAs with max level 2.08V (or 1.93V typ)\nLowpass @ 1585 Hz"
     (at 325.12 99.06 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
@@ -984,13 +979,12 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid c8692ec3-ed20-4219-8d2a-bdc1d7395ee6)
   )
-  (text "Load Vref_2.5:\nAD5328: 45k or 10M impedance (suggest latter-- buffered input)\n"
-    (at 345.44 204.47 0)
+  (text "Sheet load:\nVref_2.5: 45k\n" (at 157.48 22.86 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid da4f8615-e36c-42a1-98ee-c91ba745e63e)
   )
-  (text "DAC: 2.5V Reference Voltage\nOutputs at 1X gain from AD5328"
-    (at 25.4 22.86 0)
+  (text "DAC: 2.5V Reference Voltage\nOutputs at 1X gain from AD5328.\nVref impedance 45k for 1X gain"
+    (at 25.4 26.67 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid f9cdf5da-db86-4b3a-a169-cee2874bc0ff)
   )
