@@ -4226,7 +4226,7 @@
     (property "Reference" "R16" (id 0) (at 233.68 115.57 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "20k" (id 1) (at 233.68 120.65 90)
+    (property "Value" "39k" (id 1) (at 233.68 120.65 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (id 2) (at 232.41 119.888 90)
@@ -4823,14 +4823,14 @@
     (in_bom yes) (on_board yes)
     (uuid a1d1081b-60f3-404d-bc54-add38fcf4fef)
     (property "Reference" "C59" (id 0) (at 232.41 106.045 90))
-    (property "Value" "100p" (id 1) (at 232.41 108.4381 90))
+    (property "Value" "70pF-ish" (id 1) (at 232.41 108.4381 90))
     (property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (id 2) (at 236.22 110.7948 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 232.41 111.76 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "C14858" (id 4) (at 232.41 111.76 0)
+    (property "LCSC Part" "" (id 4) (at 232.41 111.76 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid e54515fe-cbc5-4e8b-a459-fecdc60cb4a8))
@@ -6060,7 +6060,7 @@
       (reference "C58") (unit 1) (value "0.1u") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/a1d1081b-60f3-404d-bc54-add38fcf4fef"
-      (reference "C59") (unit 1) (value "100p") (footprint "Capacitor_SMD:C_0603_1608Metric")
+      (reference "C59") (unit 1) (value "70pF-ish") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/da4a5fb8-a3c6-4fdd-a68b-dbeebd7f1c13"
       (reference "C60") (unit 1) (value "0.1u") (footprint "Capacitor_SMD:C_0603_1608Metric")
@@ -6180,7 +6180,7 @@
       (reference "R15") (unit 1) (value "22k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/22087325-fa4e-460e-adfe-eca921195a58"
-      (reference "R16") (unit 1) (value "20k") (footprint "Resistor_SMD:R_0603_1608Metric")
+      (reference "R16") (unit 1) (value "39k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/00000000-0000-0000-0000-000061ff2290/7fbdb3ae-3711-4c8b-89ab-fbbd5fba79f0"
       (reference "R17") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
