@@ -1212,6 +1212,10 @@
     (uuid 9857ff01-2b48-458b-a4b4-ca963efe88fe)
   )
 
+  (label "SAWTOOTH_3394" (at 147.32 106.68 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 42403a68-fc3f-42fc-9cbd-f2929e8ff8b4)
+  )
   (label "3394_EXT_IN" (at 139.7 81.28 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid b6d4b4f1-d959-4317-929e-706e7e8937dc)
@@ -1219,6 +1223,10 @@
   (label "3394_EXT_IN" (at 63.5 38.1 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid dd0ab54f-b817-4151-bdd3-61dd46eede79)
+  )
+  (label "VCO_3394" (at 149.86 85.09 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid e23b01ab-4786-4341-b06e-b687a5a8f1ad)
   )
 
   (hierarchical_label "VCF_SUM" (shape input) (at 95.25 113.03 180)
