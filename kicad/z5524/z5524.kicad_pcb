@@ -2340,7 +2340,7 @@
 
   (footprint "Resistor_SMD:R_0603_1608Metric" (layer "F.Cu")
     (tedit 5F68FEEE) (tstamp 13e5a55a-f959-43d7-93f8-9a2bcb27ea03)
-    (at 97.2 63.2 -90)
+    (at 92.34 62.7 -90)
     (descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor")
     (property "Sheetfile" "z5524.kicad_sch")
@@ -2549,25 +2549,25 @@
     (pad "3" smd roundrect (at -2.8625 -0.975) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 7 "+5V") (pinfunction "VDD") (pintype "power_in") (tstamp b5f5edd1-7f3c-48b0-915b-6fb1948b2d76))
     (pad "4" smd roundrect (at -2.8625 -0.325) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 106 "/DAC 2130/PWM_DAC") (pinfunction "VOUT_A") (pintype "output") (tstamp 95be1784-3dd7-426f-a63a-46a906237d33))
+      (net 107 "/DAC 2130/SAW_MIX_DAC") (pinfunction "VOUT_A") (pintype "output") (tstamp 95be1784-3dd7-426f-a63a-46a906237d33))
     (pad "5" smd roundrect (at -2.8625 0.325) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 107 "/DAC 2130/SAW_MIX_DAC") (pinfunction "VOUT_B") (pintype "output") (tstamp 7c8ec677-c89e-40fb-80c1-254f8c21f6a5))
+      (net 145 "/DAC 2130/LINEAR_DAC") (pinfunction "VOUT_B") (pintype "output") (tstamp 7c8ec677-c89e-40fb-80c1-254f8c21f6a5))
     (pad "6" smd roundrect (at -2.8625 0.975) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 145 "/DAC 2130/LINEAR_DAC") (pinfunction "VOUT_C") (pintype "output") (tstamp feae41bd-74fe-4b00-ac36-32c0c56bdbd7))
+      (net 100 "/DAC 2130/EXP_PITCH_DAC") (pinfunction "VOUT_C") (pintype "output") (tstamp feae41bd-74fe-4b00-ac36-32c0c56bdbd7))
     (pad "7" smd roundrect (at -2.8625 1.625) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 100 "/DAC 2130/EXP_PITCH_DAC") (pinfunction "VOUT_D") (pintype "output") (tstamp 93532bf5-8782-41b3-9722-3644f64efa41))
+      (net 106 "/DAC 2130/PWM_DAC") (pinfunction "VOUT_D") (pintype "output") (tstamp 93532bf5-8782-41b3-9722-3644f64efa41))
     (pad "8" smd roundrect (at -2.8625 2.275) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 5 "/VREF_2.5") (pinfunction "VREF_ABCD") (pintype "input") (tstamp 6482e037-9f6d-4e4c-9682-019f17d1d430))
     (pad "9" smd roundrect (at 2.8625 2.275) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 5 "/VREF_2.5") (pinfunction "VREF_EFGH") (pintype "input") (tstamp 7e48d23f-e4fe-4a78-851e-14a93ec511ce))
     (pad "10" smd roundrect (at 2.8625 1.625) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 108 "/DAC 2130/PULSE_MIX_DAC") (pinfunction "VOUT_E") (pintype "output") (tstamp 1d137ef5-cb93-4ef1-9164-2c9b98144466))
+      (net 155 "/DAC 2130/AS3394_VCO_CV_DAC") (pinfunction "VOUT_E") (pintype "output") (tstamp 1d137ef5-cb93-4ef1-9164-2c9b98144466))
     (pad "11" smd roundrect (at 2.8625 0.975) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 109 "/DAC 2130/TRI_MIX_DAC") (pinfunction "VOUT_F") (pintype "output") (tstamp e1c808de-3201-479d-b189-d23baca5be61))
+      (net 156 "/DAC 2130/AS3394_SINE_CV_DAC") (pinfunction "VOUT_F") (pintype "output") (tstamp e1c808de-3201-479d-b189-d23baca5be61))
     (pad "12" smd roundrect (at 2.8625 0.325) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 155 "/DAC 2130/AS3394_VCO_CV_DAC") (pinfunction "VOUT_G") (pintype "output") (tstamp f8d4e4d9-42f6-4412-b3cd-63212334f68a))
+      (net 108 "/DAC 2130/PULSE_MIX_DAC") (pinfunction "VOUT_G") (pintype "output") (tstamp f8d4e4d9-42f6-4412-b3cd-63212334f68a))
     (pad "13" smd roundrect (at 2.8625 -0.325) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 156 "/DAC 2130/AS3394_SINE_CV_DAC") (pinfunction "VOUT_H") (pintype "output") (tstamp 6664fc3a-b96f-436b-a821-4754ed2678a9))
+      (net 109 "/DAC 2130/TRI_MIX_DAC") (pinfunction "VOUT_H") (pintype "output") (tstamp 6664fc3a-b96f-436b-a821-4754ed2678a9))
     (pad "14" smd roundrect (at 2.8625 -0.975) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 1 "GND") (pinfunction "GND") (pintype "power_in") (tstamp efb471db-af21-41ec-89cc-a56955a815d7))
     (pad "15" smd roundrect (at 2.8625 -1.625) (size 1.475 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
@@ -2625,7 +2625,7 @@
 
   (footprint "Capacitor_SMD:C_1206_3216Metric" (layer "F.Cu")
     (tedit 5F68FEEE) (tstamp 1b998b10-58ed-4f7d-9878-238558c21484)
-    (at 92.9 62.9 180)
+    (at 102.4 62.43 180)
     (descr "Capacitor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "capacitor")
     (property "LCSC Part" "C1848")
@@ -3150,7 +3150,7 @@
 
   (footprint "Package_TO_SOT_THT:TO-92_Inline" (layer "F.Cu")
     (tedit 5A1DD157) (tstamp 2e54208a-e7c8-4977-af3e-d7a79500def6)
-    (at 98.76 59.67 90)
+    (at 93.9 59.17 90)
     (descr "TO-92 leads in-line, narrow, oval pads, drill 0.75mm (see NXP sot054_po.pdf)")
     (tags "to-92 sc-43 sc-43a sot54 PA33 transistor")
     (property "Sheetfile" "z5524.kicad_sch")
@@ -4718,7 +4718,7 @@
 
   (footprint "Resistor_SMD:R_0805_2012Metric" (layer "F.Cu")
     (tedit 5F68FEEE) (tstamp 52e7c71a-45fe-43bf-b44b-9cbd21df2a69)
-    (at 100.2 62.7 180)
+    (at 95.34 62.2 180)
     (descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor")
     (property "Sheetfile" "z5524.kicad_sch")
@@ -5415,7 +5415,7 @@
 
   (footprint "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder" (layer "F.Cu")
     (tedit 5F68FEEF) (tstamp 686b6c87-2724-4b9b-ab0c-6c534d0da0c0)
-    (at 102.6 58.2 -90)
+    (at 97.74 57.7 -90)
     (descr "Capacitor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (property "Kemet" "T491A105K016AT")
@@ -5678,7 +5678,7 @@
 
   (footprint "Capacitor_SMD:C_1206_3216Metric_Pad1.33x1.80mm_HandSolder" (layer "F.Cu")
     (tedit 5F68FEEF) (tstamp 6e48ea68-e20a-4fae-bf42-3fe24975fa6b)
-    (at 98.5 53.9 180)
+    (at 93.64 53.4 180)
     (descr "Capacitor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (property "Kemet" "T491A105K016AT")
@@ -6070,7 +6070,7 @@
 
   (footprint "Capacitor_SMD:C_1206_3216Metric" (layer "F.Cu")
     (tedit 5F68FEEE) (tstamp 731cad05-f270-4aa2-9885-dbbb0a107b6f)
-    (at 92.9 53.9 180)
+    (at 102.4 53.43 180)
     (descr "Capacitor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "capacitor")
     (property "LCSC Part" "C1848")
@@ -8021,7 +8021,7 @@
 
   (footprint "Package_TO_SOT_THT:TO-92_Inline" (layer "F.Cu")
     (tedit 5A1DD157) (tstamp b64c2854-c431-473b-9f9e-d1e6b9bf7379)
-    (at 93.26 59.67 90)
+    (at 102.76 59.2 90)
     (descr "TO-92 leads in-line, narrow, oval pads, drill 0.75mm (see NXP sot054_po.pdf)")
     (tags "to-92 sc-43 sc-43a sot54 PA33 transistor")
     (property "Sheetfile" "z5524.kicad_sch")
@@ -10123,7 +10123,7 @@
     (property "LCSC Part" "C7426")
     (property "Sheetfile" "z5524.kicad_sch")
     (property "Sheetname" "")
-    (path "/f2ee7a57-3012-42b1-96f4-0a5cb56b1e1c")
+    (path "/8a442d48-3015-44f2-9ca0-c3bac28e04f0")
     (attr smd)
     (fp_text reference "U11" (at 0 -3.4 90) (layer "F.SilkS")
       (effects (font (size 1 1) (thickness 0.15)))
@@ -26150,12 +26150,6 @@
       f0f4e557-41fc-4cfd-8150-8d0842ec9f0b
     )
   )
-  (group "" (id 2e246520-0b35-4792-ad25-97c2cddefbe2)
-    (members
-      92f9a68e-9e7e-466e-adbc-94ab08e4af57
-      d10bf185-8b68-491f-b0f1-91ced90c7d42
-    )
-  )
   (group "" (id 2fc85357-0847-4fe7-82a9-7b85cf4b86a6)
     (members
       53e7d881-3c87-49f5-9e86-62237e3abf89
@@ -26217,9 +26211,23 @@
       eb524760-386a-4784-b97e-9835c64b6a15
     )
   )
-  (group "" (id 92f9a68e-9e7e-466e-adbc-94ab08e4af57)
+  (group "" (id 93d75bed-71db-44f9-b7da-dd2ff35bd6cd)
     (members
+      08c4fd51-5f1c-4dfa-ace4-9c1df0a83a9a
+      1761795b-03b3-4d1e-8c44-8f3a77735186
+      20aa8d9d-5e11-4ec8-bebb-96b6d7a66299
+      2b323b7b-dfb0-436f-9734-156e416652d1
+      32a03971-95b1-4e62-b42b-e4e30dc06bc9
       37a2353b-544e-489e-a308-03e152b14909
+      5a9364b0-aa06-471d-94c5-cc73b693e1fa
+      67ac6900-552f-4c0c-853a-365d1478a354
+      74f91626-498a-4694-b751-c8c8d0c3ce85
+      7aefe85a-953d-4bf9-832c-796f0bb3e17d
+      8c7152cb-4b92-4948-843e-82d814edd414
+      8d9b79bc-f815-4bc3-ab31-782ebc6dd427
+      a4beb0db-c2ca-4bc9-9f16-708ecfff1011
+      ad7e7393-7ac2-4a7d-805d-c9c501d4594d
+      b738d7b2-3c4e-413f-bd83-e0ed3588a6b0
       c147fb3d-f9dd-4c71-947d-6ad22714737b
       d7e2999d-533c-4dbd-8e1a-87664fb62fcd
     )
@@ -26256,24 +26264,6 @@
       e3dc5685-f0f9-4178-a0cb-759a41429f84
       ec091a8d-f23c-41f3-af23-9919f27d819e
       f9759018-949f-49fa-a03f-4b0375f9f55a
-    )
-  )
-  (group "" (id d10bf185-8b68-491f-b0f1-91ced90c7d42)
-    (members
-      08c4fd51-5f1c-4dfa-ace4-9c1df0a83a9a
-      1761795b-03b3-4d1e-8c44-8f3a77735186
-      20aa8d9d-5e11-4ec8-bebb-96b6d7a66299
-      2b323b7b-dfb0-436f-9734-156e416652d1
-      32a03971-95b1-4e62-b42b-e4e30dc06bc9
-      5a9364b0-aa06-471d-94c5-cc73b693e1fa
-      67ac6900-552f-4c0c-853a-365d1478a354
-      74f91626-498a-4694-b751-c8c8d0c3ce85
-      7aefe85a-953d-4bf9-832c-796f0bb3e17d
-      8c7152cb-4b92-4948-843e-82d814edd414
-      8d9b79bc-f815-4bc3-ab31-782ebc6dd427
-      a4beb0db-c2ca-4bc9-9f16-708ecfff1011
-      ad7e7393-7ac2-4a7d-805d-c9c501d4594d
-      b738d7b2-3c4e-413f-bd83-e0ed3588a6b0
     )
   )
   (group "" (id e33b1290-af77-4525-a71d-5b68ecf3feeb)
