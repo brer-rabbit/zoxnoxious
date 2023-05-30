@@ -4623,7 +4623,7 @@
     (uuid 41e8013e-0a3e-4681-8f2c-e92c952272b2)
     (property "Reference" "U2" (id 0) (at 74.93 256.0304 0))
     (property "Value" "LM337L_TO92" (id 1) (at 74.93 258.5673 0))
-    (property "Footprint" "Package_TO_SOT_THT:TO-92_Inline" (id 2) (at 74.93 257.175 0)
+    (property "Footprint" "Package_TO_SOT_THT:TO-92_Inline_Wide" (id 2) (at 74.93 257.175 0)
       (effects (font (size 1.27 1.27) italic) hide)
     )
     (property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm337l.pdf" (id 3) (at 74.93 252.095 0)
@@ -4749,7 +4749,7 @@
     (uuid 50b5bd90-5e4e-4623-aae9-c11555ee256f)
     (property "Reference" "U8" (id 0) (at 29.845 235.6952 0))
     (property "Value" "LM78L05_TO92" (id 1) (at 29.845 238.2321 0))
-    (property "Footprint" "Package_TO_SOT_THT:TO-92_Inline" (id 2) (at 29.845 235.585 0)
+    (property "Footprint" "Package_TO_SOT_THT:TO-92_Inline_Wide" (id 2) (at 29.845 235.585 0)
       (effects (font (size 1.27 1.27) italic) hide)
     )
     (property "Datasheet" "https://www.onsemi.com/pub/Collateral/MC78L06A-D.pdf" (id 3) (at 29.845 242.57 0)
@@ -4963,7 +4963,7 @@
     (pin "1" (uuid bcf4c24d-fc45-4ce2-92c3-2f396874666c))
   )
 
-  (symbol (lib_id "Amplifier_Operational:NE5532") (at 223.52 198.12 0) (mirror x) (unit 2)
+  (symbol (lib_id "Amplifier_Operational:NE5532") (at 223.52 198.12 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 8a442d48-3015-44f2-9ca0-c3bac28e04f0)
     (property "Reference" "U11" (id 0) (at 226.06 194.31 0))
@@ -5403,7 +5403,7 @@
     (pin "1" (uuid d732601b-f087-441f-b61f-caf2046fd68f))
   )
 
-  (symbol (lib_id "Amplifier_Operational:NE5532") (at 398.78 127 0) (mirror x) (unit 1)
+  (symbol (lib_id "Amplifier_Operational:NE5532") (at 398.78 127 0) (mirror x) (unit 2)
     (in_bom yes) (on_board yes)
     (uuid f2ee7a57-3012-42b1-96f4-0a5cb56b1e1c)
     (property "Reference" "U11" (id 0) (at 400.05 123.19 0))
@@ -6766,7 +6766,7 @@
       (reference "U1") (unit 5) (value "TL074") (footprint "Package_SO:TSSOP-14_4.4x5mm_P0.65mm")
     )
     (path "/41e8013e-0a3e-4681-8f2c-e92c952272b2"
-      (reference "U2") (unit 1) (value "LM337L_TO92") (footprint "Package_TO_SOT_THT:TO-92_Inline")
+      (reference "U2") (unit 1) (value "LM337L_TO92") (footprint "Package_TO_SOT_THT:TO-92_Inline_Wide")
     )
     (path "/68f55b4c-badc-4e5f-b2c1-98584ab9d832"
       (reference "U3") (unit 1) (value "LM4040BIM3-2.5") (footprint "Package_TO_SOT_SMD:SOT-23")
@@ -6789,10 +6789,10 @@
     (path "/421536de-310f-49f4-8499-2f71ebf48b84"
       (reference "U5") (unit 5) (value "DG442xY") (footprint "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-000061ff2290/929e7156-a1d5-41da-b272-4566fba4c822"
+    (path "/00000000-0000-0000-0000-000061ff2290/7dc609d0-a945-4486-8800-04d310d8738b"
       (reference "U6") (unit 1) (value "TL072") (footprint "Package_SO:SO-8_3.9x4.9mm_P1.27mm")
     )
-    (path "/00000000-0000-0000-0000-000061ff2290/7dc609d0-a945-4486-8800-04d310d8738b"
+    (path "/00000000-0000-0000-0000-000061ff2290/929e7156-a1d5-41da-b272-4566fba4c822"
       (reference "U6") (unit 2) (value "TL072") (footprint "Package_SO:SO-8_3.9x4.9mm_P1.27mm")
     )
     (path "/00000000-0000-0000-0000-000061ff2290/26cbbd1f-75ed-42d8-870c-aa33b6bb65e5"
@@ -6802,7 +6802,7 @@
       (reference "U7") (unit 1) (value "PCA9555D") (footprint "Package_SO:TSSOP-24_4.4x7.8mm_P0.65mm")
     )
     (path "/50b5bd90-5e4e-4623-aae9-c11555ee256f"
-      (reference "U8") (unit 1) (value "LM78L05_TO92") (footprint "Package_TO_SOT_THT:TO-92_Inline")
+      (reference "U8") (unit 1) (value "LM78L05_TO92") (footprint "Package_TO_SOT_THT:TO-92_Inline_Wide")
     )
     (path "/998834c5-8208-4d7e-a084-854ca45521ff/4b2eebe8-ec7c-4971-938c-db45b06cce01"
       (reference "U9") (unit 1) (value "AS3394") (footprint "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm")
@@ -6816,10 +6816,10 @@
     (path "/998834c5-8208-4d7e-a084-854ca45521ff/9dee1bc7-285f-4252-bfa4-d479b8e4e3df"
       (reference "U10") (unit 3) (value "TL072") (footprint "Package_SO:SO-8_3.9x4.9mm_P1.27mm")
     )
-    (path "/f2ee7a57-3012-42b1-96f4-0a5cb56b1e1c"
+    (path "/8a442d48-3015-44f2-9ca0-c3bac28e04f0"
       (reference "U11") (unit 1) (value "NE5532") (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm")
     )
-    (path "/8a442d48-3015-44f2-9ca0-c3bac28e04f0"
+    (path "/f2ee7a57-3012-42b1-96f4-0a5cb56b1e1c"
       (reference "U11") (unit 2) (value "NE5532") (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm")
     )
     (path "/3d056dbc-8053-4087-945d-ddd219d8253a"

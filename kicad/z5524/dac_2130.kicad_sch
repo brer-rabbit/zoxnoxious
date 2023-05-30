@@ -1506,7 +1506,7 @@
     (pin "1" (uuid d124af53-cc5c-494b-be99-f51e593b1eda))
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL072") (at 71.12 191.77 0) (mirror x) (unit 2)
+  (symbol (lib_id "Amplifier_Operational:TL072") (at 71.12 191.77 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 7dc609d0-a945-4486-8800-04d310d8738b)
     (property "Reference" "U6" (id 0) (at 72.39 187.96 0))
@@ -1591,7 +1591,7 @@
     (pin "2" (uuid 97a78402-9ac4-45e2-b0ec-f43258517561))
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL072") (at 71.12 133.35 0) (mirror x) (unit 1)
+  (symbol (lib_id "Amplifier_Operational:TL072") (at 71.12 133.35 0) (mirror x) (unit 2)
     (in_bom yes) (on_board yes)
     (uuid 929e7156-a1d5-41da-b272-4566fba4c822)
     (property "Reference" "U6" (id 0) (at 73.66 129.54 0))
