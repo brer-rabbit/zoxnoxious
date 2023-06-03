@@ -6499,7 +6499,7 @@
       (reference "R23") (unit 1) (value "110k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/6e9d8a8d-869b-434b-add6-a26546b8d844"
-      (reference "R24") (unit 1) (value "10k") (footprint "Resistor_SMD:R_1206_3216Metric")
+      (reference "R24") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0603_1608Metric")
     )
     (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/e29764e5-8b96-45ae-a36d-fb118076be89"
       (reference "R25") (unit 1) (value "20k") (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -6750,16 +6750,16 @@
     (path "/21c330a6-81e4-425c-af85-d172a479efcb/c343db17-7d70-4564-a671-0570769b84a7"
       (reference "TP7") (unit 1) (value "TestPoint") (footprint "TestPoint:TestPoint_Pad_1.5x1.5mm")
     )
-    (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/ef7e966d-6735-45c4-b038-59a7a7c2c8f4"
+    (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/0511e559-7a48-4715-b1e7-20d92c775a1f"
       (reference "U1") (unit 1) (value "TL074") (footprint "Package_SO:TSSOP-14_4.4x5mm_P0.65mm")
     )
-    (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/0511e559-7a48-4715-b1e7-20d92c775a1f"
+    (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/ef7e966d-6735-45c4-b038-59a7a7c2c8f4"
       (reference "U1") (unit 2) (value "TL074") (footprint "Package_SO:TSSOP-14_4.4x5mm_P0.65mm")
     )
-    (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/fc8556be-56d4-43a3-a4ca-13e237271883"
+    (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/9d4405d2-6321-481f-9190-0c6c4b37c283"
       (reference "U1") (unit 3) (value "TL074") (footprint "Package_SO:TSSOP-14_4.4x5mm_P0.65mm")
     )
-    (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/9d4405d2-6321-481f-9190-0c6c4b37c283"
+    (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/fc8556be-56d4-43a3-a4ca-13e237271883"
       (reference "U1") (unit 4) (value "TL074") (footprint "Package_SO:TSSOP-14_4.4x5mm_P0.65mm")
     )
     (path "/aeb7338b-a37f-4681-9a79-7ea87a0a2e97/6d747897-097b-44b7-8c7b-aefc33167b01"
