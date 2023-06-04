@@ -989,7 +989,7 @@
     (uuid f9cdf5da-db86-4b3a-a169-cee2874bc0ff)
   )
 
-  (label "SAW_MIX_DAC" (at 114.3 48.26 180)
+  (label "SAW_MIX_DAC" (at 114.3 66.04 180)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 1f34e00c-0462-44de-9867-240adfee9844)
   )
@@ -1017,7 +1017,7 @@
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 5648be1d-ab9a-40ff-8a01-1dd4c1197e3c)
   )
-  (label "TRI_MIX_DAC" (at 114.3 66.04 180)
+  (label "TRI_MIX_DAC" (at 114.3 48.26 180)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid 596940d7-003f-4537-88d0-2bea108058b8)
   )
