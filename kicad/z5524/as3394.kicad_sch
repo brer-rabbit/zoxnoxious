@@ -1959,7 +1959,7 @@
     (property "Value" "4u7" (id 1) (at 119.38 157.48 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Capacitor_THT:CP_Radial_D4.0mm_P1.50mm" (id 2) (at 126.6952 158.75 0)
+    (property "Footprint" "Capacitor_THT:CP_Radial_D4.0mm_P2.00mm" (id 2) (at 126.6952 158.75 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 125.73 154.94 0)
