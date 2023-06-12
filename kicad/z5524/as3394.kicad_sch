@@ -1206,8 +1206,8 @@
     (uuid fdfd50ca-a523-46f3-803a-b05fbd050933)
   )
 
-  (text "While the output is centered around 0V, this isn't optimal\nfor the AS3394 secondary in.  Hence the trim pot."
-    (at 57.15 71.12 0)
+  (text "EWhile the output is centered around 0V, this isn't optimal\nfor the AS3394 secondary in.  Hence the trim pot.\nAt least, that's what happens on the breadboard."
+    (at 21.59 63.5 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 3437c676-6822-41aa-9d29-14ec8739d08b)
   )
@@ -2539,7 +2539,7 @@
     (property "Datasheet" "~" (at 146.05 92.71 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "" (at 146.05 92.71 0)
+    (property "LCSC Part" "C23193" (at 146.05 92.71 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 06c435ae-3152-44c2-9bfe-b6338b4ba748))
