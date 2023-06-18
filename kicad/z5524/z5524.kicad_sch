@@ -3665,7 +3665,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 80ca50ff-3389-4a57-a82c-8960b2891beb)
   )
-  (text "Load: -19mA" (at 68.58 261.62 0)
+  (text "Load: -19mA" (at 68.58 262.89 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 8aa2a4fd-8c15-4dc9-be2f-d25c483e33fa)
   )
