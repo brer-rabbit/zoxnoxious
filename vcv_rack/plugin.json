@@ -1,5 +1,5 @@
 {
-  "slug": "Zoxnoxious-HWInterface",
+  "slug": "Zoxnoxious",
   "name": "Zoxnoxious Hardware Interface",
   "version": "2.0.0",
   "license": "Apache-2.0",
@@ -38,6 +38,12 @@
         "Hardware",
         "VCF"
       ]
+    },
+    {
+      "slug": "Zoxnoxious5524",
+      "name": "Zoxnoxious5524",
+      "description": "",
+      "tags": []
     }
   ]
 }

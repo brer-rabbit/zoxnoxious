@@ -51,6 +51,7 @@ void init(Plugin* p) {
 	// Add modules here
         p->addModel(modelZoxnoxious3340);
         p->addModel(modelZoxnoxious3372);
+        p->addModel(modelZoxnoxious5524);
         p->addModel(modelPatchingMatrix);
 
 	// Any other plugin initialization may go here.
