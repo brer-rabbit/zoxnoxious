@@ -55,8 +55,6 @@ struct Zoxnoxious5524 : Module {
         OUTPUTS_LEN
     };
     enum LightId {
-        LEFT_EXPANDER_LIGHT_LIGHT,
-        RIGHT_EXPANDER_LIGHT_LIGHT,
         VCO_ONE_VOCT_CLIP_LIGHT,
         VCO_ONE_PW_CLIP_LIGHT,
         VCO_ONE_LINEAR_CLIP_LIGHT,
@@ -217,9 +215,115 @@ struct Zoxnoxious5524 : Module {
         lightDivider.setDivision(512);
     }
 
-	void process(const ProcessArgs& args) override {
-            processExpander(args);
+    void process(const ProcessArgs& args) override {
+        processExpander(args);
+
+        if (lightDivider.process()) {
+            lights[VCO_TWO_WAVE_PULSE_BUTTON_LIGHT].setBrightness(
+                params[VCO_TWO_WAVE_PULSE_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_TWO_WAVE_SAW_BUTTON_LIGHT].setBrightness(
+                params[VCO_TWO_WAVE_SAW_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_TWO_WAVE_TRI_BUTTON_LIGHT].setBrightness(
+                params[VCO_TWO_WAVE_TRI_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_ONE_TO_EXP_FM_VCO_TWO_BUTTON_LIGHT].setBrightness(
+                params[VCO_ONE_TO_EXP_FM_VCO_TWO_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_ONE_TO_WAVE_SELECT_VCO_TWO_BUTTON_LIGHT].setBrightness(
+                params[VCO_ONE_TO_WAVE_SELECT_VCO_TWO_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_LIGHT].setBrightness(
+                params[VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_TWO_TO_SOFT_SYNC_VCO_ONE_BUTTON_LIGHT].setBrightness(
+                params[VCO_TWO_TO_SOFT_SYNC_VCO_ONE_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_ONE_TO_PW_VCO_TWO_BUTTON_LIGHT].setBrightness(
+                params[VCO_ONE_TO_PW_VCO_TWO_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_ONE_TO_VCF_BUTTON_LIGHT].setBrightness(
+                params[VCO_ONE_TO_VCF_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_TWO_TO_PW_VCO_ONE_BUTTON_LIGHT].setBrightness(
+                params[VCO_TWO_TO_PW_VCO_ONE_BUTTON_PARAM].getValue() > 0.f
+            );
+
+            lights[VCO_TWO_TO_HARD_SYNC_VCO_ONE_BUTTON_LIGHT].setBrightness(
+                params[VCO_TWO_TO_HARD_SYNC_VCO_ONE_BUTTON_PARAM].getValue() > 0.f
+            );
+
+
+            // clipping lights and timers
+            const float lightTime = args.sampleTime * lightDivider.getDivision();
+            const float brightnessDeltaTime = 1 / lightTime;
+
+            vcoOneVoctClipTimer -= lightTime;
+            lights[VCO_ONE_VOCT_CLIP_LIGHT].setBrightnessSmooth(vcoOneVoctClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoOnePwClipTimer -= lightTime;
+            lights[VCO_ONE_PW_CLIP_LIGHT].setBrightnessSmooth(vcoOnePwClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoOneLinearClipTimer -= lightTime;
+            lights[VCO_ONE_LINEAR_CLIP_LIGHT].setBrightnessSmooth(vcoOneLinearClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoTwoVoctClipTimer -= lightTime;
+            lights[VCO_TWO_VOCT_CLIP_LIGHT].setBrightnessSmooth(vcoTwoVoctClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoTwoPwClipTimer -= lightTime;
+            lights[VCO_TWO_PW_CLIP_LIGHT].setBrightnessSmooth(vcoTwoPwClipTimer > 0.f, brightnessDeltaTime);
+
+            vcfCutoffClipTimer -= lightTime;
+            lights[VCF_CUTOFF_CLIP_LIGHT].setBrightnessSmooth(vcfCutoffClipTimer > 0.f, brightnessDeltaTime);
+
+            vcfResonanceClipTimer -= lightTime;
+            lights[VCF_RESONANCE_CLIP_LIGHT].setBrightnessSmooth(vcfResonanceClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoMixClipTimer -= lightTime;
+            lights[VCO_MIX_CLIP_LIGHT].setBrightnessSmooth(vcoMixClipTimer > 0.f, brightnessDeltaTime);
+
+            finalGainClipTimer -= lightTime;
+            lights[FINAL_GAIN_CLIP_LIGHT].setBrightnessSmooth(finalGainClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoOnePulseClipTimer -= lightTime;
+            lights[VCO_ONE_PULSE_CLIP_LIGHT].setBrightnessSmooth(vcoOnePulseClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoOneTriangleClipTimer -= lightTime;
+            lights[VCO_ONE_TRIANGLE_CLIP_LIGHT].setBrightnessSmooth(vcoOneTriangleClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoOneSawClipTimer -= lightTime;
+            lights[VCO_ONE_SAW_CLIP_LIGHT].setBrightnessSmooth(vcoOneSawClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoOneModAmountClipTimer -= lightTime;
+            lights[VCO_ONE_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(vcoOneModAmountClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoTwoModAmountClipTimer -= lightTime;
+            lights[VCO_TWO_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(vcoTwoModAmountClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoTwoWaveshapeTzfmClipTimer -= lightTime;
+            lights[VCO_TWO_WAVESHAPE_TZFM_CLIP_LIGHT].setBrightnessSmooth(vcoTwoWaveshapeTzfmClipTimer > 0.f, brightnessDeltaTime);
+
+            vcoTwoTriVcfClipTimer -= lightTime;
+            lights[VCO_TWO_TRI_VCF_CLIP_LIGHT].setBrightnessSmooth(vcoTwoTriVcfClipTimer > 0.f, brightnessDeltaTime);
+
+            setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
+            setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
+
 	}
+
+    }
+
+
 };
 
 
