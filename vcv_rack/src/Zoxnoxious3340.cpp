@@ -339,6 +339,30 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     }
 
 
+
+    /** getCardHardwareId
+     * return the hardware Id of the 3340 card
+     */
+    static const uint8_t hardwareId = 0x02;
+    uint8_t getHardwareId() override {
+        return hardwareId;
+    }
+
+
+    void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) override {
+        ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
+        output1NameString = getCardOutputName(hardwareId, 1, slot);
+        output2NameString = getCardOutputName(hardwareId, 2, slot);
+    }
+
+    void onChannelAssignmentLost() override {
+        ZoxnoxiousModule::onChannelAssignmentLost();
+        output1NameString = invalidCardOutputName;
+        output2NameString = invalidCardOutputName;
+    }
+
+
+    private:
     void sendOrQueueMidiMessage(ZoxnoxiousControlMsg *controlMsg, int newValue, int index) {
         if (buttonParamToMidiProgramList[index].previousValue != newValue) {
             buttonParamToMidiProgramList[index].previousValue = newValue;
@@ -363,28 +387,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                 INFO("Zoxnoxioius3340: dropping MIDI message, bus full and queue full");
             }
         }
-    }
-
-
-    /** getCardHardwareId
-     * return the hardware Id of the 3340 card
-     */
-    static const uint8_t hardwareId = 0x02;
-    uint8_t getHardwareId() override {
-        return hardwareId;
-    }
-
-
-    void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) override {
-        ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
-        output1NameString = getCardOutputName(hardwareId, 1, slot);
-        output2NameString = getCardOutputName(hardwareId, 2, slot);
-    }
-
-    void onChannelAssignmentLost() override {
-        ZoxnoxiousModule::onChannelAssignmentLost();
-        output1NameString = invalidCardOutputName;
-        output2NameString = invalidCardOutputName;
     }
 
 };

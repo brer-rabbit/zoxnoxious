@@ -1,7 +1,12 @@
 #include "plugin.hpp"
+#include "zcomponentlib.hpp"
+#include "ZoxnoxiousExpander.hpp"
 
 
-struct Zoxnoxious5524 : Module {
+const static int midiMessageQueueMaxSize = 16;
+
+
+struct Zoxnoxious5524 : ZoxnoxiousModule {
     enum ParamId {
         VCO_ONE_VOCT_KNOB_PARAM,
         VCO_ONE_PW_KNOB_PARAM,
@@ -324,88 +329,306 @@ struct Zoxnoxious5524 : Module {
     }
 
 
+
+    /** processZoxnoxiousControl
+     *
+     * add our control voltage values to the control message.  Add or queue any MIDI message.
+     *
+     */
+    void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
+
+        if (!hasChannelAssignment) {
+            return;
+        }
+
+        // if we have any queued midi messages, send them if possible
+        if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
+            //INFO("zoxnoxious3340: clock %" PRId64 " : bus is open, popping MIDI message from queue", APP->engine->getFrame());
+            controlMsg->midiMessageSet = true;
+            controlMsg->midiMessage = midiMessageQueue.front();
+            midiMessageQueue.pop_front();
+        }
+
+
+        // Any buttons params pushed need to send midi events.  Send directly or queue.
+        for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
+            int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
+            sendOrQueueMidiMessage(controlMsg, newValue, i);
+        }
+
+
+        float v;
+        const float clipTime = 0.25f;
+
+
+        // 3394 Triangle to VCF
+        v = params[VCO_TWO_TRI_VCF_KNOB_PARAM].getValue() + inputs[VCO_TWO_TRI_VCF_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 15] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 15] != v) {
+            vcoTwoTriVcfClipTimer = clipTime;
+        }
+
+        // 3394 Waveshaped output to 2130 FM
+        v = params[VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM].getValue() + inputs[VCO_TWO_WAVESHAPE_TZFM_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 14] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 14] != v) {
+            vcoTwoWaveshapeTzfmClipTimer = clipTime;
+        }
+
+        // 3394 Mod Amount VCA
+        v = params[VCO_TWO_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[VCO_TWO_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 13] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 13] != v) {
+            vcoTwoModAmountClipTimer = clipTime;
+        }
+
+        // 2130 Mod Amount VCA
+        v = params[VCO_ONE_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[VCO_ONE_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 12] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 12] != v) {
+            vcoOneModAmountClipTimer = clipTime;
+        }
+
+        // 2130 Saw Level
+        v = params[VCO_ONE_SAW_KNOB_PARAM].getValue() + inputs[VCO_ONE_SAW_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 11] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 11] != v) {
+            vcoOneSawClipTimer = clipTime;
+        }
+
+        // 2130 Triangle Level
+        v = params[VCO_ONE_TRIANGLE_KNOB_PARAM].getValue() + inputs[VCO_ONE_TRIANGLE_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 10] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 10] != v) {
+            vcoOneTriangleClipTimer = clipTime;
+        }
+
+        // 2130 Pulse Level
+        v = params[VCO_ONE_PULSE_KNOB_PARAM].getValue() + inputs[VCO_ONE_PULSE_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 9] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 9] != v) {
+            vcoOnePulseClipTimer = clipTime;
+        }
+
+        // Final Gain VCA on 3394
+        v = params[FINAL_GAIN_KNOB_PARAM].getValue() + inputs[FINAL_GAIN_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 8] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 8] != v) {
+            finalGainClipTimer = clipTime;
+        }
+
+        // VCO One / VCO Two Mix to filter on 3394
+        v = params[VCO_MIX_KNOB_PARAM].getValue() + inputs[VCO_MIX_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 7] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 7] != v) {
+            vcoMixClipTimer = clipTime;
+        }
+
+        // 3394 VCF Resonance
+        v = params[VCF_RESONANCE_KNOB_PARAM].getValue() + inputs[VCF_RESONANCE_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 6] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 6] != v) {
+            vcfResonanceClipTimer = clipTime;
+        }
+
+        // 3394 VCF Cutoff
+        v = params[VCF_CUTOFF_KNOB_PARAM].getValue() + inputs[VCF_CUTOFF_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 5] != v) {
+            vcfCutoffClipTimer = clipTime;
+        }
+
+        // VCO Two PW
+        v = params[VCO_TWO_PW_KNOB_PARAM].getValue() + inputs[VCO_TWO_PW_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 4] != v) {
+            vcoTwoPwClipTimer = clipTime;
+        }
+
+        // VCO Two Volt/Octave
+        v = params[VCO_TWO_VOCT_KNOB_PARAM].getValue() + inputs[VCO_TWO_VOCT_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 3] != v) {
+            vcoTwoVoctClipTimer = clipTime;
+        }
+
+        // VCO One Linear TZFM
+        v = params[VCO_ONE_LINEAR_KNOB_PARAM].getValue() + inputs[VCO_ONE_LINEAR_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 2] != v) {
+            vcoOneLinearClipTimer = clipTime;
+        }
+
+        // VCO One Pulse Width
+        v = params[VCO_ONE_PW_KNOB_PARAM].getValue() + inputs[VCO_ONE_PW_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 1] != v) {
+            vcoOnePwClipTimer = clipTime;
+        }
+
+        // VCO One Volt/Octave
+        v = params[VCO_ONE_VOCT_KNOB_PARAM].getValue() + inputs[VCO_ONE_VOCT_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset] != v) {
+            vcoOneVoctClipTimer = clipTime;
+        }
+
+
+    }
+
+
+    /** getCardHardwareId
+     * return the hardware Id of the 3340 card
+     */
+    static const uint8_t hardwareId = 0x04;
+    uint8_t getHardwareId() override {
+        return hardwareId;
+    }
+
+
+    void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) override {
+        ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
+        output1NameString = getCardOutputName(hardwareId, 1, slot);
+        output2NameString = getCardOutputName(hardwareId, 2, slot);
+    }
+
+    void onChannelAssignmentLost() override {
+        ZoxnoxiousModule::onChannelAssignmentLost();
+        output1NameString = invalidCardOutputName;
+        output2NameString = invalidCardOutputName;
+    }
+
+
+
+    private:
+    void sendOrQueueMidiMessage(ZoxnoxiousControlMsg *controlMsg, int newValue, int index) {
+        if (buttonParamToMidiProgramList[index].previousValue != newValue) {
+            buttonParamToMidiProgramList[index].previousValue = newValue;
+            if (controlMsg->midiMessageSet == false) {
+                // send direct
+                controlMsg->midiMessage.setSize(2);
+                controlMsg->midiMessage.setChannel(midiChannel);
+                controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
+                controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[index].midiProgram[newValue]);
+                controlMsg->midiMessageSet = true;
+                INFO("zoxnoxious3340: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
+            }
+            else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
+                midi::Message queuedMessage;
+                queuedMessage.setSize(2);
+                queuedMessage.setChannel(midiChannel);
+                queuedMessage.setStatus(midiProgramChangeStatus);
+                queuedMessage.setNote(buttonParamToMidiProgramList[index].midiProgram[newValue]);
+                midiMessageQueue.push_back(queuedMessage);
+            }
+            else {
+                INFO("Zoxnoxioius3340: dropping MIDI message, bus full and queue full");
+            }
+        }
+    }
+
+
 };
 
 
 struct Zoxnoxious5524Widget : ModuleWidget {
-	Zoxnoxious5524Widget(Zoxnoxious5524* module) {
-		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/Zoxnoxious5524.svg")));
+    Zoxnoxious5524Widget(Zoxnoxious5524* module) {
+        setModule(module);
+        setPanel(createPanel(asset::plugin(pluginInstance, "res/Zoxnoxious5524.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+        addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+        addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(12.298, 25.908)), module, Zoxnoxious5524::VCO_ONE_VOCT_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.903, 25.908)), module, Zoxnoxious5524::VCO_ONE_PW_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(49.645, 25.908)), module, Zoxnoxious5524::VCO_ONE_LINEAR_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(73.245, 25.908)), module, Zoxnoxious5524::VCO_TWO_VOCT_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(90.987, 25.908)), module, Zoxnoxious5524::VCO_TWO_PW_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.94, 25.908)), module, Zoxnoxious5524::VCF_CUTOFF_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(147.544, 25.908)), module, Zoxnoxious5524::VCF_RESONANCE_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.94, 62.522)), module, Zoxnoxious5524::VCO_MIX_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(147.544, 62.522)), module, Zoxnoxious5524::FINAL_GAIN_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(12.298, 65.704)), module, Zoxnoxious5524::VCO_ONE_PULSE_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(49.645, 65.594)), module, Zoxnoxious5524::VCO_ONE_TRIANGLE_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.903, 65.867)), module, Zoxnoxious5524::VCO_ONE_SAW_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(73.245, 66.311)), module, Zoxnoxious5524::VCO_TWO_WAVE_PULSE_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(90.518, 66.311)), module, Zoxnoxious5524::VCO_TWO_WAVE_SAW_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(107.792, 66.311)), module, Zoxnoxious5524::VCO_TWO_WAVE_TRI_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.971, 100.58)), module, Zoxnoxious5524::VCO_ONE_TO_EXP_FM_VCO_TWO_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(47.31, 100.58)), module, Zoxnoxious5524::VCO_ONE_TO_WAVE_SELECT_VCO_TWO_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(90.846, 100.58)), module, Zoxnoxious5524::VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(110.444, 100.58)), module, Zoxnoxious5524::VCO_TWO_TO_SOFT_SYNC_VCO_ONE_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(12.705, 102.585)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(73.225, 103.172)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.94, 103.172)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(147.045, 103.397)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_KNOB_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.971, 115.486)), module, Zoxnoxious5524::VCO_ONE_TO_PW_VCO_TWO_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(47.31, 115.486)), module, Zoxnoxious5524::VCO_ONE_TO_VCF_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(90.846, 115.486)), module, Zoxnoxious5524::VCO_TWO_TO_PW_VCO_ONE_BUTTON_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(110.444, 115.486)), module, Zoxnoxious5524::VCO_TWO_TO_HARD_SYNC_VCO_ONE_BUTTON_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(12.298, 25.908)), module, Zoxnoxious5524::VCO_ONE_VOCT_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.903, 25.908)), module, Zoxnoxious5524::VCO_ONE_PW_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(49.645, 25.908)), module, Zoxnoxious5524::VCO_ONE_LINEAR_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(73.245, 25.908)), module, Zoxnoxious5524::VCO_TWO_VOCT_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(90.987, 25.908)), module, Zoxnoxious5524::VCO_TWO_PW_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.94, 25.908)), module, Zoxnoxious5524::VCF_CUTOFF_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(147.544, 25.908)), module, Zoxnoxious5524::VCF_RESONANCE_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.94, 62.522)), module, Zoxnoxious5524::VCO_MIX_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(147.544, 62.522)), module, Zoxnoxious5524::FINAL_GAIN_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(12.298, 65.704)), module, Zoxnoxious5524::VCO_ONE_PULSE_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(49.645, 65.594)), module, Zoxnoxious5524::VCO_ONE_TRIANGLE_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.903, 65.867)), module, Zoxnoxious5524::VCO_ONE_SAW_KNOB_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.298, 39.271)), module, Zoxnoxious5524::VCO_ONE_VOCT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.903, 39.271)), module, Zoxnoxious5524::VCO_ONE_PW_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(49.645, 39.271)), module, Zoxnoxious5524::VCO_ONE_LINEAR_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(73.245, 39.271)), module, Zoxnoxious5524::VCO_TWO_VOCT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(90.987, 39.271)), module, Zoxnoxious5524::VCO_TWO_PW_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.94, 39.271)), module, Zoxnoxious5524::VCF_CUTOFF_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.544, 39.271)), module, Zoxnoxious5524::VCF_RESONANCE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.94, 75.884)), module, Zoxnoxious5524::VCO_MIX_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.544, 75.884)), module, Zoxnoxious5524::FINAL_GAIN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.298, 79.066)), module, Zoxnoxious5524::VCO_ONE_PULSE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(49.645, 78.956)), module, Zoxnoxious5524::VCO_ONE_TRIANGLE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.903, 79.229)), module, Zoxnoxious5524::VCO_ONE_SAW_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.705, 115.948)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(73.225, 116.534)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.94, 116.534)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.045, 116.759)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_INPUT));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(12.705, 102.585)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(73.225, 103.172)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(127.94, 103.172)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(147.045, 103.397)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_KNOB_PARAM));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(2.02, 8.219)), module, Zoxnoxious5524::LEFT_EXPANDER_LIGHT_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(160.346, 8.219)), module, Zoxnoxious5524::RIGHT_EXPANDER_LIGHT_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(16.261, 31.798)), module, Zoxnoxious5524::VCO_ONE_VOCT_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(35.865, 31.798)), module, Zoxnoxious5524::VCO_ONE_PW_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(53.608, 31.798)), module, Zoxnoxious5524::VCO_ONE_LINEAR_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(77.208, 31.798)), module, Zoxnoxious5524::VCO_TWO_VOCT_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(94.95, 31.798)), module, Zoxnoxious5524::VCO_TWO_PW_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 31.798)), module, Zoxnoxious5524::VCF_CUTOFF_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.507, 31.798)), module, Zoxnoxious5524::VCF_RESONANCE_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 68.411)), module, Zoxnoxious5524::VCO_MIX_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.507, 68.411)), module, Zoxnoxious5524::FINAL_GAIN_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(16.261, 71.704)), module, Zoxnoxious5524::VCO_ONE_PULSE_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(53.608, 71.593)), module, Zoxnoxious5524::VCO_ONE_TRIANGLE_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(35.866, 71.867)), module, Zoxnoxious5524::VCO_ONE_SAW_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(16.668, 108.585)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(77.188, 109.172)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 109.172)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_CLIP_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.008, 109.286)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_CLIP_LIGHT));
 
-		// mm2px(Vec(18.0, 3.636))
-		addChild(createWidget<Widget>(mm2px(Vec(40.269, 48.012))));
-		// mm2px(Vec(18.0, 3.636))
-		addChild(createWidget<Widget>(mm2px(Vec(139.527, 50.578))));
-	}
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(73.245, 66.311)), module, Zoxnoxious5524::VCO_TWO_WAVE_PULSE_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_WAVE_PULSE_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(90.518, 66.311)), module, Zoxnoxious5524::VCO_TWO_WAVE_SAW_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_WAVE_SAW_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(107.792, 66.311)), module, Zoxnoxious5524::VCO_TWO_WAVE_TRI_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_WAVE_TRI_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(31.971, 100.58)), module, Zoxnoxious5524::VCO_ONE_TO_EXP_FM_VCO_TWO_BUTTON_PARAM, Zoxnoxious5524::VCO_ONE_TO_EXP_FM_VCO_TWO_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(47.31, 100.58)), module, Zoxnoxious5524::VCO_ONE_TO_WAVE_SELECT_VCO_TWO_BUTTON_PARAM, Zoxnoxious5524::VCO_ONE_TO_WAVE_SELECT_VCO_TWO_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(90.846, 100.58)), module, Zoxnoxious5524::VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(110.444, 100.58)), module, Zoxnoxious5524::VCO_TWO_TO_SOFT_SYNC_VCO_ONE_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_TO_SOFT_SYNC_VCO_ONE_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(31.971, 115.486)), module, Zoxnoxious5524::VCO_ONE_TO_PW_VCO_TWO_BUTTON_PARAM, Zoxnoxious5524::VCO_ONE_TO_PW_VCO_TWO_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(47.31, 115.486)), module, Zoxnoxious5524::VCO_ONE_TO_VCF_BUTTON_PARAM, Zoxnoxious5524::VCO_ONE_TO_VCF_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(90.846, 115.486)), module, Zoxnoxious5524::VCO_TWO_TO_PW_VCO_ONE_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_TO_PW_VCO_ONE_BUTTON_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(110.444, 115.486)), module, Zoxnoxious5524::VCO_TWO_TO_HARD_SYNC_VCO_ONE_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_TO_HARD_SYNC_VCO_ONE_BUTTON_LIGHT));
+
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.298, 39.271)), module, Zoxnoxious5524::VCO_ONE_VOCT_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.903, 39.271)), module, Zoxnoxious5524::VCO_ONE_PW_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(49.645, 39.271)), module, Zoxnoxious5524::VCO_ONE_LINEAR_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(73.245, 39.271)), module, Zoxnoxious5524::VCO_TWO_VOCT_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(90.987, 39.271)), module, Zoxnoxious5524::VCO_TWO_PW_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.94, 39.271)), module, Zoxnoxious5524::VCF_CUTOFF_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.544, 39.271)), module, Zoxnoxious5524::VCF_RESONANCE_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.94, 75.884)), module, Zoxnoxious5524::VCO_MIX_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.544, 75.884)), module, Zoxnoxious5524::FINAL_GAIN_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.298, 79.066)), module, Zoxnoxious5524::VCO_ONE_PULSE_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(49.645, 78.956)), module, Zoxnoxious5524::VCO_ONE_TRIANGLE_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.903, 79.229)), module, Zoxnoxious5524::VCO_ONE_SAW_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.705, 115.948)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(73.225, 116.534)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(127.94, 116.534)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(147.045, 116.759)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_INPUT));
+
+        addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.020, 8.219)), module, Zoxnoxious5524::LEFT_EXPANDER_LIGHT));
+        addChild(createLightCentered<TriangleRightLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(160.346, 8.219)), module, Zoxnoxious5524::RIGHT_EXPANDER_LIGHT));
+
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(16.261, 31.798)), module, Zoxnoxious5524::VCO_ONE_VOCT_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(35.865, 31.798)), module, Zoxnoxious5524::VCO_ONE_PW_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(53.608, 31.798)), module, Zoxnoxious5524::VCO_ONE_LINEAR_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(77.208, 31.798)), module, Zoxnoxious5524::VCO_TWO_VOCT_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(94.95, 31.798)), module, Zoxnoxious5524::VCO_TWO_PW_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 31.798)), module, Zoxnoxious5524::VCF_CUTOFF_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.507, 31.798)), module, Zoxnoxious5524::VCF_RESONANCE_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 68.411)), module, Zoxnoxious5524::VCO_MIX_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.507, 68.411)), module, Zoxnoxious5524::FINAL_GAIN_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(16.261, 71.704)), module, Zoxnoxious5524::VCO_ONE_PULSE_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(53.608, 71.593)), module, Zoxnoxious5524::VCO_ONE_TRIANGLE_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(35.866, 71.867)), module, Zoxnoxious5524::VCO_ONE_SAW_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(16.668, 108.585)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(77.188, 109.172)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 109.172)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.008, 109.286)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_CLIP_LIGHT));
+
+        // mm2px(Vec(18.0, 3.636))
+        addChild(createWidget<Widget>(mm2px(Vec(40.269, 48.012))));
+        // mm2px(Vec(18.0, 3.636))
+        addChild(createWidget<Widget>(mm2px(Vec(139.527, 50.578))));
+
+        mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(40.269, 48.012)));
+        mix1OutputTextField->box.size = (mm2px(Vec(18.0, 3.636)));
+        mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
+        addChild(mix1OutputTextField);
+        mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(139.527, 50.578)));
+        mix1OutputTextField->box.size = (mm2px(Vec(18.0, 3.636)));
+        mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
+        addChild(mix1OutputTextField);
+
+
+    }
+
+
+    CardTextDisplay *mix1OutputTextField;
+    CardTextDisplay *mix2OutputTextField;
 };
 
 

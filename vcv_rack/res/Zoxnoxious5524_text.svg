@@ -41,15 +41,15 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="1.0841671"
-     inkscape:cx="291.92917"
-     inkscape:cy="236.58715"
+     inkscape:zoom="0.99204839"
+     inkscape:cx="239.40364"
+     inkscape:cy="263.59601"
      inkscape:window-width="1544"
      inkscape:window-height="881"
-     inkscape:window-x="129"
-     inkscape:window-y="69"
+     inkscape:window-x="4"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      width="71.12mm"
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#cfdee6"
@@ -585,7 +585,7 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="background"
-     style="display:none">
+     style="display:inline">
     <path
        sodipodi:type="star"
        style="fill:none;stroke-width:0.264999"
@@ -632,7 +632,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:none;opacity:1">
+     style="display:inline;opacity:1">
     <path
        style="display:inline;fill:#c7b89b;fill-opacity:1;stroke:#000000;stroke-width:0.158;stroke-dasharray:none;stroke-opacity:1"
        id="rect1316-8"
@@ -1285,6 +1285,70 @@
          id="tspan1272"
          x="42.300274"
          y="96.197838">SELECT</tspan></text>
+    <text
+       xml:space="preserve"
+       style="display:inline;opacity:0.99;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="85.164017"
+       y="92.791336"
+       id="text11629"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan8880"
+         x="85.164017"
+         y="92.791336">FREQ MOD</tspan><tspan
+         sodipodi:role="line"
+         id="tspan8882"
+         x="85.164017"
+         y="96.032173">VCO ONE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="display:inline;opacity:0.99;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="102.92636"
+       y="95.774094"
+       id="text3638-6-08-7"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan11178"
+         x="102.92636"
+         y="95.774094">SOFT SYNC</tspan></text>
+    <text
+       xml:space="preserve"
+       style="display:inline;opacity:0.99;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="84.549408"
+       y="109.51043"
+       id="text4000"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan8868"
+         x="84.549408"
+         y="109.51043">PW MOD</tspan><tspan
+         sodipodi:role="line"
+         id="tspan8870"
+         x="84.549408"
+         y="112.75127">VCO ONE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="display:inline;opacity:0.99;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="104.12775"
+       y="109.35853"
+       id="text3638-6-08-7-0"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan7006"
+         x="104.12775"
+         y="109.35853">HARD</tspan><tspan
+         sodipodi:role="line"
+         id="tspan7008"
+         x="104.12775"
+         y="112.59937">SUBSYNC</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -1523,36 +1587,6 @@
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
        inkscape:label="VCO_TWO_WAVESHAPE_TZFM_CLIP" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="102.92636"
-       y="95.774094"
-       id="text3638-6-08-7"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan11178"
-         x="102.92636"
-         y="95.774094">SOFT SYNC</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="104.12775"
-       y="109.35853"
-       id="text3638-6-08-7-0"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan7006"
-         x="104.12775"
-         y="109.35853">HARD</tspan><tspan
-         sodipodi:role="line"
-         id="tspan7008"
-         x="104.12775"
-         y="112.59937">SUBSYNC</tspan></text>
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3-9-2-5-4"
        data-name="Tempo#RoundLargeBlackKnob"
@@ -1595,32 +1629,6 @@
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
        inkscape:label="VCO_TWO_MOD_AMOUNT_CLIP" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="85.164017"
-       y="92.791336"
-       id="text11629"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan8880">FREQ MOD</tspan><tspan
-         sodipodi:role="line"
-         id="tspan8882">VCO ONE</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="84.549408"
-       y="109.51043"
-       id="text4000"
-       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
-       inkscape:export-xdpi="600.01202"
-       inkscape:export-ydpi="600.01202"><tspan
-         sodipodi:role="line"
-         id="tspan8868">PW MOD</tspan><tspan
-         sodipodi:role="line"
-         id="tspan8870">VCO ONE</tspan></text>
     <circle
        id="circle4006"
        data-name="Tempo#RoundLargeBlackKnob"
@@ -1876,15 +1884,6 @@
        style="display:inline;opacity:0.9801;fill:#ff00ff;stroke-width:0.264583"
        inkscape:label="VCO_TWO_VOCT_CLIP" />
     <rect
-       id="f9b09e17-fc78-4216-9b09-40d2874876ff-0-4-3"
-       data-name="Screen"
-       y="50.578159"
-       width="18"
-       height="3.636193"
-       x="139.52673"
-       style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713581"
-       inkscape:label="OUT1_TEXT" />
-    <rect
        id="rect6022"
        data-name="Screen"
        y="48.012035"
@@ -1893,5 +1892,14 @@
        x="40.268639"
        style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713581"
        inkscape:label="OUT2_TEXT" />
+    <rect
+       id="f9b09e17-fc78-4216-9b09-40d2874876ff-0-4-3"
+       data-name="Screen"
+       y="50.578159"
+       width="18"
+       height="3.636193"
+       x="139.52673"
+       style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713581"
+       inkscape:label="OUT1_TEXT" />
   </g>
 </svg>
