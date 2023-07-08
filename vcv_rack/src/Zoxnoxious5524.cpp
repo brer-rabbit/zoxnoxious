@@ -164,7 +164,9 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         vcoOneModAmountClipTimer(0.f),
         vcoTwoModAmountClipTimer(0.f),
         vcoTwoWaveshapeTzfmClipTimer(0.f),
-        vcoTwoTriVcfClipTimer(0.f) {
+        vcoTwoTriVcfClipTimer(0.f),
+        output1NameString(invalidCardOutputName),
+        output2NameString(invalidCardOutputName) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(VCO_ONE_VOCT_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 8.f);
@@ -609,19 +611,16 @@ struct Zoxnoxious5524Widget : ModuleWidget {
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 109.172)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.008, 109.286)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_CLIP_LIGHT));
 
-        // mm2px(Vec(18.0, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(40.269, 48.012))));
-        // mm2px(Vec(18.0, 3.636))
-        addChild(createWidget<Widget>(mm2px(Vec(139.527, 50.578))));
 
         mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(40.269, 48.012)));
         mix1OutputTextField->box.size = (mm2px(Vec(18.0, 3.636)));
         mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
         addChild(mix1OutputTextField);
-        mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(139.527, 50.578)));
-        mix1OutputTextField->box.size = (mm2px(Vec(18.0, 3.636)));
-        mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
-        addChild(mix1OutputTextField);
+
+        mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(139.527, 50.578)));
+        mix2OutputTextField->box.size = (mm2px(Vec(18.0, 3.636)));
+        mix2OutputTextField->setText(module ? &module->output1NameString : NULL);
+        addChild(mix2OutputTextField);
 
 
     }

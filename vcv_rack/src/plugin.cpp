@@ -35,6 +35,9 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
     else if (cardId == 0x03) {
         cardName = "3372 VCF";
     }
+    else if (cardId == 0x04) {
+        cardName = "5524 Out";
+    }
     else {
         return "----";
     }

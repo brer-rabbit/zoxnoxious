@@ -42,14 +42,14 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="0.99204839"
-     inkscape:cx="239.40364"
-     inkscape:cy="263.59601"
+     inkscape:cx="265.10804"
+     inkscape:cy="205.13112"
      inkscape:window-width="1544"
      inkscape:window-height="881"
      inkscape:window-x="4"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      width="71.12mm"
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#cfdee6"
@@ -1317,9 +1317,9 @@
          y="95.774094">SOFT SYNC</tspan></text>
     <text
        xml:space="preserve"
-       style="display:inline;opacity:0.99;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        x="84.549408"
-       y="109.51043"
+       y="108.45824"
        id="text4000"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
@@ -1327,16 +1327,16 @@
          sodipodi:role="line"
          id="tspan8868"
          x="84.549408"
-         y="109.51043">PW MOD</tspan><tspan
+         y="108.45824">PW MOD</tspan><tspan
          sodipodi:role="line"
          id="tspan8870"
          x="84.549408"
-         y="112.75127">VCO ONE</tspan></text>
+         y="111.69908">VCO ONE</tspan></text>
     <text
        xml:space="preserve"
-       style="display:inline;opacity:0.99;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        x="104.12775"
-       y="109.35853"
+       y="108.41901"
        id="text3638-6-08-7-0"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        inkscape:export-xdpi="600.01202"
@@ -1344,11 +1344,11 @@
          sodipodi:role="line"
          id="tspan7006"
          x="104.12775"
-         y="109.35853">HARD</tspan><tspan
+         y="108.41901">HARD</tspan><tspan
          sodipodi:role="line"
          id="tspan7008"
          x="104.12775"
-         y="112.59937">SUBSYNC</tspan></text>
+         y="111.65984">SUBSYNC</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
