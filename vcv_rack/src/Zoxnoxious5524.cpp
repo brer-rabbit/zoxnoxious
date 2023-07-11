@@ -625,7 +625,6 @@ struct Zoxnoxious5524Widget : ModuleWidget {
 
     }
 
-
     CardTextDisplay *mix1OutputTextField;
     CardTextDisplay *mix2OutputTextField;
 };

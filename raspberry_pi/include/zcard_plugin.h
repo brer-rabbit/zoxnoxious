@@ -47,12 +47,12 @@ extern zlog_category_t *zlog_c;
 struct zhost;
 struct zhost* zhost_create();
 
-/* get_spi_handle
+/* set_spi_interface
  * must be called by plugin prior any function's spiWrite() or when changing spi mode changes
  * in a function.  Wraps/caches pigpio spiOpen and provides a return consistent with spiOpen.
  * A valid handle can be used for pigpio's spiWrite.  Do not close the handle.
  */
-int set_spi_interface(struct zhost *zhost, int spi_mode, int slot);
+int set_spi_interface(struct zhost *zhost, unsigned int spi_channel, unsigned int spi_mode, int slot);
 
 
 

@@ -16,7 +16,6 @@
 #include "zcard_plugin.h"
 
 #define SPI_RATE 12000000
-#define SPI_CHANNEL 0
 
 #define INITIAL_SPI_FLAGS 1
 #define INITIAL_SLOT 5
@@ -27,20 +26,27 @@
 #define MUXOUT_2 26
 
 
+#define NUM_SPI_CHIP_SELECTS 2
+
 /* zlog loggin' */
 zlog_category_t *zlog_c = NULL;
 
+struct spi_device {
+    int spi_flags;
+    int spi_handle;
+};
 
 struct zhost {
-  int spi_flags;
-  int active_slot;
-  int spi_handle;
+    struct spi_device spi_devices[NUM_SPI_CHIP_SELECTS];
+    int active_slot;
+//    int spi_flags;
+//    int spi_handle;
 };
 
 
 struct gpio_pin_value_tuple {
-  unsigned int gpio;
-  unsigned int level;
+    unsigned int gpio;
+    unsigned int level;
 };
 
 // mind bit ordering here vs usage...MSB is a thing
@@ -88,42 +94,47 @@ struct zhost* zhost_create() {
   }
 
   zhost->active_slot = INITIAL_SLOT;
-  zhost->spi_flags = INITIAL_SPI_FLAGS;
-  if ((zhost->spi_handle = spiOpen(0, SPI_RATE, zhost->spi_flags)) < 0) {
-    ERROR("failed to open SPI");
-    free(zhost);
-    return NULL;
+  for (int i = 0; i < NUM_SPI_CHIP_SELECTS; ++i) {
+      zhost->spi_devices[i].spi_flags = INITIAL_SPI_FLAGS;
+      if ((zhost->spi_devices[i].spi_handle = spiOpen(0, SPI_RATE, zhost->spi_devices[i].spi_flags)) < 0) {
+          ERROR("failed to open SPI channel %d", i);
+          free(zhost);
+          return NULL;
+      }
   }
+
 
   return zhost;
 }
 
 
-int set_spi_interface(struct zhost *zhost, int spi_flags, int slot) {
+int set_spi_interface(struct zhost *zhost, unsigned int spi_channel, unsigned int spi_flags, int slot) {
 
-  if (zhost->active_slot != slot) {
-    // change GPIOs to the slot
-    if (gpioWrite(pin_value_tuple[slot][0].gpio, pin_value_tuple[slot][0].level) ||
-        gpioWrite(pin_value_tuple[slot][1].gpio, pin_value_tuple[slot][1].level) ||
-        gpioWrite(pin_value_tuple[slot][2].gpio, pin_value_tuple[slot][2].level)) {
-      ERROR("gpio write failed");
-      return -1;  // valid spi handle is >= 0
+    assert(spi_channel < NUM_SPI_CHIP_SELECTS);
+
+    if (zhost->active_slot != slot) {
+        // change GPIOs to the slot
+        if (gpioWrite(pin_value_tuple[slot][0].gpio, pin_value_tuple[slot][0].level) ||
+            gpioWrite(pin_value_tuple[slot][1].gpio, pin_value_tuple[slot][1].level) ||
+            gpioWrite(pin_value_tuple[slot][2].gpio, pin_value_tuple[slot][2].level)) {
+            ERROR("gpio write failed");
+            return -1;  // valid spi handle is >= 0
+        }
+        zhost->active_slot = slot;
     }
-    zhost->active_slot = slot;
-  }
 
 
-  // get a SPI handle- return the existing one if it's a match
-  if (zhost->spi_flags != spi_flags) {
-    if ( spiClose(zhost->spi_handle) != 0 ) {
-      ERROR("spiClose failed");
+    // get a SPI handle- return the existing one if it's a match
+    if (zhost->spi_devices[spi_channel].spi_flags != spi_flags) {
+        if ( spiClose(zhost->spi_devices[spi_channel].spi_handle) != 0 ) {
+            ERROR("spiClose failed");
+        }
+        if ( (zhost->spi_devices[spi_channel].spi_handle =
+              spiOpen(spi_channel, SPI_RATE, spi_flags)) < 0) {
+            ERROR("spiOpen failed");
+        }
+        zhost->spi_devices[spi_channel].spi_flags = spi_flags;
     }
-    if ( (zhost->spi_handle = spiOpen(SPI_CHANNEL, SPI_RATE, spi_flags)) < 0) {
-      ERROR("spiOpen failed");
-    }
-    zhost->spi_flags = spi_flags;
-  }
-  
 
-  return zhost->spi_handle;
+    return zhost->spi_devices[spi_channel].spi_handle;
 }
