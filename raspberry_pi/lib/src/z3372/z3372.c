@@ -27,7 +27,7 @@
 #define SPI_MODE 1
 
 // chip select zero
-#define SPI_CHANNEL 1
+#define SPI_CHANNEL 0
 
 #define NUM_CHANNELS 7
 
