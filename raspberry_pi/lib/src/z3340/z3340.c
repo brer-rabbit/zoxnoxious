@@ -25,6 +25,7 @@
 // DAC: Analog Devices AD5328
 // https://www.analog.com/media/en/technical-documentation/data-sheets/ad5308_5318_5328.pdf
 #define SPI_MODE 1
+#define SPI_CHANNEL 0 // chip select zero
 
 struct z3340_card {
   struct zhost *zhost;
@@ -86,7 +87,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
   }
 
   // configure DAC
-  spi_channel = set_spi_interface(zhost, SPI_MODE, slot);
+  spi_channel = set_spi_interface(zhost, SPI_CHANNEL, SPI_MODE, slot);
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
@@ -126,7 +127,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   char samples_to_dac[2];
   int spi_channel;
 
-  spi_channel = set_spi_interface(zcard->zhost, SPI_MODE, zcard->slot);
+  spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
 
   for (int i = 0; i < 6; ++i) {
     if (zcard->previous_samples[i] != samples[i] ) {
