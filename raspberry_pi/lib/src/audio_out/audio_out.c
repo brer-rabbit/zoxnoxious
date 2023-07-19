@@ -22,6 +22,8 @@
 // DAC: MCP4822
 #define SPI_MODE 0
 
+// chip select 0
+#define SPI_CHANNEL 0
 
 struct audio_out_card {
   struct zhost *zhost;
@@ -100,7 +102,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   char samples_to_dac[2];
   int spi_channel;
 
-  spi_channel = set_spi_interface(zcard->zhost, SPI_MODE, zcard->slot);
+  spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
 
   for (int i = 0; i < 2; ++i) {
     if (zcard->previous_samples[i] != samples[i] ) {

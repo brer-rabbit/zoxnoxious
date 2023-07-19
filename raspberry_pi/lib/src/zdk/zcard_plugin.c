@@ -96,7 +96,7 @@ struct zhost* zhost_create() {
   zhost->active_slot = INITIAL_SLOT;
   for (int i = 0; i < NUM_SPI_CHIP_SELECTS; ++i) {
       zhost->spi_devices[i].spi_flags = INITIAL_SPI_FLAGS;
-      if ((zhost->spi_devices[i].spi_handle = spiOpen(0, SPI_RATE, zhost->spi_devices[i].spi_flags)) < 0) {
+      if ((zhost->spi_devices[i].spi_handle = spiOpen(i, SPI_RATE, zhost->spi_devices[i].spi_flags)) < 0) {
           ERROR("failed to open SPI channel %d", i);
           free(zhost);
           return NULL;
