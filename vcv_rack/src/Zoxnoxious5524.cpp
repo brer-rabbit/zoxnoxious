@@ -38,22 +38,25 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         PARAMS_LEN
     };
     enum InputId {
+        // inputs are in DAC order from schematic
+        // DAC AS3394 / SPI chip select 0
+        VCO_MIX_INPUT,
+        VCO_TWO_PW_INPUT,
+        FINAL_GAIN_INPUT,
+        VCO_TWO_TRI_VCF_INPUT,
+        VCF_RESONANCE_INPUT,
+        VCO_ONE_MOD_AMOUNT_INPUT,
+        VCO_TWO_VOCT_INPUT,
+        VCF_CUTOFF_INPUT,
+        // DAC SSI2130 / SPI chip select 1
+        VCO_ONE_TRIANGLE_INPUT,
+        VCO_ONE_LINEAR_INPUT,
         VCO_ONE_VOCT_INPUT,
         VCO_ONE_PW_INPUT,
-        VCO_ONE_LINEAR_INPUT,
-        VCO_TWO_VOCT_INPUT,
-        VCO_TWO_PW_INPUT,
-        VCF_CUTOFF_INPUT,
-        VCF_RESONANCE_INPUT,
-        VCO_MIX_INPUT,
-        FINAL_GAIN_INPUT,
-        VCO_ONE_PULSE_INPUT,
-        VCO_ONE_TRIANGLE_INPUT,
-        VCO_ONE_SAW_INPUT,
-        VCO_ONE_MOD_AMOUNT_INPUT,
-        VCO_TWO_MOD_AMOUNT_INPUT,
         VCO_TWO_WAVESHAPE_TZFM_INPUT,
-        VCO_TWO_TRI_VCF_INPUT,
+        VCO_TWO_MOD_AMOUNT_INPUT,
+        VCO_ONE_PULSE_INPUT,
+        VCO_ONE_SAW_INPUT,
         INPUTS_LEN
     };
     enum OutputId {
@@ -119,6 +122,15 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
 
     // mapping button switches to send MIDI program changes.
 
+    // VCO2 Saw and Tri params send a single MIDI prog change
+    // these aren't actually used -- the values end up being calculated.
+    // kept here for the hell of it.
+    const uint8_t vcoTwoSawOffTriOff = 0;
+    const uint8_t vcoTwoSawOffTriOn  = 1;
+    const uint8_t vcoTwoSawOnTriOff  = 2;
+    const uint8_t vcoTwoSawOnTriOn   = 3;
+    uint8_t vcoTwoTriSawPrevState = vcoTwoSawOffTriOff; // init to first program in list
+
     // Detect state changes by tracking previousValue, wiht INT_MIN
     // being an init value (all value will be detected to change first
     // clock cycle).  
@@ -129,23 +141,19 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         uint8_t midiProgram[8];
     } buttonParamToMidiProgramList[15] =
       {
-          { VCO_TWO_WAVE_PULSE_BUTTON_PARAM, INT_MIN, { 0, 1 } },
-          { VCO_TWO_WAVE_SAW_BUTTON_PARAM, INT_MIN, { 2, 3 } },
-          { VCO_TWO_WAVE_TRI_BUTTON_PARAM, INT_MIN, { 4, 5 } },
-          { VCO_ONE_TO_EXP_FM_VCO_TWO_BUTTON_PARAM, INT_MIN, { 6, 7 } },
-          { VCO_ONE_TO_WAVE_SELECT_VCO_TWO_BUTTON_PARAM, INT_MIN, { 8, 9 } },
-          { VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_PARAM, INT_MIN, { 10, 11 } },
-          { VCO_TWO_TO_SOFT_SYNC_VCO_ONE_BUTTON_PARAM, INT_MIN, { 12, 13 } },
-          { VCO_ONE_MOD_AMOUNT_KNOB_PARAM, INT_MIN, { 14, 15 } },
-          { VCO_TWO_MOD_AMOUNT_KNOB_PARAM, INT_MIN, { 16, 17 } },
-          { VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM, INT_MIN, { 18, 19 } },
-          { VCO_TWO_TRI_VCF_KNOB_PARAM, INT_MIN, { 20, 21 } },
-          { VCO_ONE_TO_PW_VCO_TWO_BUTTON_PARAM, INT_MIN, { 22, 23 } },
-          { VCO_ONE_TO_VCF_BUTTON_PARAM, INT_MIN, { 24, 25 } },
-          { VCO_TWO_TO_PW_VCO_ONE_BUTTON_PARAM, INT_MIN, { 26, 27 } },
-          { VCO_TWO_TO_HARD_SYNC_VCO_ONE_BUTTON_PARAM, INT_MIN, { 28, 29 } }
+          { VCO_ONE_TO_EXP_FM_VCO_TWO_BUTTON_PARAM, INT_MIN, { 4, 5 } },
+          { VCO_ONE_TO_WAVE_SELECT_VCO_TWO_BUTTON_PARAM, INT_MIN, { 6, 7 } },
+          { VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_PARAM, INT_MIN, { 8, 9 } },
+          { VCO_TWO_TO_SOFT_SYNC_VCO_ONE_BUTTON_PARAM, INT_MIN, { 10, 11 } },
+          { VCO_ONE_TO_PW_VCO_TWO_BUTTON_PARAM, INT_MIN, { 12, 13 } },
+          { VCO_ONE_TO_VCF_BUTTON_PARAM, INT_MIN, { 14, 15 } },
+          { VCO_TWO_TO_PW_VCO_ONE_BUTTON_PARAM, INT_MIN, { 16, 17 } },
+          { VCO_TWO_TO_HARD_SYNC_VCO_ONE_BUTTON_PARAM, INT_MIN, { 18, 19 } }
       };
 
+    // VCO Two pulse is enabled/disabled by setting the pulse width to
+    // minimum value.  Track that outside of buttonParamToMidiProgramList.
+    bool vcoTwoPulseEnabled = false;
 
 
     Zoxnoxious5524() :
@@ -345,7 +353,6 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
 
         // if we have any queued midi messages, send them if possible
         if (controlMsg->midiMessageSet == false && midiMessageQueue.size() > 0) {
-            //INFO("zoxnoxious3340: clock %" PRId64 " : bus is open, popping MIDI message from queue", APP->engine->getFrame());
             controlMsg->midiMessageSet = true;
             controlMsg->midiMessage = midiMessageQueue.front();
             midiMessageQueue.pop_front();
@@ -358,23 +365,54 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
             sendOrQueueMidiMessage(controlMsg, newValue, i);
         }
 
+        // convert the params to the MIDI prog change number: 1, 2, 3, 4
+        int vcoTwoSaw = static_cast<int>(std::round(params[VCO_TWO_WAVE_SAW_BUTTON_PARAM].getValue())) * 2;
+        int vcoTwoTri = static_cast<int>(std::round(params[VCO_TWO_WAVE_TRI_BUTTON_PARAM].getValue()));
+        
+        if (vcoTwoSaw + vcoTwoTri != vcoTwoTriSawPrevState) {
+            vcoTwoTriSawPrevState = vcoTwoSaw + vcoTwoTri;
+            // either send the message right now if slot open or queue it
+            if (controlMsg->midiMessageSet == false) {
+                // send direct
+                controlMsg->midiMessage.setSize(2);
+                controlMsg->midiMessage.setChannel(midiChannel);
+                controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
+                controlMsg->midiMessage.setNote(vcoTwoTriSawPrevState);
+                controlMsg->midiMessageSet = true;
+            }
+            else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
+                midi::Message queuedMessage;
+                queuedMessage.setSize(2);
+                queuedMessage.setChannel(midiChannel);
+                queuedMessage.setStatus(midiProgramChangeStatus);
+                queuedMessage.setNote(vcoTwoTriSawPrevState);
+                midiMessageQueue.push_back(queuedMessage);
+            }
+            else {
+                INFO("Zoxnoxioius5524: dropping MIDI message, bus full and queue full");
+            }
+
+        }
+
 
         float v;
         const float clipTime = 0.25f;
 
+        // Sequence of output: this needs to match what the Raspberry
+        // Pi driver expects.  Put the values in that order.
 
-        // 3394 Triangle to VCF
-        v = params[VCO_TWO_TRI_VCF_KNOB_PARAM].getValue() + inputs[VCO_TWO_TRI_VCF_INPUT].getVoltageSum() / 10.f;
+        // 2130 Saw Level
+        v = params[VCO_ONE_SAW_KNOB_PARAM].getValue() + inputs[VCO_ONE_SAW_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 15] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 15] != v) {
-            vcoTwoTriVcfClipTimer = clipTime;
+            vcoOneSawClipTimer = clipTime;
         }
 
-        // 3394 Waveshaped output to 2130 FM
-        v = params[VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM].getValue() + inputs[VCO_TWO_WAVESHAPE_TZFM_INPUT].getVoltageSum() / 10.f;
+        // 2130 Pulse Level
+        v = params[VCO_ONE_PULSE_KNOB_PARAM].getValue() + inputs[VCO_ONE_PULSE_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 14] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 14] != v) {
-            vcoTwoWaveshapeTzfmClipTimer = clipTime;
+            vcoOnePulseClipTimer = clipTime;
         }
 
         // 3394 Mod Amount VCA
@@ -384,103 +422,110 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
             vcoTwoModAmountClipTimer = clipTime;
         }
 
-        // 2130 Mod Amount VCA
-        v = params[VCO_ONE_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[VCO_ONE_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
+        // 3394 Waveshaped output to 2130 FM
+        v = params[VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM].getValue() + inputs[VCO_TWO_WAVESHAPE_TZFM_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[cvChannelOffset + 12] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[cvChannelOffset + 12] != v) {
-            vcoOneModAmountClipTimer = clipTime;
-        }
-
-        // 2130 Saw Level
-        v = params[VCO_ONE_SAW_KNOB_PARAM].getValue() + inputs[VCO_ONE_SAW_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 11] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 11] != v) {
-            vcoOneSawClipTimer = clipTime;
-        }
-
-        // 2130 Triangle Level
-        v = params[VCO_ONE_TRIANGLE_KNOB_PARAM].getValue() + inputs[VCO_ONE_TRIANGLE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 10] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 10] != v) {
-            vcoOneTriangleClipTimer = clipTime;
-        }
-
-        // 2130 Pulse Level
-        v = params[VCO_ONE_PULSE_KNOB_PARAM].getValue() + inputs[VCO_ONE_PULSE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 9] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 9] != v) {
-            vcoOnePulseClipTimer = clipTime;
-        }
-
-        // Final Gain VCA on 3394
-        v = params[FINAL_GAIN_KNOB_PARAM].getValue() + inputs[FINAL_GAIN_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 8] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 8] != v) {
-            finalGainClipTimer = clipTime;
-        }
-
-        // VCO One / VCO Two Mix to filter on 3394
-        v = params[VCO_MIX_KNOB_PARAM].getValue() + inputs[VCO_MIX_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 7] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 7] != v) {
-            vcoMixClipTimer = clipTime;
-        }
-
-        // 3394 VCF Resonance
-        v = params[VCF_RESONANCE_KNOB_PARAM].getValue() + inputs[VCF_RESONANCE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 6] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 6] != v) {
-            vcfResonanceClipTimer = clipTime;
-        }
-
-        // 3394 VCF Cutoff
-        v = params[VCF_CUTOFF_KNOB_PARAM].getValue() + inputs[VCF_CUTOFF_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 5] != v) {
-            vcfCutoffClipTimer = clipTime;
-        }
-
-        // VCO Two PW
-        v = params[VCO_TWO_PW_KNOB_PARAM].getValue() + inputs[VCO_TWO_PW_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 4] != v) {
-            vcoTwoPwClipTimer = clipTime;
-        }
-
-        // VCO Two Volt/Octave
-        v = params[VCO_TWO_VOCT_KNOB_PARAM].getValue() + inputs[VCO_TWO_VOCT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 3] != v) {
-            vcoTwoVoctClipTimer = clipTime;
-        }
-
-        // VCO One Linear TZFM
-        v = params[VCO_ONE_LINEAR_KNOB_PARAM].getValue() + inputs[VCO_ONE_LINEAR_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 2] != v) {
-            vcoOneLinearClipTimer = clipTime;
+            vcoTwoWaveshapeTzfmClipTimer = clipTime;
         }
 
         // VCO One Pulse Width
         v = params[VCO_ONE_PW_KNOB_PARAM].getValue() + inputs[VCO_ONE_PW_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 1] != v) {
+        controlMsg->frame[cvChannelOffset + 11] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 11] != v) {
             vcoOnePwClipTimer = clipTime;
         }
 
         // VCO One Volt/Octave
         v = params[VCO_ONE_VOCT_KNOB_PARAM].getValue() + inputs[VCO_ONE_VOCT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset] != v) {
+        controlMsg->frame[cvChannelOffset + 10] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 10] != v) {
             vcoOneVoctClipTimer = clipTime;
         }
 
+        // VCO One Linear TZFM
+        v = params[VCO_ONE_LINEAR_KNOB_PARAM].getValue() + inputs[VCO_ONE_LINEAR_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 9] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 9] != v) {
+            vcoOneLinearClipTimer = clipTime;
+        }
+
+        // 2130 Triangle Level
+        v = params[VCO_ONE_TRIANGLE_KNOB_PARAM].getValue() + inputs[VCO_ONE_TRIANGLE_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 8] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 8] != v) {
+            vcoOneTriangleClipTimer = clipTime;
+        }
+
+        // 3394 VCF Cutoff
+        v = params[VCF_CUTOFF_KNOB_PARAM].getValue() + inputs[VCF_CUTOFF_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 7] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 7] != v) {
+            vcfCutoffClipTimer = clipTime;
+        }
+
+        // VCO Two Volt/Octave
+        v = params[VCO_TWO_VOCT_KNOB_PARAM].getValue() + inputs[VCO_TWO_VOCT_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 6] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 6] != v) {
+            vcoTwoVoctClipTimer = clipTime;
+        }
+
+        // 2130 Mod Amount VCA
+        v = params[VCO_ONE_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[VCO_ONE_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 5] != v) {
+            vcoOneModAmountClipTimer = clipTime;
+        }
+
+        // 3394 VCF Resonance
+        v = params[VCF_RESONANCE_KNOB_PARAM].getValue() + inputs[VCF_RESONANCE_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 4] != v) {
+            vcfResonanceClipTimer = clipTime;
+        }
+
+        // 3394 Triangle to VCF
+        v = params[VCO_TWO_TRI_VCF_KNOB_PARAM].getValue() + inputs[VCO_TWO_TRI_VCF_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 3] != v) {
+            vcoTwoTriVcfClipTimer = clipTime;
+        }
+
+        // Final Gain VCA on 3394
+        v = params[FINAL_GAIN_KNOB_PARAM].getValue() + inputs[FINAL_GAIN_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset + 2] != v) {
+            finalGainClipTimer = clipTime;
+        }
+
+        // VCO Two PW
+        // Note Pulse Width handles enable/disable
+        vcoTwoPulseEnabled = static_cast<bool>(std::round(params[VCO_TWO_WAVE_PULSE_BUTTON_PARAM].getValue()));
+        if (vcoTwoPulseEnabled) {
+            v = params[VCO_TWO_PW_KNOB_PARAM].getValue() + inputs[VCO_TWO_PW_INPUT].getVoltageSum() / 10.f;
+            // TODO: Consider clamp at >0.f, determine value
+            controlMsg->frame[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
+            if (controlMsg->frame[cvChannelOffset + 1] != v) {
+                vcoTwoPwClipTimer = clipTime;
+            }
+        }
+        else {
+            controlMsg->frame[cvChannelOffset + 1] = 0.f;
+        }
+
+        // VCO One / VCO Two Mix to filter on 3394
+        v = params[VCO_MIX_KNOB_PARAM].getValue() + inputs[VCO_MIX_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[cvChannelOffset] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[cvChannelOffset] != v) {
+            vcoMixClipTimer = clipTime;
+        }
 
     }
 
 
     /** getCardHardwareId
-     * return the hardware Id of the 3340 card
+     * return the hardware Id of the card
      */
     static const uint8_t hardwareId = 0x04;
     uint8_t getHardwareId() override {
@@ -513,7 +558,7 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
                 controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
                 controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[index].midiProgram[newValue]);
                 controlMsg->midiMessageSet = true;
-                INFO("zoxnoxious3340: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
+                INFO("zoxnoxious5524: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
             }
             else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
                 midi::Message queuedMessage;
@@ -524,7 +569,7 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
                 midiMessageQueue.push_back(queuedMessage);
             }
             else {
-                INFO("Zoxnoxioius3340: dropping MIDI message, bus full and queue full");
+                INFO("Zoxnoxious5524: dropping MIDI message, bus full and queue full");
             }
         }
     }
