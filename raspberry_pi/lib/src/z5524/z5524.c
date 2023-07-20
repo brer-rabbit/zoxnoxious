@@ -176,7 +176,7 @@ struct midi_program_to_gpio {
 // VCO1 == SSI2130
 // VCO2 == AS3394
 
-// array indexed by MIDI program number
+// array indexed by MIDI program number -- maybe todo: reorder to match wiring
 static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 1, port1_addr, 0b00000000, 0b00111111 }, // prog 0 - VCO2 Saw Off Tri Off
   { 1, port1_addr, 0b10000000, 0b10111111 }, // prog 1 - VCO2 Saw Off Tri On
