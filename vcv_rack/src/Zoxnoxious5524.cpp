@@ -5,6 +5,9 @@
 
 const static int midiMessageQueueMaxSize = 16;
 
+// VCO1 ==> SSI2130
+// VCO2 ==> AS3394
+
 
 struct Zoxnoxious5524 : ZoxnoxiousModule {
     enum ParamId {
@@ -122,25 +125,25 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
 
     // mapping button switches to send MIDI program changes.
 
-    // VCO2 Saw and Tri params send a single MIDI prog change
-    // these aren't actually used -- the values end up being calculated.
-    // kept here for the hell of it.
-    const uint8_t vcoTwoSawOffTriOff = 0;
-    const uint8_t vcoTwoSawOffTriOn  = 1;
-    const uint8_t vcoTwoSawOnTriOff  = 2;
-    const uint8_t vcoTwoSawOnTriOn   = 3;
-    uint8_t vcoTwoTriSawPrevState = vcoTwoSawOffTriOff; // init to first program in list
+    // VCO2 Saw and Tri params send a single MIDI prog change.
+    // the const is the program change offset from zero for the program change.
+    // Four program changes handle off/off, off/on, on/off, on/on.
+    // With a value of 0, the prog changes for tri/saw are 0,1,2,3.
+    const uint8_t vcoTwoSawTriMidiProgramOffset = 0;
+    uint8_t vcoTwoTriSawPrevState = vcoTwoSawTriMidiProgramOffset; // init to first program in list
+
 
     // Detect state changes by tracking previousValue, wiht INT_MIN
     // being an init value (all value will be detected to change first
     // clock cycle).  
 
     struct buttonParamMidiProgram {
-        enum ParamId button;
+        const enum ParamId button;
         int previousValue;
-        uint8_t midiProgram[8];
+        const uint8_t midiProgram[8];
     } buttonParamToMidiProgramList[15] =
       {
+
           { VCO_ONE_TO_EXP_FM_VCO_TWO_BUTTON_PARAM, INT_MIN, { 4, 5 } },
           { VCO_ONE_TO_WAVE_SELECT_VCO_TWO_BUTTON_PARAM, INT_MIN, { 6, 7 } },
           { VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_PARAM, INT_MIN, { 8, 9 } },
@@ -365,12 +368,13 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
             sendOrQueueMidiMessage(controlMsg, newValue, i);
         }
 
-        // convert the params to the MIDI prog change number: 1, 2, 3, 4
+        // convert the params to the MIDI prog change number: 0, 1, 2, 3
         int vcoTwoSaw = static_cast<int>(std::round(params[VCO_TWO_WAVE_SAW_BUTTON_PARAM].getValue())) * 2;
         int vcoTwoTri = static_cast<int>(std::round(params[VCO_TWO_WAVE_TRI_BUTTON_PARAM].getValue()));
-        
-        if (vcoTwoSaw + vcoTwoTri != vcoTwoTriSawPrevState) {
-            vcoTwoTriSawPrevState = vcoTwoSaw + vcoTwoTri;
+        int vcoTwoTriSawCurrentState = vcoTwoSaw + vcoTwoTri + vcoTwoSawTriMidiProgramOffset;
+        if (vcoTwoTriSawCurrentState != vcoTwoTriSawPrevState) {
+            vcoTwoTriSawPrevState = vcoTwoTriSawCurrentState;
+
             // either send the message right now if slot open or queue it
             if (controlMsg->midiMessageSet == false) {
                 // send direct
