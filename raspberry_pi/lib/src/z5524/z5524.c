@@ -129,13 +129,15 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct z5524_card *zcard = (struct z5524_card*)zcard_plugin;
   char samples_to_dac[2];
   int spi_channel;
+  uint16_t this_sample;
 
   for (int chip_select = 0; chip_select < CHIP_SELECTS; chip_select++) {
       spi_channel = set_spi_interface(zcard->zhost, chip_select, SPI_MODE, zcard->slot);
 
       for (int i = 0; i < DAC_CHANNELS; ++i) {
-          if (zcard->previous_samples[chip_select][i] != samples[i]) {
-              zcard->previous_samples[chip_select][i] = samples[i];
+        this_sample = samples[i + chip_select * DAC_CHANNELS];
+          if (zcard->previous_samples[chip_select][i] != this_sample) {
+            zcard->previous_samples[chip_select][i] = this_sample;
 
               // DAC write:
               // bits 15-0:
@@ -144,8 +146,8 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
               // Given a 16-bit signed input, write it to a 12-bit signed values.
               // Any negative value clips to zero.
               if (samples[i] >= 0) {
-                  samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
-                  samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+                  samples_to_dac[0] = channel_map[i] | (this_sample) >> 11;
+                  samples_to_dac[1] = this_sample >> 3;
               }
               else {
                   samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
