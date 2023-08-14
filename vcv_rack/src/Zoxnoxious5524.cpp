@@ -141,9 +141,8 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         const enum ParamId button;
         int previousValue;
         const uint8_t midiProgram[8];
-    } buttonParamToMidiProgramList[15] =
+    } buttonParamToMidiProgramList[8] =
       {
-
           { VCO_ONE_TO_EXP_FM_VCO_TWO_BUTTON_PARAM, INT_MIN, { 4, 5 } },
           { VCO_ONE_TO_WAVE_SELECT_VCO_TWO_BUTTON_PARAM, INT_MIN, { 6, 7 } },
           { VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_PARAM, INT_MIN, { 8, 9 } },
