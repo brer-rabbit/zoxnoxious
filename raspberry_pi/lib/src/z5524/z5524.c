@@ -181,9 +181,9 @@ struct midi_program_to_gpio {
 // array indexed by MIDI program number -- maybe todo: reorder to match wiring
 static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 1, port1_addr, 0b00000000, 0b00111111 }, // prog 0 - VCO2 Saw Off Tri Off
-  { 1, port1_addr, 0b10000000, 0b10111111 }, // prog 1 - VCO2 Saw Off Tri On
-  { 1, port1_addr, 0b01000000, 0b01111111 }, // prog 2 - VCO2 Saw On  Tri Off
-  { 1, port1_addr, 0b11000000, 0b11111111 }, // prog 3 - VCO2 Saw On  Tri On
+  { 1, port1_addr, 0b01000000, 0b01111111 }, // prog 1 - VCO2 Saw Off Tri On
+  { 1, port1_addr, 0b11000000, 0b11111111 }, // prog 2 - VCO2 Saw On  Tri Off
+  { 1, port1_addr, 0b10000000, 0b10111111 }, // prog 3 - VCO2 Saw On  Tri On
   { 1, port1_addr, 0b00000000, 0b11101111 }, // prog 4 - VCO1 Exp FM Off
   { 1, port1_addr, 0b00010000, 0b11111111 }, // prog 5 - VCO1 Exp FM On
   { 1, port1_addr, 0b00000000, 0b11011111 }, // prog 6 - VCO1 to Wave Select Off
