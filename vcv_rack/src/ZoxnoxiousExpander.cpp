@@ -55,7 +55,9 @@ ZoxnoxiousModule::ZoxnoxiousModule() :
 }
 
 void ZoxnoxiousModule::setExpanderPrimary() {
-    // ...and this isn't actually used for anything yet
+    // important to mark the "primary" module.  This is the one that
+    // originates command messages (passed to left) and
+    // consumes control messages (received from left)
     isPrimary = true;
 }
 
@@ -80,8 +82,10 @@ void ZoxnoxiousModule::onExpanderChange (const ExpanderChangeEvent &e) {
         true : false;
 
     // command msg changed (added or removed) on the right- reset/mark (un)authoritative
-    // so this passes along to the left 
-    initCommandMsgState();
+    // so this passes along to the left, as long as we're not the primary
+    if (!isPrimary) {
+        initCommandMsgState();
+    }
 }
 
 
