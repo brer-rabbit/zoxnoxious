@@ -667,7 +667,7 @@ struct Zoxnoxious5524Widget : ModuleWidget {
 
         mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(139.527, 50.578)));
         mix2OutputTextField->box.size = (mm2px(Vec(18.0, 3.636)));
-        mix2OutputTextField->setText(module ? &module->output1NameString : NULL);
+        mix2OutputTextField->setText(module ? &module->output2NameString : NULL);
         addChild(mix2OutputTextField);
 
 
