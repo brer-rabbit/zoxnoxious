@@ -82,10 +82,8 @@ void ZoxnoxiousModule::onExpanderChange (const ExpanderChangeEvent &e) {
         true : false;
 
     // command msg changed (added or removed) on the right- reset/mark (un)authoritative
-    // so this passes along to the left, as long as we're not the primary
-    if (!isPrimary) {
-        initCommandMsgState();
-    }
+    // so this passes along to the left
+    initCommandMsgState();
 }
 
 

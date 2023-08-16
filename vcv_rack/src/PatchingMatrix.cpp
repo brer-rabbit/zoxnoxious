@@ -341,6 +341,12 @@ struct PatchingMatrix : ZoxnoxiousModule {
      * override and provide data basd on discovery
      */
     void initCommandMsgState() override {
+        // do not re-init if we already know the plugin list.
+        // This implies we do not expect the list to change once it is set.
+        if (receivedPluginList) {
+            return;
+        }
+
         zCommand_a.authoritativeSource = true;
         // channelAssignment data:
         // hardware cardId, channelOffset (from zero), midiChannel, assignmentOwned
