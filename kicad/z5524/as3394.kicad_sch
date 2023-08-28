@@ -2185,7 +2185,7 @@
           (reference "R48") (unit 1)
         )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R83") (unit 1)
+          (reference "R97") (unit 1)
         )
       )
     )
@@ -2246,7 +2246,7 @@
           (reference "R48") (unit 1)
         )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R48") (unit 1)
+          (reference "R54") (unit 1)
         )
       )
     )
@@ -2296,7 +2296,7 @@
   (symbol (lib_id "Device:R") (at 349.885 133.35 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 33313338-e4c6-47f8-ae0f-5fce905499d2)
-    (property "Reference" "R55" (at 354.965 134.62 0)
+    (property "Reference" "R72" (at 354.965 134.62 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "1k" (at 353.695 132.08 0)
@@ -2316,7 +2316,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R55") (unit 1)
+          (reference "R72") (unit 1)
         )
       )
     )
@@ -2355,7 +2355,7 @@
   (symbol (lib_id "Diode:1N4148WS") (at 139.7 148.59 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3c842b4e-d090-4c60-ad25-73e8fe731c8b)
-    (property "Reference" "D3" (at 141.732 147.7553 90)
+    (property "Reference" "D5" (at 141.732 147.7553 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "1N4148WS" (at 142.24 149.86 90)
@@ -2381,7 +2381,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "D3") (unit 1)
+          (reference "D5") (unit 1)
         )
       )
     )
@@ -2469,7 +2469,7 @@
   (symbol (lib_id "Device:R") (at 163.83 93.98 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 48b004b2-d758-4d57-a60c-979eacdb6788)
-    (property "Reference" "R73" (at 161.29 93.345 90)
+    (property "Reference" "R76" (at 161.29 93.345 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "1k" (at 166.37 93.98 90)
@@ -2489,7 +2489,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R73") (unit 1)
+          (reference "R76") (unit 1)
         )
       )
     )
@@ -2571,7 +2571,7 @@
   (symbol (lib_id "Device:R") (at 184.15 95.25 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4f2d4dea-ae2e-4650-908f-3516c29a9029)
-    (property "Reference" "R77" (at 182.88 97.79 90)
+    (property "Reference" "R79" (at 182.88 97.79 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "62k" (at 182.245 92.71 90)
@@ -2591,7 +2591,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R77") (unit 1)
+          (reference "R79") (unit 1)
         )
       )
     )
@@ -2600,7 +2600,7 @@
   (symbol (lib_id "Device:C") (at 125.73 73.66 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 532a9acd-4e10-4651-a2de-291d204e4e48)
-    (property "Reference" "C50" (at 125.73 67.8012 90)
+    (property "Reference" "C52" (at 125.73 67.8012 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "33n" (at 125.73 70.3381 90)
@@ -2623,7 +2623,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "C50") (unit 1)
+          (reference "C52") (unit 1)
         )
       )
     )
@@ -2632,7 +2632,7 @@
   (symbol (lib_id "Device:C") (at 120.65 57.15 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5a5c3211-066d-4376-8199-8370bb381870)
-    (property "Reference" "C54" (at 120.65 51.2912 90)
+    (property "Reference" "C43" (at 120.65 51.2912 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "33n" (at 120.65 53.8281 90)
@@ -2655,7 +2655,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "C54") (unit 1)
+          (reference "C43") (unit 1)
         )
       )
     )
@@ -2687,7 +2687,7 @@
           (reference "R74") (unit 1)
         )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R74") (unit 1)
+          (reference "R80") (unit 1)
         )
       )
     )
@@ -2696,7 +2696,7 @@
   (symbol (lib_id "Device:R") (at 189.23 106.68 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6225aaee-c162-4ee3-8c1c-0548723e532b)
-    (property "Reference" "R70" (at 190.5 104.14 90)
+    (property "Reference" "R78" (at 190.5 104.14 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "1k" (at 191.135 109.22 90)
@@ -2716,7 +2716,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R70") (unit 1)
+          (reference "R78") (unit 1)
         )
       )
     )
@@ -2725,7 +2725,7 @@
   (symbol (lib_id "Device:R") (at 337.185 127 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 65d8b664-2a43-49fd-8c60-c5d4bf66318e)
-    (property "Reference" "R57" (at 335.915 132.08 0)
+    (property "Reference" "R65" (at 335.915 132.08 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "68k" (at 338.455 133.35 0)
@@ -2745,7 +2745,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R57") (unit 1)
+          (reference "R65") (unit 1)
         )
       )
     )
@@ -2777,7 +2777,7 @@
           (reference "R51") (unit 1)
         )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R51") (unit 1)
+          (reference "R56") (unit 1)
         )
       )
     )
@@ -2811,7 +2811,7 @@
   (symbol (lib_id "Device:C") (at 110.49 140.97 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 6e529aad-8a14-46d8-93af-468185601b92)
-    (property "Reference" "C58" (at 110.49 135.1112 90)
+    (property "Reference" "C59" (at 110.49 135.1112 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 110.49 137.6481 90)
@@ -2831,7 +2831,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "C58") (unit 1)
+          (reference "C59") (unit 1)
         )
       )
     )
@@ -3031,7 +3031,7 @@
   (symbol (lib_id "Device:C") (at 123.19 66.04 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 89e01d50-7a1a-439a-bb10-eb0f02882ff0)
-    (property "Reference" "C49" (at 123.19 60.1812 90)
+    (property "Reference" "C55" (at 123.19 60.1812 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "33n" (at 123.19 62.7181 90)
@@ -3054,7 +3054,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "C49") (unit 1)
+          (reference "C55") (unit 1)
         )
       )
     )
@@ -3092,7 +3092,7 @@
   (symbol (lib_id "Device:C") (at 118.11 46.99 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 9db53bb2-4a96-4612-a48d-f038a295fa5e)
-    (property "Reference" "C45" (at 118.11 41.1312 90)
+    (property "Reference" "C50" (at 118.11 41.1312 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "560p" (at 118.11 43.6681 90)
@@ -3112,7 +3112,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "C45") (unit 1)
+          (reference "C50") (unit 1)
         )
       )
     )
@@ -3121,7 +3121,7 @@
   (symbol (lib_id "Device:R") (at 118.11 135.89 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid a1257201-e003-463d-9ec2-dc742359dee4)
-    (property "Reference" "R78" (at 116.84 140.97 0)
+    (property "Reference" "R105" (at 116.84 140.97 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "240k" (at 119.38 142.24 0)
@@ -3141,7 +3141,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R78") (unit 1)
+          (reference "R105") (unit 1)
         )
       )
     )
@@ -3150,7 +3150,7 @@
   (symbol (lib_id "Device:C") (at 106.68 77.47 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid aa687c95-1255-4cae-9f79-2ade4a33472b)
-    (property "Reference" "C53" (at 106.68 71.6112 90)
+    (property "Reference" "C54" (at 106.68 71.6112 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 106.68 74.1481 90)
@@ -3170,7 +3170,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "C53") (unit 1)
+          (reference "C54") (unit 1)
         )
       )
     )
@@ -3223,7 +3223,7 @@
           (reference "TP4") (unit 1)
         )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "TP4") (unit 1)
+          (reference "TP7") (unit 1)
         )
       )
     )
@@ -3285,7 +3285,7 @@
   (symbol (lib_id "Diode:1N4148WS") (at 132.08 161.29 90) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid bb0164c6-8029-47d3-b41e-cbb1c5213423)
-    (property "Reference" "D2" (at 127.635 163.83 90)
+    (property "Reference" "D3" (at 127.635 163.83 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "1N4148WS" (at 119.38 161.925 90)
@@ -3311,7 +3311,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "D2") (unit 1)
+          (reference "D3") (unit 1)
         )
       )
     )
@@ -3343,7 +3343,7 @@
           (reference "R52") (unit 1)
         )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R52") (unit 1)
+          (reference "R57") (unit 1)
         )
       )
     )
@@ -3371,7 +3371,7 @@
           (reference "TP4") (unit 1)
         )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "TP8") (unit 1)
+          (reference "TP5") (unit 1)
         )
       )
     )
@@ -3421,7 +3421,7 @@
   (symbol (lib_id "Device:C_Polarized") (at 125.73 154.94 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d440da47-e3c3-4b7f-86f3-4d72640b7086)
-    (property "Reference" "C47" (at 120.65 152.4 0)
+    (property "Reference" "C48" (at 120.65 152.4 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "4u7" (at 119.38 157.48 0)
@@ -3444,7 +3444,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "C47") (unit 1)
+          (reference "C48") (unit 1)
         )
       )
     )
@@ -3453,7 +3453,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 187.96 87.63 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid d6ac1882-84f9-473a-95d5-d12d8f5c6759)
-    (property "Reference" "TP5" (at 189.357 83.4933 0)
+    (property "Reference" "TP3" (at 189.357 83.4933 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 189.357 86.0302 0)
@@ -3469,7 +3469,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "TP5") (unit 1)
+          (reference "TP3") (unit 1)
         )
       )
     )
@@ -3478,7 +3478,7 @@
   (symbol (lib_id "Diode:1N4148WS") (at 132.08 148.59 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid dd6b61cb-efcb-460d-8c2f-a6219e026195)
-    (property "Reference" "D5" (at 130.048 149.4247 90)
+    (property "Reference" "D4" (at 130.048 149.4247 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "1N4148WS" (at 129.54 146.05 90)
@@ -3504,7 +3504,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "D5") (unit 1)
+          (reference "D4") (unit 1)
         )
       )
     )
@@ -3579,7 +3579,7 @@
   (symbol (lib_id "Device:R") (at 204.47 99.06 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid dfb43ed9-79ab-4c66-8121-3183611f3a5e)
-    (property "Reference" "R88" (at 205.74 96.52 90)
+    (property "Reference" "R85" (at 205.74 96.52 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "62k" (at 206.375 101.6 90)
@@ -3599,7 +3599,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R88") (unit 1)
+          (reference "R85") (unit 1)
         )
       )
     )
@@ -3608,7 +3608,7 @@
   (symbol (lib_id "Device:R") (at 146.05 92.71 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e4a5799f-c378-4c46-9267-141f93fc6a90)
-    (property "Reference" "R69" (at 145.415 95.25 90)
+    (property "Reference" "R81" (at 145.415 95.25 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "510" (at 146.05 90.17 90)
@@ -3628,7 +3628,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R69") (unit 1)
+          (reference "R81") (unit 1)
         )
       )
     )
@@ -3637,7 +3637,7 @@
   (symbol (lib_id "Diode:1N4148WS") (at 139.7 161.29 270) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e70dd4bb-6ae9-43a2-9dfa-4b607a3ebd9b)
-    (property "Reference" "D4" (at 144.78 160.02 90)
+    (property "Reference" "D2" (at 144.78 160.02 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "1N4148WS" (at 152.4 162.56 90)
@@ -3663,7 +3663,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "D4") (unit 1)
+          (reference "D2") (unit 1)
         )
       )
     )
@@ -3697,7 +3697,7 @@
   (symbol (lib_id "Device:R") (at 356.235 115.57 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid f08f6b7a-9b6b-4b96-91ef-19c1a469ea9e)
-    (property "Reference" "R72" (at 356.235 110.8542 90)
+    (property "Reference" "R75" (at 356.235 110.8542 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "13k" (at 356.235 113.3911 90)
@@ -3717,7 +3717,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R72") (unit 1)
+          (reference "R75") (unit 1)
         )
       )
     )
@@ -3763,7 +3763,7 @@
           (reference "U11") (unit 4)
         )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "U11") (unit 4)
+          (reference "U13") (unit 4)
         )
       )
     )
@@ -3797,7 +3797,7 @@
   (symbol (lib_id "Device:R") (at 337.185 115.57 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid fcbf17a7-738f-405c-9fc2-7ea235d54732)
-    (property "Reference" "R71" (at 337.185 110.8542 90)
+    (property "Reference" "R82" (at 337.185 110.8542 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "8k2" (at 337.185 113.3911 90)
@@ -3817,7 +3817,7 @@
     (instances
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
-          (reference "R71") (unit 1)
+          (reference "R82") (unit 1)
         )
       )
     )
