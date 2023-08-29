@@ -3555,8 +3555,8 @@
     (uuid ff32299f-89b0-492e-9ce0-b422e470e571)
   )
 
-  (text "VREF_4.096 load: 10k\n641 < Rs < 1863\nfor current 1000uA : 75uA"
-    (at 158.75 265.43 0)
+  (text "VREF_4.096 load: 3.8k:  500 < Rs < 864\nfor current thru LM4040 of: 1000uA to 75uA"
+    (at 150.495 264.16 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 36e9f1d6-e40c-4763-9fe4-e8f9d43d4b9c)
   )
@@ -5558,10 +5558,10 @@
   (symbol (lib_id "Device:R") (at 168.91 234.95 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 74010760-0918-469e-a250-4c4e6aed40de)
-    (property "Reference" "R98" (at 171.45 233.68 0)
+    (property "Reference" "R98" (at 172.085 233.68 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "1k" (at 171.45 236.22 0)
+    (property "Value" "680" (at 172.085 236.22 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 167.132 234.95 90)
@@ -5570,7 +5570,7 @@
     (property "Datasheet" "~" (at 168.91 234.95 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC" "C21190" (at 168.91 234.95 0)
+    (property "LCSC" "C23228" (at 168.91 234.95 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 4e150c80-749d-4bf6-9d6a-481d42db6386))
