@@ -34,6 +34,7 @@ struct ZoxnoxiousControlMsg {
 
 static const int maxCards = 8; // need this just to size channelAssignments array, that's it
 static const int invalidSlot = maxCards;
+static const int invalidCardDeviceId = -1;
 static const int invalidCvChannelOffset = -1;
 static const int invalidMidiChannel = -1;
 static const uint8_t invalidCardId = 0;
@@ -41,6 +42,7 @@ static const std::string invalidCardOutputName = "----";
 
 struct ChannelAssignment {
     uint8_t cardId; // physical card's identifier
+    int cardDeviceId; // device id: usb device
     int cvChannelOffset;  // offset to write channel to the controlmsg frame
     int midiChannel;
     bool assignmentOwned; // true if a card claimed this assignment
@@ -90,6 +92,7 @@ protected:
     // data acquired from the ZoxnoxiousCommandMsg-
     // this data will be used when writing to the ZonxnoxiousControlMsg
     bool hasChannelAssignment;
+    int cardDeviceId;
     int cvChannelOffset;
     int midiChannel;
     int slot;

@@ -17,16 +17,16 @@ static const ZoxnoxiousCommandMsg commandEmpty =
   {
       // authoritativeSource
       false,
-      // cardId, cvChannelOffset, midiChannel, assignmentOwned
+      // cardId, cardDeviceId, cvChannelOffset, midiChannel, assignmentOwned
       {
-          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCvChannelOffset, invalidMidiChannel, false}
+          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false}
       }
   };
 
@@ -164,6 +164,7 @@ void ZoxnoxiousModule::processZoxnoxiousCommand(ZoxnoxiousCommandMsg *zCommand) 
                 zCommand->channelAssignments[slot].assignmentOwned = true; // I OWNEZ THEE
                 // then copy the relevant info
                 midiChannel = zCommand->channelAssignments[slot].midiChannel;
+                cardDeviceId = zCommand->channelAssignments[slot].cardDeviceId;
                 cvChannelOffset = zCommand->channelAssignments[slot].cvChannelOffset;
                 //INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : hasChannelAssignment at slot %d", APP->engine->getFrame(), getId(), slot);
                 onChannelAssignmentEstablished(zCommand);
@@ -178,7 +179,7 @@ void ZoxnoxiousModule::processZoxnoxiousCommand(ZoxnoxiousCommandMsg *zCommand) 
         }
     }
     else {
-        // typical case -- we have a channel assignemnt already.
+        // typical case -- we have a channel assignment already.
         // Claim our assignment so the command can be daisy chained along.
         zCommand->channelAssignments[slot].assignmentOwned = true;
     }
@@ -190,6 +191,7 @@ void ZoxnoxiousModule::initCommandMsgState() {
     zCommand_b = commandEmpty;
 
     hasChannelAssignment = false;
+    cardDeviceId = invalidCardDeviceId;
     cvChannelOffset = invalidCvChannelOffset;
     midiChannel = invalidMidiChannel;
 }
