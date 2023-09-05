@@ -55,7 +55,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         LIGHTS_LEN
     };
 
-    ZoxnoxiousAudioPort audioPort;
+    std::vector<ZoxnoxiousAudioPort*> audioPort;
     ZoxnoxiousMidiOutput midiOutput;
     midi::InputQueue midiInput;
 
@@ -109,8 +109,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
     dsp::ClockDivider discoveryRequestClockDivider;
 
 
-    PatchingMatrix() : audioPort(this),
-                       mix2ButtonsPreviousState{false},
+    PatchingMatrix() : mix2ButtonsPreviousState{false},
                        cardAOutput1NameString(invalidCardOutputName),
                        cardAOutput2NameString(invalidCardOutputName),
                        cardBOutput1NameString(invalidCardOutputName),
@@ -123,8 +122,14 @@ struct PatchingMatrix : ZoxnoxiousModule {
                        cardEOutput2NameString(invalidCardOutputName),
                        cardFOutput1NameString(invalidCardOutputName),
                        cardFOutput2NameString(invalidCardOutputName) {
+
         setExpanderPrimary();
         PatchingMatrix::initCommandMsgState();
+
+        for(int i = 0; i < maxDevices; ++i) {
+            audioPort.push_back(new ZoxnoxiousAudioPort(this));
+        }
+
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configSwitch(MIX_LEFT_SELECT_PARAM, 0.f, 1.f, 0.f, "Left Output", { "Out1", "Out2" });
@@ -166,18 +171,25 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
     ~PatchingMatrix() {
-        audioPort.setDriverId(-1);
+        for (int i = 0; i < maxDevices; ++i) {
+            audioPort[i]->setDriverId(-1);
+            delete audioPort[i];
+        }
     }
 
     void onReset() override {
-        audioPort.setDriverId(-1);
+        for (int i = 0; i < maxDevices; ++i) {
+            audioPort[i]->setDriverId(-1);
+        }
         midiOutput.reset();
     }
 
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override {
-        audioPort.engineInputBuffer.clear();
-        audioPort.engineOutputBuffer.clear();
+        for (int i = 0; i < maxDevices; ++i) {
+            audioPort[i]->engineInputBuffer.clear();
+            audioPort[i]->engineOutputBuffer.clear();
+        }
     }
 
 
@@ -350,14 +362,14 @@ struct PatchingMatrix : ZoxnoxiousModule {
         zCommand_a.authoritativeSource = true;
         // channelAssignment data:
         // hardware cardId, channelOffset (from zero), midiChannel, assignmentOwned
-        zCommand_a.channelAssignments[0] = { 0x00, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
-        zCommand_a.channelAssignments[1] = { 0x00, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
-        zCommand_a.channelAssignments[2] = { 0x00, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
-        zCommand_a.channelAssignments[3] = { 0x00, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
-        zCommand_a.channelAssignments[4] = { 0x00, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
-        zCommand_a.channelAssignments[5] = { 0x00, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
-        zCommand_a.channelAssignments[6] = { 0x00, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
-        zCommand_a.channelAssignments[7] = { 0x00, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
+        zCommand_a.channelAssignments[0] = { 0x00, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
+        zCommand_a.channelAssignments[1] = { 0x00, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
+        zCommand_a.channelAssignments[2] = { 0x00, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
+        zCommand_a.channelAssignments[3] = { 0x00, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
+        zCommand_a.channelAssignments[4] = { 0x00, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
+        zCommand_a.channelAssignments[5] = { 0x00, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
+        zCommand_a.channelAssignments[6] = { 0x00, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
+        zCommand_a.channelAssignments[7] = { 0x00, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false };
 
         // to hardcode assignments:
         //zCommand_a.channelAssignments[0] = { 0x02, 0, 0, false };
@@ -408,46 +420,43 @@ private:
      */
     void processControlChannels(ZoxnoxiousControlMsg *controlMsg) {
 
-        if (audioPort.deviceNumOutputs > 0) {
-            dsp::Frame<maxChannels> inputFrame = {};
-            float v;
-            const float clipTime = 0.25f;
+        for (int deviceNum = 0; deviceNum < maxDevices; ++deviceNum) {
 
-            // copy expander control voltages to Frame
-            for (int i = 0; i < audioPort.deviceNumOutputs; ++i) {  // TODO: USE THIS LINE NOT THE NEXT
-            //for (int i = 0; i < maxChannels; ++i) { // DELETE THIS LINE
-                inputFrame.samples[i] = controlMsg->frame[i];
-            }
+            if (audioPort[deviceNum]->deviceNumOutputs > 0) {
+                dsp::Frame<maxChannels> inputFrame = {};
+                float v;
+                const float clipTime = 0.25f;
 
-            // add in local control voltages
-            switch (audioPort.deviceNumOutputs) {
-            default:
-            case 2:
-                // left level
-                v = params[LEFT_LEVEL_KNOB_PARAM].getValue() + inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f;
-                inputFrame.samples[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
-                if (inputFrame.samples[cvChannelOffset + 1] != v) {
-                    leftLevelClipTimer = clipTime;
+                // copy expander control voltages to Frame
+                int minChannels = audioPort[deviceNum]->deviceNumOutputs < maxChannels ?
+                                  audioPort[deviceNum]->deviceNumOutputs : maxChannels;
+                for (int channel = 0; channel < minChannels; ++channel) {
+                    inputFrame.samples[channel] = controlMsg->frame[deviceNum][channel];
                 }
 
-                // fall through
-            case 1:
-                // right level
-                v = params[RIGHT_LEVEL_KNOB_PARAM].getValue() + inputs[RIGHT_LEVEL_INPUT].getVoltageSum() / 10.f;
-                inputFrame.samples[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
-                if (inputFrame.samples[cvChannelOffset + 0] != v) {
-                    rightLevelClipTimer = clipTime;
+                // add in local control voltages if deviceNum is our device
+                if (deviceNum == outputDeviceId) {
+
+                    // left level
+                    v = params[LEFT_LEVEL_KNOB_PARAM].getValue() + inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f;
+                    inputFrame.samples[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
+                    if (inputFrame.samples[cvChannelOffset + 1] != v) {
+                        leftLevelClipTimer = clipTime;
+                    }
+
+                    // right level
+                    v = params[RIGHT_LEVEL_KNOB_PARAM].getValue() + inputs[RIGHT_LEVEL_INPUT].getVoltageSum() / 10.f;
+                    inputFrame.samples[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
+                    if (inputFrame.samples[cvChannelOffset + 0] != v) {
+                        rightLevelClipTimer = clipTime;
+                    }
                 }
-
-                // fall through
-            case 0:
-                break;
+                
+                if (!audioPort[deviceNum]->engineInputBuffer.full()) {
+                    audioPort[deviceNum]->engineInputBuffer.push(inputFrame);
+                }
             }
-
-            if (!audioPort.engineInputBuffer.full()) {
-                audioPort.engineInputBuffer.push(inputFrame);
-            }
-        }
+        } // for deviceNum
     }
 
 
@@ -521,7 +530,7 @@ private:
         for (int i = 0; i < maxCards; ++i) {
             if (msg.bytes[i * 2 + bytesOffset] != 0 && msg.bytes[i * 2 + bytesOffset] != 0xFF) {
                 leftExpanderProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 2 + bytesOffset];
-                leftExpanderProducerMessage->channelAssignments[i].cardDeviceId = 0; // hardcode
+                leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = 0; // hardcode
                 leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = msg.bytes[i * 2 + bytesOffset + 1];
                 leftExpanderProducerMessage->channelAssignments[i].midiChannel = midiChannel++;
                 leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
@@ -532,7 +541,7 @@ private:
             }
             else {
                 leftExpanderProducerMessage->channelAssignments[i].cardId = 0x00;
-                leftExpanderProducerMessage->channelAssignments[i].cardDeviceId = invalidCardDeviceId;
+                leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = invalidOutputDeviceId;
                 leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = invalidCvChannelOffset;
                 leftExpanderProducerMessage->channelAssignments[i].midiChannel = invalidMidiChannel;
                 leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
@@ -592,18 +601,18 @@ private:
             if (msg.bytes[i * 3 + bytesOffset] != 0 && msg.bytes[i * 3 + bytesOffset] != 0xFF) {
                 leftExpanderProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 3 + bytesOffset];
                 leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = msg.bytes[i * 3 + bytesOffset + 1];
-                leftExpanderProducerMessage->channelAssignments[i].cardDeviceId = msg.bytes[i * 3 + bytesOffset + 2];
+                leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = msg.bytes[i * 3 + bytesOffset + 2];
                 leftExpanderProducerMessage->channelAssignments[i].midiChannel = midiChannel++;
                 leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
                 INFO("  Discovery Report: card 0x%X device %d offset %d midi %d",
                      leftExpanderProducerMessage->channelAssignments[i].cardId,
-                     leftExpanderProducerMessage->channelAssignments[i].cardDeviceId,
+                     leftExpanderProducerMessage->channelAssignments[i].outputDeviceId,
                      leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset,
                      leftExpanderProducerMessage->channelAssignments[i].midiChannel);
             }
             else {
                 leftExpanderProducerMessage->channelAssignments[i].cardId = 0x00;
-                leftExpanderProducerMessage->channelAssignments[i].cardDeviceId = invalidCardDeviceId;
+                leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = invalidOutputDeviceId;
                 leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = invalidCvChannelOffset;
                 leftExpanderProducerMessage->channelAssignments[i].midiChannel = invalidMidiChannel;
                 leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
@@ -618,12 +627,16 @@ private:
 
 
 
+    static const std::string audioPortNum;
 
     json_t* dataToJson() override {
         json_t* rootJ = json_object();
         json_object_set_new(rootJ, "midiInput", midiInput.toJson());
         json_object_set_new(rootJ, "midiOutput", midiOutput.toJson());
-        json_object_set_new(rootJ, "audioPort", audioPort.toJson());
+        for (int deviceNum = 0; deviceNum < maxDevices; ++deviceNum) {
+            std::string thisAudioPortNum = audioPortNum + std::to_string(deviceNum);
+            json_object_set_new(rootJ, thisAudioPortNum.c_str(), audioPort[deviceNum]->toJson());
+        }
         return rootJ;
     }
 
@@ -638,9 +651,12 @@ private:
             midiOutput.fromJson(midiOutputJ);
         }
 
-        json_t* audioPortJ = json_object_get(rootJ, "audioPort");
-        if (audioPortJ) {
-            audioPort.fromJson(audioPortJ);
+        for (int deviceNum = 0; deviceNum < maxDevices; ++deviceNum) {
+            std::string thisAudioPortNum = audioPortNum + std::to_string(deviceNum);
+            json_t* audioPortJ = json_object_get(rootJ, thisAudioPortNum.c_str());
+            if (audioPortJ) {
+                audioPort[deviceNum]->fromJson(audioPortJ);
+            }
         }
     }
 
@@ -783,10 +799,17 @@ struct PatchingMatrixWidget : ModuleWidget {
                                              appendMidiMenu(menu, &module->midiInput);
                                          }));
         menu->addChild(new MenuSeparator);
-        menu->addChild(createSubmenuItem("Audio Device", "",
+        menu->addChild(createSubmenuItem("Audio Device 0", "",
                                          [=](Menu* menu) {
-                                             appendAudioMenu(menu, &module->audioPort);
+                                             appendAudioMenu(menu, module->audioPort[0]);
                                          }));
+        if (maxDevices > 1) {
+            menu->addChild(createSubmenuItem("Audio Device 1", "",
+                                             [=](Menu* menu) {
+                                                 appendAudioMenu(menu, module->audioPort[1]);
+                                             }));
+        }
+
     }
 
     CardTextDisplay *cardAInputTextField;
@@ -816,4 +839,5 @@ struct PatchingMatrixWidget : ModuleWidget {
 };
 
 
+const std::string PatchingMatrix::audioPortNum = "audioPort";
 Model* modelPatchingMatrix = createModel<PatchingMatrix, PatchingMatrixWidget>("PatchingMatrix");

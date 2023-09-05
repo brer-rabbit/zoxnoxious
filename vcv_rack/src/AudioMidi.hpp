@@ -1,5 +1,7 @@
 #include "plugin.hpp"
 
+#include "ZoxnoxiousExpander.hpp"
+
 /* this code is pretty much all taken from VCV Rack's Fundamental.  */
 
 struct ZoxnoxiousMidiOutput : midi::Output {
@@ -31,16 +33,14 @@ struct ZoxnoxiousMidiOutput : midi::Output {
 // depending on the hardware and the particular signal, so it makes sense the
 // hardware module writer implementor better know the clamping
 // requirements for each signal.
-const int num_audio_inputs = 31;
-const int num_audio_outputs = 31;
 struct ZoxnoxiousAudioPort : audio::Port {
 	Module* module;
 
-	dsp::DoubleRingBuffer<dsp::Frame<num_audio_inputs>, 32768> engineInputBuffer;
-	dsp::DoubleRingBuffer<dsp::Frame<num_audio_outputs>, 32768> engineOutputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<maxChannels>, 32768> engineInputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<maxChannels>, 32768> engineOutputBuffer;
 
-	dsp::SampleRateConverter<num_audio_inputs> inputSrc;
-	dsp::SampleRateConverter<num_audio_outputs> outputSrc;
+	dsp::SampleRateConverter<maxChannels> inputSrc;
+	dsp::SampleRateConverter<maxChannels> outputSrc;
 
 	// Port variable caches
 	int deviceNumInputs = 0;
@@ -50,8 +50,8 @@ struct ZoxnoxiousAudioPort : audio::Port {
 
 	ZoxnoxiousAudioPort(Module* module) {
 		this->module = module;
-		maxOutputs = num_audio_inputs;
-		maxInputs = num_audio_outputs;
+		maxOutputs = maxChannels;
+		maxInputs = maxChannels;
 		inputSrc.setQuality(6);
 		outputSrc.setQuality(6);
 	}
@@ -72,8 +72,8 @@ struct ZoxnoxiousAudioPort : audio::Port {
 	}
 
 	void processInput(const float* input, int inputStride, int frames) override {
-		deviceNumInputs = std::min(getNumInputs(), num_audio_outputs);
-		deviceNumOutputs = std::min(getNumOutputs(), num_audio_inputs);
+		deviceNumInputs = std::min(getNumInputs(), maxChannels);
+		deviceNumOutputs = std::min(getNumOutputs(), maxChannels);
 		deviceSampleRate = getSampleRate();
 
 		// DEBUG("%p: new device block ____________________________", this);
@@ -109,7 +109,7 @@ struct ZoxnoxiousAudioPort : audio::Port {
 			outputSrc.setChannels(deviceNumInputs);
 			int inputFrames = frames;
 			int outputFrames = engineOutputBuffer.capacity();
-			outputSrc.process(input, inputStride, &inputFrames, (float*) engineOutputBuffer.endData(), num_audio_outputs, &outputFrames);
+			outputSrc.process(input, inputStride, &inputFrames, (float*) engineOutputBuffer.endData(), maxChannels, &outputFrames);
 			engineOutputBuffer.endIncr(outputFrames);
 			// Request exactly as many frames as we have in the engine output buffer.
 			requestedEngineFrames = engineOutputBuffer.size();
@@ -140,7 +140,7 @@ struct ZoxnoxiousAudioPort : audio::Port {
 			// Convert engine input -> audio output
 			int inputFrames = engineInputBuffer.size();
 			int outputFrames = frames;
-			inputSrc.process((const float*) engineInputBuffer.startData(), num_audio_inputs, &inputFrames, output, outputStride, &outputFrames);
+			inputSrc.process((const float*) engineInputBuffer.startData(), maxChannels, &inputFrames, output, outputStride, &outputFrames);
 			engineInputBuffer.startIncr(inputFrames);
 			// Clamp output samples
 			for (int i = 0; i < outputFrames; i++) {

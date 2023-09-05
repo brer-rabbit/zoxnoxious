@@ -4,7 +4,8 @@
 
 
 // maximum number of channels on a USB Audio interface
-static const int maxChannels = 31;
+static const int maxChannels = 27;
+static const int maxDevices = 2;
 
 // This doesn't go here-- figure out a home for it. nothing to do with expander.
 static const uint8_t midiProgramChangeStatus = 0xC;
@@ -19,7 +20,7 @@ static const uint8_t midiProgramChangeStatus = 0xC;
  */
 
 struct ZoxnoxiousControlMsg {
-    float frame[maxChannels];
+    float frame[maxDevices][maxChannels];
     bool midiMessageSet;
     midi::Message midiMessage;
 };
@@ -34,7 +35,7 @@ struct ZoxnoxiousControlMsg {
 
 static const int maxCards = 8; // need this just to size channelAssignments array, that's it
 static const int invalidSlot = maxCards;
-static const int invalidCardDeviceId = -1;
+static const int invalidOutputDeviceId = -1;
 static const int invalidCvChannelOffset = -1;
 static const int invalidMidiChannel = -1;
 static const uint8_t invalidCardId = 0;
@@ -42,7 +43,7 @@ static const std::string invalidCardOutputName = "----";
 
 struct ChannelAssignment {
     uint8_t cardId; // physical card's identifier
-    int cardDeviceId; // device id: usb device
+    int outputDeviceId; // device id: usb device, offset to frame
     int cvChannelOffset;  // offset to write channel to the controlmsg frame
     int midiChannel;
     bool assignmentOwned; // true if a card claimed this assignment
@@ -92,7 +93,7 @@ protected:
     // data acquired from the ZoxnoxiousCommandMsg-
     // this data will be used when writing to the ZonxnoxiousControlMsg
     bool hasChannelAssignment;
-    int cardDeviceId;
+    int outputDeviceId;
     int cvChannelOffset;
     int midiChannel;
     int slot;

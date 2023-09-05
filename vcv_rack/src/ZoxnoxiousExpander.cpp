@@ -17,16 +17,16 @@ static const ZoxnoxiousCommandMsg commandEmpty =
   {
       // authoritativeSource
       false,
-      // cardId, cardDeviceId, cvChannelOffset, midiChannel, assignmentOwned
+      // cardId, outputDeviceId, cvChannelOffset, midiChannel, assignmentOwned
       {
-          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
-          { invalidCardId, invalidCardDeviceId, invalidCvChannelOffset, invalidMidiChannel, false}
+          { invalidCardId, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false},
+          { invalidCardId, invalidOutputDeviceId, invalidCvChannelOffset, invalidMidiChannel, false}
       }
   };
 
@@ -164,7 +164,7 @@ void ZoxnoxiousModule::processZoxnoxiousCommand(ZoxnoxiousCommandMsg *zCommand) 
                 zCommand->channelAssignments[slot].assignmentOwned = true; // I OWNEZ THEE
                 // then copy the relevant info
                 midiChannel = zCommand->channelAssignments[slot].midiChannel;
-                cardDeviceId = zCommand->channelAssignments[slot].cardDeviceId;
+                outputDeviceId = zCommand->channelAssignments[slot].outputDeviceId;
                 cvChannelOffset = zCommand->channelAssignments[slot].cvChannelOffset;
                 //INFO("Z Expander: frame %" PRId64 ": module id %" PRId64 " : hasChannelAssignment at slot %d", APP->engine->getFrame(), getId(), slot);
                 onChannelAssignmentEstablished(zCommand);
@@ -191,7 +191,7 @@ void ZoxnoxiousModule::initCommandMsgState() {
     zCommand_b = commandEmpty;
 
     hasChannelAssignment = false;
-    cardDeviceId = invalidCardDeviceId;
+    outputDeviceId = invalidOutputDeviceId;
     cvChannelOffset = invalidCvChannelOffset;
     midiChannel = invalidMidiChannel;
 }

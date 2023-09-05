@@ -406,99 +406,99 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
 
         // 2130 Saw Level
         v = params[VCO_ONE_SAW_KNOB_PARAM].getValue() + inputs[VCO_ONE_SAW_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 15] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 15] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 15] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 15] != v) {
             vcoOneSawClipTimer = clipTime;
         }
 
         // 2130 Pulse Level
         v = params[VCO_ONE_PULSE_KNOB_PARAM].getValue() + inputs[VCO_ONE_PULSE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 14] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 14] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 14] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 14] != v) {
             vcoOnePulseClipTimer = clipTime;
         }
 
         // 3394 Mod Amount VCA
         v = params[VCO_TWO_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[VCO_TWO_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 13] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 13] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 13] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 13] != v) {
             vcoTwoModAmountClipTimer = clipTime;
         }
 
         // 3394 Waveshaped output to 2130 FM
         v = params[VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM].getValue() + inputs[VCO_TWO_WAVESHAPE_TZFM_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 12] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 12] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 12] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 12] != v) {
             vcoTwoWaveshapeTzfmClipTimer = clipTime;
         }
 
         // VCO One Pulse Width
         v = params[VCO_ONE_PW_KNOB_PARAM].getValue() + inputs[VCO_ONE_PW_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 11] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 11] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 11] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 11] != v) {
             vcoOnePwClipTimer = clipTime;
         }
 
         // VCO One Volt/Octave
         v = params[VCO_ONE_VOCT_KNOB_PARAM].getValue() + inputs[VCO_ONE_VOCT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 10] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 10] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 10] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 10] != v) {
             vcoOneVoctClipTimer = clipTime;
         }
 
         // VCO One Linear TZFM
         v = params[VCO_ONE_LINEAR_KNOB_PARAM].getValue() + inputs[VCO_ONE_LINEAR_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 9] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 9] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 9] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 9] != v) {
             vcoOneLinearClipTimer = clipTime;
         }
 
         // 2130 Triangle Level
         v = params[VCO_ONE_TRIANGLE_KNOB_PARAM].getValue() + inputs[VCO_ONE_TRIANGLE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 8] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 8] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 8] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 8] != v) {
             vcoOneTriangleClipTimer = clipTime;
         }
 
         // 3394 VCF Cutoff
         v = params[VCF_CUTOFF_KNOB_PARAM].getValue() + inputs[VCF_CUTOFF_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 7] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 7] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 7] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 7] != v) {
             vcfCutoffClipTimer = clipTime;
         }
 
         // VCO Two Volt/Octave
         v = params[VCO_TWO_VOCT_KNOB_PARAM].getValue() + inputs[VCO_TWO_VOCT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 6] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 6] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 6] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 6] != v) {
             vcoTwoVoctClipTimer = clipTime;
         }
 
         // 2130 Mod Amount VCA
         v = params[VCO_ONE_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[VCO_ONE_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 5] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 5] != v) {
             vcoOneModAmountClipTimer = clipTime;
         }
 
         // 3394 VCF Resonance
         v = params[VCF_RESONANCE_KNOB_PARAM].getValue() + inputs[VCF_RESONANCE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 4] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 4] != v) {
             vcfResonanceClipTimer = clipTime;
         }
 
         // 3394 Triangle to VCF
         v = params[VCO_TWO_TRI_VCF_KNOB_PARAM].getValue() + inputs[VCO_TWO_TRI_VCF_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 3] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 3] != v) {
             vcoTwoTriVcfClipTimer = clipTime;
         }
 
         // Final Gain VCA on 3394
         v = params[FINAL_GAIN_KNOB_PARAM].getValue() + inputs[FINAL_GAIN_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset + 2] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 2] != v) {
             finalGainClipTimer = clipTime;
         }
 
@@ -508,19 +508,19 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         if (vcoTwoPulseEnabled) {
             v = params[VCO_TWO_PW_KNOB_PARAM].getValue() + inputs[VCO_TWO_PW_INPUT].getVoltageSum() / 10.f;
             // TODO: Consider clamp at >0.f, determine value
-            controlMsg->frame[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
-            if (controlMsg->frame[cvChannelOffset + 1] != v) {
+            controlMsg->frame[outputDeviceId][cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
+            if (controlMsg->frame[outputDeviceId][cvChannelOffset + 1] != v) {
                 vcoTwoPwClipTimer = clipTime;
             }
         }
         else {
-            controlMsg->frame[cvChannelOffset + 1] = 0.f;
+            controlMsg->frame[outputDeviceId][cvChannelOffset + 1] = 0.f;
         }
 
         // VCO One / VCO Two Mix to filter on 3394
         v = params[VCO_MIX_KNOB_PARAM].getValue() + inputs[VCO_MIX_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[cvChannelOffset] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[cvChannelOffset] != v) {
+        controlMsg->frame[outputDeviceId][cvChannelOffset] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset] != v) {
             vcoMixClipTimer = clipTime;
         }
 
