@@ -671,7 +671,8 @@ static void* midi_in_to_plugins(void *arg) {
 
 
 // simple function to produce the static discovery report in midi sysex.
-// makes assumption that 20 bytes are available in the buffer.
+// Assumes that 28 bytes are available in the buffer.
+// Discovery report spec is documented in the "midi.spec" file.
 static void generate_discovery_report(uint8_t discovery_report_sysex[]) {
   discovery_report_sysex[0] = 0xF0; // sysex start
   discovery_report_sysex[1] = 0x7D; // test manufacturer
@@ -679,8 +680,9 @@ static void generate_discovery_report(uint8_t discovery_report_sysex[]) {
   discovery_report_sysex[19] = 0xF7; // end sysex
 
   for (int i = 0; i < card_mgr->num_cards; ++i) {
-    discovery_report_sysex[3 + card_mgr->cards[i].slot * 2] = card_mgr->cards[i].card_id;
-    discovery_report_sysex[4 + card_mgr->cards[i].slot * 2] = card_mgr->cards[i].channel_offset;
+    discovery_report_sysex[3 + card_mgr->cards[i].slot * 3] = card_mgr->cards[i].card_id;
+    discovery_report_sysex[4 + card_mgr->cards[i].slot * 3] = card_mgr->cards[i].channel_offset;
+    discovery_report_sysex[5 + card_mgr->cards[i].slot * 3] = card_mgr->cards[i].pcm_device_num;
   }
 
 }

@@ -521,7 +521,7 @@ private:
      */
     void processDiscoveryReport(const midi::Message &msg) {
         const int bytesOffset = 3; // actual data starts at this offset
-        int midiChannel = 0;
+        int assignedMidiChannel = 0;
         // which message to update?
         ZoxnoxiousCommandMsg *leftExpanderProducerMessage =
             leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
@@ -532,7 +532,7 @@ private:
                 leftExpanderProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 2 + bytesOffset];
                 leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = 0; // hardcode
                 leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = msg.bytes[i * 2 + bytesOffset + 1];
-                leftExpanderProducerMessage->channelAssignments[i].midiChannel = midiChannel++;
+                leftExpanderProducerMessage->channelAssignments[i].midiChannel = assignedMidiChannel++;
                 leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
                 INFO("  Discovery Report: card 0x%X offset %d midi %d",
                      leftExpanderProducerMessage->channelAssignments[i].cardId,
@@ -540,7 +540,7 @@ private:
                      leftExpanderProducerMessage->channelAssignments[i].midiChannel);
             }
             else {
-                leftExpanderProducerMessage->channelAssignments[i].cardId = 0x00;
+                leftExpanderProducerMessage->channelAssignments[i].cardId = invalidCardId;
                 leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = invalidOutputDeviceId;
                 leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = invalidCvChannelOffset;
                 leftExpanderProducerMessage->channelAssignments[i].midiChannel = invalidMidiChannel;
@@ -591,7 +591,7 @@ private:
      */
     void processDiscoveryReport2(const midi::Message &msg) {
         const int bytesOffset = 3; // actual data starts at this offset
-        int midiChannel = 0;
+        int assignedMidiChannel = 0;
         // which message to update?
         ZoxnoxiousCommandMsg *leftExpanderProducerMessage =
             leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
@@ -602,7 +602,7 @@ private:
                 leftExpanderProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 3 + bytesOffset];
                 leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = msg.bytes[i * 3 + bytesOffset + 1];
                 leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = msg.bytes[i * 3 + bytesOffset + 2];
-                leftExpanderProducerMessage->channelAssignments[i].midiChannel = midiChannel++;
+                leftExpanderProducerMessage->channelAssignments[i].midiChannel = assignedMidiChannel++;
                 leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
                 INFO("  Discovery Report: card 0x%X device %d offset %d midi %d",
                      leftExpanderProducerMessage->channelAssignments[i].cardId,
@@ -611,7 +611,7 @@ private:
                      leftExpanderProducerMessage->channelAssignments[i].midiChannel);
             }
             else {
-                leftExpanderProducerMessage->channelAssignments[i].cardId = 0x00;
+                leftExpanderProducerMessage->channelAssignments[i].cardId = invalidCardId;
                 leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = invalidOutputDeviceId;
                 leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = invalidCvChannelOffset;
                 leftExpanderProducerMessage->channelAssignments[i].midiChannel = invalidMidiChannel;
