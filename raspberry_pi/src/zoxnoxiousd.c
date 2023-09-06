@@ -676,7 +676,7 @@ static void* midi_in_to_plugins(void *arg) {
 static void generate_discovery_report(uint8_t discovery_report_sysex[]) {
   discovery_report_sysex[0] = 0xF0; // sysex start
   discovery_report_sysex[1] = 0x7D; // test manufacturer
-  discovery_report_sysex[2] = 0x01; // sysex discovery report
+  discovery_report_sysex[2] = 0x02; // sysex discovery report
   discovery_report_sysex[19] = 0xF7; // end sysex
 
   for (int i = 0; i < card_mgr->num_cards; ++i) {
