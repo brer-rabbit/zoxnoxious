@@ -479,89 +479,28 @@ private:
 
     const uint8_t midiManufacturerId = 0x7d;
     const uint8_t midiSysexDiscoveryReport = 0x01;
-    const uint8_t midiSysexDiscoveryReport2 = 0x02;
 
     void processMidiMessage(const midi::Message &msg) {
         // sysex test
+        INFO("processing MIDI message");
         if (msg.getStatus() == 0xf && msg.getSize() > 3 && msg.bytes[1] == midiManufacturerId) {
             if (msg.bytes[2] == midiSysexDiscoveryReport) {
                 processDiscoveryReport(msg);
             }
-            else if (msg.bytes[2] == midiSysexDiscoveryReport2) {
-                processDiscoveryReport2(msg);
+            else {
+                INFO("sysex: unknown");
             }
         }
     }
+
 
     /** processDiscoveryReport
      *
      * read the report on which cards are present in the system.  The
-     * MIDI sysex format for this is 20 bytes:
+     * MIDI sysex format for this is 28 bytes:
      * 0xF0
      * 0x7D
      * 0x01 -- discovery report
-     * 0x?? -- cardA id
-     * 0x?? -- cardA channel offset
-     * 0x?? -- cardB id
-     * 0x?? -- cardB channel offset
-     * 0x?? -- cardC id
-     * 0x?? -- cardC channel offset
-     * 0x?? -- cardD id
-     * 0x?? -- cardD channel offset
-     * 0x?? -- cardE id
-     * 0x?? -- cardE channel offset
-     * 0x?? -- cardF id
-     * 0x?? -- cardF channel offset
-     * 0x?? -- cardG id
-     * 0x?? -- cardG channel offset
-     * 0x?? -- cardH id
-     * 0x?? -- cardH channel offset
-     * 0xF7
-     * if the card Id isn't 0x00 or 0xFF then process it
-     */
-    void processDiscoveryReport(const midi::Message &msg) {
-        const int bytesOffset = 3; // actual data starts at this offset
-        int assignedMidiChannel = 0;
-        // which message to update?
-        ZoxnoxiousCommandMsg *leftExpanderProducerMessage =
-            leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
-
-        INFO("received discovery report:");
-        for (int i = 0; i < maxCards; ++i) {
-            if (msg.bytes[i * 2 + bytesOffset] != 0 && msg.bytes[i * 2 + bytesOffset] != 0xFF) {
-                leftExpanderProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 2 + bytesOffset];
-                leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = 0; // hardcode
-                leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = msg.bytes[i * 2 + bytesOffset + 1];
-                leftExpanderProducerMessage->channelAssignments[i].midiChannel = assignedMidiChannel++;
-                leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
-                INFO("  Discovery Report: card 0x%X offset %d midi %d",
-                     leftExpanderProducerMessage->channelAssignments[i].cardId,
-                     leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset,
-                     leftExpanderProducerMessage->channelAssignments[i].midiChannel);
-            }
-            else {
-                leftExpanderProducerMessage->channelAssignments[i].cardId = invalidCardId;
-                leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = invalidOutputDeviceId;
-                leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = invalidCvChannelOffset;
-                leftExpanderProducerMessage->channelAssignments[i].midiChannel = invalidMidiChannel;
-                leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
-            }
-        }
-
-        // note to self that we need not request a report.  Pass it along to any expanded modules.
-        receivedPluginList = true;
-        processZoxnoxiousCommand(leftExpanderProducerMessage);
-        leftExpander.messageFlipRequested = true;
-    }
-
-
-    /** processDiscoveryReport2
-     *
-     * read the report on which cards are present in the system.  The
-     * MIDI sysex format for this is 20 bytes:
-     * 0xF0
-     * 0x7D
-     * 0x02 -- discovery report2
      * 0x?? -- cardA id
      * 0x?? -- cardA channel offset
      * 0x?? -- cardA device id
@@ -587,16 +526,22 @@ private:
      * 0x?? -- cardH channel offset
      * 0x?? -- cardH device id
      * 0xF7
-     * if the card Id isn't 0x00 or 0xFF then process it
+     * if the card Id isn't 0x00 or 0xFF then process it.
+     * This report specifies exactly what cards are present in the
+     * system and how the host (VCV Rack) is to communicate with each card.
      */
-    void processDiscoveryReport2(const midi::Message &msg) {
+    static const int discoveryReportMessageSize = 28;
+    void processDiscoveryReport(const midi::Message &msg) {
         const int bytesOffset = 3; // actual data starts at this offset
         int assignedMidiChannel = 0;
         // which message to update?
         ZoxnoxiousCommandMsg *leftExpanderProducerMessage =
             leftExpander.producerMessage == &zCommand_a ? &zCommand_a : &zCommand_b;
 
-        INFO("received discovery report:");
+        if (msg.getSize() != discoveryReportMessageSize) {
+            WARN("Discovery report contains %d bytes, expected %d", msg.getSize(), discoveryReportMessageSize);
+        }
+
         for (int i = 0; i < maxCards; ++i) {
             if (msg.bytes[i * 3 + bytesOffset] != 0 && msg.bytes[i * 3 + bytesOffset] != 0xFF) {
                 leftExpanderProducerMessage->channelAssignments[i].cardId = msg.bytes[i * 3 + bytesOffset];
@@ -604,7 +549,7 @@ private:
                 leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = msg.bytes[i * 3 + bytesOffset + 2];
                 leftExpanderProducerMessage->channelAssignments[i].midiChannel = assignedMidiChannel++;
                 leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
-                INFO("  Discovery Report: card 0x%X device %d offset %d midi %d",
+                INFO("Discovery Report: card 0x%X device %d offset %d midi %d",
                      leftExpanderProducerMessage->channelAssignments[i].cardId,
                      leftExpanderProducerMessage->channelAssignments[i].outputDeviceId,
                      leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset,
@@ -616,10 +561,14 @@ private:
                 leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset = invalidCvChannelOffset;
                 leftExpanderProducerMessage->channelAssignments[i].midiChannel = invalidMidiChannel;
                 leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
+                INFO("Discovery Report: No card %d", i);
             }
         }
 
-        // note to self that we need not request a report.  Pass it along to any expanded modules.
+        // note to self that with a report received, we need not keep requesting it.
+        // Process the results and pass it along to any expanded modules (flip request).
+        // Since the report is basically static (no hotplugging modules) we shouldn't need
+        // to produce a new one or flip the left message again.
         receivedPluginList = true;
         processZoxnoxiousCommand(leftExpanderProducerMessage);
         leftExpander.messageFlipRequested = true;
