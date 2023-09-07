@@ -49,7 +49,7 @@
 #define EXPIRATIONS_MISSED_ONE 1
 #define EXPIRATIONS_MISSED_LT_TEN 2
 #define EXPIRATIONS_MISSED_GTE_TEN 3
-
+#define DISCOVERY_REPORT_SIZE_BYTES 28
 
 
 
@@ -562,7 +562,7 @@ static void* midi_in_to_plugins(void *arg) {
   };
   uint64_t expirations;
   struct midi_state midi_state = { 0 };
-  uint8_t discovery_report_sysex[28];
+  uint8_t discovery_report_sysex[DISCOVERY_REPORT_SIZE_BYTES] = { 0 };
 
   generate_discovery_report(discovery_report_sysex);
 
@@ -647,7 +647,8 @@ static void* midi_in_to_plugins(void *arg) {
           if (buffer[i] == DISCOVERY_REQUEST) {
             // no additional data required for a discovery request
             // action is to send a discovery response
-            INFO("MIDI: discovery sysex request received");
+            INFO("MIDI: discovery sysex request received, sending %d bytes",
+                 sizeof(discovery_report_sysex) / sizeof(uint8_t));
             z_midi_write(discovery_report_sysex, sizeof(discovery_report_sysex) / sizeof(uint8_t));
           }
           else {
@@ -677,7 +678,7 @@ static void generate_discovery_report(uint8_t discovery_report_sysex[]) {
   discovery_report_sysex[0] = 0xF0; // sysex start
   discovery_report_sysex[1] = 0x7D; // test manufacturer
   discovery_report_sysex[2] = 0x01; // sysex discovery report
-  discovery_report_sysex[19] = 0xF7; // end sysex
+  discovery_report_sysex[27] = 0xF7; // end sysex
 
   for (int i = 0; i < card_mgr->num_cards; ++i) {
     discovery_report_sysex[3 + card_mgr->cards[i].slot * 3] = card_mgr->cards[i].card_id;
@@ -696,11 +697,18 @@ static int z_midi_write(uint8_t *buffer, int buffer_size) {
   if (midi_out != NULL) {
     midi_write_status = snd_rawmidi_write(midi_out, buffer, buffer_size);
   }
+  else {
+    ERROR("MIDI: midi out is NULL");
+  }
 
   pthread_mutex_unlock(&midi_out_mutex);
 
   if (midi_write_status < 0) {
     ERROR("Error writing to midi output: %s", snd_strerror(midi_write_status));
+  }
+  else if (midi_write_status != buffer_size) {
+    ERROR("Error writing to midi output: wrote %d of %d bytes",
+          midi_write_status, buffer_size);
   }
 
   return midi_write_status;

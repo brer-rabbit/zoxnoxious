@@ -5,9 +5,12 @@
 #
 
 # USB Audio configuration:
-# 8 channels at 4 kHz, 16 bit.
-# eventually this will be multiple audio cards with 24 or 32 channels...
-AUDIO_CHANNEL_MASK=255
+# 8,16,24,27 channels at 4 kHz, 16 bit.  27 is max.
+#AUDIO_CHANNEL_MASK=255
+#AUDIO_CHANNEL_MASK=65535
+#AUDIO_CHANNEL_MASK=16777215
+AUDIO_CHANNEL_MASK=134217727  # 27
+
 AUDIO_SAMPLE_RATES=4000
 AUDIO_SAMPLE_SIZE=2
 
