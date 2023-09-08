@@ -55,7 +55,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         LIGHTS_LEN
     };
 
-    std::vector<ZoxnoxiousAudioPort*> audioPort;
+    std::vector<ZoxnoxiousAudioPort*> audioPorts;
     ZoxnoxiousMidiOutput midiOutput;
     midi::InputQueue midiInput;
 
@@ -127,7 +127,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
         PatchingMatrix::initCommandMsgState();
 
         for(int i = 0; i < maxDevices; ++i) {
-            audioPort.push_back(new ZoxnoxiousAudioPort(this));
+            audioPorts.push_back(new ZoxnoxiousAudioPort(this));
         }
 
 
@@ -171,24 +171,24 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
 
     ~PatchingMatrix() {
-        for (int i = 0; i < maxDevices; ++i) {
-            audioPort[i]->setDriverId(-1);
-            delete audioPort[i];
+        for (auto it = audioPorts.begin(); it != audioPorts.end(); ++it) {
+            (*it)->setDriverId(-1);
+            delete *it;
         }
     }
 
     void onReset() override {
-        for (int i = 0; i < maxDevices; ++i) {
-            audioPort[i]->setDriverId(-1);
+        for (auto it = audioPorts.begin(); it != audioPorts.end(); ++it) {
+            (*it)->setDriverId(-1);
         }
         midiOutput.reset();
     }
 
 
     void onSampleRateChange(const SampleRateChangeEvent& e) override {
-        for (int i = 0; i < maxDevices; ++i) {
-            audioPort[i]->engineInputBuffer.clear();
-            audioPort[i]->engineOutputBuffer.clear();
+        for (auto it = audioPorts.begin(); it != audioPorts.end(); ++it) {
+            (*it)->engineInputBuffer.clear();
+            (*it)->engineOutputBuffer.clear();
         }
     }
 
@@ -420,22 +420,22 @@ private:
      */
     void processControlChannels(ZoxnoxiousControlMsg *controlMsg) {
 
-        for (int deviceNum = 0; deviceNum < maxDevices; ++deviceNum) {
+        for (std::size_t deviceNum = 0; deviceNum < audioPorts.size(); ++deviceNum) {
 
-            if (audioPort[deviceNum]->deviceNumOutputs > 0) {
+            if (audioPorts[deviceNum]->deviceNumOutputs > 0) {
                 dsp::Frame<maxChannels> inputFrame = {};
                 float v;
                 const float clipTime = 0.25f;
 
                 // copy expander control voltages to Frame
-                int minChannels = audioPort[deviceNum]->deviceNumOutputs < maxChannels ?
-                                  audioPort[deviceNum]->deviceNumOutputs : maxChannels;
+                int minChannels = audioPorts[deviceNum]->deviceNumOutputs < maxChannels ?
+                                  audioPorts[deviceNum]->deviceNumOutputs : maxChannels;
                 for (int channel = 0; channel < minChannels; ++channel) {
                     inputFrame.samples[channel] = controlMsg->frame[deviceNum][channel];
                 }
 
                 // add in local control voltages if deviceNum is our device
-                if (deviceNum == outputDeviceId) {
+                if (deviceNum == static_cast<std::size_t>(outputDeviceId)) {
 
                     // left level
                     v = params[LEFT_LEVEL_KNOB_PARAM].getValue() + inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f;
@@ -452,8 +452,8 @@ private:
                     }
                 }
                 
-                if (!audioPort[deviceNum]->engineInputBuffer.full()) {
-                    audioPort[deviceNum]->engineInputBuffer.push(inputFrame);
+                if (!audioPorts[deviceNum]->engineInputBuffer.full()) {
+                    audioPorts[deviceNum]->engineInputBuffer.push(inputFrame);
                 }
             }
         } // for deviceNum
@@ -582,9 +582,9 @@ private:
         json_t* rootJ = json_object();
         json_object_set_new(rootJ, "midiInput", midiInput.toJson());
         json_object_set_new(rootJ, "midiOutput", midiOutput.toJson());
-        for (int deviceNum = 0; deviceNum < maxDevices; ++deviceNum) {
+        for (std::size_t deviceNum = 0; deviceNum < audioPorts.size(); ++deviceNum) {
             std::string thisAudioPortNum = audioPortNum + std::to_string(deviceNum);
-            json_object_set_new(rootJ, thisAudioPortNum.c_str(), audioPort[deviceNum]->toJson());
+            json_object_set_new(rootJ, thisAudioPortNum.c_str(), audioPorts[deviceNum]->toJson());
         }
         return rootJ;
     }
@@ -600,11 +600,11 @@ private:
             midiOutput.fromJson(midiOutputJ);
         }
 
-        for (int deviceNum = 0; deviceNum < maxDevices; ++deviceNum) {
+        for (std::size_t deviceNum = 0; deviceNum < audioPorts.size(); ++deviceNum) {
             std::string thisAudioPortNum = audioPortNum + std::to_string(deviceNum);
             json_t* audioPortJ = json_object_get(rootJ, thisAudioPortNum.c_str());
             if (audioPortJ) {
-                audioPort[deviceNum]->fromJson(audioPortJ);
+                audioPorts[deviceNum]->fromJson(audioPortJ);
             }
         }
     }
@@ -750,12 +750,12 @@ struct PatchingMatrixWidget : ModuleWidget {
         menu->addChild(new MenuSeparator);
         menu->addChild(createSubmenuItem("Audio Device 0", "",
                                          [=](Menu* menu) {
-                                             appendAudioMenu(menu, module->audioPort[0]);
+                                             appendAudioMenu(menu, module->audioPorts[0]);
                                          }));
-        if (maxDevices > 1) {
+        if (module->audioPorts.size() > 0) {
             menu->addChild(createSubmenuItem("Audio Device 1", "",
                                              [=](Menu* menu) {
-                                                 appendAudioMenu(menu, module->audioPort[1]);
+                                                 appendAudioMenu(menu, module->audioPorts[1]);
                                              }));
         }
 
