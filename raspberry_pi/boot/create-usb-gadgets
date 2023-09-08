@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Script to create USB Gadgets on a Pi
-# A USB Audio gadget is created and a USB MIDI gadget
+# Two USB Audio gadgets are created and a USB MIDI gadget
 #
 
 # USB Audio configuration:
@@ -39,7 +39,7 @@ mkdir -p configs/c.1/strings/0x409
  
 # UAC2 (audio) gadget
 # attributes from: https://www.kernel.org/doc/Documentation/ABI/testing/configfs-usb-gadget-uac2
-for i in 0
+for i in 0 1
 do
     mkdir -p functions/uac2.usb${i}
     echo $AUDIO_CHANNEL_MASK > functions/uac2.usb${i}/c_chmask
