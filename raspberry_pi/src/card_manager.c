@@ -40,7 +40,9 @@ static const char *config_lookup_eeprom_base_i2c_address = CARD_MANAGER_KEY_NAME
 #define PROCESS_SAMPLES "process_samples"
 #define PROCESS_MIDI "process_midi"
 #define PROCESS_MIDI_PROGRAM_CHANGE "process_midi_program_change"
-
+#define TUNEREQ_SAVE_STATE "tunereq_save_state"
+#define TUNEREQ_TUNE_CARD "tunereq_tune_card"
+#define TUNEREQ_RESTORE_STATE "tunereq_restore_state"
 
 
 
@@ -231,6 +233,24 @@ int load_card_plugins(struct card_manager *card_mgr) {
       card->process_midi_program_change = dlsym(card->dl_plugin_lib, PROCESS_MIDI_PROGRAM_CHANGE);
       if (card->process_midi_program_change == NULL) {
         ERROR("failed find symbol " PROCESS_MIDI_PROGRAM_CHANGE ", %s", dlerror());
+        return 1;
+      }
+
+      card->tunereq_save_state = dlsym(card->dl_plugin_lib, TUNEREQ_SAVE_STATE);
+      if (card->tunereq_save_state == NULL) {
+        ERROR("failed find symbol " TUNEREQ_SAVE_STATE ", %s", dlerror());
+        return 1;
+      }
+
+      card->tunereq_tune_card = dlsym(card->dl_plugin_lib, TUNEREQ_TUNE_CARD);
+      if (card->tunereq_tune_card == NULL) {
+        ERROR("failed find symbol " TUNEREQ_TUNE_CARD ", %s", dlerror());
+        return 1;
+      }
+
+      card->tunereq_restore_state = dlsym(card->dl_plugin_lib, TUNEREQ_RESTORE_STATE);
+      if (card->tunereq_restore_state == NULL) {
+        ERROR("failed find symbol " TUNEREQ_RESTORE_STATE ", %s", dlerror());
         return 1;
       }
 

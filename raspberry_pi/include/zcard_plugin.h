@@ -55,8 +55,6 @@ struct zhost* zhost_create();
 int set_spi_interface(struct zhost *zhost, unsigned int spi_channel, unsigned int spi_mode, int slot);
 
 
-
-
 /** init the plugin.
  * Input: slot number for the card (0-7).
  * Any setup/state should be done here (constructor).  Return a
@@ -125,6 +123,42 @@ typedef int (*process_midi_f)(void *zcard_plugin, uint8_t *midi_message, size_t 
  * process a midi message program change for this plugin.
  */
 typedef int (*process_midi_program_change_f)(void *zcard_plugin, uint8_t program_number);
+
+
+/** tunereq_save_state_f
+ *
+ * Start of a tune request.  The tune request may be for this card or
+ * it may be for a different card.  Regardless the card is expected to:
+ * (1) save any state that may be manipulated during tuning
+ * (2) mute any outputs if applicable
+ * Set any state to avoid any MIDI updates so they can be queued.  Anything
+ * coming in via USB Audio PCM shouldn't need to be saved.
+ *
+ * Return zero on success, non-zero on failure.
+ */
+typedef int (*tunereq_save_state_f)(void *zcard_plugin);
+
+/** tunreq_tune_card
+ *
+ * Tune this card.  The method has complete control over setting any
+ * values necessary to complete tuning.  All other cards should be
+ * mute and prepared for tuning.
+ * The card can consider storing tuning results to restore on the next boot.
+ *
+ * Return zero on success, non-zero on failure.
+ */
+typedef int (*tunereq_tune_card_f)(void *zcard_plugin);
+
+/** tunereq_restore_state_f
+ *
+ * A tune request completed.  This may be for this card or it may be
+ * for a different card.  Either way, the card is expected to restore
+ * state to where it was at the beginning of the tune request when
+ * tunereq_save_state_f was called.
+ *
+ * Return zero on success, non-zero on failure.
+ */
+typedef int (*tunereq_restore_state_f)(void *zcard_plugin);
 
 
 

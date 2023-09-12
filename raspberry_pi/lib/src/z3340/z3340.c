@@ -241,3 +241,17 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
   return error;
 }
 
+
+
+int tunereq_save_state(void *zcard_plugin) {
+  INFO("Z3340: tune request save state");
+  return 0;
+}
+int tunereq_tune_card(void *zcard_plugin) {
+  INFO("Z3340: tune request tune card");
+  return 0;
+}
+int tunereq_restore_state(void *zcard_plugin) {
+  INFO("Z3340: tune request restore state");
+  return 0;
+}

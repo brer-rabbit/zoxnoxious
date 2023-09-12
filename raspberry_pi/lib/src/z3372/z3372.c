@@ -237,3 +237,15 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
 
   return error;
 }
+
+
+
+int tunereq_save_state(void *zcard_plugin) {
+    return 0;
+}
+int tunereq_tune_card(void *zcard_plugin) {
+    return 0;
+}
+int tunereq_restore_state(void *zcard_plugin) {
+    return 0;
+}

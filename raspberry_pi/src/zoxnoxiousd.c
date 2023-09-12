@@ -74,6 +74,7 @@ static void* read_pcm_and_call_plugins(void *);
 static void* midi_in_to_plugins(void *);
 static void generate_discovery_report(uint8_t discovery_report_sysex[]);
 static int z_midi_write(uint8_t *buffer, int buffer_size);
+static int autotune_all_cards(struct card_manager *card_mgr);
 
 
 
@@ -242,6 +243,7 @@ int main(int argc, char **argv, char **envp) {
   }
 
 
+
   sigemptyset(&signal_set);
   sigaddset(&signal_set, SIGUSR1);
   sigaddset(&signal_set, SIGHUP);
@@ -375,8 +377,7 @@ static int open_midi_device(config_t *cfg) {
 
 
 // add timespec in t1 to accumulator storing in accumulator
-static inline void timespec_accumulate(const struct timespec *t1, struct timespec *accumulator)
-{
+static inline void timespec_accumulate(const struct timespec *t1, struct timespec *accumulator) {
   accumulator->tv_sec += t1->tv_sec;
   accumulator->tv_nsec += t1->tv_nsec;
   if (accumulator->tv_nsec >= 1000000000) {
@@ -442,6 +443,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
       ERROR("pcm1: error from alsa_pcm_ensure_ready");
     }
   }
+
 
   if ( (timerfd_settime(timerfd_sample_clock, 0, &itimerspec_sample_clock, 0) ) == -1) {
     char error[256];
@@ -712,4 +714,26 @@ static int z_midi_write(uint8_t *buffer, int buffer_size) {
   }
 
   return midi_write_status;
+}
+
+
+// autotune_all_cards
+// iterate over all the cards and run the tune routine
+static int autotune_all_cards(struct card_manager *card_mgr) {
+
+  // each card will save state
+  for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
+    (card_mgr->card_update_order[card_num]->tunereq_save_state)(card_mgr->card_update_order[card_num]->plugin_object);
+  }
+
+  // tune each card
+  for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
+    (card_mgr->card_update_order[card_num]->tunereq_save_state)(card_mgr->card_update_order[card_num]->plugin_object);
+  }
+
+  // restore state
+  for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
+    (card_mgr->card_update_order[card_num]->tunereq_save_state)(card_mgr->card_update_order[card_num]->plugin_object);
+  }
+
 }
