@@ -251,6 +251,10 @@ int main(int argc, char **argv, char **envp) {
   sigaddset(&signal_set, SIGTERM);
   pthread_sigmask(SIG_BLOCK, &signal_set, NULL);
 
+
+  // cpu tune request for all cards
+  autotune_all_cards(card_mgr);
+
   // start threads
   if ( pthread_create(&alsa_pcm_to_plugin_thread, NULL, read_pcm_and_call_plugins, NULL) ) {
     ERROR("failed to start thread for read_pcm_and_call_plugins");
@@ -728,12 +732,13 @@ static int autotune_all_cards(struct card_manager *card_mgr) {
 
   // tune each card
   for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
-    (card_mgr->card_update_order[card_num]->tunereq_save_state)(card_mgr->card_update_order[card_num]->plugin_object);
+    (card_mgr->card_update_order[card_num]->tunereq_tune_card)(card_mgr->card_update_order[card_num]->plugin_object);
   }
 
   // restore state
   for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
-    (card_mgr->card_update_order[card_num]->tunereq_save_state)(card_mgr->card_update_order[card_num]->plugin_object);
+    (card_mgr->card_update_order[card_num]->tunereq_restore_state)(card_mgr->card_update_order[card_num]->plugin_object);
   }
 
+  return 0;
 }
