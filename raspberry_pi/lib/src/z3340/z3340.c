@@ -1,4 +1,4 @@
-/* Copyright 2022 Kyle Farrell
+/* Copyright 2023 Kyle Farrell
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License.  You may
@@ -33,6 +33,8 @@ struct z3340_card {
   int i2c_handle;
   uint8_t pca9555_port[2];  // gpio registers
   int16_t previous_samples[6];
+
+  uint8_t tune_store_pca9555_port[2];
 };
 
 static const uint8_t port0_addr = 0x02;
@@ -40,6 +42,8 @@ static const uint8_t port1_addr = 0x03;
 static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
+static const uint8_t tune_config_port0_data = 0x00;
+static const uint8_t tune_config_port1_data = 0x00;
 
 // six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
 static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
@@ -243,15 +247,47 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
 
 
 
+/** tunereq_save_state
+ * Save current state of gpio registers.
+ * The DAC values are already stored as previous_samples.
+ */
 int tunereq_save_state(void *zcard_plugin) {
+  struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
+
   INFO("Z3340: tune request save state");
+  zcard->tune_store_pca9555_port[0] = zcard->pca9555_port[0];
+  zcard->tune_store_pca9555_port[1] = zcard->pca9555_port[1];
+
+
   return 0;
 }
+
+
 int tunereq_tune_card(void *zcard_plugin) {
+  struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
+  int error;
+
   INFO("Z3340: tune request tune card");
+  // set any state necessary on the gpio -- all modulations off, outputs off
+  error = i2cWriteByteData(z3340_card->i2c_handle, config_port0_addr, tune_config_port0_data);
+  error += i2cWriteByteData(z3340_card->i2c_handle, config_port1_addr, tune_config_port0_data);
+  if (error) {
+    ERROR("z3340: error writing to I2C bus address %d\n", i2c_addr);
+    return -1;
+  }
+
+
   return 0;
 }
+
+
+
 int tunereq_restore_state(void *zcard_plugin) {
+  struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
+
   INFO("Z3340: tune request restore state");
+  zcard->pca9555_port[0] = zcard->tune_store_pca9555_port[0];
+  zcard->pca9555_port[1] = zcard->tune_store_pca9555_port[1];
+
   return 0;
 }
