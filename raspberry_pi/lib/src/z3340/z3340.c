@@ -26,13 +26,14 @@
 // https://www.analog.com/media/en/technical-documentation/data-sheets/ad5308_5318_5328.pdf
 #define SPI_MODE 1
 #define SPI_CHANNEL 0 // chip select zero
+#define NUM_DAC_CHANNELS 6
 
 struct z3340_card {
   struct zhost *zhost;
   int slot;
   int i2c_handle;
   uint8_t pca9555_port[2];  // gpio registers
-  int16_t previous_samples[6];
+  int16_t previous_samples[NUM_DAC_CHANNELS];
 
   uint8_t tune_store_pca9555_port[2];
 };
@@ -42,8 +43,16 @@ static const uint8_t port1_addr = 0x03;
 static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
+
+// tuning params
 static const uint8_t tune_config_port0_data = 0x00;
 static const uint8_t tune_config_port1_data = 0x00;
+static const char tune_dac_state[][] = { { 0x00, 0x00 }, // freq
+                                         { 0x10, 0x00 }, // sync level
+                                         { 0x38, 0x00 }, // pulse width: 50%
+                                         { 0x40, 0x00 }, // tri vca
+                                         { 0x50, 0x00 }, // ext mod
+                                         { 0x78, 0x00 } }; // linear: mid-range
 
 // six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
 static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
@@ -95,6 +104,10 @@ void* init_zcard(struct zhost *zhost, int slot) {
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
+  // init previous values to an invalid value
+  for (int i = 0; i < NUM_DAC_CHANNELS) ++i) {
+    previous_samples[i] = -1;
+  }
 
   return z3340;
 }
@@ -119,7 +132,7 @@ char* get_plugin_name() {
 
 struct zcard_properties* get_zcard_properties() {
   struct zcard_properties *props = (struct zcard_properties*) malloc(sizeof(struct zcard_properties));
-  props->num_channels = 6;
+  props->num_channels = NUM_DAC_CHANNELS;
   props->spi_mode = 0;
   return props;
 }
@@ -263,9 +276,11 @@ int tunereq_save_state(void *zcard_plugin) {
 }
 
 
+
 int tunereq_tune_card(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
   int error;
+  int spi_channel;
 
   INFO("Z3340: tune request tune card");
   // set any state necessary on the gpio -- all modulations off, outputs off
@@ -276,14 +291,21 @@ int tunereq_tune_card(void *zcard_plugin) {
     return -1;
   }
 
+  spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
+  // set DAC state
+  for (int i = 0; i < NUM_DAC_CHANNELS; ++i) {
+    spiWrite(spi_channel, &tune_dac_state[i], 2);
+  }
 
   return 0;
 }
 
 
 
+
 int tunereq_restore_state(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
+
 
   INFO("Z3340: tune request restore state");
   zcard->pca9555_port[0] = zcard->tune_store_pca9555_port[0];
