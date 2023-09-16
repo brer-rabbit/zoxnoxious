@@ -45,6 +45,10 @@ static const uint8_t config_port_as_output = 0x00;
 // channel for DAC is upper 4 bits
 static const int channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
 
+// slew rate limit these signals
+static const int final_vca_cs = 0;
+static const int final_vca_dac = 2;
+static const int slew_limit = 3000;
 
 
 void* init_zcard(struct zhost *zhost, int slot) {
@@ -129,7 +133,25 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct z5524_card *zcard = (struct z5524_card*)zcard_plugin;
   char samples_to_dac[2];
   int spi_channel;
-  uint16_t this_sample;
+  int16_t this_sample;
+  int slew_delta;
+
+  // slew rate limit filter.
+  // The 3394 final_vca should be slew rate limited.  From zero to max
+  // should be a couple milliseconds, not 250us.  Avoid clicks.
+  slew_delta = samples[final_vca_dac + final_vca_cs * DAC_CHANNELS] -
+    zcard->previous_samples[final_vca_cs][final_vca_dac];
+  if (slew_delta > slew_limit) { // limit positive
+    samples[final_vca_dac + final_vca_cs * DAC_CHANNELS] =
+      zcard->previous_samples[final_vca_cs][final_vca_dac] + slew_limit;
+  }
+  else if (slew_delta < -slew_limit) {
+    samples[final_vca_dac + final_vca_cs * DAC_CHANNELS] =
+      zcard->previous_samples[final_vca_cs][final_vca_dac] - slew_limit;
+  }
+
+
+  // dac output samples
 
   for (int chip_select = 0; chip_select < CHIP_SELECTS; chip_select++) {
       spi_channel = set_spi_interface(zcard->zhost, chip_select, SPI_MODE, zcard->slot);
@@ -145,7 +167,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
               // MSB zero specifies DAC data.  Next three bits are DAC address.  Final 12 are data.
               // Given a 16-bit signed input, write it to a 12-bit signed values.
               // Any negative value clips to zero.
-              if (samples[i] >= 0) {
+              if (this_sample >= 0) {
                   samples_to_dac[0] = channel_map[i] | (this_sample) >> 11;
                   samples_to_dac[1] = this_sample >> 3;
               }
