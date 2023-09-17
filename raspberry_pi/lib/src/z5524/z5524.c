@@ -48,7 +48,7 @@ static const int channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x7
 // slew rate limit these signals
 static const int final_vca_cs = 0;
 static const int final_vca_dac = 2;
-static const int slew_limit = 3000;
+static const int slew_limit = 2000; // ~4ms max rise or fall time: 250us * 32768/2000
 
 // helper declarations
 inline static int dac_write(int16_t this_sample, int dac_line, int spi_channel);
