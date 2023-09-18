@@ -26,6 +26,7 @@
 // https://www.analog.com/media/en/technical-documentation/data-sheets/ad5308_5318_5328.pdf
 #define SPI_MODE 1
 #define SPI_CHANNEL 0 // chip select zero
+#define DAC_CHANNELS 6
 
 struct z3340_card {
   struct zhost *zhost;
@@ -46,6 +47,7 @@ static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
 
 // slew rate limit the triangle vca
 static const int slew_limit = 3000;
+static const int triangle_vca_id = 3;
 
 void* init_zcard(struct zhost *zhost, int slot) {
   int error = 0;
@@ -127,14 +129,13 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
   char samples_to_dac[2];
   int spi_channel;
-  int dac_channel;
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
 
   // this is broken up, rather crudely, to filter the triangle VCA amount.  If not
   // for that a single loop would do
   // first channels: freq_cv, sync_level, pwm
-  for (dac_channel = 0; dac_channel < 3; ++dac_channel) {
+  for (int dac_channel = 0; dac_channel < DAC_CHANNELS; ++dac_channel) {
     if (zcard->previous_samples[dac_channel] != samples[dac_channel] ) {
       // DAC write:
       // bits 15-0:
@@ -142,63 +143,44 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       // MSB zero specifies DAC data.  Next three bits are DAC address.  Final 12 are data.
       // Given a 16-bit signed input, write it to a 12-bit signed values.
       // Any negative value clips to zero.
-      if (samples[dac_channel] >= 0) {
-        samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) samples[dac_channel]) >> 11;
-        samples_to_dac[1] = ((uint16_t) samples[dac_channel]) >> 3;
-        zcard->previous_samples[dac_channel] = samples[dac_channel];
+
+      // Special handling for triangle out to slew rate limit.  Limit is
+      // approx 2.5 ms for full off -- full on or vice versa.
+      if (dac_channel == triangle_vca_id) {
+        int16_t triangle_sample;
+        int slew_delta = samples[dac_channel] - zcard->previous_samples[dac_channel];
+        if (slew_delta > slew_limit) { // limit positive
+          triangle_sample = zcard->previous_samples[dac_channel] + slew_limit;
+        }
+        else if (slew_delta < -slew_limit) {
+          triangle_sample = zcard->previous_samples[dac_channel] - slew_limit;
+        }
+        else {
+          triangle_sample = samples[dac_channel];
+        }
+
+        if (triangle_sample >= 0) {
+          samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) triangle_sample) >> 11;
+          samples_to_dac[1] = ((uint16_t) triangle_sample) >> 3;
+          zcard->previous_samples[dac_channel] = triangle_sample;
+        }
+        else {
+          samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
+          samples_to_dac[1] = 0;
+          zcard->previous_samples[dac_channel] = 0;
+        }
       }
       else {
-        samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
-        samples_to_dac[1] = (uint16_t) 0;
-        zcard->previous_samples[dac_channel] = 0;
-      }
-
-      spiWrite(spi_channel, samples_to_dac, 2);
-    }
-  }
-
-  // triangle VCA processing
-  if (zcard->previous_samples[dac_channel] != samples[dac_channel] ) {
-    int16_t triangle_sample;
-    int slew_delta = samples[dac_channel] - zcard->previous_samples[dac_channel];
-    if (slew_delta > slew_limit) { // limit positive
-      triangle_sample = zcard->previous_samples[dac_channel] + slew_limit;
-    }
-    else if (slew_delta < -slew_limit) {
-      triangle_sample = zcard->previous_samples[dac_channel] - slew_limit;
-    }
-    else {
-      triangle_sample = samples[dac_channel];
-    }
-
-    if (triangle_sample >= 0) {
-      samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) triangle_sample) >> 11;
-      samples_to_dac[1] = ((uint16_t) triangle_sample) >> 3;
-      zcard->previous_samples[dac_channel] = triangle_sample;
-    }
-    else {
-      samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
-      samples_to_dac[1] = (uint16_t) 0;
-      zcard->previous_samples[dac_channel] = 0;
-    }
-
-    spiWrite(spi_channel, samples_to_dac, 2);
-  }
-
-
-  // remaining DAC channels: osc_ext_vca, linear_fm
-  for (++dac_channel; dac_channel < 6; ++dac_channel) {
-    if (zcard->previous_samples[dac_channel] != samples[dac_channel] ) {
-
-      if (samples[dac_channel] >= 0) {
-        samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) samples[dac_channel]) >> 11;
-        samples_to_dac[1] = ((uint16_t) samples[dac_channel]) >> 3;
-        zcard->previous_samples[dac_channel] = samples[dac_channel];
-      }
-      else {
-        samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
-        samples_to_dac[1] = (uint16_t) 0;
-        zcard->previous_samples[dac_channel] = 0;
+        if (samples[dac_channel] >= 0) {
+          samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) samples[dac_channel]) >> 11;
+          samples_to_dac[1] = ((uint16_t) samples[dac_channel]) >> 3;
+          zcard->previous_samples[dac_channel] = samples[dac_channel];
+        }
+        else {
+          samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
+          samples_to_dac[1] = 0;
+          zcard->previous_samples[dac_channel] = 0;
+        }
       }
 
       spiWrite(spi_channel, samples_to_dac, 2);

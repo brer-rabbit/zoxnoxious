@@ -167,6 +167,9 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   chip_select++;
   spi_channel = set_spi_interface(zcard->zhost, chip_select, SPI_MODE, zcard->slot);
 
+  // and the DAC out for CS1, the SSI2130.  Yes, this could be a loop for chip
+  // select but this pulls the check for 3394 final_vca_dac out.  No need to
+  // check that condition here.
   for (int i = 0; i < DAC_CHANNELS; ++i) {
     this_sample = samples[i + chip_select * DAC_CHANNELS];
     if (zcard->previous_samples[chip_select][i] != this_sample) {
