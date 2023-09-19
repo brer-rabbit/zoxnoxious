@@ -57,7 +57,9 @@ static const char tune_dac_state[][] = { { 0x00, 0x00 }, // freq
 // six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
 static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
 
-
+// slew rate limit the triangle vca
+static const int slew_limit = 3000;
+static const int triangle_vca_id = 3;
 
 void* init_zcard(struct zhost *zhost, int slot) {
   int error = 0;
@@ -146,44 +148,60 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
 
-  for (int i = 0; i < 6; ++i) {
-    if (zcard->previous_samples[i] != samples[i] ) {
-      zcard->previous_samples[i] = samples[i];
-
+  // this is broken up, rather crudely, to filter the triangle VCA amount.  If not
+  // for that a single loop would do
+  // first channels: freq_cv, sync_level, pwm
+  for (int dac_channel = 0; dac_channel < NUM_DAC_CHANNELS; ++dac_channel) {
+    if (zcard->previous_samples[dac_channel] != samples[dac_channel] ) {
       // DAC write:
       // bits 15-0:
       // 0 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0
       // MSB zero specifies DAC data.  Next three bits are DAC address.  Final 12 are data.
       // Given a 16-bit signed input, write it to a 12-bit signed values.
       // Any negative value clips to zero.
-      if (samples[i] >= 0) {
-        samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
-        samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+
+      // Special handling for triangle out to slew rate limit.  Limit is
+      // approx 2.5 ms for full off -- full on or vice versa.
+      if (dac_channel == triangle_vca_id) {
+        int16_t triangle_sample;
+        int slew_delta = samples[dac_channel] - zcard->previous_samples[dac_channel];
+        if (slew_delta > slew_limit) { // limit positive
+          triangle_sample = zcard->previous_samples[dac_channel] + slew_limit;
+        }
+        else if (slew_delta < -slew_limit) {
+          triangle_sample = zcard->previous_samples[dac_channel] - slew_limit;
+        }
+        else {
+          triangle_sample = samples[dac_channel];
+        }
+
+        if (triangle_sample >= 0) {
+          samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) triangle_sample) >> 11;
+          samples_to_dac[1] = ((uint16_t) triangle_sample) >> 3;
+          zcard->previous_samples[dac_channel] = triangle_sample;
+        }
+        else {
+          samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
+          samples_to_dac[1] = 0;
+          zcard->previous_samples[dac_channel] = 0;
+        }
       }
       else {
-        samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
-        samples_to_dac[1] = (uint16_t) 0;
+        if (samples[dac_channel] >= 0) {
+          samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) samples[dac_channel]) >> 11;
+          samples_to_dac[1] = ((uint16_t) samples[dac_channel]) >> 3;
+          zcard->previous_samples[dac_channel] = samples[dac_channel];
+        }
+        else {
+          samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
+          samples_to_dac[1] = 0;
+          zcard->previous_samples[dac_channel] = 0;
+        }
       }
 
       spiWrite(spi_channel, samples_to_dac, 2);
-
-#ifdef DAC_DEBUG
-      // test DAC channel is at 0x60; mirror dac channel 0x40 for test
-      if (i == 3) {
-        samples_to_dac[0] |= 0x20;
-        spiWrite(spi_channel, samples_to_dac, 2);
-      }
-#endif
-        
     }
   }
-
-  /*
-    INFO("z3340: samples: %p %5hd %5hd %5hd %5hd %5hd %5hd\n",
-           (void*) samples,
-           samples[0], samples[1], samples[2],
-           samples[3], samples[4], samples[5]);
-  */
 
   return 0;
 }

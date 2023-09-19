@@ -27,6 +27,8 @@ int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
 
 
+static const float noiseVcaThresholdGateLevel = 0.f;
+
 struct Zoxnoxious3372 : ZoxnoxiousModule {
     enum ParamId {
         CUTOFF_KNOB_PARAM,
@@ -269,7 +271,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         channel++;
         v = params[NOISE_KNOB_PARAM].getValue() + inputs[NOISE_LEVEL_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        noise_enabled = controlMsg->frame[outputDeviceId][cvChannelOffset + channel] > 0.005f ? true : false;
+        noise_enabled = controlMsg->frame[outputDeviceId][cvChannelOffset + channel] > noiseVcaThresholdGateLevel ? true : false;
         // no clip LED for noise level
 
         channel++;

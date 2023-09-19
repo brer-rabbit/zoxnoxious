@@ -59,6 +59,10 @@ static const uint8_t config_port_as_output = 0x00;
 static const uint8_t channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x70 };
 
 
+// slew rate limit the Noise VCA
+static const int slew_limit = 250;
+static const int noise_vca_id = 2;
+
 
 void* init_zcard(struct zhost *zhost, int slot) {
   int error = 0;
@@ -145,24 +149,54 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 
   for (int i = 0; i < NUM_CHANNELS; ++i) {
     if (zcard->previous_samples[i] != samples[i] ) {
-      zcard->previous_samples[i] = samples[i];
 
-      // DAC write:
-      // bits 15-0:
-      // 0 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0
-      // MSB zero specifies DAC data.  Next three bits are DAC address.  Final 12 are data.
-      // Given a 16-bit signed input, write it to a 12-bit signed values.
-      // Any negative value clips to zero.
-      if (samples[i] >= 0) {
-        samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
-        samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+      if (i == noise_vca_id) {
+        int16_t noise_vca_sample;
+        int slew_delta = samples[i] - zcard->previous_samples[i];
+        if (slew_delta > slew_limit) { // limit positive slew
+          noise_vca_sample = zcard->previous_samples[i] + slew_limit;
+        }
+        else if (slew_delta < -slew_limit) { // limit negative slew
+          noise_vca_sample = zcard->previous_samples[i] - slew_limit;
+        }
+        else {
+          noise_vca_sample = samples[i];
+        }
+
+        if (samples[i] >= 0) {
+          zcard->previous_samples[i] = samples[i];
+          samples_to_dac[0] = channel_map[i] | ((uint16_t) noise_vca_sample) >> 11;
+          samples_to_dac[1] = ((uint16_t) noise_vca_sample) >> 3;
+        }
+        else {
+          zcard->previous_samples[i] = 0;
+          samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
+          samples_to_dac[1] = 0;
+        }
+
       }
-      else {
-        samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
-        samples_to_dac[1] = (uint16_t) 0;
+      else { // any DAC line except noise VCA
+
+        // DAC write:
+        // bits 15-0:
+        // 0 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0
+        // MSB zero specifies DAC data.  Next three bits are DAC address.  Final 12 are data.
+        // Given a 16-bit signed input, write it to a 12-bit signed values.
+        // Any negative value clips to zero.
+        if (samples[i] >= 0) {
+          zcard->previous_samples[i] = samples[i];
+          samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
+          samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+        }
+        else {
+          zcard->previous_samples[i] = 0;
+          samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
+          samples_to_dac[1] = 0;
+        }
+
       }
 
-      spiWrite(spi_channel, samples_to_dac, 2);        
+      spiWrite(spi_channel, samples_to_dac, 2);
     }
   }
 
