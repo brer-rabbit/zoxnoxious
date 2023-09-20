@@ -28,6 +28,11 @@
 #define SPI_CHANNEL 0 // chip select zero
 #define NUM_DAC_CHANNELS 6
 
+struct tuning_point {
+  int16_t sample;
+  float frequency;
+};
+
 struct z3340_card {
   struct zhost *zhost;
   int slot;
@@ -36,6 +41,8 @@ struct z3340_card {
   int16_t previous_samples[NUM_DAC_CHANNELS];
 
   uint8_t tune_store_pca9555_port[2];
+  struct tuning_point tuning_points[9];
+  int current_tuning_point;
 };
 
 static const uint8_t port0_addr = 0x02;
@@ -46,7 +53,7 @@ static const uint8_t config_port_as_output = 0x00;
 
 // tuning params
 static const uint8_t tune_config_port0_data = 0x00;
-static const uint8_t tune_config_port1_data = 0x00;
+static const uint8_t tune_config_port1_data = 0x02; // output1 pulse -- not actually necessary
 static const char tune_dac_state[][] = { { 0x00, 0x00 }, // freq
                                          { 0x10, 0x00 }, // sync level
                                          { 0x38, 0x00 }, // pulse width: 50%
@@ -315,6 +322,10 @@ int tunereq_tune_card(void *zcard_plugin) {
     spiWrite(spi_channel, &tune_dac_state[i], 2);
   }
 
+  // ready to setup frequency measurement
+  
+
+
   return 0;
 }
 
@@ -330,4 +341,16 @@ int tunereq_restore_state(void *zcard_plugin) {
   zcard->pca9555_port[1] = zcard->tune_store_pca9555_port[1];
 
   return 0;
+}
+
+
+
+// internal / static functions
+
+// Callback function to implement gpioGetSamplesFuncEx_t.  Read the
+// samples from gpioGetSamplesFuncEx.  Store the results with the
+// z3340_card userdata.
+
+static void read_samples(const gpioSample_t *samples, int numSamples, void *userdata) {
+  
 }
