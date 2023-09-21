@@ -317,8 +317,6 @@ int tunereq_save_state(void *zcard_plugin) {
 
 
 
-// TODO: move this to the zdk lib
-static const int gpio_id_by_slot[] = { 17, 27, 22, 23, 24, 25 };
 
 int tunereq_tune_card(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;

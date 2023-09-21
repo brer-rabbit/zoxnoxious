@@ -161,5 +161,9 @@ typedef int (*tunereq_tune_card_f)(void *zcard_plugin);
 typedef int (*tunereq_restore_state_f)(void *zcard_plugin);
 
 
+/** convenience for mapping: find the gpio that a slot drives
+ */
+extern const int gpio_id_by_slot[];
+
 
 #endif

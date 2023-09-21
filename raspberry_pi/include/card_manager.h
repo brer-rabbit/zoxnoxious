@@ -141,4 +141,5 @@ void assign_update_order(struct card_manager *card_mgr);
 void assign_hw_audio_channels(struct card_manager *card_mgr, int *channels, int num_devices);
 
 
+
 #endif

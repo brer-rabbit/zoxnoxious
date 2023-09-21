@@ -138,3 +138,6 @@ int set_spi_interface(struct zhost *zhost, unsigned int spi_channel, unsigned in
 
     return zhost->spi_devices[spi_channel].spi_handle;
 }
+
+
+const int gpio_id_by_slot[] = { 17, 27, 22, 23, 24, 25 };
