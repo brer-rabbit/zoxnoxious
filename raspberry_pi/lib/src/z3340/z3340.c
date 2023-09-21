@@ -41,6 +41,7 @@ struct z3340_card {
   float frequency_tuning_points[9];
   int tuning_num_samples;
   int freq_tuning_index;  // for loop index to frequency_tuning_points
+  uint32_t prev_low_to_high_tick;
   uint32_t gpio_mask;
 };
 
@@ -103,6 +104,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
 
   z3340->zhost = zhost;
   z3340->slot = slot;
+  zcard->gpio_mask = 1 << gpio_id_by_slot[zcard->slot]; // used for tuning
   z3340->pca9555_port[0] = 0x00;
   z3340->pca9555_port[1] = 0x00;
 
@@ -132,9 +134,9 @@ void* init_zcard(struct zhost *zhost, int slot) {
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
-
   return z3340;
 }
+
 
 
 void free_zcard(void *zcard_plugin) {
@@ -323,7 +325,6 @@ int tunereq_tune_card(void *zcard_plugin) {
   int error;
   int spi_channel;
 
-  zcard->gpio_mask = 1 << gpio_id_by_slot[zcard->slot]; // get gpio number of slot, set mask bit
   INFO("Z3340: tune request tune card using slot %d gpio mask %u", zcard->slot, zcard->gpio_mask);
 
   // set any state necessary on the gpio -- all modulations off, outputs off
@@ -348,22 +349,8 @@ int tunereq_tune_card(void *zcard_plugin) {
        ++zcard->freq_tuning_index) {
     // set DAC
     spiWrite(spi_channel, tune_freq_dac_values[zcard->freq_tuning_index], 2);
+    measure_freq(zcard);
 
-    zcard->frequency_tuning_points[zcard->freq_tuning_index] = 0.0;
-    zcard->tuning_num_samples = 0;
-    // register callback
-    gpioSetGetSamplesFuncEx(read_samples, zcard->gpio_mask, zcard);
-
-    // usleep 100ms
-    usleep(100000);
-
-    // unregister callback
-    gpioSetGetSamplesFuncEx(NULL, 0, zcard);
-    INFO("Z3340: slot %d tune %i done: %f / %d",
-         zcard->slot,
-         zcard->freq_tuning_index,
-         zcard->frequency_tuning_points[zcard->freq_tuning_index],
-         zcard->tuning_num_samples);
   }
 
   INFO("Z3340: tune slot %d complete", zcard->slot);
@@ -405,10 +392,49 @@ static void read_samples(const gpioSample_t *samples, int num_samples, void *use
 
     // todo: record last low to high for delta
     if (gpio_low_to_high) { // if it's a low to high
+
       zcard->tuning_num_samples++;
       zcard->frequency_tuning_points[zcard->freq_tuning_index] +=
         (samples[sample_index].tick - samples[sample_index - 1].tick);
     }
   }
+
+}
+
+
+
+/** measure_freq
+ *
+ * pre: i2c setup correctly, DAC frequency CV written with voltage for freq measurement,
+ *      other DAC lines set accordingly.
+ *
+ * --> set the sample callback
+ * --> sleep 100usec
+ * --> verify we have adequate samples
+ * --> unset callback function
+ *
+ * Return frequency at this point.  Return a negative value on failure.
+ */
+static int measure_freq(struct z3340_card *zcard) {
+
+  zcard->frequency_tuning_points[zcard->freq_tuning_index] = 0.0;
+  zcard->tuning_num_samples = 0;
+  zcard->prev_low_to_high_tick = 0;
+  // register callback
+  gpioSetGetSamplesFuncEx(read_samples, zcard->gpio_mask, zcard);
+
+
+  // TODO: verify we have adequate samples
+  // usleep 100ms
+  usleep(100000);
+
+
+  // unregister callback
+  gpioSetGetSamplesFuncEx(NULL, 0, zcard);
+  INFO("Z3340: slot %d tune %i done: %f / %d",
+       zcard->slot,
+       zcard->freq_tuning_index,
+       zcard->frequency_tuning_points[zcard->freq_tuning_index],
+       zcard->tuning_num_samples);
 
 }
