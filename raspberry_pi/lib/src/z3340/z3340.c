@@ -15,6 +15,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "zcard_plugin.h"
 
@@ -28,10 +29,6 @@
 #define SPI_CHANNEL 0 // chip select zero
 #define NUM_DAC_CHANNELS 6
 
-struct tuning_point {
-  int16_t sample;
-  float frequency;
-};
 
 struct z3340_card {
   struct zhost *zhost;
@@ -41,9 +38,12 @@ struct z3340_card {
   int16_t previous_samples[NUM_DAC_CHANNELS];
 
   uint8_t tune_store_pca9555_port[2];
-  struct tuning_point tuning_points[9];
-  int current_tuning_point;
+  float frequency_tuning_points[9];
+  int tuning_num_samples;
+  int freq_tuning_index;  // for loop index to frequency_tuning_points
+  uint32_t gpio_mask;
 };
+
 
 static const uint8_t port0_addr = 0x02;
 static const uint8_t port1_addr = 0x03;
@@ -51,22 +51,41 @@ static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
 
-// tuning params
-static const uint8_t tune_config_port0_data = 0x00;
-static const uint8_t tune_config_port1_data = 0x02; // output1 pulse -- not actually necessary
-static const char tune_dac_state[][] = { { 0x00, 0x00 }, // freq
-                                         { 0x10, 0x00 }, // sync level
-                                         { 0x38, 0x00 }, // pulse width: 50%
-                                         { 0x40, 0x00 }, // tri vca
-                                         { 0x50, 0x00 }, // ext mod
-                                         { 0x78, 0x00 } }; // linear: mid-range
-
 // six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
 static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
 
+//
+// tuning params
+//
+static const uint8_t tune_config_port0_data = 0x00;
+static const uint8_t tune_config_port1_data = 0x02; // output1 pulse -- not actually necessary
+static char tune_dac_state[][2] = { { 0x00, 0x00 }, // freq
+                                    { 0x10, 0x00 }, // sync level
+                                    { 0x38, 0x00 }, // pulse width: 50%
+                                    { 0x40, 0x00 }, // tri vca
+                                    { 0x50, 0x00 }, // ext mod
+                                    { 0x78, 0x00 } }; // linear: mid-range
+// tune_freq_dac_values: the DAC values to run through for a tuning request:
+// all on frequency CV, each step is up by 1 volt (512 decimal).
+static char tune_freq_dac_values[][2] = { { 0x00, 0x00 }, // freq 0V
+                                                { 0x02, 0x00 }, // freq 1V
+                                                { 0x04, 0x00 }, // freq 2V
+                                                { 0x06, 0x00 }, // freq 3V
+                                                { 0x08, 0x00 }, // freq 4V
+                                                { 0x0a, 0x00 }, // freq 5V
+                                                { 0x0c, 0x00 }, // freq 6V
+                                                { 0x0e, 0x00 }, // freq 7V
+                                                { 0x0f, 0xff } }; // freq 8V
+static void read_samples(const gpioSample_t *samples, int numSamples, void *userdata);
+
+
+//
 // slew rate limit the triangle vca
+//
 static const int slew_limit = 3000;
 static const int triangle_vca_id = 3;
+
+
 
 void* init_zcard(struct zhost *zhost, int slot) {
   int error = 0;
@@ -113,10 +132,6 @@ void* init_zcard(struct zhost *zhost, int slot) {
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
-  // init previous values to an invalid value
-  for (int i = 0; i < NUM_DAC_CHANNELS) ++i) {
-    previous_samples[i] = -1;
-  }
 
   return z3340;
 }
@@ -302,29 +317,58 @@ int tunereq_save_state(void *zcard_plugin) {
 
 
 
+// TODO: move this to the zdk lib
+static const int gpio_id_by_slot[] = { 17, 27, 22, 23, 24, 25 };
+
 int tunereq_tune_card(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
   int error;
   int spi_channel;
 
-  INFO("Z3340: tune request tune card");
+  zcard->gpio_mask = 1 << gpio_id_by_slot[zcard->slot]; // get gpio number of slot, set mask bit
+  INFO("Z3340: tune request tune card using slot %d gpio mask %u", zcard->slot, zcard->gpio_mask);
+
   // set any state necessary on the gpio -- all modulations off, outputs off
-  error = i2cWriteByteData(z3340_card->i2c_handle, config_port0_addr, tune_config_port0_data);
-  error += i2cWriteByteData(z3340_card->i2c_handle, config_port1_addr, tune_config_port0_data);
+  error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, tune_config_port0_data);
+  error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, tune_config_port1_data);
   if (error) {
-    ERROR("z3340: error writing to I2C bus address %d\n", i2c_addr);
+    ERROR("z3340: error writing to I2C bus handle %d\n", zcard->i2c_handle);
     return -1;
   }
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
   // set DAC state
   for (int i = 0; i < NUM_DAC_CHANNELS; ++i) {
-    spiWrite(spi_channel, &tune_dac_state[i], 2);
+    spiWrite(spi_channel, tune_dac_state[i], 2);
   }
 
-  // ready to setup frequency measurement
-  
+  INFO("Z3340: tune request slot %d setup done", zcard->slot);
 
+  // ready to setup frequency measurement
+  for (zcard->freq_tuning_index = 0;
+       zcard->freq_tuning_index < sizeof(tune_freq_dac_values) / sizeof(tune_freq_dac_values[0]);
+       ++zcard->freq_tuning_index) {
+    // set DAC
+    spiWrite(spi_channel, tune_freq_dac_values[zcard->freq_tuning_index], 2);
+
+    zcard->frequency_tuning_points[zcard->freq_tuning_index] = 0.0;
+    zcard->tuning_num_samples = 0;
+    // register callback
+    gpioSetGetSamplesFuncEx(read_samples, zcard->gpio_mask, zcard);
+
+    // usleep 100ms
+    usleep(100000);
+
+    // unregister callback
+    gpioSetGetSamplesFuncEx(NULL, 0, zcard);
+    INFO("Z3340: slot %d tune %i done: %f / %d",
+         zcard->slot,
+         zcard->freq_tuning_index,
+         zcard->frequency_tuning_points[zcard->freq_tuning_index],
+         zcard->tuning_num_samples);
+  }
+
+  INFO("Z3340: tune slot %d complete", zcard->slot);
 
   return 0;
 }
@@ -351,6 +395,22 @@ int tunereq_restore_state(void *zcard_plugin) {
 // samples from gpioGetSamplesFuncEx.  Store the results with the
 // z3340_card userdata.
 
-static void read_samples(const gpioSample_t *samples, int numSamples, void *userdata) {
-  
+static void read_samples(const gpioSample_t *samples, int num_samples, void *userdata) {
+  struct z3340_card *zcard = (struct z3340_card*)userdata;
+  int sample_index;
+  int gpio_low_to_high;
+
+  for (sample_index = 1; sample_index < num_samples; ++sample_index) {
+    // xor to find any changes, and with gpio mask to get bit of interest
+    gpio_low_to_high =
+      (samples[sample_index - 1].level ^ samples[sample_index].level) & zcard->gpio_mask;
+
+    // todo: record last low to high for delta
+    if (gpio_low_to_high) { // if it's a low to high
+      zcard->tuning_num_samples++;
+      zcard->frequency_tuning_points[zcard->freq_tuning_index] +=
+        (samples[sample_index].tick - samples[sample_index - 1].tick);
+    }
+  }
+
 }
