@@ -78,6 +78,7 @@ static char tune_freq_dac_values[][2] = { { 0x00, 0x00 }, // freq 0V
                                                 { 0x0e, 0x00 }, // freq 7V
                                                 { 0x0f, 0xff } }; // freq 8V
 static void read_samples(const gpioSample_t *samples, int numSamples, void *userdata);
+static int measure_freq(struct z3340_card *zcard);
 
 
 //
@@ -104,7 +105,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
 
   z3340->zhost = zhost;
   z3340->slot = slot;
-  zcard->gpio_mask = 1 << gpio_id_by_slot[zcard->slot]; // used for tuning
+  z3340->gpio_mask = 1 << gpio_id_by_slot[z3340->slot]; // used for tuning
   z3340->pca9555_port[0] = 0x00;
   z3340->pca9555_port[1] = 0x00;
 
@@ -393,9 +394,14 @@ static void read_samples(const gpioSample_t *samples, int num_samples, void *use
     // todo: record last low to high for delta
     if (gpio_low_to_high) { // if it's a low to high
 
-      zcard->tuning_num_samples++;
-      zcard->frequency_tuning_points[zcard->freq_tuning_index] +=
-        (samples[sample_index].tick - samples[sample_index - 1].tick);
+      if (zcard->prev_low_to_high_tick != 0) {
+        if (samples[sample_index].tick > zcard->prev_low_to_high_tick) {
+          zcard->tuning_num_samples++;
+          zcard->frequency_tuning_points[zcard->freq_tuning_index] +=
+            (samples[sample_index].tick - zcard->prev_low_to_high_tick);
+        }
+      }
+      zcard->prev_low_to_high_tick = samples[sample_index].tick;
     }
   }
 
@@ -416,6 +422,7 @@ static void read_samples(const gpioSample_t *samples, int num_samples, void *use
  * Return frequency at this point.  Return a negative value on failure.
  */
 static int measure_freq(struct z3340_card *zcard) {
+  int max_retries = 1;
 
   zcard->frequency_tuning_points[zcard->freq_tuning_index] = 0.0;
   zcard->tuning_num_samples = 0;
@@ -424,9 +431,10 @@ static int measure_freq(struct z3340_card *zcard) {
   gpioSetGetSamplesFuncEx(read_samples, zcard->gpio_mask, zcard);
 
 
-  // TODO: verify we have adequate samples
-  // usleep 100ms
-  usleep(100000);
+  while (max_retries-- && zcard->tuning_num_samples < 5) {
+    // TODO: verify we have adequate samples
+    usleep(10000);
+  }
 
 
   // unregister callback
@@ -437,4 +445,5 @@ static int measure_freq(struct z3340_card *zcard) {
        zcard->frequency_tuning_points[zcard->freq_tuning_index],
        zcard->tuning_num_samples);
 
+  return 0;
 }
