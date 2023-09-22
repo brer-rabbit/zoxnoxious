@@ -39,12 +39,15 @@ struct z3340_card {
 
   uint8_t tune_store_pca9555_port[2];
   float frequency_tuning_points[9];
-  int tuning_num_samples;
-  int freq_tuning_index;  // for loop index to frequency_tuning_points
-  uint32_t prev_low_to_high_tick;
   uint32_t gpio_mask;
 };
 
+
+struct tuning_point {
+  int tuning_num_samples;
+  uint32_t prev_low_to_high_tick;
+  int freq_tuning_index;  // for loop index to frequency_tuning_points
+};
 
 static const uint8_t port0_addr = 0x02;
 static const uint8_t port1_addr = 0x03;
@@ -382,26 +385,26 @@ int tunereq_restore_state(void *zcard_plugin) {
 // z3340_card userdata.
 
 static void read_samples(const gpioSample_t *samples, int num_samples, void *userdata) {
-  struct z3340_card *zcard = (struct z3340_card*)userdata;
+  struct tuning_point *tuning_point = (struct tuning_point*)userdata;
   int sample_index;
   int gpio_low_to_high;
 
   for (sample_index = 1; sample_index < num_samples; ++sample_index) {
     // xor to find any changes, and with gpio mask to get bit of interest
     gpio_low_to_high =
-      (samples[sample_index - 1].level ^ samples[sample_index].level) & zcard->gpio_mask;
+      (samples[sample_index - 1].level ^ samples[sample_index].level) & tuning_point->gpio_mask;
 
     // todo: record last low to high for delta
     if (gpio_low_to_high) { // if it's a low to high
 
-      if (zcard->prev_low_to_high_tick != 0) {
-        if (samples[sample_index].tick > zcard->prev_low_to_high_tick) {
-          zcard->tuning_num_samples++;
-          zcard->frequency_tuning_points[zcard->freq_tuning_index] +=
-            (samples[sample_index].tick - zcard->prev_low_to_high_tick);
+      if (tuning_point->prev_low_to_high_tick != 0) {
+        if (samples[sample_index].tick > tuning_point->prev_low_to_high_tick) {
+          tuning_point->tuning_num_samples++;
+          tuning_point->frequency_tuning_points[tuning_point->freq_tuning_index] +=
+            (samples[sample_index].tick - tuning_point->prev_low_to_high_tick);
         }
       }
-      zcard->prev_low_to_high_tick = samples[sample_index].tick;
+      tuning_point->prev_low_to_high_tick = samples[sample_index].tick;
     }
   }
 
