@@ -88,14 +88,15 @@ static char tune_freq_dac_values[][2] = { { 0x00, 0x00 }, // freq 0V
                                                 { 0x0f, 0xff } }; // freq 8V
 
 static const int vco_settle_usec_time = 2000;
-static const int tune_sampling_usec_time = 25000;
-static const int tuning_minimum_samples = 10;
-static const int tuning_sampling_retries = 5;
+static const int tune_sampling_usec_time = 50000;
+static const int tuning_minimum_samples = 16;
+static const int tuning_sampling_retries = 32;
 
 
 static void read_samples(const gpioSample_t *samples, int numSamples, void *userdata);
-static int measure_freq(struct z3340_card *zcard, int tuning_index, int spi_channel);
-
+static float measure_period(struct z3340_card *zcard, const int tuning_index, const int spi_channel);
+static float find_mean_period_from_ticks(const struct tuning_point *tuning_point);
+static int uint32_compare(const void* a, const void* b);
 
 //
 // slew rate limit the triangle vca
@@ -364,7 +365,7 @@ int tunereq_tune_card(void *zcard_plugin) {
   for (int tuning_point = 0;
        tuning_point < sizeof(tune_freq_dac_values) / sizeof(tune_freq_dac_values[0]);
        ++tuning_point) {
-    measure_freq(zcard, tuning_point, spi_channel);
+    measure_period(zcard, tuning_point, spi_channel);
 
   }
 
@@ -413,7 +414,7 @@ static void read_samples(const gpioSample_t *samples, int num_samples, void *use
     tuning_point->prev_level = level;
 
     if (high) { // if it's a low to high
-      if (tuning_point->is_recording && tuning_point->num_samples < 32) {
+      if (tuning_point->is_recording && tuning_point->num_samples < MAX_TUNING_SAMPLES) {
         tuning_point->tick_samples[ tuning_point->num_samples++ ] = samples[sample_index].tick;
       }
     }
@@ -423,7 +424,7 @@ static void read_samples(const gpioSample_t *samples, int num_samples, void *use
 
 
 
-/** measure_freq
+/** measure_period
  *
  * pre: i2c setup correctly, DAC frequency CV written with voltage for freq measurement,
  *      other DAC lines set accordingly.
@@ -432,12 +433,16 @@ static void read_samples(const gpioSample_t *samples, int num_samples, void *use
  * --> sleep 100usec
  * --> verify we have adequate samples
  * --> unset callback function
+ * Measure the average period of a cycle, positive edge to positive edge.
+ * Measurement uses pigpio's gpioSetGetSamplesFuncEx function.  Var tuning_minimum_samples
+ * defines the minimal number of datapoints necessary to characterize a point.  Of the data,
+ * the inner 25%-75% is used to find a mean value.  Outliers excluded.
  *
- * Return frequency at this point.  Return a negative value on failure.
+ * Return the average period in microseconds (float).  Return -1.0 (test vs <0.0) if unable to measure.
  */
-static int measure_freq(struct z3340_card *zcard, int tuning_index, int spi_channel) {
+static float measure_period(struct z3340_card *zcard, const int tuning_index, const int spi_channel) {
   struct tuning_point tuning_point;
-  int max_retries = tuning_sampling_retries;
+  int attempt_num = 0;
 
   // set DAC
   spiWrite(spi_channel, tune_freq_dac_values[tuning_index], 2);
@@ -450,7 +455,7 @@ static int measure_freq(struct z3340_card *zcard, int tuning_index, int spi_chan
 
   gpioSetGetSamplesFuncEx(read_samples, zcard->gpio_mask, &tuning_point);
 
-  while (tuning_point.num_samples < tuning_minimum_samples && max_retries--) {
+  while (tuning_point.num_samples < MAX_TUNING_SAMPLES && ++attempt_num < tuning_sampling_retries) {
     // TODO: verify we have adequate samples
     usleep(tune_sampling_usec_time);
   }
@@ -465,6 +470,7 @@ static int measure_freq(struct z3340_card *zcard, int tuning_index, int spi_chan
        tuning_index,
        tuning_point.num_samples);
 
+  /*
   for (int i = 1; i < tuning_point.num_samples; ++i) {
     INFO("Z3340: %u : %u --> %f",
          tuning_point.tick_samples[i],
@@ -472,6 +478,57 @@ static int measure_freq(struct z3340_card *zcard, int tuning_index, int spi_chan
          tuning_point.tick_samples[i] - tuning_point.tick_samples[i - 1] != 0 ?
          1000000.0 / ((float)(tuning_point.tick_samples[i] - tuning_point.tick_samples[i - 1])) : 0.0);
   }
+  */
 
-  return 0;
+  return tuning_point.num_samples > tuning_minimum_samples ?
+    find_mean_period_from_ticks(&tuning_point) : -1.0;
+}
+
+
+
+
+/** find_mean_period_from_ticks
+ * given a tuning_point with some tick_samples, find the mean of the differences between ticks.
+ * Pre: the tuning_point has some data in it.  At least enough for statistical analysis.
+ * * Contruct array of tick deltas
+ * * Sort array
+ * * Take mean from 25%-75% data
+ */
+static float find_mean_period_from_ticks(const struct tuning_point *tuning_point) {
+  uint32_t tick_deltas[MAX_TUNING_SAMPLES - 1];
+  int idx_25th, idx_75th;
+  float mean_period = 0.0;
+
+  // construct deltas
+  for (int i = 0; i < tuning_point->num_samples - 1; ++i) {
+    tick_deltas[i] = tuning_point->tick_samples[i + 1] - tuning_point->tick_samples[i];
+  }
+
+  // sort array
+  qsort(tick_deltas, tuning_point->num_samples - 1, sizeof(uint32_t), uint32_compare);
+
+  // establish 25% - 75%
+  idx_25th = (tuning_point->num_samples - 1) * 0.25;
+  idx_75th = (tuning_point->num_samples - 1) * 0.75;
+
+  for (int i = idx_25th; i < idx_75th; ++i) {
+    mean_period += tick_deltas[i];
+  }
+
+  // number of elements used for calc
+  mean_period = mean_period / (idx_75th - idx_25th + 1);
+
+  INFO("Z3340: Freq: %.2f Hz", 1000000.f / mean_period);
+
+  return 0.0;
+}
+
+
+static int uint32_compare(const void* a, const void* b) {
+  uint32_t uint_a = * ( (uint32_t*) a );
+  uint32_t uint_b = * ( (uint32_t*) b );
+
+  if (uint_a == uint_b ) return 0;
+  else if ( uint_a < uint_b ) return -1;
+  else return 1;
 }
