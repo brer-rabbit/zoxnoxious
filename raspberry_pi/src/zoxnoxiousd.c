@@ -1,4 +1,4 @@
-/* Copyright 2022 Kyle Farrell
+/* Copyright 2023 Kyle Farrell
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License.  You may
@@ -173,6 +173,7 @@ int main(int argc, char **argv, char **envp) {
 
   // SPI, pigpio start
 #ifndef MOCK_DATA
+  gpioCfgClock(2, 1, 1);
   if (gpioInitialise() < 0) {
     ERROR("gpioInitialise failed, bye!");
     return -1;
