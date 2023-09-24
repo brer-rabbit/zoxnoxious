@@ -87,7 +87,7 @@ static char tune_freq_dac_values[][2] = { { 0x00, 0x00 }, // freq 0V
                                                 { 0x0e, 0x00 }, // freq 7V
                                                 { 0x0f, 0xff } }; // freq 8V
 
-static const int vco_settle_usec_time = 2000;
+static const int vco_settle_usec_time = 1000;
 static const int tune_sampling_usec_time = 50000;
 static const int tuning_minimum_samples = 16;
 static const int tuning_sampling_retries = 32;
@@ -498,6 +498,7 @@ static float find_mean_period_from_ticks(const struct tuning_point *tuning_point
   uint32_t tick_deltas[MAX_TUNING_SAMPLES - 1];
   int idx_25th, idx_75th;
   float mean_period = 0.0;
+  int n = 0;
 
   // construct deltas
   for (int i = 0; i < tuning_point->num_samples - 1; ++i) {
@@ -511,12 +512,20 @@ static float find_mean_period_from_ticks(const struct tuning_point *tuning_point
   idx_25th = (tuning_point->num_samples - 1) * 0.25;
   idx_75th = (tuning_point->num_samples - 1) * 0.75;
 
-  for (int i = idx_25th; i < idx_75th; ++i) {
+  for (int i = idx_25th; i <= idx_75th; ++i) {
+    INFO("Z3340: %d  : %d", i, tick_deltas[i]);
     mean_period += tick_deltas[i];
+    n++;
   }
+
 
   // number of elements used for calc
   mean_period = mean_period / (idx_75th - idx_25th + 1);
+  
+  INFO("Z3340: Freq easy: %.2f Hz,  75th:%d   25th:%d  total %.2f  n=%d",
+       1000000.f / ((tuning_point->tick_samples[tuning_point->num_samples - 1] - tuning_point->tick_samples[0] - 1) / tuning_point->num_samples),
+       idx_75th, idx_25th, mean_period, n);
+
 
   INFO("Z3340: Freq: %.2f Hz", 1000000.f / mean_period);
 

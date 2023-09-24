@@ -173,7 +173,7 @@ int main(int argc, char **argv, char **envp) {
 
   // SPI, pigpio start
 #ifndef MOCK_DATA
-  gpioCfgClock(2, 1, 1);
+  gpioCfgClock(4, 1, 1);
   if (gpioInitialise() < 0) {
     ERROR("gpioInitialise failed, bye!");
     return -1;
