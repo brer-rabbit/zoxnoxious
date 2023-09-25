@@ -380,10 +380,13 @@ int tunereq_restore_state(void *zcard_plugin) {
 
 
   INFO("Z3340: tune request restore state");
+  // restore GPIO expander state
   zcard->pca9555_port[0] = zcard->tune_store_pca9555_port[0];
   zcard->pca9555_port[1] = zcard->tune_store_pca9555_port[1];
+  int error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, zcard->pca9555_port[0]);
+  error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, zcard->pca9555_port[1]);
 
-  return 0;
+  return error;
 }
 
 
