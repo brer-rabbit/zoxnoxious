@@ -733,7 +733,7 @@ static int autotune_all_cards(struct card_manager *card_mgr) {
 
   // tune each card
   for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
-    (card_mgr->card_update_order[card_num]->tunereq_tune_card)(card_mgr->card_update_order[card_num]->plugin_object);
+    (card_mgr->card_update_order[card_num]->tunereq_set_point)(card_mgr->card_update_order[card_num]->plugin_object);
   }
 
   // restore state

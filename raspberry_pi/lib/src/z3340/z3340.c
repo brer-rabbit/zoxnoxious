@@ -317,7 +317,6 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
 }
 
 
-
 /** tunereq_save_state
  * Save current state of gpio registers.
  * The DAC values are already stored as previous_samples.
@@ -329,8 +328,7 @@ int tunereq_save_state(void *zcard_plugin) {
   zcard->tune_store_pca9555_port[0] = zcard->pca9555_port[0];
   zcard->tune_store_pca9555_port[1] = zcard->pca9555_port[1];
 
-
-  return 0;
+  return TUNE_COMPLETE_SUCCESS;
 }
 
 
@@ -369,9 +367,18 @@ int tunereq_tune_card(void *zcard_plugin) {
 
   INFO("Z3340: tune slot %d complete", zcard->slot);
 
-  return 0;
+  return TUNE_COMPLETE_SUCCESS;
 }
 
+
+tune_status_t tunereq_set_point(void *zcard_plugin) {
+  return TUNE_COMPLETE_SUCCESS;
+}
+
+
+tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
+  return TUNE_COMPLETE_SUCCESS;
+}
 
 
 
@@ -386,7 +393,7 @@ int tunereq_restore_state(void *zcard_plugin) {
   int error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, zcard->pca9555_port[0]);
   error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, zcard->pca9555_port[1]);
 
-  return error;
+  return TUNE_COMPLETE_SUCCESS;
 }
 
 

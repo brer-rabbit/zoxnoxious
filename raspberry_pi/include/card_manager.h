@@ -42,7 +42,8 @@ struct plugin_card {
   process_midi_f process_midi;
   process_midi_program_change_f process_midi_program_change;
   tunereq_save_state_f tunereq_save_state;
-  tunereq_tune_card_f tunereq_tune_card;
+  tunereq_set_point_f tunereq_set_point;
+  tunereq_measurement_f tunereq_measurement;
   tunereq_restore_state_f tunereq_restore_state;
   free_zcard_f free_zcard;
   void *plugin_object;

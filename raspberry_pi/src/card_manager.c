@@ -41,7 +41,8 @@ static const char *config_lookup_eeprom_base_i2c_address = CARD_MANAGER_KEY_NAME
 #define PROCESS_MIDI "process_midi"
 #define PROCESS_MIDI_PROGRAM_CHANGE "process_midi_program_change"
 #define TUNEREQ_SAVE_STATE "tunereq_save_state"
-#define TUNEREQ_TUNE_CARD "tunereq_tune_card"
+#define TUNEREQ_SET_POINT "tunereq_set_point"
+#define TUNEREQ_MEASUREMENT "tunereq_measurement"
 #define TUNEREQ_RESTORE_STATE "tunereq_restore_state"
 
 
@@ -242,9 +243,15 @@ int load_card_plugins(struct card_manager *card_mgr) {
         return 1;
       }
 
-      card->tunereq_tune_card = dlsym(card->dl_plugin_lib, TUNEREQ_TUNE_CARD);
-      if (card->tunereq_tune_card == NULL) {
-        ERROR("failed find symbol " TUNEREQ_TUNE_CARD ", %s", dlerror());
+      card->tunereq_set_point = dlsym(card->dl_plugin_lib, TUNEREQ_SET_POINT);
+      if (card->tunereq_set_point == NULL) {
+        ERROR("failed find symbol " TUNEREQ_SET_POINT ", %s", dlerror());
+        return 1;
+      }
+
+      card->tunereq_measurement = dlsym(card->dl_plugin_lib, TUNEREQ_MEASUREMENT);
+      if (card->tunereq_measurement == NULL) {
+        ERROR("failed find symbol " TUNEREQ_MEASUREMENT ", %s", dlerror());
         return 1;
       }
 

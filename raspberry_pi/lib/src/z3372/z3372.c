@@ -274,12 +274,15 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
 
 
 
-int tunereq_save_state(void *zcard_plugin) {
-    return 0;
+tune_status_t tunereq_save_state(void *zcard_plugin) {
+  return TUNE_COMPLETE_SUCCESS;
 }
-int tunereq_tune_card(void *zcard_plugin) {
-    return 0;
+tune_status_t tunereq_set_point(void *zcard_plugin) {
+  return TUNE_COMPLETE_SUCCESS;
 }
-int tunereq_restore_state(void *zcard_plugin) {
-    return 0;
+tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
+  return TUNE_COMPLETE_SUCCESS;
+}
+tune_status_t tunereq_restore_state(void *zcard_plugin) {
+  return TUNE_COMPLETE_SUCCESS;
 }

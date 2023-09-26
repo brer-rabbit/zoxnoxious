@@ -139,6 +139,21 @@ typedef int (*process_midi_program_change_f)(void *zcard_plugin, uint8_t program
  * A maximum of 32 iterations is allowed.
  */
 
+/* return a TUNE_COMPLETE_* when done with measurements.
+ * A TUNE_CONTINUE will loop the setup/measurement calls.
+ */
+typedef enum {
+  TUNE_COMPLETE_SUCCESS,
+  TUNE_COMPLETE_FAILED,
+  TUNE_CONTINUE
+} tune_status_t;
+
+struct tuning_measurement {
+  float frequency;
+  int samples;
+  int sampling_period;
+};
+
 /** tunereq_save_state_f
  *
  * Start of a tune request.  The tune request may be for this card or
@@ -150,18 +165,21 @@ typedef int (*process_midi_program_change_f)(void *zcard_plugin, uint8_t program
  *
  * Return zero on success, non-zero on failure.
  */
-typedef int (*tunereq_save_state_f)(void *zcard_plugin);
+typedef tune_status_t (*tunereq_save_state_f)(void *zcard_plugin);
 
-/** tunereq_tune_card
+/** tunereq_set_point_f
  *
- * Tune this card.  The method has complete control over setting any
- * values necessary to complete tuning.  All other cards should be
- * mute and prepared for tuning.
- * The card can consider storing tuning results to restore on the next boot.
- *
- * Return zero on success, non-zero on failure.
+ * Setup call for setting the next calibration point.
+ * Set any DAC states or whatever for the next calibration point.
  */
-typedef int (*tunereq_tune_card_f)(void *zcard_plugin);
+typedef tune_status_t (*tunereq_set_point_f)(void *zcard_plugin);
+
+/** tunereq_measurement_f
+ *
+ * Receive the results of the tune point.  The card can
+ * consider storing tuning results to restore on the next boot.
+ */
+typedef tune_status_t (*tunereq_measurement_f)(void *zcard_plugin, struct tuning_measurement *tuning_measurement);
 
 /** tunereq_restore_state_f
  *
@@ -169,10 +187,8 @@ typedef int (*tunereq_tune_card_f)(void *zcard_plugin);
  * for a different card.  Either way, the card is expected to restore
  * state to where it was at the beginning of the tune request when
  * tunereq_save_state_f was called.
- *
- * Return zero on success, non-zero on failure.
  */
-typedef int (*tunereq_restore_state_f)(void *zcard_plugin);
+typedef tune_status_t (*tunereq_restore_state_f)(void *zcard_plugin);
 
 
 /** convenience for mapping: find the gpio that a slot drives
