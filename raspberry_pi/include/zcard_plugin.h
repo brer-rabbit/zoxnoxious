@@ -125,6 +125,20 @@ typedef int (*process_midi_f)(void *zcard_plugin, uint8_t *midi_message, size_t 
 typedef int (*process_midi_program_change_f)(void *zcard_plugin, uint8_t program_number);
 
 
+/** Tuning
+
+ * tuning is done in parallel across all cards.
+ * 1. The zoxnoxiousd caller notes all cards as "untuned".
+ * Each card:
+ * 2. Save state with tunereq_save_state_f
+ * 3. Set next calibration/measurement point with tunereq_set_next_f
+ * 4. Passed results of measurement with tunereq_results_f
+ * 5. Restore state with tunereq_restore_state_f
+ *
+ * Steps 3 and 4 are repeated until all cards report tuning complete.
+ * A maximum of 32 iterations is allowed.
+ */
+
 /** tunereq_save_state_f
  *
  * Start of a tune request.  The tune request may be for this card or
@@ -138,7 +152,7 @@ typedef int (*process_midi_program_change_f)(void *zcard_plugin, uint8_t program
  */
 typedef int (*tunereq_save_state_f)(void *zcard_plugin);
 
-/** tunreq_tune_card
+/** tunereq_tune_card
  *
  * Tune this card.  The method has complete control over setting any
  * values necessary to complete tuning.  All other cards should be
