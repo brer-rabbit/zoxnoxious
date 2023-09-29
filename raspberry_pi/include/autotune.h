@@ -1,4 +1,4 @@
-/* Copyright 2022 Kyle Farrell
+/* Copyright 2023 Kyle Farrell
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License.  You may
@@ -14,16 +14,12 @@
  */
 
 
-#ifndef ZOXNOXIOUSD_H
-#define ZOXNOXIOUSD_H
+#ifndef AUTOTUNE_H
+#define AUTOTUNE_H
 
-#include "zcard_plugin.h"
+#include "card_manager.h"
 
-#define ZOXNOXIOUS_DIR_ENV_VAR_NAME "ZOXNOXIOUS_DIR"
-#define DEFAULT_ZOXNOXIOUS_DIRECTORY "/usr/local/zoxnoxious"
-#define CONFIG_DIRNAME "/etc/"
-#define CONFIG_FILENAME "zoxnoxiousd.cfg"
 
-#define MIDI_DEVICE_KEY "zmidi.device"
+int autotune_all_cards(struct card_manager *card_mgr);
 
-#endif
+#endif // AUTOTUNE_H

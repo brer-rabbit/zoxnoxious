@@ -17,8 +17,9 @@
 #ifndef CARD_MANAGER_H
 #define CARD_MANAGER_H
 
-#include "zoxnoxiousd.h"
+#include <libconfig.h>
 
+#include "zoxnoxiousd.h"
 
 #define MAX_SLOTS 8
 

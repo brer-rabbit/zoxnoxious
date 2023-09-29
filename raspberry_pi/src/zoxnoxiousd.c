@@ -22,7 +22,6 @@
 #include <alsa/asoundlib.h>
 #include <getopt.h>
 #include <inttypes.h>
-#include <libconfig.h>
 #include <limits.h>
 #include <pigpio.h>
 #include <signal.h>
@@ -38,6 +37,7 @@
 #include <zlog.h>
 
 #include "zoxnoxiousd.h"
+#include "autotune.h"
 #include "card_manager.h"
 #include "zalsa.h"
 #include "zcard_plugin.h"
@@ -74,7 +74,6 @@ static void* read_pcm_and_call_plugins(void *);
 static void* midi_in_to_plugins(void *);
 static void generate_discovery_report(uint8_t discovery_report_sysex[]);
 static int z_midi_write(uint8_t *buffer, int buffer_size);
-static int autotune_all_cards(struct card_manager *card_mgr);
 
 
 
@@ -719,27 +718,4 @@ static int z_midi_write(uint8_t *buffer, int buffer_size) {
   }
 
   return midi_write_status;
-}
-
-
-// autotune_all_cards
-// iterate over all the cards and run the tune routine
-static int autotune_all_cards(struct card_manager *card_mgr) {
-
-  // each card will save state
-  for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
-    (card_mgr->card_update_order[card_num]->tunereq_save_state)(card_mgr->card_update_order[card_num]->plugin_object);
-  }
-
-  // tune each card
-  for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
-    (card_mgr->card_update_order[card_num]->tunereq_set_point)(card_mgr->card_update_order[card_num]->plugin_object);
-  }
-
-  // restore state
-  for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
-    (card_mgr->card_update_order[card_num]->tunereq_restore_state)(card_mgr->card_update_order[card_num]->plugin_object);
-  }
-
-  return 0;
 }

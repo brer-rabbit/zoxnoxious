@@ -328,6 +328,14 @@ int tunereq_save_state(void *zcard_plugin) {
   zcard->tune_store_pca9555_port[0] = zcard->pca9555_port[0];
   zcard->tune_store_pca9555_port[1] = zcard->pca9555_port[1];
 
+  // set any state necessary on the gpio -- all modulations off, outputs off
+  error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, tune_config_port0_data);
+  error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, tune_config_port1_data);
+  if (error) {
+    ERROR("z3340: tunereq_save_state: error writing to I2C bus handle %d\n", zcard->i2c_handle);
+    return TUNE_COMPLETE_FAILED;
+  }
+
   return TUNE_COMPLETE_SUCCESS;
 }
 
@@ -341,13 +349,6 @@ int tunereq_tune_card(void *zcard_plugin) {
 
   INFO("Z3340: tune request tune card using slot %d gpio mask %u", zcard->slot, zcard->gpio_mask);
 
-  // set any state necessary on the gpio -- all modulations off, outputs off
-  error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, tune_config_port0_data);
-  error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, tune_config_port1_data);
-  if (error) {
-    ERROR("z3340: error writing to I2C bus handle %d\n", zcard->i2c_handle);
-    return -1;
-  }
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
   // set DAC state
