@@ -141,3 +141,4 @@ int set_spi_interface(struct zhost *zhost, unsigned int spi_channel, unsigned in
 
 
 const int gpio_id_by_slot[] = { 17, 27, 22, 23, 24, 25 };
+const int gpio_id_by_slot_size = sizeof(gpio_id_by_slot) / sizeof(int);

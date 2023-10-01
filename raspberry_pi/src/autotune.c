@@ -30,9 +30,10 @@
 
 struct tuning_state {
   int inited;
-  uint32_t initial_low_to_high_tick;
-  uint32_t last_low_to_high_tick;
-  int32_t prev_level[MAX_SLOTS];
+  uint32_t gpio_mask;
+  uint32_t initial_tick;
+  uint32_t last_tick;
+  int32_t prev_level;
   struct tuning_measurement measurements[MAX_SLOTS];
 };
 
@@ -52,7 +53,6 @@ int autotune_all_cards(struct card_manager *card_mgr) {
   uint32_t cards_to_tune = INIT_TUNED_RECORD(card_mgr->num_cards);
   tune_status_t tune_status;
   int tuning_iterations;
-  int gpio_mask;
   struct tuning_state tuning_state;
 
   // each card will save state
@@ -72,7 +72,7 @@ int autotune_all_cards(struct card_manager *card_mgr) {
   // some function to call on the plugin to ack the tuning failure.
   for (tuning_iterations = 0; tuning_iterations < MAX_TUNING_ITERATIONS; ++tuning_iterations) {
 
-    gpio_mask = 0; // create gpio mask as we go through first loop
+    tuning_state.gpio_mask = 0; // create gpio mask as we go through first loop
 
     // each card should set its next set point
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
@@ -80,7 +80,8 @@ int autotune_all_cards(struct card_manager *card_mgr) {
         struct plugin_card *this_card = card_mgr->card_update_order[card_num];
         tune_status = (this_card->tunereq_set_point)(this_card->plugin_object);
 
-        gpio_mask |= (1 << gpio_id_by_slot[ this_card->slot ]);
+        // accumulate the gpio mask as we go
+        tuning_state.gpio_mask |= (1 << gpio_id_by_slot[ this_card->slot ]);
 
         if (tune_status != TUNE_CONTINUE) {
           cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
@@ -90,7 +91,7 @@ int autotune_all_cards(struct card_manager *card_mgr) {
     }
 
     // set the monitor and record gpio pins
-    gpioSetGetSamplesFuncEx(read_samples, gpio_mask, &tuning_state);
+    gpioSetGetSamplesFuncEx(read_samples, tuning_state.gpio_mask, &tuning_state);
 
     usleep(tune_sampling_usec_time);
     /*
@@ -136,10 +137,13 @@ static void read_samples(const gpioSample_t *samples, int num_samples, void *use
 
   if (!tuning_state->inited) {
     tuning_state->inited = 1;
+    tuning_state->initial_tick = samples[0].tick;
     for (int i = 0; i < MAX_SLOTS; ++i) {
-      tuning_state->prev_level[i] = samples[0].level;
+      tuning_state->prev_level = samples[0].level;
     }
   }
+
+  tuning_state->last_tick = samples[num_samples - 1].tick;
 
   for (sample_index = 0; sample_index < num_samples; ++sample_index) {
     // xor to find any changes, and with gpio mask to get bit of interest
@@ -148,12 +152,12 @@ static void read_samples(const gpioSample_t *samples, int num_samples, void *use
     tuning_state->prev_level = level;
 
     if (high) { // if it's a low to high
-      if (tuning_state->low_to_high_count++ == 0) { // count will be 1 greater than number of cycles
-        tuning_state->initial_low_to_high_tick = samples[sample_index].tick;
+      for (int slot = 0; slot < gpio_id_by_slot_size; ++slot) {
+        if (high & (1 << gpio_id_by_slot[slot])) {
+          tuning_state->measurements[slot].samples++;
+        }
       }
-
-      tuning_state->last_low_to_high_tick = samples[sample_index].tick;
     }
-  }
 
+  }
 }
