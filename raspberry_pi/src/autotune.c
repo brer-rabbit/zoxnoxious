@@ -26,6 +26,7 @@
 #define INIT_TUNED_RECORD(num_cards)  ((1 << num_cards) - 1)
 #define SET_CARD_TUNED(card_record, this_card) card_record & ~(1 << this_card)
 #define TEST_CARD_TUNED(card_record, this_card) card_record & (1 << this_card)
+#define TEST_ALL_CARDS_TUNED(card_record) card_record
 
 
 struct tuning_state {
@@ -39,7 +40,7 @@ struct tuning_state {
 
 // callback from gpioSetGetSamplesFuncEx
 static void read_samples(const gpioSample_t *samples, int num_samples, void *userdata);
-static const int tune_sampling_usec_time = 100000;
+static const int tune_sampling_usec_time = 500000;
 
 
 
@@ -54,6 +55,11 @@ int autotune_all_cards(struct card_manager *card_mgr) {
   tune_status_t tune_status;
   int tuning_iterations;
   struct tuning_state tuning_state;
+  uint32_t measurement_period;
+
+
+  INFO("starting autotune: bitrecord: 0x%X", cards_to_tune);
+  memset(&tuning_state, 0, sizeof(struct tuning_state));
 
   // each card will save state
   for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
@@ -61,18 +67,22 @@ int autotune_all_cards(struct card_manager *card_mgr) {
     tune_status = (this_card->tunereq_save_state)(this_card->plugin_object);
     if (tune_status != TUNE_CONTINUE) {
       cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
-      INFO("autotune: save state: card %d tuned (cards: %d)", card_num, cards_to_tune);
+      INFO("autotune: tunereq_save_state: card %d reports tuned (bitrecord: 0x%X)", card_num, cards_to_tune);
     }
   }
 
 
-  // loop here since each card may require multiple tuning iterations.  Typical would
-  // be to set a calibration point, measure, then repeat for a number of cycles.
-  // Todo: should have some "ok you exceeded the iterations" function to call.  And
-  // some function to call on the plugin to ack the tuning failure.
-  for (tuning_iterations = 0; tuning_iterations < MAX_TUNING_ITERATIONS; ++tuning_iterations) {
+  // loop here since each card may require multiple tuning iterations.
+  // A typical card may set a calibration point, measure, then repeat
+  // for a number of cycles.  Todo: should have some "ok you exceeded
+  // the iterations" function to call.  And some function to call on
+  // the plugin to ack the tuning failure.
+  for (tuning_iterations = 0;
+       tuning_iterations < MAX_TUNING_ITERATIONS && TEST_ALL_CARDS_TUNED(cards_to_tune);
+       ++tuning_iterations) {
 
-    tuning_state.gpio_mask = 0; // create gpio mask as we go through first loop
+    // create gpio mask for get samples function as we go through first loop
+    tuning_state.gpio_mask = 0;
 
     // each card should set its next set point
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
@@ -80,43 +90,44 @@ int autotune_all_cards(struct card_manager *card_mgr) {
         struct plugin_card *this_card = card_mgr->card_update_order[card_num];
         tune_status = (this_card->tunereq_set_point)(this_card->plugin_object);
 
-        // accumulate the gpio mask as we go
-        tuning_state.gpio_mask |= (1 << gpio_id_by_slot[ this_card->slot ]);
-
         if (tune_status != TUNE_CONTINUE) {
           cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
-          INFO("autotune: set point: %d card tuned (cards: %d)", card_num, cards_to_tune);
+          INFO("autotune: tunereq_set_point: card %d reports tuned (bitrecord: 0x%X)", card_num, cards_to_tune);
+        }
+        else {
+          // record this card's gpio: accumulate add bit to gpio mask
+          tuning_state.gpio_mask |= (1 << gpio_id_by_slot[ this_card->slot ]);
+          INFO("autotune: tunereq_set_point: card %d set for tune", card_num);
         }
       }
     }
 
-    // set the monitor and record gpio pins
+    // set the monitor and record gpio pins, sleep, then unreg the callback
     gpioSetGetSamplesFuncEx(read_samples, tuning_state.gpio_mask, &tuning_state);
-
     usleep(tune_sampling_usec_time);
-    /*
-    while (tuning_state.low_to_high_count < MAX_TUNING_SAMPLES &&
-           ++attempt_num < tuning_sampling_retries) {
-      usleep(tune_sampling_usec_time);
-    }
-    */
-
-    // unregister callback
     gpioSetGetSamplesFuncEx(NULL, 0, NULL);
 
-
+    measurement_period = tuning_state.last_tick - tuning_state.initial_tick;
     // report results to each card
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
       if (TEST_CARD_TUNED(cards_to_tune, card_num)) {
+        struct tuning_measurement *card_measurement = &tuning_state.measurements[card_num];
+        card_measurement->sampling_period = measurement_period;
+        card_measurement->frequency = card_measurement->samples * 1000000.f / measurement_period;
+        INFO("autotune: measurement: card %d: %f Hz (%d measurements)",
+             card_num,
+             card_measurement->frequency, card_measurement->samples);
+
         struct plugin_card *this_card = card_mgr->card_update_order[card_num];
-        tune_status = (this_card->tunereq_measurement)(this_card->plugin_object, NULL);
+        tune_status = (this_card->tunereq_measurement)(this_card->plugin_object,
+                                                       &tuning_state.measurements[card_num]);
+
         if (tune_status != TUNE_CONTINUE) {
           cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
           INFO("autotune: measure: %d card tuned (cards: %d)", card_num, cards_to_tune);
         }
       }
     }
-
   }
 
   // restore state
@@ -129,7 +140,14 @@ int autotune_all_cards(struct card_manager *card_mgr) {
 
 
 
-
+/** read_samples
+ *
+ * callback function for gpioSetGetSamplesFuncEx.  Lifted most
+ * entirely from the frequency count pigpio reference.  After init'ing
+ * with the initial tick time and levels, check each sample for low to
+ * high transitions.  Record the apropo low to high for the
+ * measurements of each gpio.
+ */
 static void read_samples(const gpioSample_t *samples, int num_samples, void *userdata) {
   struct tuning_state *tuning_state = (struct tuning_state*)userdata;
   int sample_index;

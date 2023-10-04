@@ -70,10 +70,10 @@ static const uint8_t tune_config_port0_data = 0x00;
 static const uint8_t tune_config_port1_data = 0x02; // output1 pulse -- not actually necessary
 static char tune_dac_state[][2] = { { 0x00, 0x00 }, // freq
                                     { 0x10, 0x00 }, // sync level
-                                    { 0x38, 0x00 }, // pulse width: 50%
+                                    { 0x37, 0xff }, // pulse width: 50%
                                     { 0x40, 0x00 }, // tri vca
                                     { 0x50, 0x00 }, // ext mod
-                                    { 0x78, 0x00 } }; // linear: mid-range
+                                    { 0x77, 0xff } }; // linear: mid-range
 // tune_freq_dac_values: the DAC values to run through for a tuning request:
 // all on frequency CV, each step is up by 1 volt (512 decimal).
 static char tune_freq_dac_values[][2] = { { 0x00, 0x00 }, // freq 0V
@@ -90,10 +90,6 @@ static const int vco_settle_usec_time = 1000;
 static const int tune_sampling_usec_time = 50000;
 static const int tuning_minimum_samples = 16;
 static const int tuning_sampling_retries = 32;
-
-
-static void read_samples(const gpioSample_t *samples, int numSamples, void *userdata);
-static float measure_freq(struct z3340_card *zcard, const int tuning_index, const int spi_channel);
 
 
 //
@@ -323,6 +319,7 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
  */
 int tunereq_save_state(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
+  int error;
 
   INFO("Z3340: tune request save state");
   zcard->tune_store_pca9555_port[0] = zcard->pca9555_port[0];
@@ -336,19 +333,18 @@ int tunereq_save_state(void *zcard_plugin) {
     return TUNE_COMPLETE_FAILED;
   }
 
-  return TUNE_COMPLETE_SUCCESS;
+  return TUNE_CONTINUE;
 }
 
 
 
 
-int tunereq_tune_card(void *zcard_plugin) {
+tune_status_t tunereq_set_point(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
   int error;
   int spi_channel;
 
   INFO("Z3340: tune request tune card using slot %d gpio mask %u", zcard->slot, zcard->gpio_mask);
-
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
   // set DAC state
@@ -356,24 +352,7 @@ int tunereq_tune_card(void *zcard_plugin) {
     spiWrite(spi_channel, tune_dac_state[i], 2);
   }
 
-  INFO("Z3340: tune request slot %d setup done", zcard->slot);
-
-  // ready to setup frequency measurement
-  for (int tune_freq_dac_index = 0;
-       tune_freq_dac_index < sizeof(tune_freq_dac_values) / sizeof(tune_freq_dac_values[0]);
-       ++tune_freq_dac_index) {
-    measure_freq(zcard, tune_freq_dac_index, spi_channel);
-
-  }
-
-  INFO("Z3340: tune slot %d complete", zcard->slot);
-
-  return TUNE_COMPLETE_SUCCESS;
-}
-
-
-tune_status_t tunereq_set_point(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
+  return TUNE_CONTINUE;
 }
 
 
@@ -397,86 +376,3 @@ int tunereq_restore_state(void *zcard_plugin) {
   return TUNE_COMPLETE_SUCCESS;
 }
 
-
-
-// internal / static functions
-
-// Callback function to implement gpioGetSamplesFuncEx_t.  Read the
-// samples from gpioGetSamplesFuncEx.  Store the results with the
-// z3340_card userdata.
-
-static void read_samples(const gpioSample_t *samples, int num_samples, void *userdata) {
-  struct tuning_point *tuning_point = (struct tuning_point*)userdata;
-  int sample_index;
-  int high, level;
-
-  if (!tuning_point->inited) {
-    tuning_point->inited = 1;
-    tuning_point->prev_level = samples[0].level;
-  }
-
-  for (sample_index = 0; sample_index < num_samples; ++sample_index) {
-    // xor to find any changes, and with gpio mask to get bit of interest
-    level = samples[sample_index].level;
-    high = ((tuning_point->prev_level ^ level) & tuning_point->gpio_mask) & level;
-    tuning_point->prev_level = level;
-
-    if (high) { // if it's a low to high
-      if (tuning_point->low_to_high_count++ == 0) { // count will be 1 greater than number of cycles
-        tuning_point->initial_low_to_high_tick = samples[sample_index].tick;
-      }
-
-      tuning_point->last_low_to_high_tick = samples[sample_index].tick;
-    }
-  }
-
-}
-
-
-
-/** measure_freq
- *
- * pre: i2c setup correctly, DAC frequency CV written with voltage for freq measurement,
- *      other DAC lines set accordingly.
- *
- * --> set the sample callback
- * --> sleep 100usec
- * --> verify we have adequate samples
- * --> unset callback function
- * Measure the average period of a cycle, positive edge to positive edge.
- * Measurement uses pigpio's gpioSetGetSamplesFuncEx function.  Var tuning_minimum_samples
- * defines the minimal number of datapoints necessary to characterize a point.  Of the data,
- * the inner 25%-75% is used to find a mean value.  Outliers excluded.
- *
- * Return the frequency in Hz.  Return -1.0 (test vs <0.0) if unable to measure.
- */
-static float measure_freq(struct z3340_card *zcard, const int tuning_index, const int spi_channel) {
-  struct tuning_point tuning_point;
-  int attempt_num = 0;
-  float frequency;
-
-  // set DAC
-  spiWrite(spi_channel, tune_freq_dac_values[tuning_index], 2);
-  usleep(vco_settle_usec_time);
-
-  tuning_point.gpio_mask = zcard->gpio_mask;
-  tuning_point.inited = 0;
-  tuning_point.low_to_high_count = 0;
-
-  gpioSetGetSamplesFuncEx(read_samples, zcard->gpio_mask, &tuning_point);
-
-  while (tuning_point.low_to_high_count < MAX_TUNING_SAMPLES &&
-         ++attempt_num < tuning_sampling_retries) {
-    usleep(tune_sampling_usec_time);
-  }
-
-  // unregister callback
-  gpioSetGetSamplesFuncEx(NULL, 0, zcard);
-
-  frequency = 1000000.f * (tuning_point.low_to_high_count - 1.f) /
-    (tuning_point.last_low_to_high_tick - tuning_point.initial_low_to_high_tick);
-
-  INFO("Z3340: slot %d tune %i done: %.2f Hz", zcard->slot, tuning_index, frequency);
-
-  return -1.0;
-}

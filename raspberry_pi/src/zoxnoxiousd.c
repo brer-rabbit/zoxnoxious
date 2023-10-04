@@ -342,12 +342,14 @@ static void sig_dump_stats(int signum) {
   }
   in_dump_stats = 1;
 
-  INFO("requested stats: %ld.%.9ld / %" PRId64 " idle sec/samples; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
+  INFO("requested stats: %ld.%.9ld / %" PRId64 " idle sec/samples; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations; pcm[0] xrun recovery: %d; pcm[1] xrun recovery: %d",
        sec_pcm_write_idle, nsec_pcm_write_idle,
        missed_expirations[EXPIRATIONS_ONTIME],
        missed_expirations[EXPIRATIONS_MISSED_ONE],
        missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
-       missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
+       missed_expirations[EXPIRATIONS_MISSED_GTE_TEN],
+       pcm_state[0] ? pcm_state[0]->xrun_recovery_count : -1,
+       pcm_state[1] ? pcm_state[1]->xrun_recovery_count : -1);
 
   in_dump_stats = 0;
 }
