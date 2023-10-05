@@ -28,7 +28,7 @@
 #define SPI_MODE 1
 #define SPI_CHANNEL 0 // chip select zero
 #define NUM_DAC_CHANNELS 6
-
+#define NUM_TUNING_POINTS 8
 
 struct z3340_card {
   struct zhost *zhost;
@@ -37,22 +37,13 @@ struct z3340_card {
   uint8_t pca9555_port[2];  // gpio registers
   int16_t previous_samples[NUM_DAC_CHANNELS];
 
+  // tuning params
   uint8_t tune_store_pca9555_port[2];
-  float frequency_tuning_points[9];
-  uint32_t gpio_mask;
+  int tuning_point;
+  float tuning_points_hz[NUM_TUNING_POINTS];
+  int tuning_complete;
 };
 
-
-#define MAX_TUNING_SAMPLES 64
-
-struct tuning_point {
-  uint32_t gpio_mask;
-  int inited;
-  int32_t prev_level;
-  uint32_t initial_low_to_high_tick;
-  uint32_t last_low_to_high_tick;
-  int low_to_high_count;
-};
 
 static const uint8_t port0_addr = 0x02;
 static const uint8_t port1_addr = 0x03;
@@ -74,6 +65,7 @@ static char tune_dac_state[][2] = { { 0x00, 0x00 }, // freq
                                     { 0x40, 0x00 }, // tri vca
                                     { 0x50, 0x00 }, // ext mod
                                     { 0x77, 0xff } }; // linear: mid-range
+
 // tune_freq_dac_values: the DAC values to run through for a tuning request:
 // all on frequency CV, each step is up by 1 volt (512 decimal).
 static char tune_freq_dac_values[][2] = { { 0x00, 0x00 }, // freq 0V
@@ -85,12 +77,6 @@ static char tune_freq_dac_values[][2] = { { 0x00, 0x00 }, // freq 0V
                                                 { 0x0c, 0x00 }, // freq 6V
                                                 { 0x0e, 0x00 }, // freq 7V
                                                 { 0x0f, 0xff } }; // freq 8V
-
-static const int vco_settle_usec_time = 1000;
-static const int tune_sampling_usec_time = 50000;
-static const int tuning_minimum_samples = 16;
-static const int tuning_sampling_retries = 32;
-
 
 //
 // slew rate limit the triangle vca
@@ -116,7 +102,6 @@ void* init_zcard(struct zhost *zhost, int slot) {
 
   z3340->zhost = zhost;
   z3340->slot = slot;
-  z3340->gpio_mask = 1 << gpio_id_by_slot[z3340->slot]; // used for tuning
   z3340->pca9555_port[0] = 0x00;
   z3340->pca9555_port[1] = 0x00;
 
@@ -313,15 +298,30 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
 }
 
 
+//
+// Tuning!
+//
+
 /** tunereq_save_state
  * Save current state of gpio registers.
- * The DAC values are already stored as previous_samples.
+ * The DAC values are already stored as previous_samples, should we
+ * want to restore them.
  */
 int tunereq_save_state(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
-  int error;
+  int error, spi_channel;
 
-  INFO("Z3340: tune request save state");
+  // prep for tune
+  zcard->tuning_point = 0;
+  zcard->tuning_complete = 0;
+  memset(zcard->tuning_points_hz, 0, sizeof(float) * NUM_TUNING_POINTS);
+
+  spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
+  // set DAC state
+  for (int i = 0; i < NUM_DAC_CHANNELS; ++i) {
+    spiWrite(spi_channel, tune_dac_state[i], 2);
+  }
+
   zcard->tune_store_pca9555_port[0] = zcard->pca9555_port[0];
   zcard->tune_store_pca9555_port[1] = zcard->pca9555_port[1];
 
@@ -333,31 +333,40 @@ int tunereq_save_state(void *zcard_plugin) {
     return TUNE_COMPLETE_FAILED;
   }
 
+
   return TUNE_CONTINUE;
 }
 
 
 
+/** tunereq_set_point
+ * set the next tuning point.  "Next" state is tracked by zcard->tuning_point.
+ */
 
 tune_status_t tunereq_set_point(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
-  int error;
   int spi_channel;
 
-  INFO("Z3340: tune request tune card using slot %d gpio mask %u", zcard->slot, zcard->gpio_mask);
-
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
-  // set DAC state
-  for (int i = 0; i < NUM_DAC_CHANNELS; ++i) {
-    spiWrite(spi_channel, tune_dac_state[i], 2);
-  }
+  spiWrite(spi_channel, tune_freq_dac_values[ zcard->tuning_point ], 2);
 
   return TUNE_CONTINUE;
 }
 
 
+/** tunereq_measurement
+ * record the measurement succeeded, advance state to next tuning point.
+ */
 tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
-  return TUNE_COMPLETE_SUCCESS;
+  struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
+
+  if (++zcard->tuning_point >= NUM_TUNING_POINTS) {
+    zcard->tuning_complete = 1;
+    return TUNE_COMPLETE_SUCCESS;
+  }
+  else {
+    return TUNE_CONTINUE;
+  }
 }
 
 
@@ -367,11 +376,19 @@ int tunereq_restore_state(void *zcard_plugin) {
 
 
   INFO("Z3340: tune request restore state");
+
   // restore GPIO expander state
   zcard->pca9555_port[0] = zcard->tune_store_pca9555_port[0];
   zcard->pca9555_port[1] = zcard->tune_store_pca9555_port[1];
   int error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, zcard->pca9555_port[0]);
   error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, zcard->pca9555_port[1]);
+
+  if (zcard->tuning_complete == 1) {
+    // create lookup table based on measurement
+  }
+  else {
+    // linear table
+  }
 
   return TUNE_COMPLETE_SUCCESS;
 }

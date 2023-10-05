@@ -67,7 +67,7 @@ int autotune_all_cards(struct card_manager *card_mgr) {
     tune_status = (this_card->tunereq_save_state)(this_card->plugin_object);
     if (tune_status != TUNE_CONTINUE) {
       cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
-      INFO("autotune: tunereq_save_state: card %d reports tuned (bitrecord: 0x%X)", card_num, cards_to_tune);
+      INFO("autotune: tunereq_save_state: card %d reports tuned", card_num);
     }
   }
 
@@ -92,22 +92,38 @@ int autotune_all_cards(struct card_manager *card_mgr) {
 
         if (tune_status != TUNE_CONTINUE) {
           cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
-          INFO("autotune: tunereq_set_point: card %d reports tuned (bitrecord: 0x%X)", card_num, cards_to_tune);
+          INFO("autotune: tunereq_set_point: card %d reports tuned", card_num);
         }
         else {
           // record this card's gpio: accumulate add bit to gpio mask
           tuning_state.gpio_mask |= (1 << gpio_id_by_slot[ this_card->slot ]);
-          INFO("autotune: tunereq_set_point: card %d set for tune", card_num);
+          INFO("autotune: tunereq_set_point: card %d setup for tune", card_num);
         }
       }
     }
+
+    // reset for each iteration
+    tuning_state.inited = 0;
+    memset(tuning_state.measurements, 0, sizeof(struct tuning_measurement) * MAX_SLOTS);
 
     // set the monitor and record gpio pins, sleep, then unreg the callback
     gpioSetGetSamplesFuncEx(read_samples, tuning_state.gpio_mask, &tuning_state);
     usleep(tune_sampling_usec_time);
     gpioSetGetSamplesFuncEx(NULL, 0, NULL);
 
+
+    if (tuning_state.last_tick < tuning_state.initial_tick) {
+      // Timer wrap -- happens every 71.6 minutes.
+      // TODO: this needs more thought behind it.  May be better to
+      // just pause tunereq_set_point if near the threshold.
+      INFO("autotune: timer wrap during autotune (%u last < %u initial tick)",
+           tuning_state.last_tick, tuning_state.initial_tick);
+      continue;
+    }
+
     measurement_period = tuning_state.last_tick - tuning_state.initial_tick;
+    measurement_period = measurement_period ? measurement_period : 1; // don't divide by zero
+
     // report results to each card
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
       if (TEST_CARD_TUNED(cards_to_tune, card_num)) {
@@ -124,7 +140,7 @@ int autotune_all_cards(struct card_manager *card_mgr) {
 
         if (tune_status != TUNE_CONTINUE) {
           cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
-          INFO("autotune: measure: %d card tuned (cards: %d)", card_num, cards_to_tune);
+          INFO("autotune: measure: %d card reported as tuned", card_num);
         }
       }
     }
