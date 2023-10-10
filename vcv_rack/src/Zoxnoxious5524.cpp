@@ -660,17 +660,15 @@ struct Zoxnoxious5524Widget : ModuleWidget {
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.008, 109.286)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_CLIP_LIGHT));
 
 
-        mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(40.269, 48.012)));
+        mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(139.527, 50.578)));
         mix1OutputTextField->box.size = (mm2px(Vec(18.0, 3.636)));
         mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
         addChild(mix1OutputTextField);
 
-        mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(139.527, 50.578)));
+        mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(40.269, 48.012)));
         mix2OutputTextField->box.size = (mm2px(Vec(18.0, 3.636)));
         mix2OutputTextField->setText(module ? &module->output2NameString : NULL);
         addChild(mix2OutputTextField);
-
-
     }
 
     CardTextDisplay *mix1OutputTextField;
