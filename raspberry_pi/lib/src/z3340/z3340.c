@@ -28,7 +28,7 @@
 #define SPI_MODE 1
 #define SPI_CHANNEL 0 // chip select zero
 #define NUM_DAC_CHANNELS 6
-#define NUM_TUNING_POINTS 8
+#define NUM_TUNING_POINTS 9
 
 struct z3340_card {
   struct zhost *zhost;
@@ -342,6 +342,7 @@ int tunereq_save_state(void *zcard_plugin) {
 /** tunereq_set_point
  * set the next tuning point.  "Next" state is tracked by zcard->tuning_point.
  */
+const static uint8_t led_bit = 0x8;
 
 tune_status_t tunereq_set_point(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
@@ -349,6 +350,10 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
   spiWrite(spi_channel, tune_freq_dac_values[ zcard->tuning_point ], 2);
+
+  // eye candy- flash LED while tuning
+  i2cWriteByteData(zcard->i2c_handle, config_port0_addr,
+                   zcard->tuning_point & 0x1 ? tune_config_port0_data | led_bit : tune_config_port0_data);
 
   return TUNE_CONTINUE;
 }
@@ -360,6 +365,18 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
 tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
 
+  if (tuning_measurement->samples == 0) {
+    ERROR("tuning measure zero samples for tuning point %d",
+          zcard->tuning_point);
+    return TUNE_COMPLETE_FAILED;
+  }
+  else if (tuning_measurement->samples < 10) {
+    WARN("tuning point %d measured %d samples, few samples for tuning",
+         zcard->tuning_point, tuning_measurement->samples);
+  }
+
+  zcard->tuning_points_hz[zcard->tuning_point] = tuning_measurement->frequency;
+
   if (++zcard->tuning_point >= NUM_TUNING_POINTS) {
     zcard->tuning_complete = 1;
     return TUNE_COMPLETE_SUCCESS;
@@ -370,12 +387,14 @@ tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement 
 }
 
 
+/** tunereq_restore_state
+ * if tuning measurements succeeded, create correction mapping table.
+ * if tuning failed, create linear table (no corrections).
+ */
 
 int tunereq_restore_state(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
 
-
-  INFO("Z3340: tune request restore state");
 
   // restore GPIO expander state
   zcard->pca9555_port[0] = zcard->tune_store_pca9555_port[0];

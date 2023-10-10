@@ -41,6 +41,10 @@ static const uint8_t port1_addr = 0x03;
 static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
+static const uint8_t startup_hard_sync_value = 0x02;
+static const uint16_t startup_as3394_high_freq = 0x7FFF;
+static const uint16_t startup_as3394_vco_dac_line = 6;
+
 
 // channel for DAC is upper 4 bits
 static const int channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
@@ -54,6 +58,12 @@ static const int slew_limit = 2000; // ~4ms max rise or fall time: 250us * 32768
 inline static int dac_write(int16_t this_sample, int dac_line, int spi_channel);
 
 
+/* init_zcard
+ * set gpio & dac initial values.  Of note: the SSI2130 doesn't always
+ * startup unless a hard sync signal is sent.  To do this, enable hard
+ * and crank frequency to a high level.  Enough to make sure a sync
+ * pulse or two is sent with a short sleep.
+ */
 void* init_zcard(struct zhost *zhost, int slot) {
   int error = 0;
   int i2c_addr = slot + PCA9555_BASE_I2C_ADDRESS;
@@ -71,7 +81,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
   z5524->zhost = zhost;
   z5524->slot = slot;
   z5524->pca9555_port[0] = 0x00;
-  z5524->pca9555_port[1] = 0x00;
+  z5524->pca9555_port[1] = startup_hard_sync_value; // hard sync enabled
 
   z5524->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
   if (z5524->i2c_handle < 0) {
@@ -95,11 +105,18 @@ void* init_zcard(struct zhost *zhost, int slot) {
   }
 
   // configure DAC
-  for (int chip_select = 0; chip_select < 2; ++chip_select) {
-      spi_channel = set_spi_interface(zhost, chip_select, SPI_MODE, slot);
-      spiWrite(spi_channel, dac_ctrl0_reg, 2);
-      spiWrite(spi_channel, dac_ctrl1_reg, 2);
-  }
+  spi_channel = set_spi_interface(zhost, 0, SPI_MODE, slot);
+  spiWrite(spi_channel, dac_ctrl0_reg, 2);
+  spiWrite(spi_channel, dac_ctrl1_reg, 2);
+  dac_write(startup_as3394_high_freq, startup_as3394_vco_dac_line, spi_channel);
+
+  spi_channel = set_spi_interface(zhost, 1, SPI_MODE, slot);
+  spiWrite(spi_channel, dac_ctrl0_reg, 2);
+  spiWrite(spi_channel, dac_ctrl1_reg, 2);
+
+
+  z5524->pca9555_port[1] = 0x00;
+  error = i2cWriteByteData(z5524->i2c_handle, port1_addr, z5524->pca9555_port[1]);
 
 
   return z5524;
