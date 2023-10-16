@@ -104,6 +104,14 @@ void* init_zcard(struct zhost *zhost, int slot) {
     return NULL;
   }
 
+  // init previous_samples to non-valid value
+  for (int i = 0; i < CHIP_SELECTS; ++i) {
+    for (int j = 0; j < DAC_CHANNELS; ++j) {
+      z5524->previous_samples[i][j] = -1;
+    }
+  }
+
+
   // configure DAC
   spi_channel = set_spi_interface(zhost, 0, SPI_MODE, slot);
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
@@ -114,9 +122,6 @@ void* init_zcard(struct zhost *zhost, int slot) {
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
-
-  z5524->pca9555_port[1] = 0x00;
-  error = i2cWriteByteData(z5524->i2c_handle, port1_addr, z5524->pca9555_port[1]);
 
 
   return z5524;
@@ -216,9 +221,9 @@ struct midi_program_to_gpio {
 
 // array indexed by MIDI program number -- maybe todo: reorder to match wiring
 static const struct midi_program_to_gpio midi_program_to_gpio[] = {
-  { 1, port1_addr, 0b00000000, 0b00111111 }, // prog 0 - VCO2 Saw Off Tri Off
+  { 1, port1_addr, 0b11000000, 0b11111111 }, // prog 0 - VCO2 Saw Off Tri Off
   { 1, port1_addr, 0b01000000, 0b01111111 }, // prog 1 - VCO2 Saw Off Tri On
-  { 1, port1_addr, 0b11000000, 0b11111111 }, // prog 2 - VCO2 Saw On  Tri Off
+  { 1, port1_addr, 0b00000000, 0b00111111 }, // prog 2 - VCO2 Saw On  Tri Off
   { 1, port1_addr, 0b10000000, 0b10111111 }, // prog 3 - VCO2 Saw On  Tri On
   { 1, port1_addr, 0b00000000, 0b11101111 }, // prog 4 - VCO1 Exp FM Off
   { 1, port1_addr, 0b00010000, 0b11111111 }, // prog 5 - VCO1 Exp FM On

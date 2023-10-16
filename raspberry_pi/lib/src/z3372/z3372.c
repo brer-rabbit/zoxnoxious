@@ -109,6 +109,9 @@ void* init_zcard(struct zhost *zhost, int slot) {
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
+  for (int i = 0; i < NUM_CHANNELS; ++i) {
+    z3372->previous_samples[i] = -1;
+  }
 
   return z3372;
 }
