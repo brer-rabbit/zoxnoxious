@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include "zcard_plugin.h"
+#include "tune_utils.h"
 
 
 // GPIO: PCA9555
@@ -42,6 +43,7 @@ struct z3340_card {
   int tuning_point;
   float tuning_points_hz[NUM_TUNING_POINTS];
   int tuning_complete;
+  int16_t freq_tuned[4096];
 };
 
 
@@ -53,6 +55,7 @@ static const uint8_t config_port_as_output = 0x00;
 
 // six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
 static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
+
 
 //
 // tuning params
@@ -77,6 +80,9 @@ static char tune_freq_dac_values[][2] = { { 0x00, 0x00 }, // freq 0V
                                                 { 0x0c, 0x00 }, // freq 6V
                                                 { 0x0e, 0x00 }, // freq 7V
                                                 { 0x0f, 0xff } }; // freq 8V
+
+static const double expected_dac_values_per_octave = 409.6; // for 12 bits / 10 volt range
+
 
 //
 // slew rate limit the triangle vca
@@ -131,8 +137,15 @@ void* init_zcard(struct zhost *zhost, int slot) {
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
-  for (int i = 0; i < NUM_DAC_CHANNELS; ++i) {
-    z3340->previous_samples[i] = -1;
+
+  // set DAC prev values to unallowed value
+ for (int i = 0; i < NUM_DAC_CHANNELS; ++i) {
+   z3340->previous_samples[i] = -1;
+ }
+
+  // tuning -- start with untuned / lineiar
+  for (int i = 0; i < 4096; ++i) {
+    zcard->freq_tuned[i] = i;
   }
 
   return z3340;
@@ -408,9 +421,13 @@ int tunereq_restore_state(void *zcard_plugin) {
 
   if (zcard->tuning_complete == 1) {
     // create lookup table based on measurement
+    
   }
   else {
-    // linear table
+    // linear table -- no corrections
+    for (int i = 0; i < 4096; ++i) {
+      zcard->freq_tuned[i] = i;
+    }
   }
 
   return TUNE_COMPLETE_SUCCESS;
