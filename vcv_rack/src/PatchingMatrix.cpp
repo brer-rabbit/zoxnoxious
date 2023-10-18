@@ -105,6 +105,10 @@ struct PatchingMatrix : ZoxnoxiousModule {
 
     // Discovery related variables
     midi::Message MIDI_DISCOVERY_REQUEST_SYSEX; // this should be const static
+    midi::Message MIDI_SHUTDOWN_SYSEX;
+    midi::Message MIDI_RESTART_SYSEX;
+    midi::Message MIDI_TUNE_REQUEST;
+
     bool receivedPluginList = false;
     dsp::ClockDivider discoveryRequestClockDivider;
 
@@ -167,6 +171,20 @@ struct PatchingMatrix : ZoxnoxiousModule {
         MIDI_DISCOVERY_REQUEST_SYSEX.bytes[2] = 0x02;
         MIDI_DISCOVERY_REQUEST_SYSEX.bytes[3] = 0xF7;
 
+        MIDI_SHUTDOWN_SYSEX.setSize(4);
+        MIDI_SHUTDOWN_SYSEX.bytes[0] = 0xF0;
+        MIDI_SHUTDOWN_SYSEX.bytes[1] = 0x7D;
+        MIDI_SHUTDOWN_SYSEX.bytes[2] = 0x03;
+        MIDI_SHUTDOWN_SYSEX.bytes[3] = 0xF7;
+
+        MIDI_RESTART_SYSEX.setSize(4);
+        MIDI_RESTART_SYSEX.bytes[0] = 0xF0;
+        MIDI_RESTART_SYSEX.bytes[1] = 0x7D;
+        MIDI_RESTART_SYSEX.bytes[2] = 0x04;
+        MIDI_RESTART_SYSEX.bytes[3] = 0xF7;
+
+        MIDI_TUNE_REQUEST.setSize(1);
+        MIDI_TUNE_REQUEST.bytes[0] = 0xF6;
     }
 
 
@@ -410,6 +428,7 @@ struct PatchingMatrix : ZoxnoxiousModule {
     void onChannelAssignmentLost() override {
         ZoxnoxiousModule::onChannelAssignmentLost();
     }
+
 
 private:
 
@@ -758,6 +777,21 @@ struct PatchingMatrixWidget : ModuleWidget {
                                                  appendAudioMenu(menu, module->audioPorts[1]);
                                              }));
         }
+
+        menu->addChild(new MenuSeparator);
+
+        menu->addChild(createMenuItem("Autotune", "", [=]() {
+              module->midiOutput.sendMidiMessage(module->MIDI_TUNE_REQUEST);
+            }));
+
+        menu->addChild(new MenuSeparator);
+
+        menu->addChild(createMenuItem("Shutdown", "", [=]() {
+              module->midiOutput.sendMidiMessage(module->MIDI_SHUTDOWN_SYSEX);
+            }));
+        menu->addChild(createMenuItem("Restart", "", [=]() {
+              module->midiOutput.sendMidiMessage(module->MIDI_RESTART_SYSEX);
+            }));
 
     }
 

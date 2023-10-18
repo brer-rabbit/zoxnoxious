@@ -60,3 +60,30 @@ a  0xF0  sysex
 b  0x7D  test manufacturer
 c  0x02  discovery ack
 d  0xF7  end sysex
+
+
+
+Autotune Requst
+Client requests all cards tune
+#  byte  desc
+-- ----  ----
+a  0xF6  MIDI standard for tune request
+
+
+Shutdown Requst
+Client requests shutdown of cpu
+#  byte  desc
+-- ----  ----
+a  0xF0  sysex
+b  0x7D  test manufacturer
+c  0x03  shutdown request
+d  0xF7  end sysex
+
+Restart Requst
+Client requests shutdown of cpu
+#  byte  desc
+-- ----  ----
+a  0xF0  sysex
+b  0x7D  test manufacturer
+c  0x04  restart request
+d  0xF7  end sysex
