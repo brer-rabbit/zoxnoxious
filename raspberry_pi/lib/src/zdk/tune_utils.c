@@ -27,7 +27,7 @@ double measured_dac_delta_per_octave(double f_low, double f_high, int dac_low, i
 }
 
 double corrected_slope(double actual_dac_values_per_octave, double expected_dac_values_per_octave) {
-  return expected_dac_values_per_octave / actual_dac_values_per_octave;
+  return actual_dac_values_per_octave / expected_dac_values_per_octave;
 }
 
 
