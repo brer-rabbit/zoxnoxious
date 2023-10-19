@@ -23,11 +23,11 @@ static const double inv_log2 = 1 / log(2);
 
 double measured_dac_delta_per_octave(double f_low, double f_high, int dac_low, int dac_high) {
   double octave_delta = log(f_high / f_low) * inv_log2;
-  return (dac_high - dac_low + 1.0) / octave_delta;
+  return (dac_high - dac_low + 1) / octave_delta;
 }
 
 double corrected_slope(double actual_dac_values_per_octave, double expected_dac_values_per_octave) {
-  return actual_dac_values_per_octave / expected_dac_values_per_octave;
+  return expected_dac_values_per_octave / actual_dac_values_per_octave;
 }
 
 
@@ -43,8 +43,8 @@ int calc_dac_corrections(double slope, int prev_correction, int num_elements, in
 }
 
 
-int16_t dac_value_for_hz(double target_freq, double dac_delta_per_octave, double ref_freq, int16_t dac_offset) {
+int16_t dac_value_for_hz(double target_freq, double dac_delta_per_octave, double ref_freq, int16_t ref_freq_dac_value) {
   double freq_ratio = target_freq / ref_freq;
   double dac_value = log(freq_ratio) * inv_log2 * dac_delta_per_octave;
-    return (dac_value + 0.5) + dac_offset;
+  return (dac_value + 0.5) + ref_freq_dac_value;
 }

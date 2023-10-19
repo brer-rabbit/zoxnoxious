@@ -58,9 +58,9 @@ int calc_dac_corrections(double slope, int prev_correction, int num_elements, in
  * target_freq : frequency of interest
  * dac_delta_per_octave : return from measured_dac_delta_per_octave
  * ref_freq : low frequency for dac_delta_per_octave
- * dac_offset : dac value for ref_freq
+ * ref_freq_dac_value : dac value for ref_freq
  */
 
-int16_t dac_value_for_hz(double target_freq, double dac_delta_per_octave, double ref_freq, int16_t dac_offset);
+int16_t dac_value_for_hz(double target_freq, double dac_delta_per_octave, double ref_freq, int16_t ref_freq_dac_value);
 
 #endif // TUNE_UTILS_H
