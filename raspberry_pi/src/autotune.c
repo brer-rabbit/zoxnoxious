@@ -58,7 +58,6 @@ int autotune_all_cards(struct card_manager *card_mgr) {
   uint32_t measurement_period;
 
 
-  INFO("starting autotune: bitrecord: 0x%X", cards_to_tune);
   memset(&tuning_state, 0, sizeof(struct tuning_state));
 
   // each card will save state
@@ -92,12 +91,12 @@ int autotune_all_cards(struct card_manager *card_mgr) {
 
         if (tune_status != TUNE_CONTINUE) {
           cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
-          INFO("autotune: tunereq_set_point: card %d reports tuned", card_num);
+          INFO("tunereq_set_point: card %d reports tuned", card_num);
         }
         else {
           // record this card's gpio: accumulate add bit to gpio mask
           tuning_state.gpio_mask |= (1 << gpio_id_by_slot[ this_card->slot ]);
-          INFO("autotune: tunereq_set_point: card %d setup for tune", card_num);
+          INFO("tunereq_set_point: card %d setup for tune", card_num);
         }
       }
     }
