@@ -130,7 +130,7 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
     // Four program changes handle off/off, off/on, on/off, on/on.
     // With a value of 0, the prog changes for tri/saw are 0,1,2,3.
     const uint8_t vcoTwoSawTriMidiProgramOffset = 0;
-    uint8_t vcoTwoTriSawPrevState = vcoTwoSawTriMidiProgramOffset; // init to first program in list
+    uint8_t vcoTwoTriSawPrevState = 255; // init to invalid state
 
 
     // Detect state changes by tracking previousValue, wiht INT_MIN
