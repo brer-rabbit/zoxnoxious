@@ -17,6 +17,7 @@
 #include <stdio.h>
 
 #include "zcard_plugin.h"
+#include "tune_utils.h"
 
 
 // GPIO: PCA9555
@@ -27,6 +28,21 @@
 #define SPI_MODE 1
 #define CHIP_SELECTS 2
 #define DAC_CHANNELS 8
+#define NUM_TUNING_POINTS 9
+#define TWELVE_BITS 4096
+
+struct tunable {
+  int tuning_point; // maintain state between tuning calls
+  struct tune_point tuning_points[NUM_TUNING_POINTS];
+  int tuning_complete;
+  int16_t freq_tuned[TWELVE_BITS];
+};
+
+typedef enum {
+  TUNE_SSI2130_VCO,
+  TUNE_AS3394_VCO,
+  TUNE_AS3394_VCF
+} tuning_component_t;
 
 struct z5524_card {
   struct zhost *zhost;
@@ -34,6 +50,12 @@ struct z5524_card {
   int i2c_handle;
   uint8_t pca9555_port[2];  // gpio registers
   int16_t previous_samples[CHIP_SELECTS][DAC_CHANNELS];
+
+  // tuning params
+  struct tunable as3394_vco;
+  struct tunable as3394_vcf;
+  struct tunable ssi2130_vco;
+  tuning_component_t tune_component;
 };
 
 static const uint8_t port0_addr = 0x02;
@@ -41,7 +63,7 @@ static const uint8_t port1_addr = 0x03;
 static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
-static const uint8_t startup_hard_sync_value = 0x02;
+static const uint8_t startup_hard_sync_value = 0xC2;
 static const uint16_t startup_as3394_high_freq = 0x7FFF;
 static const uint16_t startup_as3394_vco_dac_line = 6;
 
@@ -56,6 +78,11 @@ static const int slew_limit = 2000; // ~4ms max rise or fall time: 250us * 32768
 
 // helper declarations
 inline static int dac_write(int16_t this_sample, int dac_line, int spi_channel);
+
+
+
+static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
+
 
 
 /* init_zcard
@@ -268,24 +295,6 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
 }
 
 
-
-int tunereq_save_state(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-tune_status_t tunereq_set_point(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-int tunereq_restore_state(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-
-
-// static functions
-
-
 // DAC write:
 // bits 15-0:
 // 0 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0
@@ -306,3 +315,160 @@ inline static int dac_write(int16_t this_sample, int dac_line, int spi_channel) 
 
   return spiWrite(spi_channel, samples_to_dac, 2);
 }
+
+
+
+//
+// Tuning section
+// Put all the tuning stuff down here.  A lot of it.
+// This tunes the VCOs on both chips and the VCF to 1 volt/octave.
+//
+
+
+static const uint8_t tune_config_port0_data = 0x00;
+static const uint8_t tune_config_port1_data = 0b11000000; // wave select: saw/tri off
+// tune_dac_state is in spiWrite order
+// set these values when tuning the 2130
+static const char tune_2130_dac_state_as3394[][2] = { { 0x0f, 0xff }, // vco mix: 2130
+                                                      { 0x10, 0x00 }, // pwm: off
+                                                      { 0x2f, 0xff }, // final gain
+                                                      { 0x30, 0x00 }, // vcf mod
+                                                      { 0x40, 0x00 }, // resonance
+                                                      { 0x50, 0x00 }, // 2130 mod vca
+                                                      { 0x60, 0x00 }, // 3394 vco exp freq
+                                                      { 0x7f, 0xff } }; // vcf: open
+
+static const char tune_2130_dac_state_ssi2130[][2] = { { 0x00, 0x00 }, // tri mix
+                                                       { 0x17, 0xff }, // linear: mid-range
+                                                       { 0x20, 0x00 }, // exp pitch
+                                                       { 0x37, 0xff }, // pwm
+                                                       { 0x40, 0x00 }, // sine vca
+                                                       { 0x50, 0x00 }, // 3394 mod vca
+                                                       { 0x6f, 0xff }, // pulse mix: 100%
+                                                       { 0x70, 0x00 } }; // saw mix
+
+// set these values when tuning the 3394 vco
+static const char tune_3394_vco_dac_state_as3394[][2] = { { 0x00, 0x00 }, // vco mix: 3394
+                                                          { 0x17, 0xff }, // pwm: 50%
+                                                          { 0x2f, 0xff }, // final gain
+                                                          { 0x30, 0x00 }, // vcf mod
+                                                          { 0x40, 0x00 }, // resonance
+                                                          { 0x50, 0x00 }, // 2130 mod vca
+                                                          { 0x60, 0x00 }, // 3394 vco exp freq
+                                                          { 0x7f, 0xff } }; // vcf: open
+
+static const char tune_3394_dac_state_ssi2130[][2] = { { 0x00, 0x00 }, // tri mix
+                                                       { 0x17, 0xff }, // linear: mid-range
+                                                       { 0x20, 0x00 }, // exp pitch
+                                                       { 0x37, 0xff }, // pwm
+                                                       { 0x40, 0x00 }, // sine vca
+                                                       { 0x50, 0x00 }, // 3394 mod vca
+                                                       { 0x60, 0x00 }, // pulse mix: off
+                                                       { 0x70, 0x00 } }; // saw mix
+
+// set these values when tuning the 3394 vcf (ssi2130 as per above)
+static const char tune_3394_vcf_dac_state_as3394[][2] = { { 0x00, 0x00 }, // vco mix: 3394
+                                                          { 0x10, 0x00 }, // pwm: 0%
+                                                          { 0x2f, 0xff }, // final gain
+                                                          { 0x30, 0x00 }, // vcf mod
+                                                          { 0x4f, 0xff }, // res: crank it!
+                                                          { 0x50, 0x00 }, // 2130 mod vca
+                                                          { 0x60, 0x00 }, // 3394 vco exp freq
+                                                          { 0x7f, 0xff } }; // vcf: open
+
+
+// tune frequency dac values: the DAC values to run through for a tuning request.
+// Revese the byte order before calling spiWrite and logical or with DAC line.
+// These values are used for both the 2130 and 3394.
+static const int16_t tune_freq_dac_values[] = { 0x0000,
+                                                0x0200,
+                                                0x0400,
+                                                0x0600,
+                                                0x0800,
+                                                0x0a00,
+                                                0x0c00,
+                                                0x0e00,
+                                                0x0fff };
+
+static const double tuning_initial_frequency_target = 27.5;
+static const double expected_dac_values_per_octave = 512; // for 12 bits / 8 octave range
+static const double expected_dac_vcf_values_per_octave = 409.6; // for 12 bits / 10 octave range
+
+
+/** tunereq_save_state
+ * The DAC and gpio can be restored based on existing state, so no need to save those.
+ * Setup tuning structures
+ */
+int tunereq_save_state(void *zcard_plugin) {
+  struct z5524_card *zcard = (struct z5524_card*)zcard_plugin;
+  int error, spi_channel;
+
+  // structure prep
+  memset(&zcard->as3394_vco, 0, sizeof(struct tunable));
+  memset(&zcard->as3394_vcf, 0, sizeof(struct tunable));
+  memset(&zcard->ssi2130_vco, 0, sizeof(struct tunable));
+  zcard->tune_component = TUNE_SSI2130_VCO; // start with the 2130
+
+  // set DAC values for SSI2130
+  int chip_select = 0;
+  spi_channel = set_spi_interface(zcard->zhost, chip_select, SPI_MODE, zcard->slot);
+  // set DAC state AS3394
+  for (int i = 0; i < DAC_CHANNELS; ++i) {
+    spiWrite(spi_channel, (char*)tune_2130_dac_state_as3394[i], 2);
+  }
+  spi_channel = set_spi_interface(zcard->zhost, ++chip_select, SPI_MODE, zcard->slot);
+  // set DAC state SSI2130
+  for (int i = 0; i < DAC_CHANNELS; ++i) {
+    spiWrite(spi_channel, (char*)tune_2130_dac_state_ssi2130[i], 2);
+  }
+
+
+  // set any state necessary on the gpio -- all modulations off, outputs set
+  error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, tune_config_port0_data);
+  error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, tune_config_port1_data);
+  if (error) {
+    ERROR("z5524: tunereq_save_state: error writing to I2C bus handle %d\n", zcard->i2c_handle);
+    return TUNE_COMPLETE_FAILED;
+  }
+
+  return TUNE_CONTINUE;
+}
+
+
+
+tune_status_t tunereq_set_point(void *zcard_plugin) {
+  return TUNE_COMPLETE_SUCCESS;
+}
+tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
+  return TUNE_COMPLETE_SUCCESS;
+}
+int tunereq_restore_state(void *zcard_plugin) {
+  struct z5524_card *zcard = (struct z5524_card*)zcard_plugin;
+
+  // restore gpio
+  int error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, zcard->pca9555_port[0]);
+  error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, zcard->pca9555_port[1]);
+
+  // restore DAC (or set to invalid state)
+
+  return TUNE_COMPLETE_SUCCESS;
+}
+
+
+
+
+
+/** create_linear_tuning
+ * create a linear tuning table - no corrections.  Create it for the passed in DAC channel such that
+ * it can be passed straight to spiWrite.
+ */
+static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
+  for (int i = 0; i < num_elements; ++i) {
+    unsigned char upper, lower;
+    upper = i;
+    lower = dac_channel | (0xf & i >> 8);
+    table[i] = ((int16_t)upper) << 8 | (int16_t)lower;
+  }
+}
+
+

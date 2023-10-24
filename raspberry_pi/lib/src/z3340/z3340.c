@@ -496,8 +496,6 @@ int tunereq_restore_state(void *zcard_plugin) {
   // linear table -- no corrections
   create_linear_tuning(channel_map[0], TWELVE_BITS, zcard->freq_tuned);
   return TUNE_COMPLETE_FAILED;
-
-
 }
 
 
