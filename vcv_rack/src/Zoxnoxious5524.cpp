@@ -435,7 +435,8 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         // VCO One Pulse Width
         v = params[VCO_ONE_PW_KNOB_PARAM].getValue() + inputs[VCO_ONE_PW_INPUT].getVoltageSum() / 10.f;
         // TODO: Handle the PWM tuning on the Pi, allow for clamp(v, 0.f, 1.f)
-        controlMsg->frame[outputDeviceId][cvChannelOffset + 11] = clamp(v, 0.03f, 0.97f); 
+        v = v * 0.9 + 0.05;
+        controlMsg->frame[outputDeviceId][cvChannelOffset + 11] = clamp(v, 0.05f, 0.95f); 
         if (controlMsg->frame[outputDeviceId][cvChannelOffset + 11] != v) {
             vcoOnePwClipTimer = clipTime;
         }
@@ -509,7 +510,8 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         if (vcoTwoPulseEnabled) {
             v = params[VCO_TWO_PW_KNOB_PARAM].getValue() + inputs[VCO_TWO_PW_INPUT].getVoltageSum() / 10.f;
             // TODO: Handle the PWM tuning on the Pi, allow for clamp(v, 0.f, 1.f)
-            controlMsg->frame[outputDeviceId][cvChannelOffset + 1] = clamp(v, 0.03f, 0.97f);
+            v = v * 0.9 + 0.05;
+            controlMsg->frame[outputDeviceId][cvChannelOffset + 1] = clamp(v, 0.05f, 0.95f);
             if (controlMsg->frame[outputDeviceId][cvChannelOffset + 1] != v) {
                 vcoTwoPwClipTimer = clipTime;
             }
