@@ -460,13 +460,17 @@ int tunereq_restore_state(void *zcard_plugin) {
 
     int tuned_index;
     for (int i = 0; i < NUM_TUNING_POINTS - 1; ++i) {
-      for (tuned_index = zcard->tuning_points[i].expected_dac + 0.5; tuned_index < zcard->tuning_points[i+1].expected_dac - 0.5; ++tuned_index) {
+      for (tuned_index = zcard->tuning_points[i].expected_dac + 0.5;
+           tuned_index < zcard->tuning_points[i+1].expected_dac - 0.5 &&
+             tuned_index < TWELVE_BITS;
+           ++tuned_index) {
         // y = mx + b; we have b as zcard->tuning_points[i].actual_dac
         // compute m and x
         slope = (zcard->tuning_points[i+1].actual_dac - zcard->tuning_points[i].actual_dac) /
           (zcard->tuning_points[i+1].expected_dac - zcard->tuning_points[i].expected_dac);
         int x = tuned_index - (int)(zcard->tuning_points[i].expected_dac + 0.5);
-        zcard->freq_tuned[tuned_index] = slope * x + zcard->tuning_points[i].actual_dac;
+        int y = slope * x + zcard->tuning_points[i].actual_dac;
+        zcard->freq_tuned[tuned_index] = y > 0 ? y : 0;
       }
     }
 

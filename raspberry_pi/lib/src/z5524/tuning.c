@@ -87,9 +87,6 @@ static const uint16_t tune_freq_dac_values[] = { 0x0000,
                                                 0x0c00,
                                                 0x0e00,
                                                 0x0fff };
-static const char ssi2130_vco_dac = 0x20;
-static const char as3394_vco_dac = 0x60;
-static const char as3394_vcf_dac = 0x70;
 
 // Tuning values
 static const double tuning_vco_initial_frequency_target = 27.5;  // A0
@@ -99,6 +96,7 @@ static const double expected_dac_as3394_vco_values_per_octave = 682.667; // for 
 static const double expected_dac_as3394_vcf_values_per_octave = 409.6; // for 12 bits / 10 octave range
 
 static void write_dac_lines(struct z5524_card *zcard, const char dac[][2], int num_lines, int chip_select);
+static int create_correction_table(struct tunable *tunable, double initial_frequency, char dac_line);
 
 
 
@@ -112,9 +110,9 @@ int tunereq_save_state(void *zcard_plugin) {
 
 
   // structure prep
-  memset(&zcard->as3394_vco, 0, sizeof(struct tunable));
-  memset(&zcard->as3394_vcf, 0, sizeof(struct tunable));
-  memset(&zcard->ssi2130_vco, 0, sizeof(struct tunable));
+  memset(&zcard->tunables[TUNE_SSI2130_VCO].tuning_points, 0, sizeof(struct tune_point) * NUM_TUNING_POINTS);
+  memset(&zcard->tunables[TUNE_AS3394_VCO].tuning_points, 0, sizeof(struct tune_point) * NUM_TUNING_POINTS);
+  memset(&zcard->tunables[TUNE_AS3394_VCF].tuning_points, 0, sizeof(struct tune_point) * NUM_TUNING_POINTS);
   zcard->tune_target = TUNE_SSI2130_VCO; // start with the 2130
   zcard->tuning_index = 0;
 
@@ -197,21 +195,21 @@ tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement 
 
   switch (zcard->tune_target) {
   case TUNE_SSI2130_VCO:
-    tp = &zcard->ssi2130_vco.tuning_points[ zcard->tuning_index ];
+    tp = &zcard->tunables[TUNE_SSI2130_VCO].tuning_points[ zcard->tuning_index ];
     tp->actual_dac = tune_freq_dac_values[ zcard->tuning_index ];
     tp->frequency = tuning_measurement->frequency;
     tp->expected_dac = octave_delta(tuning_measurement->frequency, tuning_vco_initial_frequency_target) *
       expected_dac_ssi2130_values_per_octave;
     break;
   case TUNE_AS3394_VCO:
-    tp = &zcard->as3394_vco.tuning_points[ zcard->tuning_index ];
+    tp = &zcard->tunables[TUNE_AS3394_VCO].tuning_points[ zcard->tuning_index ];
     tp->actual_dac = tune_freq_dac_values[ zcard->tuning_index ];
     tp->frequency = tuning_measurement->frequency;
     tp->expected_dac = octave_delta(tuning_measurement->frequency, tuning_vco_initial_frequency_target) *
       expected_dac_as3394_vco_values_per_octave;
     break;
   case TUNE_AS3394_VCF:
-    tp = &zcard->as3394_vcf.tuning_points[ zcard->tuning_index ];
+    tp = &zcard->tunables[TUNE_AS3394_VCF].tuning_points[ zcard->tuning_index ];
     tp->actual_dac = tune_freq_dac_values[ zcard->tuning_index ];
     tp->frequency = tuning_measurement->frequency;
     tp->expected_dac = octave_delta(tuning_measurement->frequency, tuning_vcf_initial_frequency_target) * expected_dac_as3394_vcf_values_per_octave;
@@ -248,6 +246,13 @@ int tunereq_restore_state(void *zcard_plugin) {
   }
   // restore DAC (or set to invalid state)
 
+
+  if (zcard->tune_target == TUNE_TARGET_LENGTH) {
+    create_correction_table(&zcard->tunables[TUNE_SSI2130_VCO], tuning_vco_initial_frequency_target, ssi2130_vco_dac);
+    create_correction_table(&zcard->tunables[TUNE_AS3394_VCO], tuning_vco_initial_frequency_target, as3394_vco_dac);
+    create_correction_table(&zcard->tunables[TUNE_AS3394_VCF], tuning_vcf_initial_frequency_target, as3394_vcf_dac);
+  }
+
   return TUNE_COMPLETE_SUCCESS;
 }
 
@@ -260,3 +265,59 @@ static void write_dac_lines(struct z5524_card *zcard, const char dac[][2], int n
   }
 }
 
+
+// TODO: this really needs to be refactored and put to tune_utils
+
+static int create_correction_table(struct tunable *tunable, double initial_frequency, char dac_line) {
+
+  double oct_delta = octave_delta(tunable->tuning_points[1].frequency,
+                                  tunable->tuning_points[0].frequency);
+
+  double dac_delta_per_octave = (TWELVE_BITS / (NUM_TUNING_POINTS - 1)) / oct_delta;
+  double low_freq_dac_value = dac_value_for_freq(initial_frequency,
+                                                 dac_delta_per_octave,
+                                                 tunable->tuning_points[0].frequency);
+  double slope;
+
+  // overwrite the expected_dac and actual_dac values of the initial entry--
+  // basically do a linear interp and move the y-intercept
+  tunable->tuning_points[0].expected_dac = 0.0; //user expects dac 0 for tuning_initial_frequency_target
+  tunable->tuning_points[0].actual_dac = 0.5 + low_freq_dac_value;
+
+  int tuned_index;
+  for (int i = 0; i < NUM_TUNING_POINTS - 1; ++i) {
+    for (tuned_index = tunable->tuning_points[i].expected_dac + 0.5;
+         tuned_index < tunable->tuning_points[i+1].expected_dac - 0.5 &&
+           tuned_index < TWELVE_BITS;
+         ++tuned_index) {
+      // y = mx + b; we have b as zcard->tuning_points[i].actual_dac
+      // compute m and x
+      slope = (tunable->tuning_points[i+1].actual_dac - tunable->tuning_points[i].actual_dac) /
+        (tunable->tuning_points[i+1].expected_dac - tunable->tuning_points[i].expected_dac);
+      int x = tuned_index - (int)(tunable->tuning_points[i].expected_dac + 0.5);
+      int y = slope * x + tunable->tuning_points[i].actual_dac;
+      tunable->calibration_table[tuned_index] = y > 0 ? y : 0;
+    }
+  }
+
+  // fill in remaining elements of table from tuned_index-1 onward.
+  INFO("dac line %c corrected to index: %d", ((unsigned char)dac_line >> 4) + '0', tuned_index);
+  for (int i = tuned_index - 1; i < TWELVE_BITS; ++i) {
+    tunable->calibration_table[i] = tunable->calibration_table[tuned_index - 1];
+  }
+
+  // cleanup table
+  for (int i = 0; i < TWELVE_BITS; ++i) {
+    if (tunable->calibration_table[i] > TWELVE_BITS - 1) {
+      tunable->calibration_table[i] = 0xff0f | dac_line;
+    }
+    else {
+      unsigned char upper, lower;
+      upper = tunable->calibration_table[i];
+      lower = dac_line | (0xf & tunable->calibration_table[i] >> 8);
+      tunable->calibration_table[i] = ((int16_t)upper) << 8 | (int16_t)lower;
+    }
+  }
+
+  return 0;
+}

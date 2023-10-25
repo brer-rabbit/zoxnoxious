@@ -32,9 +32,10 @@
 
 struct tunable {
   struct tune_point tuning_points[NUM_TUNING_POINTS];
-  int16_t freq_tuned[TWELVE_BITS];
+  int16_t calibration_table[TWELVE_BITS];
 };
 
+// this enum ordering is relevant in process samples
 typedef enum {
   TUNE_SSI2130_VCO,
   TUNE_AS3394_VCO,
@@ -50,9 +51,7 @@ struct z5524_card {
   int16_t previous_samples[CHIP_SELECTS][DAC_CHANNELS];
 
   // tuning params
-  struct tunable as3394_vco;
-  struct tunable as3394_vcf;
-  struct tunable ssi2130_vco;
+  struct tunable tunables[TUNE_TARGET_LENGTH];
   tune_target_t tune_target;
   int tuning_index; // maintain state between tuning calls for which dac value to apply
 };
@@ -70,6 +69,11 @@ extern const uint8_t startup_hard_sync_value;
 extern const uint16_t startup_as3394_high_freq;
 extern const uint16_t startup_as3394_vco_dac_line;
 
+extern const char ssi2130_vco_dac;
+extern const char as3394_vco_dac;
+extern const char as3394_vcf_dac;
+
+void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
 
 
 #endif // Z5524_H

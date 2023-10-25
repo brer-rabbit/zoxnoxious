@@ -33,6 +33,10 @@ const uint16_t startup_as3394_vco_dac_line = 6;
 const int spi_channel_ssi2130 = 1;
 const int spi_channel_as3394 = 0;
 
+const char ssi2130_vco_dac = 0x20;
+const char as3394_vco_dac = 0x60;
+const char as3394_vcf_dac = 0x70;
+
 
 // channel for DAC is upper 4 bits
 static const int channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
@@ -45,9 +49,6 @@ static const int slew_limit = 2000; // ~4ms max rise or fall time: 250us * 32768
 // helper declarations
 inline static int dac_write(int16_t this_sample, int dac_line, int spi_channel);
 
-
-
-static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
 
 
 
@@ -104,7 +105,6 @@ void* init_zcard(struct zhost *zhost, int slot) {
     }
   }
 
-
   // configure DAC
   spi_channel = set_spi_interface(zhost, spi_channel_as3394, SPI_MODE, slot);
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
@@ -115,6 +115,18 @@ void* init_zcard(struct zhost *zhost, int slot) {
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
+  // start with a linear tuning table for tunables
+  create_linear_tuning(ssi2130_vco_dac,
+                       sizeof(z5524->tunables[TUNE_SSI2130_VCO].calibration_table) / sizeof(int16_t),
+                       z5524->tunables[TUNE_SSI2130_VCO].calibration_table);
+  create_linear_tuning(as3394_vco_dac,
+                       sizeof(z5524->tunables[TUNE_AS3394_VCO].calibration_table) / sizeof(int16_t),
+                       z5524->tunables[TUNE_SSI2130_VCO].calibration_table);
+  create_linear_tuning(as3394_vcf_dac,
+                       sizeof(z5524->tunables[TUNE_AS3394_VCF].calibration_table) / sizeof(int16_t),
+                       z5524->tunables[TUNE_SSI2130_VCO].calibration_table);
+
+  // do this last to give hard sync some time to get a pulse
   z5524->pca9555_port[1] = 0x00; // disable hard sync
   i2cWriteByteData(z5524->i2c_handle, port1_addr, z5524->pca9555_port[1]);
 
@@ -153,11 +165,13 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   int spi_channel;
   int16_t this_sample;
   int slew_delta;
+  int i;
+  char samples_to_dac[2];
 
   // dac output samples
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_as3394, SPI_MODE, zcard->slot);
 
-  for (int i = 0; i < DAC_CHANNELS; ++i) {
+  for (i = 0; i < DAC_CHANNELS - 2; ++i) {
     this_sample = samples[i + spi_channel_as3394 * DAC_CHANNELS];
     if (zcard->previous_samples[spi_channel_as3394][i] != this_sample) {
 
@@ -179,16 +193,55 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     }
   }
 
-  spi_channel = set_spi_interface(zcard->zhost, spi_channel_ssi2130, SPI_MODE, zcard->slot);
+  // AS3394 DAC lines with corrections: VCO, VCF.
+  // These are both at the end of the DAC (last two lines)
+  for (; i < DAC_CHANNELS; ++i) {
+    this_sample = samples[i + spi_channel_as3394 * DAC_CHANNELS] >> 3;
+    if (zcard->previous_samples[spi_channel_as3394][i] != this_sample) {
+      if (this_sample >= 0) {
+        // magic number 5: i (the dac line) minus 5 equals TUNE_AS3394_VCO enum for tunables index
+        int16_t correct_freq_value = zcard->tunables[i - 5].calibration_table[ this_sample ];
+        spiWrite(spi_channel, (char*) &correct_freq_value, 2);
+      }
+      else {
+        samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
+        samples_to_dac[1] = 0;
+        spiWrite(spi_channel, samples_to_dac, 2);
+      }
+
+      zcard->previous_samples[spi_channel_as3394][i] = this_sample; // use provided value, not mapped value
+    }
+  }
+
 
   // and the DAC out for CS1, the SSI2130.  Yes, this could be a loop for chip
   // select but this pulls the check for 3394 final_vca_dac out.  No need to
   // check that condition here.
-  for (int i = 0; i < DAC_CHANNELS; ++i) {
-    this_sample = samples[i + spi_channel_ssi2130 * DAC_CHANNELS];
-    if (zcard->previous_samples[spi_channel_ssi2130][i] != this_sample) {
-      zcard->previous_samples[spi_channel_ssi2130][i] = this_sample;
-      dac_write(this_sample, channel_map[i], spi_channel);
+  spi_channel = set_spi_interface(zcard->zhost, spi_channel_ssi2130, SPI_MODE, zcard->slot);
+
+  for (i = 0; i < DAC_CHANNELS; ++i) {
+    if (i == 2) { // VCO: use correction table
+      this_sample = samples[i + spi_channel_ssi2130 * DAC_CHANNELS] >> 3;
+      if (zcard->previous_samples[spi_channel_ssi2130][i] != this_sample) {
+        if (this_sample >= 0) {
+          int16_t correct_freq_value = zcard->tunables[TUNE_SSI2130_VCO].calibration_table[ this_sample ];
+          spiWrite(spi_channel, (char*) &correct_freq_value, 2);
+        }
+        else {
+          samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
+          samples_to_dac[1] = 0;
+          spiWrite(spi_channel, samples_to_dac, 2);
+        }
+
+        zcard->previous_samples[spi_channel_ssi2130][i] = this_sample; // use provided value, not mapped value
+      }
+    }
+    else {
+      this_sample = samples[i + spi_channel_ssi2130 * DAC_CHANNELS];
+      if (zcard->previous_samples[spi_channel_ssi2130][i] != this_sample) {
+        zcard->previous_samples[spi_channel_ssi2130][i] = this_sample;
+        dac_write(this_sample, channel_map[i], spi_channel);
+      }
     }
   }
 
@@ -287,7 +340,7 @@ inline static int dac_write(int16_t this_sample, int dac_line, int spi_channel) 
  * create a linear tuning table - no corrections.  Create it for the passed in DAC channel such that
  * it can be passed straight to spiWrite.
  */
-static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
+void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
   for (int i = 0; i < num_elements; ++i) {
     unsigned char upper, lower;
     upper = i;
