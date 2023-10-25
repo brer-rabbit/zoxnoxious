@@ -32,7 +32,6 @@
 
 struct tunable {
   struct tune_point tuning_points[NUM_TUNING_POINTS];
-  int tuning_complete;
   int16_t freq_tuned[TWELVE_BITS];
 };
 

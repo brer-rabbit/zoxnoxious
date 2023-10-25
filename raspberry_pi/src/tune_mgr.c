@@ -142,7 +142,7 @@ int autotune_all_cards(struct card_manager *card_mgr) {
                                                        &tuning_state.measurements[card_num]);
 
         if (tune_status != TUNE_CONTINUE) {
-          //DEBUG("autotune: measure: %d card reported as tuned", card_num);
+          INFO("autotune: tunereq_measurement: card %d reports tuned", card_num);
           cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
         }
       }

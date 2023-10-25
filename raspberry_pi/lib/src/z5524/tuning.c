@@ -14,6 +14,7 @@
  */
 
 #include "z5524.h"
+#include "tune_utils.h"
 
 //
 // Tuning section
@@ -90,10 +91,15 @@ static const char ssi2130_vco_dac = 0x20;
 static const char as3394_vco_dac = 0x60;
 static const char as3394_vcf_dac = 0x70;
 
-static const double tuning_initial_frequency_target = 27.5;
-static const double expected_dac_values_per_octave = 512; // for 12 bits / 8 octave range
-static const double expected_dac_vcf_values_per_octave = 409.6; // for 12 bits / 10 octave range
+// Tuning values
+static const double tuning_vco_initial_frequency_target = 27.5;  // A0
+static const double tuning_vcf_initial_frequency_target = 13.75; // A-1
+static const double expected_dac_ssi2130_values_per_octave = 512; // for 12 bits / 8 octave range
+static const double expected_dac_as3394_vco_values_per_octave = 682.667; // for 12 bits / 6 octave range
+static const double expected_dac_as3394_vcf_values_per_octave = 409.6; // for 12 bits / 10 octave range
+
 static void write_dac_lines(struct z5524_card *zcard, const char dac[][2], int num_lines, int chip_select);
+
 
 
 /** tunereq_save_state
@@ -135,6 +141,8 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
   int spi_channel;
   char dac_values[2];
 
+  // This defines the test point data to send to the DAC.
+  // Determine which DAC line we're writing to and OR that into the right place.
   dac_values[0] = tune_freq_dac_values[ zcard->tuning_index ] >> 8;
   dac_values[1] = tune_freq_dac_values[ zcard->tuning_index ];
 
@@ -144,10 +152,19 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
     dac_values[0] |=  ssi2130_vco_dac;
     break;
   case TUNE_AS3394_VCO:
+    if (zcard->tuning_index == 0) {
+      // first tune point on 3394 vco
+      write_dac_lines(zcard, tune_3394_dac_state_ssi2130, DAC_CHANNELS, spi_channel_ssi2130);
+      write_dac_lines(zcard, tune_3394_vco_dac_state_as3394, DAC_CHANNELS, spi_channel_as3394);
+    }
     spi_channel = set_spi_interface(zcard->zhost, spi_channel_as3394, SPI_MODE, zcard->slot);
     dac_values[0] |=  as3394_vco_dac;
     break;
   case TUNE_AS3394_VCF:
+    if (zcard->tuning_index == 0) {
+      write_dac_lines(zcard, tune_3394_dac_state_ssi2130, DAC_CHANNELS, spi_channel_ssi2130);
+      write_dac_lines(zcard, tune_3394_vcf_dac_state_as3394, DAC_CHANNELS, spi_channel_as3394);
+    }
     spi_channel = set_spi_interface(zcard->zhost, spi_channel_as3394, SPI_MODE, zcard->slot);
     dac_values[0] |=  as3394_vcf_dac;
     break;
@@ -158,8 +175,8 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
   spiWrite(spi_channel, dac_values, 2);
 
   // obligatory "I'm tuning so blink the light"
-  //i2cWriteByteData(zcard->i2c_handle, config_port0_addr,
-  //zcard->tuning_index & 0x1 ? tune_config_port0_data | led_bit : tune_config_port0_data);
+  i2cWriteByteData(zcard->i2c_handle, port0_addr,
+                   zcard->tuning_index & 0x1 ? tune_gpio_port0_data | led_bit : tune_gpio_port0_data);
 
   return TUNE_CONTINUE;
 }
@@ -168,6 +185,7 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
 
 tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
   struct z5524_card *zcard = (struct z5524_card*)zcard_plugin;
+  struct tune_point *tp;
 
   if (tuning_measurement->samples == 0) {
     ERROR("tuning measure zero samples for tuning point %d / target %d",
@@ -177,29 +195,39 @@ tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement 
 
   // calculate expected frequency values
 
+  switch (zcard->tune_target) {
+  case TUNE_SSI2130_VCO:
+    tp = &zcard->ssi2130_vco.tuning_points[ zcard->tuning_index ];
+    tp->actual_dac = tune_freq_dac_values[ zcard->tuning_index ];
+    tp->frequency = tuning_measurement->frequency;
+    tp->expected_dac = octave_delta(tuning_measurement->frequency, tuning_vco_initial_frequency_target) *
+      expected_dac_ssi2130_values_per_octave;
+    break;
+  case TUNE_AS3394_VCO:
+    tp = &zcard->as3394_vco.tuning_points[ zcard->tuning_index ];
+    tp->actual_dac = tune_freq_dac_values[ zcard->tuning_index ];
+    tp->frequency = tuning_measurement->frequency;
+    tp->expected_dac = octave_delta(tuning_measurement->frequency, tuning_vco_initial_frequency_target) *
+      expected_dac_as3394_vco_values_per_octave;
+    break;
+  case TUNE_AS3394_VCF:
+    tp = &zcard->as3394_vcf.tuning_points[ zcard->tuning_index ];
+    tp->actual_dac = tune_freq_dac_values[ zcard->tuning_index ];
+    tp->frequency = tuning_measurement->frequency;
+    tp->expected_dac = octave_delta(tuning_measurement->frequency, tuning_vcf_initial_frequency_target) * expected_dac_as3394_vcf_values_per_octave;
+    break;
+  case TUNE_TARGET_LENGTH:
+    ERROR("unexpected tune measure report");
+    return TUNE_COMPLETE_FAILED;
+  }
 
   // increment to next point
   if (++zcard->tuning_index == NUM_TUNING_POINTS) {
     zcard->tuning_index = 0;
-    switch (++zcard->tune_target) {
-    case TUNE_SSI2130_VCO:
-      // assert here
-      ERROR("SSI2130 should be tuned already!");
-      break;
-    case TUNE_AS3394_VCO:
-      INFO("Tuning AS3394 VCO");
-      write_dac_lines(zcard, tune_3394_dac_state_ssi2130, DAC_CHANNELS, spi_channel_ssi2130);
-      write_dac_lines(zcard, tune_3394_vco_dac_state_as3394, DAC_CHANNELS, spi_channel_as3394);
-      break;
-    case TUNE_AS3394_VCF:
-      INFO("Tuning AS3394 VCF");
-      write_dac_lines(zcard, tune_3394_dac_state_ssi2130, DAC_CHANNELS, spi_channel_ssi2130);
-      write_dac_lines(zcard, tune_3394_vcf_dac_state_as3394, DAC_CHANNELS, spi_channel_as3394);
-      break;
-    case TUNE_TARGET_LENGTH:
+    INFO("card %d tune target %d complete", zcard->slot, zcard->tune_target);
+    if (++zcard->tune_target == TUNE_TARGET_LENGTH) {
       return TUNE_COMPLETE_SUCCESS;
     }
-
   }
 
   return TUNE_CONTINUE;
@@ -231,3 +259,4 @@ static void write_dac_lines(struct z5524_card *zcard, const char dac[][2], int n
     spiWrite(spi_channel, (char*)dac[i], 2);
   }
 }
+
