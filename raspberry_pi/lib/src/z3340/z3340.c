@@ -60,8 +60,8 @@ static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
 //
 // tuning params
 //
-static const uint8_t tune_config_port0_data = 0x00;
-static const uint8_t tune_config_port1_data = 0x02; // output1 pulse -- not actually necessary
+static const uint8_t tune_gpio_port0_data = 0x00;
+static const uint8_t tune_gpio_port1_data = 0x02; // output1 pulse -- not actually necessary
 // tune_dac_state is in spiWrite order
 static const char tune_dac_state[][2] = { { 0x00, 0x00 }, // freq
                                           { 0x10, 0x00 }, // sync level
@@ -363,8 +363,8 @@ int tunereq_save_state(void *zcard_plugin) {
 
 
   // set any state necessary on the gpio -- all modulations off, outputs off
-  error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, tune_config_port0_data);
-  error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, tune_config_port1_data);
+  error = i2cWriteByteData(zcard->i2c_handle, port0_addr, tune_gpio_port0_data);
+  error += i2cWriteByteData(zcard->i2c_handle, port1_addr, tune_gpio_port1_data);
   if (error) {
     ERROR("z3340: tunereq_save_state: error writing to I2C bus handle %d\n", zcard->i2c_handle);
     return TUNE_COMPLETE_FAILED;
@@ -386,14 +386,14 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
   int spi_channel;
   char dac_values[2]; // these are in reverse byte order
   dac_values[0] = tune_freq_dac_values[ zcard->tuning_point ] >> 8;
-  dac_values[1] = tune_freq_dac_values[ zcard->tuning_point ] << 8;
+  dac_values[1] = tune_freq_dac_values[ zcard->tuning_point ];
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
   spiWrite(spi_channel, dac_values, 2);
 
   // eye candy- flash LED while tuning
   i2cWriteByteData(zcard->i2c_handle, config_port0_addr,
-                   zcard->tuning_point & 0x1 ? tune_config_port0_data | led_bit : tune_config_port0_data);
+                   zcard->tuning_point & 0x1 ? tune_gpio_port0_data | led_bit : tune_gpio_port0_data);
 
   return TUNE_CONTINUE;
 }
@@ -460,13 +460,17 @@ int tunereq_restore_state(void *zcard_plugin) {
 
     int tuned_index;
     for (int i = 0; i < NUM_TUNING_POINTS - 1; ++i) {
-      for (tuned_index = zcard->tuning_points[i].expected_dac + 0.5; tuned_index < zcard->tuning_points[i+1].expected_dac - 0.5; ++tuned_index) {
+      for (tuned_index = zcard->tuning_points[i].expected_dac + 0.5;
+           tuned_index < zcard->tuning_points[i+1].expected_dac - 0.5 &&
+             tuned_index < TWELVE_BITS;
+           ++tuned_index) {
         // y = mx + b; we have b as zcard->tuning_points[i].actual_dac
         // compute m and x
         slope = (zcard->tuning_points[i+1].actual_dac - zcard->tuning_points[i].actual_dac) /
           (zcard->tuning_points[i+1].expected_dac - zcard->tuning_points[i].expected_dac);
         int x = tuned_index - (int)(zcard->tuning_points[i].expected_dac + 0.5);
-        zcard->freq_tuned[tuned_index] = slope * x + zcard->tuning_points[i].actual_dac;
+        int y = slope * x + zcard->tuning_points[i].actual_dac;
+        zcard->freq_tuned[tuned_index] = y > 0 ? y : 0;
       }
     }
 

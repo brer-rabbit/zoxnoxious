@@ -14,12 +14,12 @@
  */
 
 
-#ifndef AUTOTUNE_H
-#define AUTOTUNE_H
+#ifndef TUNE_MGR_H
+#define TUNE_MGR_H
 
 #include "card_manager.h"
 
 
 int autotune_all_cards(struct card_manager *card_mgr);
 
-#endif // AUTOTUNE_H
+#endif // TUNE_MGR_H
