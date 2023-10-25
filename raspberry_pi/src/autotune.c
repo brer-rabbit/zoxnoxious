@@ -28,6 +28,8 @@
 #define TEST_CARD_TUNED(card_record, this_card) card_record & (1 << this_card)
 #define TEST_ALL_CARDS_TUNED(card_record) card_record
 
+static const int card_set_sleep_time = 50000;
+
 
 struct tuning_state {
   int inited;
@@ -96,7 +98,6 @@ int autotune_all_cards(struct card_manager *card_mgr) {
         else {
           // record this card's gpio: accumulate add bit to gpio mask
           tuning_state.gpio_mask |= (1 << gpio_id_by_slot[ this_card->slot ]);
-          INFO("tunereq_set_point: card %d setup for tune", card_num);
         }
       }
     }
@@ -104,6 +105,9 @@ int autotune_all_cards(struct card_manager *card_mgr) {
     // reset for each iteration
     tuning_state.inited = 0;
     memset(tuning_state.measurements, 0, sizeof(struct tuning_measurement) * MAX_SLOTS);
+
+    // once all cards are set, give it a rest for a short duration to let things settle
+    usleep(card_set_sleep_time);
 
     // set the monitor and record gpio pins, sleep, then unreg the callback
     gpioSetGetSamplesFuncEx(read_samples, tuning_state.gpio_mask, &tuning_state);
@@ -138,7 +142,7 @@ int autotune_all_cards(struct card_manager *card_mgr) {
                                                        &tuning_state.measurements[card_num]);
 
         if (tune_status != TUNE_CONTINUE) {
-          DEBUG("autotune: measure: %d card reported as tuned", card_num);
+          //DEBUG("autotune: measure: %d card reported as tuned", card_num);
           cards_to_tune = SET_CARD_TUNED(cards_to_tune, card_num);
         }
       }
