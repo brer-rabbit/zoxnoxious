@@ -18,7 +18,7 @@
  * seeing tune to completion.
  */
 
-#include "autotune.h"
+#include "tune_mgr.h"
 #include "zcard_plugin.h"
 
 

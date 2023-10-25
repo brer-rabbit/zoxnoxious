@@ -37,7 +37,7 @@
 #include <zlog.h>
 
 #include "zoxnoxiousd.h"
-#include "autotune.h"
+#include "tune_mgr.h"
 #include "card_manager.h"
 #include "zalsa.h"
 #include "zcard_plugin.h"
@@ -425,7 +425,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
     .it_value.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
   };
   struct itimerspec itimerspec_remaining_time;
-  struct timespec accumulated_idle_time;
+  struct timespec accumulated_idle_time = { 0 };
   int valid_gettime;
 
 
