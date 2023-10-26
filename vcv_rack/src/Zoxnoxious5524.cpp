@@ -182,9 +182,9 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         configParam(VCO_ONE_VOCT_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 8.f);
         configParam(VCO_ONE_PW_KNOB_PARAM, 0.f, 1.f, 0.5f, "Pulse Width", "%", 0.f, 100.f);
         configParam(VCO_ONE_LINEAR_KNOB_PARAM, 0.f, 1.f, 0.5f, "Linear Mod", " V", 0.f, 10.f -5.f);
-        configParam(VCO_TWO_VOCT_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 8.f);
+        configParam(VCO_TWO_VOCT_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 6.f);
         configParam(VCO_TWO_PW_KNOB_PARAM, 0.f, 1.f, 0.5f, "Pulse Width", "%", 0.f, 100.f);
-        configParam(VCF_CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff", " V", 0.f, 10.f);
+        configParam(VCF_CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff", " V", 0.f, 10.f, -1.f);
         configParam(VCF_RESONANCE_KNOB_PARAM, 0.f, 1.f, 0.f, "Resonance", "%", 0.f, 100.f);
         configParam(VCO_MIX_KNOB_PARAM, 0.f, 1.f, 0.5f, "VCO1/VCO2 Mix", "%", 0.f, 200.f, -100.f);
         configParam(FINAL_GAIN_KNOB_PARAM, 0.f, 1.f, 0.f, "Final VCA", "%", 0.f, 100.f);
@@ -442,7 +442,8 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         }
 
         // VCO One Volt/Octave
-        v = params[VCO_ONE_VOCT_KNOB_PARAM].getValue() + inputs[VCO_ONE_VOCT_INPUT].getVoltageSum() / 10.f;
+        // 8 octaves
+        v = params[VCO_ONE_VOCT_KNOB_PARAM].getValue() + inputs[VCO_ONE_VOCT_INPUT].getVoltageSum() / 8.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + 10] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[outputDeviceId][cvChannelOffset + 10] != v) {
             vcoOneVoctClipTimer = clipTime;
@@ -470,7 +471,8 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         }
 
         // VCO Two Volt/Octave
-        v = params[VCO_TWO_VOCT_KNOB_PARAM].getValue() + inputs[VCO_TWO_VOCT_INPUT].getVoltageSum() / 10.f;
+        // VCO range A0 - A6
+        v = params[VCO_TWO_VOCT_KNOB_PARAM].getValue() + inputs[VCO_TWO_VOCT_INPUT].getVoltageSum() / 6.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + 6] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[outputDeviceId][cvChannelOffset + 6] != v) {
             vcoTwoVoctClipTimer = clipTime;
