@@ -680,9 +680,11 @@ static void* midi_in_to_plugins(void *arg) {
           }
           else if (buffer[i] == SHUTDOWN_REQUEST) {
             INFO("Shutdown request received");
+            system("sudo poweroff --poweroff");
           }
           else if (buffer[i] == RESTART_REQUEST) {
             INFO("Restart request received");
+            system("sudo reboot --reboot");
           }
           else {
             INFO("MIDI: sysex unknown request received");
@@ -705,6 +707,7 @@ static void* midi_in_to_plugins(void *arg) {
 
     do {
       read(timerfd_midi_clock, &expirations, sizeof(expirations));
+      // allow MIDI messages to queue in the system while tuning is in progress
     } while (system_tune_in_progress);
   }
 
