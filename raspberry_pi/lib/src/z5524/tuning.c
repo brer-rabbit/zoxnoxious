@@ -238,13 +238,19 @@ int tunereq_restore_state(void *zcard_plugin) {
 
 
   // restore gpio
-  int error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, zcard->pca9555_port[0]);
-  error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, zcard->pca9555_port[1]);
+  int error = i2cWriteByteData(zcard->i2c_handle, port0_addr, zcard->pca9555_port[0]);
+  error += i2cWriteByteData(zcard->i2c_handle, port1_addr, zcard->pca9555_port[1]);
   if (error) {
       ERROR("i2c write error on restore state from tuning");
       return TUNE_COMPLETE_FAILED;
   }
-  // restore DAC (or set to invalid state)
+
+  // restore by setting to invalid state
+  for (int i = 0; i < CHIP_SELECTS; ++i) {
+    for (int j = 0; j < DAC_CHANNELS; ++j) {
+      zcard->previous_samples[i][j] = -1;
+    }
+  }
 
 
   if (zcard->tune_target == TUNE_TARGET_LENGTH) {

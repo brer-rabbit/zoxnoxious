@@ -392,7 +392,7 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
   spiWrite(spi_channel, dac_values, 2);
 
   // eye candy- flash LED while tuning
-  i2cWriteByteData(zcard->i2c_handle, config_port0_addr,
+  i2cWriteByteData(zcard->i2c_handle, port0_addr,
                    zcard->tuning_point & 0x1 ? tune_gpio_port0_data | led_bit : tune_gpio_port0_data);
 
   return TUNE_CONTINUE;
@@ -440,8 +440,13 @@ int tunereq_restore_state(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
 
   // restore GPIO expander state
-  int error = i2cWriteByteData(zcard->i2c_handle, config_port0_addr, zcard->pca9555_port[0]);
-  error += i2cWriteByteData(zcard->i2c_handle, config_port1_addr, zcard->pca9555_port[1]);
+  int error = i2cWriteByteData(zcard->i2c_handle, port0_addr, zcard->pca9555_port[0]);
+  error += i2cWriteByteData(zcard->i2c_handle, port1_addr, zcard->pca9555_port[1]);
+
+  // set DAC prev values to unallowed value-- process_samples call will update them
+  for (int i = 0; i < NUM_DAC_CHANNELS; ++i) {
+    zcard->previous_samples[i] = -1;
+  }
 
   if (zcard->tuning_complete) {
     double oct_delta = octave_delta(zcard->tuning_points[1].frequency,

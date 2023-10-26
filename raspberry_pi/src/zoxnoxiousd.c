@@ -65,6 +65,10 @@ static _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 }
 static _Atomic time_t sec_pcm_write_idle = 0;
 static _Atomic long nsec_pcm_write_idle = 0;
 
+static _Atomic int system_tune_requested = 0;
+static _Atomic int system_tune_in_progress = 0;
+
+
 // static functions
 static void help();
 static void sig_cleanup_and_exit(int signum);
@@ -252,8 +256,10 @@ int main(int argc, char **argv, char **envp) {
   pthread_sigmask(SIG_BLOCK, &signal_set, NULL);
 
 
-  // cpu tune request for all cards
-  autotune_all_cards(card_mgr);
+  // cpu tune request for all cards:
+  // this isn't done at startup so one can tweak trimmers before autotuning.
+  // future: give user option via frontend to use linear or corrected tables.
+  //autotune_all_cards(card_mgr);
 
   // start threads
   if ( pthread_create(&alsa_pcm_to_plugin_thread, NULL, read_pcm_and_call_plugins, NULL) ) {
@@ -476,6 +482,15 @@ static void* read_pcm_and_call_plugins(void *arg) {
       }
     }
 
+
+    if (system_tune_requested) {
+      system_tune_in_progress = 1;
+      INFO("MIDI tune starting");
+      autotune_all_cards(card_mgr);
+      system_tune_in_progress = 0;
+      system_tune_requested = 0;
+    }
+
     // check on remaining time-- though we don't know if it's remaining time until we check the expirations
     valid_gettime = timerfd_gettime(timerfd_sample_clock, &itimerspec_remaining_time);
     read(timerfd_sample_clock, &expirations, sizeof(expirations));
@@ -536,6 +551,7 @@ enum midi_status_byte {
   MIDI_CHANNEL_PRESSURE = 0xD0,
   MIDI_PITCH_BEND = 0xE0,
   MIDI_SYSEX_START = 0xF0,
+  MIDI_TUNE_REQUEST = 0xF6,
   MIDI_SYSEX_END = 0xF7
 };
 
@@ -543,6 +559,8 @@ enum sysex_message_type {
   TYPE_UNSET = 0,
   DISCOVERY_RESPONSE = 0x01,
   DISCOVERY_REQUEST = 0x02,
+  SHUTDOWN_REQUEST = 0x03,
+  RESTART_REQUEST = 0x04,
   VALID_MANUFACTURER_ID = 0x7D
 };
 
@@ -603,6 +621,7 @@ static void* midi_in_to_plugins(void *arg) {
     }
     else {
       INFO("MIDI read received %d bytes", midi_read_status);
+      INFO("Tune in progress: %d", system_tune_in_progress);
       // read the midi stream. could be starting anywhere in the stream,
       // account for that by tracking stream state. This makes the stream parsing a
       // bit obtuse but we need to account for fragmented reads and such.
@@ -659,11 +678,23 @@ static void* midi_in_to_plugins(void *arg) {
                  sizeof(discovery_report_sysex) / sizeof(uint8_t));
             z_midi_write(discovery_report_sysex, sizeof(discovery_report_sysex) / sizeof(uint8_t));
           }
+          else if (buffer[i] == SHUTDOWN_REQUEST) {
+            INFO("Shutdown request received");
+          }
+          else if (buffer[i] == RESTART_REQUEST) {
+            INFO("Restart request received");
+          }
           else {
             INFO("MIDI: sysex unknown request received");
           }
 
           midi_state.status = MIDI_STATUS_NOT_SET;
+        }
+        else if (buffer[i] == MIDI_TUNE_REQUEST) {  // no channel for sysex
+          INFO("MIDI tune requested");
+          if (!system_tune_in_progress) {
+            system_tune_requested = 1;
+          }
         }
         else {  // future: check for other status messages
           // ignore for now
@@ -672,7 +703,9 @@ static void* midi_in_to_plugins(void *arg) {
 
     }
 
-    read(timerfd_midi_clock, &expirations, sizeof(expirations));
+    do {
+      read(timerfd_midi_clock, &expirations, sizeof(expirations));
+    } while (system_tune_in_progress);
   }
 
   return NULL;

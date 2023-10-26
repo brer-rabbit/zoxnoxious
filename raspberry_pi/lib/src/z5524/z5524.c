@@ -75,7 +75,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
   z5524->zhost = zhost;
   z5524->slot = slot;
   z5524->pca9555_port[0] = 0x00;
-  z5524->pca9555_port[1] = startup_hard_sync_value; // hard sync enabled
+  z5524->pca9555_port[1] = startup_hard_sync_value; // hard sync enabled: do this early do ensure SSI2130 sets
 
   z5524->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
   if (z5524->i2c_handle < 0) {
@@ -88,8 +88,8 @@ void* init_zcard(struct zhost *zhost, int slot) {
   // turn everything "off", with the LED on.
   error += i2cWriteByteData(z5524->i2c_handle, config_port0_addr, config_port_as_output);
   error += i2cWriteByteData(z5524->i2c_handle, config_port1_addr, config_port_as_output);
+  error += i2cWriteByteData(z5524->i2c_handle, port1_addr, z5524->pca9555_port[1]); // write the hard sync request first
   error += i2cWriteByteData(z5524->i2c_handle, port0_addr, z5524->pca9555_port[0]);
-  error += i2cWriteByteData(z5524->i2c_handle, port1_addr, z5524->pca9555_port[1]);
 
   if (error) {
     ERROR("z5524: error writing to I2C bus address %d\n", i2c_addr);
@@ -121,10 +121,10 @@ void* init_zcard(struct zhost *zhost, int slot) {
                        z5524->tunables[TUNE_SSI2130_VCO].calibration_table);
   create_linear_tuning(as3394_vco_dac,
                        sizeof(z5524->tunables[TUNE_AS3394_VCO].calibration_table) / sizeof(int16_t),
-                       z5524->tunables[TUNE_SSI2130_VCO].calibration_table);
+                       z5524->tunables[TUNE_AS3394_VCO].calibration_table);
   create_linear_tuning(as3394_vcf_dac,
                        sizeof(z5524->tunables[TUNE_AS3394_VCF].calibration_table) / sizeof(int16_t),
-                       z5524->tunables[TUNE_SSI2130_VCO].calibration_table);
+                       z5524->tunables[TUNE_AS3394_VCF].calibration_table);
 
   // do this last to give hard sync some time to get a pulse
   z5524->pca9555_port[1] = 0x00; // disable hard sync
