@@ -786,11 +786,11 @@ struct PatchingMatrixWidget : ModuleWidget {
 
         menu->addChild(new MenuSeparator);
 
-        menu->addChild(createMenuItem("Shutdown", "", [=]() {
-              module->midiOutput.sendMidiMessage(module->MIDI_SHUTDOWN_SYSEX);
-            }));
         menu->addChild(createMenuItem("Restart", "", [=]() {
               module->midiOutput.sendMidiMessage(module->MIDI_RESTART_SYSEX);
+            }));
+        menu->addChild(createMenuItem("Shutdown", "", [=]() {
+              module->midiOutput.sendMidiMessage(module->MIDI_SHUTDOWN_SYSEX);
             }));
 
     }
