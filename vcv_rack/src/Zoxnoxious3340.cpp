@@ -389,6 +389,20 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         }
     }
 
+
+    json_t* dataToJson() override {
+        json_t* rootJ = json_object();
+        json_object_set_new(rootJ, "extModSelectSwitch", json_integer(extModSelectSwitchValue));
+        return rootJ;
+    }
+
+    void dataFromJson(json_t* rootJ) override {
+        json_t* extModSelectSwitchJ = json_object_get(rootJ, "extModSelectSwitch");
+        if (extModSelectSwitchJ) {
+          extModSelectSwitchValue = json_integer_value(extModSelectSwitchJ);
+        }
+    }
+
 };
 
 
