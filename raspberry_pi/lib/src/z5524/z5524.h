@@ -30,7 +30,7 @@
 #define SPI_MODE 1
 
 
-struct tunable {
+struct tunable_5524 {
   struct tune_point tuning_points[NUM_TUNING_POINTS];
   int16_t calibration_table[TWELVE_BITS];
 };
@@ -51,7 +51,7 @@ struct z5524_card {
   int16_t previous_samples[CHIP_SELECTS][DAC_CHANNELS];
 
   // tuning params
-  struct tunable tunables[TUNE_TARGET_LENGTH];
+  struct tunable_5524 tunables[TUNE_TARGET_LENGTH];
   tune_target_t tune_target;
   int tuning_index; // maintain state between tuning calls for which dac value to apply
 };

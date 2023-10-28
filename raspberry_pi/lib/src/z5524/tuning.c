@@ -96,7 +96,7 @@ static const double expected_dac_as3394_vco_values_per_octave = 682.667; // for 
 static const double expected_dac_as3394_vcf_values_per_octave = 409.6; // for 12 bits / 10 octave range
 
 static void write_dac_lines(struct z5524_card *zcard, const char dac[][2], int num_lines, int chip_select);
-static int create_correction_table(struct tunable *tunable, double initial_frequency, char dac_line);
+static int create_correction_table(struct tunable_5524 *tunable, double initial_frequency, char dac_line);
 
 
 
@@ -274,7 +274,7 @@ static void write_dac_lines(struct z5524_card *zcard, const char dac[][2], int n
 
 // TODO: this really needs to be refactored and put to tune_utils
 
-static int create_correction_table(struct tunable *tunable, double initial_frequency, char dac_line) {
+static int create_correction_table(struct tunable_5524 *tunable, double initial_frequency, char dac_line) {
 
   double oct_delta = octave_delta(tunable->tuning_points[1].frequency,
                                   tunable->tuning_points[0].frequency);
