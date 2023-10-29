@@ -41,13 +41,13 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="1.3305712"
-     inkscape:cx="279.57917"
-     inkscape:cy="224.33974"
+     inkscape:zoom="1.4275402"
+     inkscape:cx="290.35959"
+     inkscape:cy="236.42066"
      inkscape:window-width="1544"
      inkscape:window-height="881"
-     inkscape:window-x="4"
-     inkscape:window-y="25"
+     inkscape:window-x="62"
+     inkscape:window-y="103"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1"
      width="71.12mm"
@@ -795,7 +795,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="123.82043"
+       x="122.82042"
        y="16.506207"
        id="text1532"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -803,7 +803,7 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan1684"
-         x="123.82043"
+         x="122.82042"
          y="16.506207">CUTOFF</tspan></text>
     <path
        style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
@@ -837,7 +837,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="141.02873"
+       x="140.02881"
        y="16.506207"
        id="text1688"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -845,12 +845,12 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan1690"
-         x="141.02873"
+         x="140.02881"
          y="16.506207">RESONANCE</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="123.31751"
+       x="122.31709"
        y="53.11961"
        id="text1694"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -858,8 +858,34 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan2276"
-         x="123.31751"
+         x="122.31709"
          y="53.11961">VCO MIX</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="120.49495"
+       y="69.884247"
+       id="text1694-3"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan2207"
+         x="120.49495"
+         y="69.884247">ONE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
+       x="129.92639"
+       y="69.884247"
+       id="text1694-3-1"
+       inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
+       inkscape:export-xdpi="600.01202"
+       inkscape:export-ydpi="600.01202"><tspan
+         sodipodi:role="line"
+         id="tspan2236"
+         x="129.92639"
+         y="69.884247">TWO</tspan></text>
     <path
        style="display:inline;opacity:0.99;fill:none;stroke:#000000;stroke-width:0.28207px;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:0.28207, 0.28207;stroke-dashoffset:0;stroke-opacity:1"
        d="M 127.93975,55.111715 V 81.05518"
@@ -871,7 +897,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:0.99;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
-       x="141.02873"
+       x="140.02881"
        y="49.311108"
        id="text1718"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
@@ -879,7 +905,7 @@
        inkscape:export-ydpi="600.01202"><tspan
          sodipodi:role="line"
          id="tspan1728"
-         x="141.02873"
+         x="140.02881"
          y="49.311108">FINAL GAIN</tspan></text>
     <text
        xml:space="preserve"
@@ -1798,8 +1824,8 @@
     <circle
        id="circle1702"
        data-name="RGreen1#RedLight"
-       cx="131.90239"
-       cy="68.411072"
+       cx="132.72684"
+       cy="71.96875"
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
        inkscape:label="VCO_MIX_CLIP" />
@@ -1824,8 +1850,8 @@
     <circle
        id="circle1712"
        data-name="RGreen1#RedLight"
-       cx="151.50711"
-       cy="68.411072"
+       cx="152.33156"
+       cy="71.96875"
        r="0.79374999"
        style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
        inkscape:label="FINAL_GAIN_CLIP" />

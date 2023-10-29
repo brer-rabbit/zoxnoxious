@@ -654,8 +654,8 @@ struct Zoxnoxious5524Widget : ModuleWidget {
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(94.95, 31.798)), module, Zoxnoxious5524::VCO_TWO_PW_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 31.798)), module, Zoxnoxious5524::VCF_CUTOFF_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.507, 31.798)), module, Zoxnoxious5524::VCF_RESONANCE_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 68.411)), module, Zoxnoxious5524::VCO_MIX_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.507, 68.411)), module, Zoxnoxious5524::FINAL_GAIN_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(131.902, 56.411)), module, Zoxnoxious5524::VCO_MIX_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.507, 56.411)), module, Zoxnoxious5524::FINAL_GAIN_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(16.261, 71.704)), module, Zoxnoxious5524::VCO_ONE_PULSE_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(53.608, 71.593)), module, Zoxnoxious5524::VCO_ONE_TRIANGLE_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(35.866, 71.867)), module, Zoxnoxious5524::VCO_ONE_SAW_CLIP_LIGHT));
