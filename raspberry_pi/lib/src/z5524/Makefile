@@ -3,8 +3,8 @@ INCLUDE = -I../../../include
 LIBS = -shared -lpigpio -lzlog -ldl
 #config -lasound -lpthread -lzlog
 CC = gcc
+#CFLAGS = -g -Wall -shared -fPIC
 CFLAGS = -g -O2 -Wall -shared -fPIC
-#CFLAGS = -g -Wall
 
 .PHONY: default all clean
 
