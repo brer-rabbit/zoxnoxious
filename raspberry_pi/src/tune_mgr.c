@@ -130,16 +130,19 @@ int autotune_all_cards(struct card_manager *card_mgr) {
     // report results to each card
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
       if (TEST_CARD_TUNED(cards_to_tune, card_num)) {
-        struct tuning_measurement *card_measurement = &tuning_state.measurements[card_num];
+        // So: tuning_state.measurements are indexed by physical card order.
+        // Meanwhile, we're iterating over cards by card_update_order.
+        // Hence the index to tuning_state.measurements is by this_card->slot.
+        struct plugin_card *this_card = card_mgr->card_update_order[card_num];
+        struct tuning_measurement *card_measurement = &tuning_state.measurements[this_card->slot];
         card_measurement->sampling_period = measurement_period;
         card_measurement->frequency = card_measurement->samples * 1000000.f / measurement_period;
         INFO("autotune: measurement: card %d: %f Hz (%d measurements)",
              card_num,
              card_measurement->frequency, card_measurement->samples);
 
-        struct plugin_card *this_card = card_mgr->card_update_order[card_num];
         tune_status = (this_card->tunereq_measurement)(this_card->plugin_object,
-                                                       &tuning_state.measurements[card_num]);
+                                                       &tuning_state.measurements[this_card->slot]);
 
         if (tune_status != TUNE_CONTINUE) {
           INFO("autotune: tunereq_measurement: card %d reports tuned", card_num);
