@@ -44,7 +44,7 @@
 
 
 // number of stats to track and what they mean
-#define NUM_MISSED_EXPIRATIONS_STATS 4
+#define NUM_MISSED_EXPIRATIONS_STATS 1024
 #define EXPIRATIONS_ONTIME 0
 #define EXPIRATIONS_MISSED_ONE 1
 #define EXPIRATIONS_MISSED_LT_TEN 2
@@ -348,14 +348,21 @@ static void sig_dump_stats(int signum) {
   }
   in_dump_stats = 1;
 
-  INFO("requested stats: %ld.%.9ld / %" PRId64 " idle sec/samples; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations; pcm[0] xrun recovery: %d; pcm[1] xrun recovery: %d",
+  INFO("requested stats: %ld.%.9ld / %" PRId64 "; pcm[0] xrun recovery: %d; pcm[1] xrun recovery: %d",
        sec_pcm_write_idle, nsec_pcm_write_idle,
        missed_expirations[EXPIRATIONS_ONTIME],
-       missed_expirations[EXPIRATIONS_MISSED_ONE],
-       missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
-       missed_expirations[EXPIRATIONS_MISSED_GTE_TEN],
        pcm_state[0] ? pcm_state[0]->xrun_recovery_count : -1,
        pcm_state[1] ? pcm_state[1]->xrun_recovery_count : -1);
+
+  for (int i = 1; i < NUM_MISSED_EXPIRATIONS_STATS; ++i) {
+    if (missed_expirations[i]) {
+      INFO("  missed %d expirations %" PRId64 " times", i, missed_expirations[i]);
+    }
+  }
+
+    if (missed_expirations[NUM_MISSED_EXPIRATIONS_STATS -1]) {
+      INFO("  missed at least %d expirations %" PRId64 " times", NUM_MISSED_EXPIRATIONS_STATS - 1, missed_expirations[NUM_MISSED_EXPIRATIONS_STATS -1]);
+    }
 
   in_dump_stats = 0;
 }
@@ -503,15 +510,15 @@ static void* read_pcm_and_call_plugins(void *arg) {
         sec_pcm_write_idle = accumulated_idle_time.tv_sec;
         nsec_pcm_write_idle = accumulated_idle_time.tv_nsec;
       }
+      else {
+        WARN("timerfd_gettime returned %d", valid_gettime);
+      }
     }
-    else if (expirations == 2) {
-      missed_expirations[EXPIRATIONS_MISSED_ONE]++;
-    }
-    else if (expirations < 10) {
-      missed_expirations[EXPIRATIONS_MISSED_LT_TEN]++;
+    else if (expirations < NUM_MISSED_EXPIRATIONS_STATS - 1) {
+      missed_expirations[expirations]++;
     }
     else {
-      missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]++;
+      missed_expirations[NUM_MISSED_EXPIRATIONS_STATS - 1]++;
     }
 
     // downcast
@@ -519,10 +526,16 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
     // get new set of frames or advance sample pointers
     if (pcm_state[1]) {
-      alsa_advance_stream_by_frames(pcm_state[1], frames_to_advance);
+      int pcm1_return = alsa_advance_stream_by_frames(pcm_state[1], frames_to_advance);
+      if (pcm1_return) {
+        INFO("pcm1: alsa_advance_stream_by_frames: %d", pcm1_return);
+      }
     }
 
-    alsa_advance_stream_by_frames(pcm_state[0], frames_to_advance);
+    int pcm0_return = alsa_advance_stream_by_frames(pcm_state[0], frames_to_advance);
+    if (pcm0_return) {
+      INFO("pcm0: alsa_advance_stream_by_frames: %d", pcm0_return);
+    }
 
   }
 

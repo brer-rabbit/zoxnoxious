@@ -42,6 +42,8 @@ struct alsa_pcm_state {
 
   int first_period;               // boolean cleared after first frame processed, set after xrun
 
+  snd_pcm_uframes_t stop_threshold; // for allowing stop/restart
+
   // calculated once processing starts
   int channel_step_size; // step size for each channel in a frame
 
