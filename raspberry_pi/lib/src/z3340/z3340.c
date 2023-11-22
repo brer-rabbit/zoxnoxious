@@ -44,6 +44,8 @@ struct z3340_card {
   struct tune_point tuning_points[NUM_TUNING_POINTS];
   int tuning_complete;
   int16_t freq_tuned[TWELVE_BITS];
+
+  struct tunable tunable;
 };
 
 
@@ -111,6 +113,10 @@ void* init_zcard(struct zhost *zhost, int slot) {
     return NULL;
   }
 
+  z3340->tuneable.tune_points = (struct tune_point*)calloc(NUM_TUNING_POINTS, sizeof(struct tune_point));
+  z3340->tuneable.dac_calibration_table = (int16_t*)calloc(TWELVE_BITS, sizeof(int16_t));
+
+
   z3340->zhost = zhost;
   z3340->slot = slot;
   z3340->pca9555_port[0] = 0x00;
@@ -160,6 +166,9 @@ void free_zcard(void *zcard_plugin) {
   struct z3340_card *z3340 = (struct z3340_card*)zcard_plugin;
 
   if (zcard_plugin) {
+    free(z3340->tuneable.tune_points);
+    free(z3340->tuneable.dac_calibration_table);
+
     if (z3340->i2c_handle >= 0) {
       // TODO: turn off LED
       i2cClose(z3340->i2c_handle);
