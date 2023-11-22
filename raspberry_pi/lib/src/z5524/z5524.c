@@ -115,16 +115,27 @@ void* init_zcard(struct zhost *zhost, int slot) {
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
   spiWrite(spi_channel, dac_ctrl1_reg, 2);
 
+  // set tunables
+  // calloc to size
+  for (int i = TUNE_SSI2130_VCO; i < TUNE_TARGET_LENGTH; ++i) {
+    z5524->tunables[i].dac_size = TWELVE_BITS;
+    z5524->tunables[i].dac_calibration_table = (int16_t*)calloc(TWELVE_BITS, sizeof(int16_t));
+    // magic number 9: sizeof tune_freq_dac_values in tuning.c
+    z5524->tunables[i].tune_points = (struct tune_point*)calloc(NUM_TUNING_POINTS, sizeof(struct tune_point));
+    z5524->tunables[i].tune_points_size = NUM_TUNING_POINTS;
+  }
+
+
   // start with a linear tuning table for tunables
   create_linear_tuning(ssi2130_vco_dac,
-                       sizeof(z5524->tunables[TUNE_SSI2130_VCO].calibration_table) / sizeof(int16_t),
-                       z5524->tunables[TUNE_SSI2130_VCO].calibration_table);
+                       z5524->tunables[TUNE_SSI2130_VCO].dac_size,
+                       z5524->tunables[TUNE_SSI2130_VCO].dac_calibration_table);
   create_linear_tuning(as3394_vco_dac,
-                       sizeof(z5524->tunables[TUNE_AS3394_VCO].calibration_table) / sizeof(int16_t),
-                       z5524->tunables[TUNE_AS3394_VCO].calibration_table);
+                       z5524->tunables[TUNE_AS3394_VCO].dac_size,
+                       z5524->tunables[TUNE_AS3394_VCO].dac_calibration_table);
   create_linear_tuning(as3394_vcf_dac,
-                       sizeof(z5524->tunables[TUNE_AS3394_VCF].calibration_table) / sizeof(int16_t),
-                       z5524->tunables[TUNE_AS3394_VCF].calibration_table);
+                       z5524->tunables[TUNE_AS3394_VCF].dac_size,
+                       z5524->tunables[TUNE_AS3394_VCF].dac_calibration_table);
 
   // do this last to give hard sync some time to get a pulse
   z5524->pca9555_port[1] = 0x00; // disable hard sync
@@ -138,6 +149,11 @@ void free_zcard(void *zcard_plugin) {
   struct z5524_card *z5524 = (struct z5524_card*)zcard_plugin;
 
   if (zcard_plugin) {
+    for (int i = TUNE_SSI2130_VCO; i < TUNE_TARGET_LENGTH; ++i) {
+      free(z5524->tunables[i].dac_calibration_table);
+      free(z5524->tunables[i].tune_points);
+    }
+
     if (z5524->i2c_handle >= 0) {
       // TODO: turn off LED
       i2cClose(z5524->i2c_handle);
@@ -200,7 +216,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (zcard->previous_samples[spi_channel_as3394][i] != this_sample) {
       if (this_sample >= 0) {
         // magic number 5: i (the dac line) minus 5 equals TUNE_AS3394_VCO enum for tunables index
-        int16_t correct_freq_value = zcard->tunables[i - 5].calibration_table[ this_sample ];
+        int16_t correct_freq_value = zcard->tunables[i - 5].dac_calibration_table[ this_sample ];
         spiWrite(spi_channel, (char*) &correct_freq_value, 2);
       }
       else {
@@ -224,7 +240,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       this_sample = samples[i + spi_channel_ssi2130 * DAC_CHANNELS] >> 3;
       if (zcard->previous_samples[spi_channel_ssi2130][i] != this_sample) {
         if (this_sample >= 0) {
-          int16_t correct_freq_value = zcard->tunables[TUNE_SSI2130_VCO].calibration_table[ this_sample ];
+          int16_t correct_freq_value = zcard->tunables[TUNE_SSI2130_VCO].dac_calibration_table[ this_sample ];
           spiWrite(spi_channel, (char*) &correct_freq_value, 2);
         }
         else {

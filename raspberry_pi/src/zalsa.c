@@ -223,6 +223,7 @@ int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames) 
 int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
   int ret, snd_state;
   snd_pcm_sframes_t avail;
+  int xrun = 0;
 
   while (1) {
     snd_state = snd_pcm_state(pcm_state->pcm_handle);
@@ -230,6 +231,7 @@ int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
     case SND_PCM_STATE_XRUN:
     case SND_PCM_STATE_DISCONNECTED:
       ret = xrun_recovery(pcm_state, EPIPE);
+      xrun = 1;
       if (ret < 0) {
         return ret;
       }
@@ -246,6 +248,11 @@ int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
     }
 
     avail = snd_pcm_avail_update(pcm_state->pcm_handle);
+
+    if (xrun) {
+      WARN("alsa_pcm_ensure_ready: xrun snd_pcm_avail_update returned %ld", avail);
+    }
+
     if (avail < 0) {
       ret = xrun_recovery(pcm_state, -avail);
       if (ret < 0) {
@@ -266,12 +273,15 @@ int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
       else {
         ret = snd_pcm_wait(pcm_state->pcm_handle, -1);
         if (ret < 0) {
-          pcm_state->first_period = 1;
           ret = xrun_recovery(pcm_state, -ret);
           if (ret < 0) {
             return ret;
           }
         }
+        if (xrun) {
+          WARN("alsa_pcm_ensure_ready: setting first period");
+        }
+        pcm_state->first_period = 1;
       }
       continue;
     }
@@ -306,7 +316,6 @@ int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
     }
   }
 
-
   // calculate the base address for each channelnum and step size
   for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
     if (pcm_state->channel_step_size == INVALID_CHANNEL_STEP_SIZE) {
@@ -339,7 +348,6 @@ int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
   // request period_size of frames
   pcm_state->frames_provided = pcm_state->period_size;
   ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_provided);
-  pcm_state->frames_remaining = pcm_state->frames_provided;
 
   if (ret < 0) {
     ret = xrun_recovery(pcm_state, -ret);
@@ -347,6 +355,9 @@ int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
       ERROR("alsa: mmap begin avail error: %s", snd_strerror(ret));
       return ret;
     }
+  }
+  else {
+      pcm_state->frames_remaining = pcm_state->frames_provided;
   }
 
   // calculate samples address for each channel
@@ -369,6 +380,7 @@ int alsa_mmap_end(struct alsa_pcm_state *pcm_state) {
 
   committed = snd_pcm_mmap_commit(pcm_state->pcm_handle, pcm_state->offset, pcm_state->frames_provided);
   if (committed < 0 || committed != pcm_state->frames_provided) {
+    WARN("alsa_mmap_end commit: xrun_recovery");
     ret = xrun_recovery(pcm_state, committed >= 0 ? EPIPE : -committed);
     if (ret < 0) {
       return ret;
@@ -394,6 +406,7 @@ static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err) {
 
     // reset to processing first period
     pcm_state->first_period = 1;
+
     if (err < 0) {
       WARN("Can't recovery from underrun, prepare failed: %s", snd_strerror(err));
     }

@@ -30,11 +30,6 @@
 #define SPI_MODE 1
 
 
-struct tunable {
-  struct tune_point tuning_points[NUM_TUNING_POINTS];
-  int16_t calibration_table[TWELVE_BITS];
-};
-
 // this enum ordering is relevant in process samples
 typedef enum {
   TUNE_SSI2130_VCO,
@@ -52,8 +47,8 @@ struct z5524_card {
 
   // tuning params
   struct tunable tunables[TUNE_TARGET_LENGTH];
-  tune_target_t tune_target;
-  int tuning_index; // maintain state between tuning calls for which dac value to apply
+  tune_target_t tune_target; // index to tunables
+  int tuning_index; // which dac value to apply on the next set and record the measurement
 };
 
 
