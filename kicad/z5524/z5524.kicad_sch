@@ -3585,7 +3585,7 @@
     (effects (font (size 5.0038 5.0038)) (justify left bottom))
     (uuid a520860a-6912-4324-888a-236557206116)
   )
-  (text "VREF_2.5 load: 3.6k\n1470 < Rs < 3225\nfor current 1000uA : 75uA\nLCSC part is \"C\" not \"B\": prefer B"
+  (text "VREF_2.5 load: 3.2k\nTODO:\nLoad was 3.6k\n1470 < Rs < 3225\nfor current 1000uA : 75uA\nLCSC part is \"C\" not \"B\": prefer B"
     (at 109.22 263.525 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid a6396f2f-a0b1-4d3f-a865-9124a2058c02)

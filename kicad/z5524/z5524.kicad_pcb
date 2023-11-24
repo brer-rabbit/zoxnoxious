@@ -2290,7 +2290,7 @@
     (fp_line (start 2 2) (end -2 2)
       (stroke (width 0.1) (type solid)) (layer "F.Fab") (tstamp 45d37b6d-f298-4c7b-9e09-29e137352319))
     (pad "1" smd custom (at -1.95 -1.4 135) (size 0.129289 0.129289) (layers "F.Cu" "F.Paste" "F.Mask")
-      (net 163 "/SSI2130/TRI_OUT") (pinfunction "TRI_OUT") (pintype "output") (thermal_bridge_angle 45)
+      (net 163 "/SSI2130/TRI_OUT") (pinfunction "TRI_OUT") (pintype "output")
       (options (clearance outline) (anchor circle))
       (primitives
         (gr_poly
@@ -2316,7 +2316,7 @@
     (pad "7" smd roundrect (at -2.325 1 135) (size 1.55 0.2) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 109 "Net-(U2A-EXP_FREQ)") (pinfunction "EXP_FREQ") (pintype "input") (tstamp d64962cc-9869-4cb4-ac56-730d97ced3db))
     (pad "8" smd custom (at -1.95 1.4 135) (size 0.129289 0.129289) (layers "F.Cu" "F.Paste" "F.Mask")
-      (net 3 "-6V") (pinfunction "V-") (pintype "power_in") (thermal_bridge_angle 45)
+      (net 3 "-6V") (pinfunction "V-") (pintype "power_in")
       (options (clearance outline) (anchor circle))
       (primitives
         (gr_poly
@@ -2330,7 +2330,7 @@
           (width 0.1) (fill yes))
       ) (tstamp a58805ee-a728-471d-9ffc-01c8026916be))
     (pad "9" smd custom (at -1.4 1.95 135) (size 0.129289 0.129289) (layers "F.Cu" "F.Paste" "F.Mask")
-      (net 15 "/DAC 2130/TRI_MIX_2130") (pinfunction "TRI_MIX") (pintype "input") (thermal_bridge_angle 45)
+      (net 15 "/DAC 2130/TRI_MIX_2130") (pinfunction "TRI_MIX") (pintype "input")
       (options (clearance outline) (anchor circle))
       (primitives
         (gr_poly
@@ -2356,7 +2356,7 @@
     (pad "15" smd roundrect (at 1 2.325 135) (size 0.2 1.55) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 1 "GND") (pinfunction "DGND") (pintype "power_in") (tstamp 234678b4-a19c-49f8-9dad-8fba1c565f68))
     (pad "16" smd custom (at 1.4 1.95 135) (size 0.129289 0.129289) (layers "F.Cu" "F.Paste" "F.Mask")
-      (net 1 "GND") (pinfunction "AGND") (pintype "power_in") (thermal_bridge_angle 45)
+      (net 1 "GND") (pinfunction "AGND") (pintype "power_in")
       (options (clearance outline) (anchor circle))
       (primitives
         (gr_poly
@@ -2370,7 +2370,7 @@
           (width 0.1) (fill yes))
       ) (tstamp a4d89890-53ff-4a34-b957-4d2df909f077))
     (pad "17" smd custom (at 1.95 1.4 135) (size 0.129289 0.129289) (layers "F.Cu" "F.Paste" "F.Mask")
-      (net 43 "Net-(U2A-HARD_SYNC)") (pinfunction "HARD_SYNC") (pintype "input") (thermal_bridge_angle 45)
+      (net 43 "Net-(U2A-HARD_SYNC)") (pinfunction "HARD_SYNC") (pintype "input")
       (options (clearance outline) (anchor circle))
       (primitives
         (gr_poly
@@ -2396,7 +2396,7 @@
     (pad "23" smd roundrect (at 2.325 -1 135) (size 1.55 0.2) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 5 "/VREF_2.5") (pinfunction "VREF") (pintype "input") (tstamp 80cf9283-2cd1-4535-bbfa-c2fb353019bd))
     (pad "24" smd custom (at 1.95 -1.4 135) (size 0.129289 0.129289) (layers "F.Cu" "F.Paste" "F.Mask")
-      (net 146 "/AS3394_SINE") (pinfunction "SINE_OUT") (pintype "output") (thermal_bridge_angle 45)
+      (net 146 "/AS3394_SINE") (pinfunction "SINE_OUT") (pintype "output")
       (options (clearance outline) (anchor circle))
       (primitives
         (gr_poly
@@ -2410,7 +2410,7 @@
           (width 0.1) (fill yes))
       ) (tstamp 25aa84d6-dda0-4e17-a987-c7fb230c0764))
     (pad "25" smd custom (at 1.4 -1.95 135) (size 0.129289 0.129289) (layers "F.Cu" "F.Paste" "F.Mask")
-      (net 60 "/SSI2130/MIX_OUT") (pinfunction "MIX_OUT") (pintype "output") (thermal_bridge_angle 45)
+      (net 60 "/SSI2130/MIX_OUT") (pinfunction "MIX_OUT") (pintype "output")
       (options (clearance outline) (anchor circle))
       (primitives
         (gr_poly
@@ -2436,7 +2436,7 @@
     (pad "31" smd roundrect (at -1 -2.325 135) (size 0.2 1.55) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 163 "/SSI2130/TRI_OUT") (pinfunction "PWM_IN-") (pintype "input") (tstamp bc22d790-bce2-49cf-9814-8e9963729508))
     (pad "32" smd custom (at -1.4 -1.95 135) (size 0.129289 0.129289) (layers "F.Cu" "F.Paste" "F.Mask")
-      (net 132 "/SSI2130/PWM_IN") (pinfunction "PWM_IN+") (pintype "input") (thermal_bridge_angle 45)
+      (net 132 "/SSI2130/PWM_IN") (pinfunction "PWM_IN+") (pintype "input")
       (options (clearance outline) (anchor circle))
       (primitives
         (gr_poly
