@@ -1543,7 +1543,7 @@
     (property "Reference" "C16" (at 66.04 243.84 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "4.7n" (at 66.04 246.38 0)
+    (property "Value" "4n7" (at 66.04 246.38 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (at 70.8152 250.19 0)
