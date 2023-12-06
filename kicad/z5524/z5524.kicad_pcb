@@ -2091,7 +2091,7 @@
 
   (footprint "TestPoint:TestPoint_Pad_1.5x1.5mm" (layer "F.Cu")
     (tstamp 03f98f1d-5014-4b9a-aa02-5d0f269d2395)
-    (at 56.1 50)
+    (at 129.5 21.8)
     (descr "SMD rectangular pad as test Point, square 1.5mm side length")
     (tags "test point SMD pad rectangle square")
     (property "Sheetfile" "ssi2130.kicad_sch")

@@ -1994,11 +1994,6 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 8feb98b9-aac2-481c-9d2b-4b4fe5d65f47)
   )
-  (text "Passive mixing:\nThe '3394 is all voltage inputs, not current inputs.\nMod_In source impedance is very low (output from opamp)\nSimilar source impedance from all DAC lines\n_except_ PWM which has ~5k"
-    (at 224.155 240.03 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 98534128-a01f-4e27-80a8-69a0847a05b7)
-  )
   (text "Mixer Balance: -2V -- +2V\nGain inverting: 0.5\nGain non-inverting: 1.0\nLPF @ 159 Hz"
     (at 195.58 175.26 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
