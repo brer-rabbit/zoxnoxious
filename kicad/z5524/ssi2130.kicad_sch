@@ -5,9 +5,9 @@
   (paper "B")
 
   (title_block
-    (title "Zoxnoxious SSI2130/AS3394")
-    (date "2023-08-27")
-    (rev "0.2")
+    (title "Zoxnoxious Z5524 (SSI2130/AS3394)")
+    (date "2023-12-06")
+    (rev "0.3")
     (company "Zoxnoxious Engineering")
   )
 
@@ -1893,10 +1893,6 @@
     (stroke (width 0) (type default))
     (uuid 352bb014-34f8-49e1-ab64-ab22319bbeb9)
   )
-  (wire (pts (xy 236.22 53.34) (xy 242.57 53.34))
-    (stroke (width 0) (type default))
-    (uuid 368c67d9-83d9-41a3-8264-e220f56380dc)
-  )
   (wire (pts (xy 102.87 243.84) (xy 101.6 243.84))
     (stroke (width 0) (type default))
     (uuid 3896e76a-7673-4684-bf5d-acb448aec2a5)
@@ -1974,7 +1970,7 @@
     (stroke (width 0) (type default))
     (uuid 464a06c0-bcfc-488a-b567-edeb70509a94)
   )
-  (wire (pts (xy 224.79 53.34) (xy 228.6 53.34))
+  (wire (pts (xy 232.41 53.34) (xy 242.57 53.34))
     (stroke (width 0) (type default))
     (uuid 47e09b94-630d-4329-b831-32bbf49601b2)
   )
@@ -2686,8 +2682,8 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 2c762693-0182-4503-bcb0-1c253b07de80)
   )
-  (text "Sheet Load:\nVref 2.5: 25k (100uA per SSI2130 datasheet) || 5k || 100k ==> 4k\nLM7805: 3.75mA + 0.5mA\nLM337: -2.90mA"
-    (at 238.76 254 0)
+  (text "Sheet Load:\nVref 2.5: 25k (100uA per SSI2130 datasheet) || 20k || 20k || 5k || 100k ==> 2k8\nLM7805: 3.75mA + 0.5mA\nLM337: -2.90mA"
+    (at 220.218 252.476 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 418cbc1f-bd46-445b-ac43-62cc5cf2eb70)
   )
@@ -2779,7 +2775,7 @@
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid 53f6b9cb-70e5-4c8b-87b5-5df49fe94d7c)
   )
-  (hierarchical_label "EXP_CV_IN" (shape input) (at 224.79 53.34 180) (fields_autoplaced)
+  (hierarchical_label "EXP_CV_IN" (shape input) (at 232.41 53.34 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid 67523a27-2c93-4b27-aa71-d5e622a459be)
   )
@@ -4765,35 +4761,6 @@
       (project "z5524"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/21c330a6-81e4-425c-af85-d172a479efcb"
           (reference "#PWR0110") (unit 1)
-        )
-      )
-    )
-  )
-
-  (symbol (lib_id "Device:R") (at 232.41 53.34 90) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
-    (uuid a3b9e515-585c-438b-bee3-8c08f66db425)
-    (property "Reference" "R43" (at 233.68 50.8 90)
-      (effects (font (size 1.27 1.27)) (justify left))
-    )
-    (property "Value" "49k9" (at 233.68 55.88 90)
-      (effects (font (size 1.27 1.27)) (justify left))
-    )
-    (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 232.41 55.118 90)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "~" (at 232.41 53.34 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "LCSC" "C23184" (at 232.41 53.34 90)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 771d90b7-d413-499a-8ec9-641141ded652))
-    (pin "2" (uuid ef5f21ef-ef37-485c-b0a1-76d1f58e9e51))
-    (instances
-      (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/21c330a6-81e4-425c-af85-d172a479efcb"
-          (reference "R43") (unit 1)
         )
       )
     )
