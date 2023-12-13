@@ -6,7 +6,7 @@
 
   (title_block
     (title "Zoxnoxious Z5524 (SSI2130/AS3394)")
-    (date "2023-12-06")
+    (date "2023-12-12")
     (rev "0.3")
     (company "Zoxnoxious Engineering")
   )
@@ -1894,11 +1894,11 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 63f3dcdc-2d28-4c12-8eab-c8ee1d417575)
   )
-  (text "Saw: +/-2.8V\nTODO: measure observed" (at 231.775 113.03 0)
+  (text "Saw: +/-2.84V" (at 231.775 113.03 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 980c86c6-31ce-4f84-ad54-2dcf771865bc)
   )
-  (text "VCO Output levels: expected levels\ndiffer from observed levels at 63x gain\nWaveshape	Expected			Observed\nSaw			+/- 2.84V		+/- 1.64V\nTri			+/- 3.15V		-1.8 : +1.32V\nSaw+Tri		-5.67 +2.84		-2.8 : +1.76V\nPulse		+/- 1.9V			"
+  (text "TODO: use a 68k Basic part and re-eval\nVCO Output levels: expected levels\ndiffer from observed levels at 63x gain\nWaveshape	Expected			Observed\nSaw			+/- 2.84V		+/- 1.64V\nTri			+/- 3.15V		-1.8 : +1.32V\nSaw+Tri		-5.67 +2.84		-2.8 : +1.76V\nPulse		+/- 1.9V			"
     (at 201.295 94.615 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 9857ff01-2b48-458b-a4b4-ca963efe88fe)
@@ -3605,7 +3605,7 @@
     (property "Reference" "U11" (at 331.47 64.8802 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "DG442xY" (at 331.47 67.4171 0)
+    (property "Value" "DG442DY-T1-E3" (at 331.47 67.4171 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm" (at 331.47 73.66 0)
@@ -3614,7 +3614,7 @@
     (property "Datasheet" "https://datasheets.maximintegrated.com/en/ds/DG441-DG442.pdf" (at 331.47 71.12 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC" "C144269" (at 331.47 71.12 0)
+    (property "LCSC" "C2673321" (at 331.47 71.12 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid d904d718-e704-47a5-9489-d2daf37acb31))
