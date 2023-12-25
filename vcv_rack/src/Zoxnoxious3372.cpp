@@ -276,6 +276,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
 
         channel++;
         v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
+        v = v < 0.8f ? v * 0.6f : 2.6f * v - 1.6f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
             resonanceClipTimer = clipTime;
