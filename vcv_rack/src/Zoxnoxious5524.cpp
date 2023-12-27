@@ -487,6 +487,7 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
 
         // 3394 VCF Resonance
         v = params[VCF_RESONANCE_KNOB_PARAM].getValue() + inputs[VCF_RESONANCE_INPUT].getVoltageSum() / 10.f;
+        v = v < 0.8f ? v * 0.6f : 2.6f * v - 1.6f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[outputDeviceId][cvChannelOffset + 4] != v) {
             vcfResonanceClipTimer = clipTime;
