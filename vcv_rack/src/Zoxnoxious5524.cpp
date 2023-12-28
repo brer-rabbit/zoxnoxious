@@ -520,7 +520,7 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
             }
         }
         else {
-            controlMsg->frame[outputDeviceId][cvChannelOffset + 1] = 0.f;
+            controlMsg->frame[outputDeviceId][cvChannelOffset + 1] = 1.f;
         }
 
         // VCO One / VCO Two Mix to filter on 3394
