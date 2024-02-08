@@ -107,6 +107,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
       };
 
     int extModSelectSwitchValue;
+    bool extModSelectChanged;
 
     Zoxnoxious3340() :
         freqClipTimer(0.f), pulseWidthClipTimer(0.f), linearClipTimer(0.f),
@@ -116,7 +117,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         output2NameString(invalidCardOutputName),
         modulationInputNameString(invalidCardOutputName),
         modulationInputParamPrevValue(-1),
-        extModSelectSwitchValue(0) {
+        extModSelectSwitchValue(0),
+        extModSelectChanged(false) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
         configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
@@ -262,7 +264,6 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
         // the zero-th entry of buttonParamToMidiProgramList is handled here (and rather poorly)
         // add/subtract the up/down buttons
-        bool extModSelectChanged = false;
         if (params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].getValue()) {
             params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(0);
             extModSelectSwitchValue++;
@@ -280,7 +281,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         }
 
         if (extModSelectChanged) {
-            INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d", APP->engine->getFrame(), extModSelectSwitchValue);
+            extModSelectChanged = false;
+            //INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d", APP->engine->getFrame(), extModSelectSwitchValue);
             sendOrQueueMidiMessage(controlMsg, extModSelectSwitchValue, 0);
         }
 
@@ -373,7 +375,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
                 controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
                 controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[index].midiProgram[newValue]);
                 controlMsg->midiMessageSet = true;
-                INFO("zoxnoxious3340: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
+                //INFO("zoxnoxious3340: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
             }
             else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
                 midi::Message queuedMessage;
@@ -399,6 +401,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     void dataFromJson(json_t* rootJ) override {
         json_t* extModSelectSwitchJ = json_object_get(rootJ, "extModSelectSwitch");
         if (extModSelectSwitchJ) {
+            extModSelectChanged = true;
           extModSelectSwitchValue = json_integer_value(extModSelectSwitchJ);
         }
     }
