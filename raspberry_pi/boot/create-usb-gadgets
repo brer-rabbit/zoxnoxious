@@ -37,6 +37,7 @@ echo "Zoxnoxious MIDI and Audio" > strings/0x409/product
 
 mkdir -p configs/c.1/strings/0x409
  
+AUDIO_ID="Zoxnoxious-Audio"
 # UAC2 (audio) gadget
 # attributes from: https://www.kernel.org/doc/Documentation/ABI/testing/configfs-usb-gadget-uac2
 for i in 0 1
@@ -48,6 +49,7 @@ do
     echo $AUDIO_CHANNEL_MASK > functions/uac2.usb${i}/p_chmask
     echo $AUDIO_SAMPLE_RATES > functions/uac2.usb${i}/p_srate
     echo $AUDIO_SAMPLE_SIZE > functions/uac2.usb${i}/p_ssize
+    echo ${AUDIO_ID}-${i} > functions/uac2.usb${i}/function_name
     ln -s functions/uac2.usb${i} configs/c.1/
 done
 
