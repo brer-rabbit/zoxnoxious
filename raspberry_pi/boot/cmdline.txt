@@ -1,0 +1,1 @@
+console=tty1 root=PARTUUID=bd02b15a-02 rootfstype=ext4 fsck.repair=yes rootwait isolcpus=2-3
