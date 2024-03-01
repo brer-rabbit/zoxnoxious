@@ -475,16 +475,16 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
     // Business Section
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
-      // alias a couple big redirects here:
-      // lookup the card offset
-      int channel_offset = card_mgr->card_update_order[card_num]->channel_offset;
+      // alias for the deeply nested structure to the plugin card / readability
+      struct plugin_card *plugin_card = card_mgr->card_update_order[card_num];
+      int channel_offset = plugin_card->channel_offset;
 
-      // the samples relevant for this card are at the offset on the approp pcm device
-      const int16_t *samples = (const int16_t*) ( card_mgr->card_update_order[card_num]->pcm_device_num == 0 ?
+      // the samples relevant for this card are at the channel offset on the approp pcm device
+      const int16_t *samples = (const int16_t*) ( plugin_card->pcm_device_num == 0 ?
                                                   pcm_state[0]->samples[channel_offset] : pcm_state[1]->samples[channel_offset] );
 
       // then call the card's plugin with the samples via function pointer
-      if ( (card_mgr->card_update_order[card_num]->process_samples)(card_mgr->card_update_order[card_num]->plugin_object, samples) != 0) {
+      if ( (plugin_card->process_samples)(plugin_card->plugin_object, samples) != 0) {
         INFO("card error");
       }
     }
