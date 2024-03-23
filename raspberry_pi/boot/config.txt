@@ -67,7 +67,7 @@ max_framebuffers=2
 # Disable compensation for displays with overscan
 disable_overscan=1
 
-# added 4/2022 for g_audio
+# overlay dwc2 for USB gadgets
 dtoverlay=dwc2
 
 
