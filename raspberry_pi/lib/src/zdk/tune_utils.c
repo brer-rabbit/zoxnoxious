@@ -57,13 +57,14 @@ int create_correction_table(struct tunable *tunable, double initial_frequency) {
 
   int tuned_index;
   for (int i = 0; i < tunable->tune_points_size - 1; ++i) {
+    // y = mx + b; we have b as zcard->tune_points[i].actual_dac
+    // compute m and x
+    slope = (tunable->tune_points[i+1].actual_dac - tunable->tune_points[i].actual_dac) /
+      (tunable->tune_points[i+1].expected_dac - tunable->tune_points[i].expected_dac);
+
     for (tuned_index = tunable->tune_points[i].expected_dac + 0.5;
          tuned_index < tunable->tune_points[i+1].expected_dac - 0.5 && tuned_index < tunable->dac_size;
          ++tuned_index) {
-      // y = mx + b; we have b as zcard->tune_points[i].actual_dac
-      // compute m and x
-      slope = (tunable->tune_points[i+1].actual_dac - tunable->tune_points[i].actual_dac) /
-        (tunable->tune_points[i+1].expected_dac - tunable->tune_points[i].expected_dac);
       int x = tuned_index - (int)(tunable->tune_points[i].expected_dac + 0.5);
       int y = slope * x + tunable->tune_points[i].actual_dac;
       tunable->dac_calibration_table[tuned_index] = y > 0 ? y : 0; // non-negative only
