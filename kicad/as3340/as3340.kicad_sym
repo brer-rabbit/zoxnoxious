@@ -319,7 +319,7 @@
     (property "Reference" "U" (at 0 0 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "" (at -1.27 0 0)
+    (property "Value" "DG406" (at 0 2.54 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "" (at -1.27 0 0)
