@@ -1132,11 +1132,11 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid bf51a54a-66df-4f2b-85cc-cce79fc13f05)
   )
-  (label "FREQ_CV_FROM_DAC" (at 142.24 63.5 180) (fields_autoplaced)
+  (label "FREQ_CV_FROM_DAC" (at 142.24 66.04 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid d49bfd18-23b9-4a3b-ace4-f0b2fe228b53)
   )
-  (label "SYNC_LEVEL_FROM_DAC" (at 142.24 66.04 180) (fields_autoplaced)
+  (label "SYNC_LEVEL_FROM_DAC" (at 142.24 63.5 180) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid dabf0f59-a1c3-490b-a4c2-0ea907c5e2a8)
   )
@@ -1992,19 +1992,19 @@
     )
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL074") (at 349.25 60.96 0) (unit 2)
+  (symbol (lib_id "Amplifier_Operational:TL074") (at 349.25 60.96 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 8dc4514e-c9ad-4bcc-8875-865323654779)
-    (property "Reference" "U5" (at 351.155 64.77 0)
+    (property "Reference" "U5" (at 353.06 64.77 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TL074" (at 347.98 60.96 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "Package_SO:TSSOP-14_4.4x5mm_P0.65mm" (at 347.98 58.42 0)
+    (property "Footprint" "Package_SO:TSSOP-14_4.4x5mm_P0.65mm" (at 347.98 63.5 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "Datasheet" "http://www.ti.com/lit/ds/symlink/tl071.pdf" (at 350.52 55.88 0)
+    (property "Datasheet" "http://www.ti.com/lit/ds/symlink/tl071.pdf" (at 350.52 66.04 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "LCSC Part" "C96507" (at 349.25 60.96 0)
@@ -2027,7 +2027,7 @@
     (instances
       (project "as3340"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-000061ff2290"
-          (reference "U5") (unit 2)
+          (reference "U5") (unit 1)
         )
       )
     )
@@ -2062,7 +2062,7 @@
     )
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL074") (at 261.62 60.96 0) (mirror x) (unit 1)
+  (symbol (lib_id "Amplifier_Operational:TL074") (at 261.62 60.96 0) (mirror x) (unit 2)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 9a367ef6-c502-43b2-a679-e3da689e4766)
     (property "Reference" "U5" (at 262.89 65.405 0)
@@ -2097,7 +2097,7 @@
     (instances
       (project "as3340"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-000061ff2290"
-          (reference "U5") (unit 1)
+          (reference "U5") (unit 2)
         )
       )
     )

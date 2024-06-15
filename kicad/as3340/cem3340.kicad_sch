@@ -3834,7 +3834,7 @@
     )
   )
 
-  (symbol (lib_id "Analog_Switch:DG441xY") (at 82.55 60.96 180) (unit 1)
+  (symbol (lib_id "Analog_Switch:DG441xY") (at 82.55 60.96 180) (unit 2)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062ba59d6)
     (property "Reference" "U8" (at 82.55 67.7418 0)
@@ -3871,13 +3871,13 @@
     (instances
       (project "as3340"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-000061e1d4ae"
-          (reference "U8") (unit 1)
+          (reference "U8") (unit 2)
         )
       )
     )
   )
 
-  (symbol (lib_id "Analog_Switch:DG441xY") (at 223.52 45.72 180) (unit 4)
+  (symbol (lib_id "Analog_Switch:DG441xY") (at 223.52 45.72 180) (unit 3)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062be77d1)
     (property "Reference" "U8" (at 223.52 52.5018 0)
@@ -3914,7 +3914,7 @@
     (instances
       (project "as3340"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-000061e1d4ae"
-          (reference "U8") (unit 4)
+          (reference "U8") (unit 3)
         )
       )
     )
