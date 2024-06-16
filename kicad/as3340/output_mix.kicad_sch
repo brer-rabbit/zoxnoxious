@@ -1713,7 +1713,7 @@
     )
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL074") (at 151.13 88.9 0) (mirror x) (unit 4)
+  (symbol (lib_id "Amplifier_Operational:TL074") (at 151.13 88.9 0) (mirror x) (unit 3)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000626f5a9f)
     (property "Reference" "U1" (at 153.67 85.09 0)
@@ -1748,13 +1748,13 @@
     (instances
       (project "as3340"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-00006269dd41"
-          (reference "U1") (unit 4)
+          (reference "U1") (unit 3)
         )
       )
     )
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL074") (at 191.77 91.44 0) (mirror x) (unit 3)
+  (symbol (lib_id "Amplifier_Operational:TL074") (at 191.77 91.44 0) (mirror x) (unit 2)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000626f5aad)
     (property "Reference" "U1" (at 193.04 86.36 0)
@@ -1789,7 +1789,7 @@
     (instances
       (project "as3340"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-00006269dd41"
-          (reference "U1") (unit 3)
+          (reference "U1") (unit 2)
         )
       )
     )
@@ -2135,7 +2135,7 @@
     )
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL074") (at 151.13 135.89 0) (mirror x) (unit 1)
+  (symbol (lib_id "Amplifier_Operational:TL074") (at 151.13 135.89 0) (mirror x) (unit 4)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062f4c5c0)
     (property "Reference" "U1" (at 153.67 132.08 0)
@@ -2170,7 +2170,7 @@
     (instances
       (project "as3340"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-00006269dd41"
-          (reference "U1") (unit 1)
+          (reference "U1") (unit 4)
         )
       )
     )
@@ -2288,7 +2288,7 @@
     )
   )
 
-  (symbol (lib_id "Amplifier_Operational:TL074") (at 193.04 138.43 0) (mirror x) (unit 2)
+  (symbol (lib_id "Amplifier_Operational:TL074") (at 193.04 138.43 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062f4c615)
     (property "Reference" "U1" (at 194.31 133.35 0)
@@ -2323,7 +2323,7 @@
     (instances
       (project "as3340"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-00006269dd41"
-          (reference "U1") (unit 2)
+          (reference "U1") (unit 1)
         )
       )
     )
