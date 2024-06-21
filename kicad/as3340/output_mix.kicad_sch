@@ -1493,7 +1493,7 @@
     (uuid ff366aca-3d4b-4d52-ab81-ab53b5a6f31f)
   )
 
-  (text "Mix1: output is scaled by 2X this\nSignal		Input Level	Output:	Offset	Low		High	Peak-to-Peak\nPulse		0 : 10.5			-1.1	-1.1	1.1		2.2\nSaw1		0 : 8				-0.4	-0.4	0.4		0.8\nSaw2		0 : 8				-1.1	-1.1	1.0		2.0\nTriangle	0 : 3.5				AC		-1.7	1.7		3.5\nComparator	-5 : 5				0		-2		2		4\n\nMix2\nPulse		0 : 10.5			0.0		0.0		3.1		3.1\nSaw1		0 : 8				0.0		0.0		3.8		3.8"
+  (text "Mix1: output is scaled by 2X this\nSignal		Input Level	Output:	Offset	Low		High	Peak-to-Peak\nPulse		0 : 10.5			-1.1	-1.1	1.1		2.2\nSaw			0 : 8				-0.4	-0.4	0.4		0.8\nTriangle	0 : 3.5				AC		-1.7	1.7		3.5\n\nMix2\nPulse		0 : 10.5			0.0		0.0		3.1		3.1\nSaw1		0 : 8				0.0		0.0		3.8		3.8"
     (at 315.595 48.26 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 2067b225-f30f-45da-b844-94eef3accca4)
@@ -1507,8 +1507,8 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 5544c479-3df6-4f91-bd02-fbd8c067c11c)
   )
-  (text "Offsets: mix1 center roughly around 0V\nPulse, Saw: offset via reference voltage\nTriangle AC coupled, since amplitude is variable\nTriangle cap is an X7R ceramic; a better quality cap may be preferred\n"
-    (at 314.96 59.69 0)
+  (text "Mix1:\nOffsets center roughly around 0V\nPulse: offset via control voltage\nSaw, Tri: AC coupled\n\nMix2:\nUnipolar signals"
+    (at 314.96 66.04 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 5e069a44-284b-4dd1-a605-d5d945fefb59)
   )
