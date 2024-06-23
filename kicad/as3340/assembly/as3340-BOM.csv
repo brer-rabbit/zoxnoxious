@@ -1,69 +1,47 @@
 Comment,Designator,Footprint,LCSC Part #
-0.1u Unpolarized capacitor,"C1,C2,C3,C4,C6,C7,C8,C9,C11,C12,C13,C20,C22,C25,C26,C27,C28,C29,C30,C31,C32,C34,C35,C37,C39",C_0603_1608Metric,C14663
-22n Unpolarized capacitor,"C5,C42,C43",C_0603_1608Metric,C21122
-4.7n Unpolarized capacitor,C10,C_0603_1608Metric,C53987
-1u Unpolarized capacitor,"C14,C15",C_1206_3216Metric,C1848
-1n Unpolarized capacitor,C16,C_0603_1608Metric,C1588
-10n Unpolarized capacitor,"C17,C19,C23,C33,C36,C44",C_0603_1608Metric,C57112
-1u Unpolarized capacitor,C18,C_0805_2012Metric,C28323
-1000p Unpolarized capacitor,C21,Nichicon QYX2A102KTP,
-4.7u Unpolarized capacitor,C24,C_0805_2012Metric,C1779
-22p Unpolarized capacitor,"C38,C40",C_0603_1608Metric,C1653
-2.2u Unpolarized capacitor,C41,C_1206_3216Metric,C50254
-100n Unpolarized capacitor,C45,C_0805_2012Metric,C28233
-"1N4148W 75V 0.15A Fast Switching Diode, SOD-123","D1,D2",D_SOD-123,C81598
-LED Light emitting diode,D4,LED_0603_1608Metric,C2286
-MountingHole Mounting Hole without connection,"H1,H2,H3,H4",MountingHole_3.2mm_M3,
-"Conn_01x01 Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)",J1,PinHeader_1x01_P2.54mm_Vertical,
-"Conn_01x02 Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)","J2,J6",PinHeader_1x02_P2.54mm_Vertical,
-"Conn_02x20_Odd_Even Generic connector, double row, 02x20, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)",J3,PinHeader_2x20_P2.54mm_Horizontal,
-"Conn_01x03 Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)",J5,PinHeader_1x03_P2.54mm_Vertical,
-"MMBT3904 0.2A Ic, 40V Vce, Small Signal NPN Transistor, TO-92",Q1,SOT-23,C20526
-47k Resistor,"R1,R5,R8,R39,R66,R70,R71,R73",R_0603_1608Metric,C25819
-10k Resistor,"R2,R12,R21,R24,R26,R28,R49,R57,R61,R68,R69",R_0603_1608Metric,C25804
-20k Resistor,R3,R_0603_1608Metric,
-300k Resistor,"R4,R58,R75",R_0603_1608Metric,C25805
-180k Resistor,R6,R_0603_1608Metric,
-470k Resistor,R7,R_0603_1608Metric,
-220k Resistor,R9,R_0603_1608Metric,
-1k Resistor,"R10,R65",R_0603_1608Metric,C21190
-100k Resistor,"R11,R14,R48,R51",R_0603_1608Metric,C25803
-150k Resistor,R13,R_0603_1608Metric,C22807
-68k Resistor,"R15,R16",R_0603_1608Metric,C23231
-56k Resistor,"R17,R22",R_0603_1608Metric,C23206
-82k Resistor,R18,R_0603_1608Metric,C23254
-33k Resistor,"R19,R54,R55",R_0603_1608Metric,C4216
-5k1 Resistor,R20,R_0603_1608Metric,C23186
-1M Resistor,"R23,R27,R37,R41",R_0603_1608Metric,C22935
-10k Resistor,R25,R_0805_2012Metric,C17414
-750k Resistor,"R29,R30",R_0603_1608Metric,
-1M5 Resistor,R31,R_0603_1608Metric,C4172
-470 Resistor,"R32,R46",R_0805_2012Metric,C17710
-24k Resistor,R33,R_0603_1608Metric,C23352
-5k6 Resistor,R34,R_0603_1608Metric,C23189
-1k8 Resistor,R35,R_0603_1608Metric,C4177
-51k Resistor,"R36,R67",R_0603_1608Metric,C23196
-100k 0.1% Resistor,R38,R_0603_1608Metric,C25803
-39k Resistor,R40,R_0603_1608Metric,C23153
-200k Resistor,R42,R_0603_1608Metric,C25811
-15k Resistor,"R43,R64",R_0603_1608Metric,C22809
-4k7 Resistor,R47,R_1206_3216Metric,C17936
-22k Resistor,R50,R_0603_1608Metric,C31850
-8k2 Resistor,"R52,R53",R_0603_1608Metric,C25981
-2k Resistor,R56,R_0603_1608Metric,C22975
-110k Resistor,"R72,R74",R_0603_1608Metric,
-10K ,RV1,Potentiometer_Bourns_3296W_Vertical,
-20k ,RV2,Potentiometer_Bourns_3296W_Vertical,
-TestPoint test point,"TP2,TP3,TP4,TP5,TP6",TestPoint_Pad_2.0x2.0mm,
-"TL074 Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14","U1,U2,U12",SOIC-14_3.9x8.7mm_P1.27mm,C6963
-"AS3340 Voltage Controlled Oscillator (VCO), DIP-16/SOIC-16",U3,SOIC-16_3.9x9.9mm_P1.27mm,
-PS508 ,U4,SOIC-16_3.9x9.9mm_P1.27mm,C2673104
-"MAX333A Quad SPDT CMOS Analog Switch, 17Ohm Ron, DIP-20/SOIC-20/SSOP-20/TSSOP-20",U5,SOIC-20W_7.5x12.8mm_P1.27mm,
-AS3360 ,U6,SOIC-14_3.9x8.7mm_P1.27mm,
-"PCA9555D IO expander 16 GPIO, I2C 400kHz, Interrupt, 2.3 - 5.5V, SOIC-24",U7,TSSOP-24_4.4x7.8mm_P0.65mm,C83265
-"DG442CY+ Quad SPST Analog Switches, normally ON, 60Ohm Ron, DIP-16","U8,U9",SOIC-16_3.9x9.9mm_P1.27mm,
-"LM79L05 3-Terminal Negative Regulator, -5V, TO-92",U10,TO-92_Inline_Wide,
-"LM393 Low-Power, Low-Offset Voltage, Dual Comparators, DIP-8/SOIC-8/TO-99-8",U11,SOIC-8_3.9x4.9mm_P1.27mm,C7955
-"LM4040AIM3-2.5 2.500V Precision Micropower Shunt Voltage Reference, SOT-23","U13,U16",SOT-23,C460725
-AD5328 Octal Voltage Output DAC,U14,TSSOP-16_4.4x5mm_P0.65mm,C29162
-"M24C02-WMN 2Kb (256x8) I2C Serial EEPROM, 2.5-5.5V, SOIC-8",U15,SOIC-8_3.9x4.9mm_P1.27mm,C7562
+"1n","C16","Capacitor_SMD:C_0603_1608Metric","C1588"
+"10n","C2,C5,C7,C10,C20","Capacitor_SMD:C_0603_1608Metric","C57112"
+"4.7u","C23","Capacitor_SMD:C_0805_2012Metric","C1779"
+"22n","C25,C28,C33,C34,C35","Capacitor_SMD:C_0603_1608Metric","C21122"
+"4n7","C15,C30","Capacitor_SMD:C_0603_1608Metric","C53987"
+"220p","C31","Capacitor_SMD:C_0603_1608Metric","C1603"
+"1u","C18,C36","Capacitor_SMD:C_0603_1608Metric","C15849"
+"22p","C39,C41","Capacitor_SMD:C_0603_1608Metric","C1653"
+"1u","C6,C8","Capacitor_SMD:C_1206_3216Metric","C1848"
+"0.1u","C1,C3,C9,C11,C12,C13,C14,C17,C19,C21,C22,C24,C26,C27,C29,C32,C37,C38,C40,C43,C44,C45,C46,C47,C48","Capacitor_SMD:C_0603_1608Metric","C14663"
+"1N4148W","D1,D2,D3","Diode_SMD:D_SOD-123","C81598"
+"LED","D4","LED_SMD:LED_0603_1608Metric","C2286"
+"2N7002","Q1,Q2","Package_TO_SOT_SMD:SOT-23","C8545"
+"MMBT3904","Q3","Package_TO_SOT_SMD:SOT-23","C20526"
+"120k","R1,R35","Resistor_SMD:R_0603_1608Metric","C25808"
+"51k","R10","Resistor_SMD:R_0603_1608Metric","C23196"
+"56k","R12,R13","Resistor_SMD:R_0603_1608Metric","C23206"
+"12k","R17,R62","Resistor_SMD:R_0603_1608Metric","C22790"
+"33k","R18,R19,R36,R39,R43,R47","Resistor_SMD:R_0603_1608Metric","C4216"
+"470","R2,R6","Resistor_SMD:R_0603_1608Metric","C23179"
+"24k","R20","Resistor_SMD:R_0603_1608Metric","C23352"
+"47k","R23,R24,R29,R53,R55,R56,R59,R60,R61","Resistor_SMD:R_0603_1608Metric","C25819"
+"82k","R25,R64","Resistor_SMD:R_0603_1608Metric","C23254"
+"200k","R27","Resistor_SMD:R_0603_1608Metric","C25811"
+"1k8","R3","Resistor_SMD:R_0603_1608Metric","C4177"
+"8k2","R30,R33,R37,R44,R46","Resistor_SMD:R_0603_1608Metric","C25981"
+"30k","R4","Resistor_SMD:R_0603_1608Metric","C22984"
+"100","R38,R40","Resistor_SMD:R_0603_1608Metric","C22775"
+"1k","R41","Resistor_SMD:R_0603_1608Metric","C21190"
+"5k6","R21,R42","Resistor_SMD:R_0603_1608Metric","C23189"
+"2k","R45","Resistor_SMD:R_0603_1608Metric","C22975"
+"10k","R7,R9,R11,R15,R31,R32,R48,R65","Resistor_SMD:R_0603_1608Metric","C25804"
+"1M","R5,R26,R28,R34","Resistor_SMD:R_0603_1608Metric","C22935"
+"100k","R14,R16,R49,R51,R54,R57,R58","Resistor_SMD:R_0603_1608Metric","C25803"
+"51","R52,R63","Resistor_SMD:R_0805_2012Metric","C17738"
+"150k","R8,R22,R50","Resistor_SMD:R_0603_1608Metric","C22807"
+"DG442CY+","U1,U8","Package_SO:SOIC-16_3.9x9.9mm_P1.27mm","C2673321"
+"PCA9555D","U11","Package_SO:TSSOP-24_4.4x7.8mm_P0.65mm","C83265"
+"AD5328","U12","Package_SO:TSSOP-16_4.4x5mm_P0.65mm","C29162"
+"DG406","U14","Package_SO:SOIC-28W_7.5x17.9mm_P1.27mm","C426318"
+"M24C02-WMN","U15","Package_SO:SOIC-8_3.9x4.9mm_P1.27mm","C7562"
+"LM311","U4","Package_SO:SOIC-8_3.9x4.9mm_P1.27mm","C12597"
+"TL074","U5,U13","Package_SO:TSSOP-14_4.4x5mm_P0.65mm","C96507"
+"LM4040AIM3-2.5","U6","Package_TO_SOT_SMD:SOT-23","C460725"
+"LM4040B-5","U7","Package_TO_SOT_SMD:SOT-23","C69315"
+"TL072","U9","Package_SO:SSOP-8_3.9x5.05mm_P1.27mm","C6961"

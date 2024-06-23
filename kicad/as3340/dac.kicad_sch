@@ -1792,7 +1792,7 @@
     (property "Datasheet" "~" (at 34.925 149.86 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "" (at 34.925 149.86 0)
+    (property "LCSC Part" "C15849" (at 34.925 149.86 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid de95b501-175b-4b46-9d5e-15979413e19e))
