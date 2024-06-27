@@ -41,15 +41,15 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="2.484209"
-     inkscape:cx="104.45981"
-     inkscape:cy="260.04253"
+     inkscape:zoom="2.1439827"
+     inkscape:cx="141.55898"
+     inkscape:cy="244.40496"
      inkscape:window-width="1366"
      inkscape:window-height="832"
-     inkscape:window-x="111"
-     inkscape:window-y="25"
+     inkscape:window-x="97"
+     inkscape:window-y="36"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      width="71.12mm"
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#cfdee6"
@@ -596,14 +596,14 @@
        inkscape:export-xdpi="600.01202"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
        id="text2262"
-       y="51.824749"
-       x="36.151794"
+       y="54.291183"
+       x="35.781532"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59267px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0932689"
        xml:space="preserve"><tspan
          sodipodi:role="line"
          id="tspan2276"
-         x="36.151794"
-         y="51.824749">SYNC</tspan></text>
+         x="35.781532"
+         y="54.291183">SYNC</tspan></text>
     <text
        inkscape:export-ydpi="600.01202"
        inkscape:export-xdpi="600.01202"
@@ -918,7 +918,7 @@
        cy="23.584002"
        r="1.3229166"
        style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
-       inkscape:label="MIX1_PULSE_BUTTON" />
+       inkscape:label="MIX1_PULSE_KNOB" />
     <circle
        id="b903da6b-121c-4663-8772-b399a6eccb9e-97-9-5-2-3"
        data-name="Tempo#RoundLargeBlackKnob"
@@ -1194,11 +1194,11 @@
        cx="33.559044"
        cy="62.254726"
        r="1.3229166"
-       style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
+       style="display:inline;fill:#ff0000;stroke-width:0.264583"
        inkscape:label="SYNC_HARD_BUTTON" />
     <circle
        inkscape:label="SYNC_SOFT_BUTTON"
-       style="display:inline;opacity:1;fill:#ff0000;stroke-width:0.264583"
+       style="display:inline;fill:#ff0000;stroke-width:0.264583"
        r="1.3229166"
        cy="62.254726"
        cx="45.189564"
