@@ -31,6 +31,15 @@
       ]
     },
     {
+      "slug": "Zoxnoxious3340Legacy",
+      "name": "Zoxnoxious3340Legacy",
+      "description": "Hardware 3340 VCO",
+      "tags": [
+        "VCO",
+        "Hardware"
+      ]
+    },
+    {
       "slug": "Zoxnoxious3372",
       "name": "Zoxnoxious3372",
       "description": "Hardware 3372 VCF",

@@ -30,13 +30,16 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
         cardName = "Audio Out";
     }
     else if (cardId == 0x02) {
-        cardName = "3340 VCO";
+        cardName = "3340Legacy";
     }
     else if (cardId == 0x03) {
         cardName = "3372 VCF";
     }
     else if (cardId == 0x04) {
       cardName = outputNumber == 1 ? "5524 VCF" : "5524 VCO1";
+    }
+    else if (cardId == 0x05) {
+        cardName = "3340 VCO";
     }
     else {
         return "----";
@@ -56,6 +59,7 @@ void init(Plugin* p) {
         p->addModel(modelZoxnoxious3372);
         p->addModel(modelZoxnoxious5524);
         p->addModel(modelPatchingMatrix);
+        p->addModel(modelZoxnoxious3340Legacy);
 
 	// Any other plugin initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
