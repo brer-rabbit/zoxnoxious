@@ -115,6 +115,10 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
           { EXT_MOD_SELECT_SWITCH_UP_PARAM, INT_MIN, { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29 } } // special handling
       };
 
+    // index of EXT_MOD_SELECT_SWITCH_UP_PARAM
+    const int extModSelectSwitchIndex =
+      sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram) - 1;
+
     int extModSelectSwitchValue;
     bool extModSelectChanged;
 
@@ -246,16 +250,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             // oddly (well, by design) this is how the mux is wired up:
             // CardA_Out1, CardA_Out2, CardB_Out1, CardC_Out1,
             // CardD_Out1, CardE_Out1, CardF_Out1, CardG_Out1,
-            int modulationParam = extModSelectSwitchValue;
-            // this handles the cases 0-7 for the mux
-            if (modulationParam > 2) {
-                modulationParam = (modulationParam - 1) * 2;
-            }
 
-            if (modulationParam != modulationInputParamPrevValue) {
-                modulationInputNameString = cardOutputNames[modulationParam];
-                // sending midi command is handled in processZoxnoxiousControl
-            }
+            modulationInputNameString = cardOutputNames[extModSelectSwitchValue];
         }
     }
 
@@ -293,23 +289,23 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
             extModSelectSwitchValue--;
             extModSelectChanged = true;
         }
-        if (extModSelectSwitchValue > 11) {
+        if (extModSelectSwitchValue > 13) {
             extModSelectSwitchValue = 0;
         } else if (extModSelectSwitchValue < 0) {
-            extModSelectSwitchValue = 11;
+            extModSelectSwitchValue = 13;
         }
 
         if (extModSelectChanged) {
             extModSelectChanged = false;
             //INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d", APP->engine->getFrame(), extModSelectSwitchValue);
-            sendOrQueueMidiMessage(controlMsg, extModSelectSwitchValue, 0);
+            sendOrQueueMidiMessage(controlMsg, extModSelectSwitchValue, extModSelectSwitchIndex);
         }
 
         // all other entries in buttonParamToMidiProgramList are handled here (almost as poorly)
 
         // Any buttons params pushed need to send midi events.  Send directly or queue.
         // skip EXT_MOD_SELECT_SWITCH_UP_PARAM.
-        for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)) - 1; ++i) {
+        for (int i = 0; i < extModSelectSwitchIndex; ++i) {
             int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
             sendOrQueueMidiMessage(controlMsg, newValue, i);
         }
@@ -446,7 +442,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         json_t* extModSelectSwitchJ = json_object_get(rootJ, "extModSelectSwitch");
         if (extModSelectSwitchJ) {
             extModSelectChanged = true;
-          extModSelectSwitchValue = json_integer_value(extModSelectSwitchJ);
+            extModSelectSwitchValue = json_integer_value(extModSelectSwitchJ);
         }
     }
 

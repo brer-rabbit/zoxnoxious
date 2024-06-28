@@ -236,6 +236,7 @@ struct Zoxnoxious3340Legacy : ZoxnoxiousModule {
             if (modulationParam != modulationInputParamPrevValue) {
                 modulationInputNameString = cardOutputNames[modulationParam];
                 // sending midi command is handled in processZoxnoxiousControl
+                modulationInputParamPrevValue = modulationParam;
             }
         }
     }
@@ -402,7 +403,7 @@ struct Zoxnoxious3340Legacy : ZoxnoxiousModule {
         json_t* extModSelectSwitchJ = json_object_get(rootJ, "extModSelectSwitch");
         if (extModSelectSwitchJ) {
             extModSelectChanged = true;
-          extModSelectSwitchValue = json_integer_value(extModSelectSwitchJ);
+            extModSelectSwitchValue = json_integer_value(extModSelectSwitchJ);
         }
     }
 
