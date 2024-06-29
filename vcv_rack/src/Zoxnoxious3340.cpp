@@ -112,7 +112,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
           { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 12, 13 } },
           { MIX2_PULSE_BUTTON_PARAM, INT_MIN, { 14, 15 } },
           { EXP_FM_BUTTON_PARAM, INT_MIN, { 16, 17 } },
-          { EXT_MOD_SELECT_SWITCH_UP_PARAM, INT_MIN, { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29 } } // special handling
+          { EXT_MOD_SELECT_SWITCH_UP_PARAM, INT_MIN, { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 } } // special handling
       };
 
     // index of EXT_MOD_SELECT_SWITCH_UP_PARAM
@@ -362,21 +362,20 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         }
         channelIndex--;
 
-        // frequency
-        v = params[FREQ_KNOB_PARAM].getValue() + inputs[FREQ_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
-            freqClipTimer = clipTime;
-        }
-        channelIndex--;
-
         // sync phase
         v = params[SYNC_PHASE_KNOB_PARAM].getValue() + inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
             syncPhaseClipTimer = clipTime;
         }
+        channelIndex--;
 
+        // frequency
+        v = params[FREQ_KNOB_PARAM].getValue() + inputs[FREQ_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
+            freqClipTimer = clipTime;
+        }
 
     }
 

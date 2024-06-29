@@ -28,7 +28,7 @@
 // https://www.analog.com/media/en/technical-documentation/data-sheets/ad5308_5318_5328.pdf
 #define SPI_MODE 1
 #define SPI_CHANNEL 0 // chip select zero
-#define NUM_DAC_CHANNELS 6
+#define NUM_DAC_CHANNELS 8
 #define NUM_TUNING_POINTS 9
 #define TWELVE_BITS 4096
 
@@ -53,35 +53,48 @@ static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
 
-// six audio channels mapped to an 8 channel DAC (yup, two unused DAC channels)
-static const int channel_map[] = { 0x00, 0x10, 0x30, 0x40, 0x50, 0x70 };
+// eight audio channels mapped to an 8 channel DAC:
+// this must match the the audio channel mapping of the source:
+// Audio channel | DAC Channel | Function
+// 0             | 1           | Freq CV
+// 1             | 0           | Sync Level
+// 2             | 2           | Pulse VCA
+// 3             | 3           | Ext Sig VCA
+// 4             | 4           | Triangle VCA
+// 5             | 5           | Saw VCA
+// 6             | 6           | Pulse Width
+// 7             | 7           | Linear Freq
+static const int channel_map[] = { 0x10, 0x00, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
 
 
 //
 // tuning params
 //
-static const uint8_t tune_gpio_port0_data = 0x00;
-static const uint8_t tune_gpio_port1_data = 0x02; // output1 pulse -- not actually necessary
-// tune_dac_state is in spiWrite order
-static const char tune_dac_state[][2] = { { 0x00, 0x00 }, // freq
-                                          { 0x10, 0x00 }, // sync level
-                                          { 0x37, 0xff }, // pulse width: 50%
+static const uint8_t tune_gpio_port0_data = 0x00; // turn everything off
+static const uint8_t tune_gpio_port1_data = 0x00;
+
+// tune_dac_state is in spiWrite order- these got straight to the DAC
+static const char tune_dac_state[][2] = { { 0x00, 0x00 }, // sync level
+                                          { 0x10, 0x00 }, // freq
+                                          { 0x2f, 0xff }, // freq
+                                          { 0x37, 0xff }, // ext mod
                                           { 0x40, 0x00 }, // tri vca
-                                          { 0x50, 0x00 }, // ext mod
+                                          { 0x50, 0x00 }, // saw vca
+                                          { 0x67, 0xff }, // pulse width: 50%
                                           { 0x77, 0xff } }; // linear: mid-range
 
 // tune_freq_dac_values: the DAC values to run through for a tuning request:
 // all on frequency CV, each step is up by 1.25 volt (512 decimal).
 // Reverse byte order before calling spiWrite.
-static const int16_t tune_freq_dac_values[] = { 0x0000, // DAC 0V
-                                                0x0200, // DAC 1.25V
-                                                0x0400, // DAC 2.5V
-                                                0x0600, // DAC 3.75V
-                                                0x0800, // DAC 5V
-                                                0x0a00, // DAC 6.25V
-                                                0x0c00, // DAC 7.5V
-                                                0x0e00, // DAC 8.75V
-                                                0x0fff }; // DAC 10V
+static const int16_t tune_freq_dac_values[] = { 0x1000, // DAC 0V
+                                                0x1200, // DAC 1.25V
+                                                0x1400, // DAC 2.5V
+                                                0x1600, // DAC 3.75V
+                                                0x1800, // DAC 5V
+                                                0x1a00, // DAC 6.25V
+                                                0x1c00, // DAC 7.5V
+                                                0x1e00, // DAC 8.75V
+                                                0x1fff }; // DAC 10V
 
 static const double tuning_initial_frequency_target = 27.5;
 static const double expected_dac_values_per_octave = 409.6; // for 12 bits / 10 octave range
@@ -113,7 +126,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
 
   z3340->zhost = zhost;
   z3340->slot = slot;
-  z3340->pca9555_port[0] = 0x00;
+  z3340->pca9555_port[0] = 0x00; // light LED: it's active low.  Set everything to off.
   z3340->pca9555_port[1] = 0x00;
 
   z3340->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
@@ -191,9 +204,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
 
   // this is broken up, rather crudely, to filter the freq CV and
-  // triangle VCA amount as special cases.  If not for that a single
-  // loop would do.
-  // Freq CV, use correction table:
+  // to use a correction table
 
   if (zcard->previous_samples[dac_channel] != samples[dac_channel]) {
     if (samples[dac_channel] >= 0) {
@@ -220,47 +231,19 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       // Given a 16-bit signed input, write it to a 12-bit signed values.
       // Any negative value clips to zero.
 
-      // Special handling for triangle out to slew rate limit.  Limit is
-      // approx 2.5 ms for full off -- full on or vice versa.
-      if (dac_channel == triangle_vca_id) {
-        int16_t triangle_sample;
-        int slew_delta = samples[dac_channel] - zcard->previous_samples[dac_channel];
-        if (slew_delta > slew_limit) { // limit positive
-          triangle_sample = zcard->previous_samples[dac_channel] + slew_limit;
-        }
-        else if (slew_delta < -slew_limit) {
-          triangle_sample = zcard->previous_samples[dac_channel] - slew_limit;
-        }
-        else {
-          triangle_sample = samples[dac_channel];
-        }
-
-        if (triangle_sample >= 0) {
-          samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) triangle_sample) >> 11;
-          samples_to_dac[1] = ((uint16_t) triangle_sample) >> 3;
-          zcard->previous_samples[dac_channel] = triangle_sample;
-        }
-        else {
-          samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
-          samples_to_dac[1] = 0;
-          zcard->previous_samples[dac_channel] = 0;
-        }
+      if (samples[dac_channel] >= 0) {
+        samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) samples[dac_channel]) >> 11;
+        samples_to_dac[1] = ((uint16_t) samples[dac_channel]) >> 3;
+        zcard->previous_samples[dac_channel] = samples[dac_channel];
       }
       else {
-        if (samples[dac_channel] >= 0) {
-          samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) samples[dac_channel]) >> 11;
-          samples_to_dac[1] = ((uint16_t) samples[dac_channel]) >> 3;
-          zcard->previous_samples[dac_channel] = samples[dac_channel];
-        }
-        else {
-          samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
-          samples_to_dac[1] = 0;
-          zcard->previous_samples[dac_channel] = 0;
-        }
+        samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
+        samples_to_dac[1] = 0;
+        zcard->previous_samples[dac_channel] = 0;
       }
-
-      spiWrite(spi_channel, samples_to_dac, 2);
     }
+
+    spiWrite(spi_channel, samples_to_dac, 2);
   }
 
   return 0;
@@ -281,36 +264,37 @@ struct midi_program_to_gpio {
 
 // array indexed by MIDI program number
 static const struct midi_program_to_gpio midi_program_to_gpio[] = {
-  { 0, port0_addr, 0b00000000, 0b11101111 }, // prog 0 - sync neg off
-  { 0, port0_addr, 0b00010000, 0b11111111 }, // prog 1 - sync neg on
-  { 1, port1_addr, 0b00000000, 0b11111101 }, // prog 2 - mix1 pulse off
-  { 1, port1_addr, 0b00000010, 0b11111111 }, // prog 3 - mix1 pulse on
-  { 1, port1_addr, 0b00000000, 0b11111110 }, // prog 4 - mix1 comp off
-  { 1, port1_addr, 0b00000001, 0b11111111 }, // prog 5 - mix1 comp on
-  { 1, port1_addr, 0b00000000, 0b10111111 }, // prog 6 - mix2 pulse off
-  { 1, port1_addr, 0b01000000, 0b11111111 }, // prog 7 - mix2 pulse on
-  { 1, port1_addr, 0b00000000, 0b01111111 }, // prog 8 - ext mod pwm off
-  { 1, port1_addr, 0b10000000, 0b11111111 }, // prog 9 - ext mod pwm on
-  { 0, port0_addr, 0b00000000, 0b11011111 }, // prog 10 - ext mod to fm off
-  { 0, port0_addr, 0b00100000, 0b11111111 }, // prog 11 - ext mod to fm on
-  { 0, port0_addr, 0b00000000, 0b01111111 }, // prog 12 - linear fm off
-  { 0, port0_addr, 0b10000000, 0b11111111 }, // prog 13 - linear fm on
-  { 1, port1_addr, 0b00000000, 0b11101111 }, // prog 14 - mix2 saw off
-  { 1, port1_addr, 0b00010000, 0b11111111 }, // prog 15 - mix2 saw on
-  { 0, port0_addr, 0b00000000, 0b10111111 }, // prog 16 - sync pos off
-  { 0, port0_addr, 0b01000000, 0b11111111 }, // prog 17 - sync pos on
-  { 1, port1_addr, 0b00000000, 0b11110011 }, // prog 18 - mix1 saw off
-  { 1, port1_addr, 0b00001000, 0b11111011 }, // prog 19 - mix1 saw low
-  { 1, port1_addr, 0b00000100, 0b11110111 }, // prog 20 - mix1 saw med
-  { 1, port1_addr, 0b00001100, 0b11111111 }, // prog 21 - mix1 saw high
-  { 0, port0_addr, 0b00000000, 0b11111000 }, // prog 22 - ext select card1 out1
-  { 0, port0_addr, 0b00000100, 0b11111100 }, // prog 23 - ext select card1 out2
-  { 0, port0_addr, 0b00000010, 0b11111010 }, // prog 24 - ext select card2 out1
-  { 0, port0_addr, 0b00000110, 0b11111110 }, // prog 25 - ext select card3 out1
-  { 0, port0_addr, 0b00000001, 0b11111001 }, // prog 26 - ext select card4 out1
-  { 0, port0_addr, 0b00000101, 0b11111101 }, // prog 27 - ext select card5 out1
-  { 0, port0_addr, 0b00000011, 0b11111011 }, // prog 28 - ext select card6 out1
-  { 0, port0_addr, 0b00000111, 0b11111111 }  // prog 29 - ext select card7 out1
+  { 0, port0_addr, 0b00000000, 0b11111110 }, // prog 0 - sync hard off
+  { 0, port0_addr, 0b00000001, 0b11111111 }, // prog 1 - sync hard on
+  { 0, port0_addr, 0b00000000, 0b11111101 }, // prog 2 - ext mod pwm off
+  { 0, port0_addr, 0b00000010, 0b11111111 }, // prog 3 - ext mod pwm on
+  { 0, port0_addr, 0b00000000, 0b11101111 }, // prog 4 - sync neg off
+  { 0, port0_addr, 0b00010000, 0b11111111 }, // prog 5 - sync neg on
+  { 0, port0_addr, 0b00000000, 0b10111111 }, // prog 6 - sync soft off
+  { 0, port0_addr, 0b01000000, 0b11111111 }, // prog 7 - sync soft on
+  { 0, port0_addr, 0b00000000, 0b01111111 }, // prog 8 - sync pos on
+  { 0, port0_addr, 0b10000000, 0b11111111 }, // prog 9 - sync pos off
+  { 1, port1_addr, 0b00000000, 0b11111110 }, // prog 10 - linear fm off
+  { 1, port1_addr, 0b00000001, 0b11111111 }, // prog 11 - linear fm on
+  { 1, port1_addr, 0b00000000, 0b11111101 }, // prog 12 - mix2 saw off
+  { 1, port1_addr, 0b00000010, 0b11111111 }, // prog 13 - mix2 saw on
+  { 1, port1_addr, 0b00000000, 0b11111011 }, // prog 14 - mix2 pulse off
+  { 1, port1_addr, 0b00000100, 0b11111111 }, // prog 15 - mix2 pulse on
+  { 1, port1_addr, 0b00000000, 0b11110111 }, // prog 16 - ext mod fm off
+  { 1, port1_addr, 0b00001000, 0b11111111 }, // prog 17 - ext mod fm on
+  { 1, port1_addr, 0b00000000, 0b00001111 }, // prog 18 - ext select card1 out1
+  { 1, port1_addr, 0b00010000, 0b00011111 }, // prog 19 - ext select card1 out2
+  { 1, port1_addr, 0b00100000, 0b00101111 }, // prog 20 - ext select card2 out1
+  { 1, port1_addr, 0b00110000, 0b00111111 }, // prog 21 - ext select card2 out2
+  { 1, port1_addr, 0b01000000, 0b01001111 }, // prog 22 - ext select card3 out1
+  { 1, port1_addr, 0b01010000, 0b01011111 }, // prog 23 - ext select card3 out2
+  { 1, port1_addr, 0b01100000, 0b01101111 }, // prog 24 - ext select card4 out1
+  { 1, port1_addr, 0b01110000, 0b01111111 }, // prog 25 - ext select card4 out2
+  { 1, port1_addr, 0b10000000, 0b10001111 }, // prog 26 - ext select card5 out1
+  { 1, port1_addr, 0b10010000, 0b10011111 }, // prog 27 - ext select card5 out2
+  { 1, port1_addr, 0b10100000, 0b10101111 }, // prog 28 - ext select card6 out1
+  { 1, port1_addr, 0b10110000, 0b10111111 }, // prog 29 - ext select card6 out2
+  { 1, port1_addr, 0b11000000, 0b11001111 }  // prog 30 - ext select card7 out1
 };
 
 int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
