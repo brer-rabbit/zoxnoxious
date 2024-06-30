@@ -9,8 +9,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     // this order should reflect the channel mapping (WHY?)
     // TODO: fix this, ordering of params shouldn't map to channels
     enum ParamId {
-        SYNC_PHASE_KNOB_PARAM,
         FREQ_KNOB_PARAM,
+        SYNC_PHASE_KNOB_PARAM,
         MIX1_PULSE_KNOB_PARAM,
         EXT_MOD_AMOUNT_KNOB_PARAM,
         MIX1_TRIANGLE_KNOB_PARAM,
@@ -32,8 +32,8 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         PARAMS_LEN
     };
     enum InputId {
-        SYNC_PHASE_INPUT,
         FREQ_INPUT,
+        SYNC_PHASE_INPUT,
         MIX1_PULSE_VCA_INPUT,
         EXT_MOD_AMOUNT_INPUT,
         MIX1_TRIANGLE_VCA_INPUT,
