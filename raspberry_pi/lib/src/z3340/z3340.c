@@ -102,12 +102,6 @@ static const double expected_dac_values_per_octave = 409.6; // for 12 bits / 10 
 static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
 
 
-//
-// slew rate limit the triangle vca
-//
-static const int slew_limit = 3000;
-static const int triangle_vca_id = 3;
-
 
 
 void* init_zcard(struct zhost *zhost, int slot) {
