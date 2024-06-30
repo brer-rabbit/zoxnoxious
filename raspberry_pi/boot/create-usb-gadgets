@@ -17,7 +17,7 @@ AUDIO_SAMPLE_SIZE=2
 # USB MIDI configuration
 MIDI_ID="Zoxnoxious-MIDI"
 
-# Load libcomposite
+# Load libcomposite: use this to enable multiple gadgets
 modprobe libcomposite
  
 # Create a gadget called usb-gadgets

@@ -100,7 +100,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
     struct buttonParamMidiProgram {
         enum ParamId button;
         int previousValue;
-        uint8_t midiProgram[12];
+        uint8_t midiProgram[13];
     } buttonParamToMidiProgramList[11] =
       {
           { SYNC_HARD_BUTTON_PARAM, INT_MIN, { 0, 1 } },
@@ -383,8 +383,9 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
     /** getCardHardwareId
      * return the hardware Id of the 3340 card
+     * This MUST match the ROM Id on the card
      */
-    static const uint8_t hardwareId = 0x05;
+    static const uint8_t hardwareId = 0x02;
     uint8_t getHardwareId() override {
         return hardwareId;
     }

@@ -346,7 +346,7 @@ struct Zoxnoxious3340Legacy : ZoxnoxiousModule {
     /** getCardHardwareId
      * return the hardware Id of the 3340 card
      */
-    static const uint8_t hardwareId = 0x02;
+    static const uint8_t hardwareId = 0x05;
     uint8_t getHardwareId() override {
         return hardwareId;
     }

@@ -30,7 +30,7 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
         cardName = "Audio Out";
     }
     else if (cardId == 0x02) {
-        cardName = "3340Legacy";
+        cardName = "3340 VCO";
     }
     else if (cardId == 0x03) {
         cardName = "3372 VCF";
@@ -39,7 +39,7 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
       cardName = outputNumber == 1 ? "5524 VCF" : "5524 VCO1";
     }
     else if (cardId == 0x05) {
-        cardName = "3340 VCO";
+        cardName = "3340Legacy";
     }
     else {
         return "----";
