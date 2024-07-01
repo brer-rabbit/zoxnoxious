@@ -94,10 +94,10 @@ static const int16_t tune_freq_dac_values[] = { 0x1000, // DAC 0V
                                                 0x1a00, // DAC 6.25V
                                                 0x1c00, // DAC 7.5V
                                                 0x1e00, // DAC 8.75V
-                                                0x1fff }; // DAC 10V
+                                                0x1fff }; // DAC 2.5V
 
 static const double tuning_initial_frequency_target = 27.5;
-static const double expected_dac_values_per_octave = 409.6; // for 12 bits / 10 octave range
+static const double expected_dac_values_per_octave = 512; // for 12 bits / 8 octave range
 
 static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
 
@@ -216,7 +216,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   }
 
 
-  for (; dac_channel < NUM_DAC_CHANNELS; ++dac_channel) {
+  for (dac_channel = 1; dac_channel < NUM_DAC_CHANNELS; ++dac_channel) {
     if (zcard->previous_samples[dac_channel] != samples[dac_channel] ) {
       // DAC write:
       // bits 15-0:
@@ -235,9 +235,11 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         samples_to_dac[1] = 0;
         zcard->previous_samples[dac_channel] = 0;
       }
+
+
+      spiWrite(spi_channel, samples_to_dac, 2);
     }
 
-    spiWrite(spi_channel, samples_to_dac, 2);
   }
 
   return 0;
@@ -466,7 +468,7 @@ int tunereq_restore_state(void *zcard_plugin) {
     // cleanup table
     for (int i = 0; i < TWELVE_BITS; ++i) {
       if (zcard->freq_tuned[i] > TWELVE_BITS - 1) {
-        zcard->freq_tuned[i] = 0xff0f;
+        zcard->freq_tuned[i] = 0xff0f | channel_map[0];
       }
       else {
         unsigned char upper, lower;
