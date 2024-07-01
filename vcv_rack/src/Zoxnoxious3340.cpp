@@ -101,7 +101,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         enum ParamId button;
         int previousValue;
         uint8_t midiProgram[13];
-    } buttonParamToMidiProgramList[11] =
+    } buttonParamToMidiProgramList[10] =
       {
           { SYNC_HARD_BUTTON_PARAM, INT_MIN, { 0, 1 } },
           { EXT_MOD_PWM_BUTTON_PARAM, INT_MIN, { 2, 3 } },
@@ -135,7 +135,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         extModSelectChanged(false) {
 
         config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-        configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 10.f);
+        configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 8.f);
         configParam(PULSE_WIDTH_KNOB_PARAM, 0.f, 1.f, 0.5f, "Pulse Width", "%", 0.f, 100.f);
         configParam(LINEAR_KNOB_PARAM, 0.f, 1.f, 0.5f, "Linear Mod", " V", 0.f, 10.f, -5.f);
 
@@ -297,7 +297,10 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
         if (extModSelectChanged) {
             extModSelectChanged = false;
-            //INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d", APP->engine->getFrame(), extModSelectSwitchValue);
+            INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d idx: %d sending: %d",
+                 APP->engine->getFrame(), extModSelectSwitchValue,
+                 extModSelectSwitchIndex,
+                 buttonParamToMidiProgramList[extModSelectSwitchIndex].midiProgram[extModSelectSwitchValue]);
             sendOrQueueMidiMessage(controlMsg, extModSelectSwitchValue, extModSelectSwitchIndex);
         }
 
