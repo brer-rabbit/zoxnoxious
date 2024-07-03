@@ -64,8 +64,8 @@ static const uint8_t config_port_as_output = 0x00;
 // 5             | 5           | Saw VCA
 // 6             | 6           | Pulse Width
 // 7             | 7           | Linear Freq
-static const int channel_map[] = { 0x10, 0x00, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
-
+static const uint8_t channel_map[] = { 0x10, 0x00, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
+static const uint8_t freq_cv_dac_channel = channel_map[0];
 
 //
 // tuning params
@@ -74,32 +74,32 @@ static const uint8_t tune_gpio_port0_data = 0x00; // turn everything off
 static const uint8_t tune_gpio_port1_data = 0x00;
 
 // tune_dac_state is in spiWrite order- these got straight to the DAC
-static const char tune_dac_state[][2] = { { 0x00, 0x00 }, // sync level
-                                          { 0x10, 0x00 }, // freq
-                                          { 0x2f, 0xff }, // freq
-                                          { 0x37, 0xff }, // ext mod
-                                          { 0x40, 0x00 }, // tri vca
-                                          { 0x50, 0x00 }, // saw vca
-                                          { 0x67, 0xff }, // pulse width: 50%
+static const uint8_t tune_dac_state[][2] = { { 0x00, 0x00 }, // sync level
+                                             { 0x10, 0x00 }, // freq
+                                             { 0x2f, 0xff }, // freq
+                                             { 0x37, 0xff }, // ext mod
+                                             { 0x40, 0x00 }, // tri vca
+                                             { 0x50, 0x00 }, // saw vca
+                                             { 0x67, 0xff }, // pulse width: 50%
                                           { 0x77, 0xff } }; // linear: mid-range
 
 // tune_freq_dac_values: the DAC values to run through for a tuning request:
 // all on frequency CV, each step is up by 1.25 volt (512 decimal).
-// Reverse byte order before calling spiWrite.
-static const int16_t tune_freq_dac_values[] = { 0x1000, // DAC 0V
-                                                0x1200, // DAC 1.25V
-                                                0x1400, // DAC 2.5V
-                                                0x1600, // DAC 3.75V
-                                                0x1800, // DAC 5V
-                                                0x1a00, // DAC 6.25V
-                                                0x1c00, // DAC 7.5V
-                                                0x1e00, // DAC 8.75V
-                                                0x1fff }; // DAC 2.5V
+// Reverse byte order before calling spiWrite and bitwise OR them with the DAC channel
+static const int16_t tune_freq_dac_values[] = { 0x0000, // DAC 0V
+                                                0x0200, // DAC 1.25V
+                                                0x0400, // DAC 2.5V
+                                                0x0600, // DAC 3.75V
+                                                0x0800, // DAC 5V
+                                                0x0a00, // DAC 6.25V
+                                                0x0c00, // DAC 7.5V
+                                                0x0e00, // DAC 8.75V
+                                                0x0fff }; // DAC 2.5V
 
 static const double tuning_initial_frequency_target = 27.5;
-static const double expected_dac_values_per_octave = 512; // for 12 bits / 8 octave range
+static const double expected_dac_values_per_octave = 512.0; // for 12 bits / 8 octave range
 
-static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
+static void create_linear_tuning(uint8_t dac_channel, int num_elements, int16_t *table);
 
 
 
@@ -156,7 +156,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
   }
 
   // tuning -- start with untuned / linear
-  create_linear_tuning(channel_map[0], TWELVE_BITS, z3340->freq_tuned);
+  create_linear_tuning(freq_cv_dac_channel, TWELVE_BITS, z3340->freq_tuned);
 
   return z3340;
 }
@@ -191,7 +191,7 @@ struct zcard_properties* get_zcard_properties() {
 
 int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
-  char samples_to_dac[2];
+  uint8_t samples_to_dac[2];
   int spi_channel;
   int dac_channel = 0;
 
@@ -209,7 +209,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     else {
       samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
       samples_to_dac[1] = 0;
-      spiWrite(spi_channel, samples_to_dac, 2);
+      spiWrite(spi_channel, (char*)samples_to_dac, 2);
     }
 
     zcard->previous_samples[dac_channel] = samples[dac_channel]; // use provided value, not mapped value, for cache
@@ -236,8 +236,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         zcard->previous_samples[dac_channel] = 0;
       }
 
-
-      spiWrite(spi_channel, samples_to_dac, 2);
+      spiWrite(spi_channel, (char*)samples_to_dac, 2);
     }
 
   }
@@ -364,12 +363,12 @@ const static uint8_t led_bit = 0x8;
 tune_status_t tunereq_set_point(void *zcard_plugin) {
   struct z3340_card *zcard = (struct z3340_card*)zcard_plugin;
   int spi_channel;
-  char dac_values[2]; // these are in reverse byte order
-  dac_values[0] = tune_freq_dac_values[ zcard->tuning_point ] >> 8;
+  uint8_t dac_values[2]; // these are in reverse byte order
+  dac_values[0] = freq_cv_dac_channel | tune_freq_dac_values[ zcard->tuning_point ] >> 8;
   dac_values[1] = tune_freq_dac_values[ zcard->tuning_point ];
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
-  spiWrite(spi_channel, dac_values, 2);
+  spiWrite(spi_channel, (char*)dac_values, 2);
 
   // eye candy- flash LED while tuning
   i2cWriteByteData(zcard->i2c_handle, port0_addr,
@@ -445,14 +444,15 @@ int tunereq_restore_state(void *zcard_plugin) {
 
     int tuned_index;
     for (int i = 0; i < NUM_TUNING_POINTS - 1; ++i) {
+      // y = mx + b; we have b as zcard->tuning_points[i].actual_dac
+      // compute m here then iterate over x
+      slope = (zcard->tuning_points[i+1].actual_dac - zcard->tuning_points[i].actual_dac) /
+        (zcard->tuning_points[i+1].expected_dac - zcard->tuning_points[i].expected_dac);
+
       for (tuned_index = zcard->tuning_points[i].expected_dac + 0.5;
            tuned_index < zcard->tuning_points[i+1].expected_dac - 0.5 &&
              tuned_index < TWELVE_BITS;
            ++tuned_index) {
-        // y = mx + b; we have b as zcard->tuning_points[i].actual_dac
-        // compute m and x
-        slope = (zcard->tuning_points[i+1].actual_dac - zcard->tuning_points[i].actual_dac) /
-          (zcard->tuning_points[i+1].expected_dac - zcard->tuning_points[i].expected_dac);
         int x = tuned_index - (int)(zcard->tuning_points[i].expected_dac + 0.5);
         int y = slope * x + zcard->tuning_points[i].actual_dac;
         zcard->freq_tuned[tuned_index] = y > 0 ? y : 0;
@@ -465,15 +465,15 @@ int tunereq_restore_state(void *zcard_plugin) {
       zcard->freq_tuned[i] = zcard->freq_tuned[tuned_index - 1];
     }
 
-    // cleanup table
+    // cleanup table and add the exact DAC channel so it can go straight out via spiWrite
     for (int i = 0; i < TWELVE_BITS; ++i) {
       if (zcard->freq_tuned[i] > TWELVE_BITS - 1) {
-        zcard->freq_tuned[i] = 0xff0f | channel_map[0];
+        zcard->freq_tuned[i] = 0xff0f | freq_cv_dac_channel;
       }
       else {
-        unsigned char upper, lower;
+        uint8_t upper, lower;
         upper = zcard->freq_tuned[i];
-        lower = channel_map[0] | (0xf & zcard->freq_tuned[i] >> 8);
+        lower = freq_cv_dac_channel | (0xf & zcard->freq_tuned[i] >> 8);
         zcard->freq_tuned[i] = ((int16_t)upper) << 8 | (int16_t)lower;
       }
     }
@@ -483,7 +483,7 @@ int tunereq_restore_state(void *zcard_plugin) {
   }
 
   // linear table -- no corrections
-  create_linear_tuning(channel_map[0], TWELVE_BITS, zcard->freq_tuned);
+  create_linear_tuning(freq_cv_dac_channel, TWELVE_BITS, zcard->freq_tuned);
   return TUNE_COMPLETE_FAILED;
 }
 
@@ -494,9 +494,9 @@ int tunereq_restore_state(void *zcard_plugin) {
  * create a linear tuning table - no corrections.  Create it for the passed in DAC channel such that
  * it can be passed straight to spiWrite.
  */
-static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
+static void create_linear_tuning(uint8_t dac_channel, int num_elements, int16_t *table) {
   for (int i = 0; i < num_elements; ++i) {
-    unsigned char upper, lower;
+    uint8_t upper, lower;
     upper = i;
     lower = dac_channel | (0xf & i >> 8);
     table[i] = ((int16_t)upper) << 8 | (int16_t)lower;
