@@ -374,7 +374,7 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
         channelIndex--;
 
         // frequency
-        v = params[FREQ_KNOB_PARAM].getValue() + inputs[FREQ_INPUT].getVoltageSum() / 10.f;
+        v = params[FREQ_KNOB_PARAM].getValue() + inputs[FREQ_INPUT].getVoltageSum() / 8.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
             freqClipTimer = clipTime;
