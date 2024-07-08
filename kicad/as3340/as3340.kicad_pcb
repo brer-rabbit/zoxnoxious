@@ -5,6 +5,13 @@
   )
 
   (paper "A4")
+  (title_block
+    (title "Z3340 VCO")
+    (date "2024-06-20")
+    (rev "0.7")
+    (company "Zoxnoxious Engineering")
+  )
+
   (layers
     (0 "F.Cu" signal)
     (1 "In1.Cu" power)
