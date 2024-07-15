@@ -427,7 +427,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "as3340.kicad_pro",
+    "filename": "z3340.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -508,7 +508,7 @@
     "meta": {
       "version": 1
     },
-    "net_format_name": "Pcbnew",
+    "net_format_name": "KiCad",
     "ngspice": {
       "fix_include_paths": true,
       "fix_passive_vals": false,
@@ -540,7 +540,7 @@
     ],
     [
       "00000000-0000-0000-0000-000061e1d4ae",
-      "cem3340"
+      "vco3340"
     ],
     [
       "00000000-0000-0000-0000-00006269dd41",
