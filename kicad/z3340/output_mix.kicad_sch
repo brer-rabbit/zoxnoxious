@@ -757,7 +757,7 @@
         )
       )
     )
-    (symbol "as3340:AS3364" (in_bom yes) (on_board yes)
+    (symbol "z3340:AS3364" (in_bom yes) (on_board yes)
       (property "Reference" "U6" (at 3.81 -5.08 0)
         (effects (font (size 1.27 1.27)))
       )
@@ -2364,7 +2364,7 @@
     )
   )
 
-  (symbol (lib_id "as3340:AS3364") (at 96.52 40.64 0) (unit 4)
+  (symbol (lib_id "z3340:AS3364") (at 96.52 40.64 0) (unit 4)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 01218111-4e4d-48bf-9d0b-a2c5c9f461ec)
     (property "Reference" "U10" (at 97.155 47.3893 0)
@@ -2404,7 +2404,7 @@
     )
   )
 
-  (symbol (lib_id "as3340:AS3364") (at 95.25 63.5 0) (unit 3)
+  (symbol (lib_id "z3340:AS3364") (at 95.25 63.5 0) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 0573a9e6-fa0a-4351-b0ba-ef6ee037cf28)
     (property "Reference" "U10" (at 97.155 70.2493 0)
@@ -2531,7 +2531,7 @@
     )
   )
 
-  (symbol (lib_id "as3340:AS3364") (at 64.77 217.17 0) (unit 2)
+  (symbol (lib_id "z3340:AS3364") (at 64.77 217.17 0) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 2403cbd9-5209-426d-8499-941c8a78d973)
     (property "Reference" "U10" (at 66.675 223.9193 0)
@@ -2596,7 +2596,7 @@
     )
   )
 
-  (symbol (lib_id "as3340:AS3364") (at 95.25 86.36 0) (unit 5)
+  (symbol (lib_id "z3340:AS3364") (at 95.25 86.36 0) (unit 5)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6d52c71b-f7c1-4762-b6e0-81292c3890c6)
     (property "Reference" "U10" (at 97.155 93.1093 0)

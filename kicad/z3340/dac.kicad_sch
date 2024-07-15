@@ -298,7 +298,7 @@
         )
       )
     )
-    (symbol "as3340:AD5328" (in_bom yes) (on_board yes)
+    (symbol "z3340:AD5328" (in_bom yes) (on_board yes)
       (property "Reference" "U" (at 0 -2.54 0)
         (effects (font (size 1.27 1.27)))
       )
@@ -2088,7 +2088,7 @@
     )
   )
 
-  (symbol (lib_id "as3340:AD5328") (at 100.33 71.12 0) (unit 1)
+  (symbol (lib_id "z3340:AD5328") (at 100.33 71.12 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 83c7916e-9521-41d8-81de-2fc150d23c26)
     (property "Reference" "U12" (at 99.06 71.12 0)

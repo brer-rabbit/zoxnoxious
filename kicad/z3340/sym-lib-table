@@ -1,3 +1,4 @@
 (sym_lib_table
-  (lib (name "as3340")(type "KiCad")(uri "${KIPRJMOD}/as3340.kicad_sym")(options "")(descr ""))
+  (version 7)
+  (lib (name "z3340")(type "KiCad")(uri "${KIPRJMOD}/z3340.kicad_sym")(options "")(descr ""))
 )

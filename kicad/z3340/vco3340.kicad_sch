@@ -1207,7 +1207,7 @@
         )
       )
     )
-    (symbol "as3340:R_POT_TRIM-Device" (pin_names (offset 1.016) hide) (in_bom yes) (on_board yes)
+    (symbol "z3340:R_POT_TRIM-Device" (pin_names (offset 1.016) hide) (in_bom yes) (on_board yes)
       (property "Reference" "RV" (at -4.445 0 90)
         (effects (font (size 1.27 1.27)))
       )
@@ -3091,7 +3091,7 @@
     )
   )
 
-  (symbol (lib_id "as3340:R_POT_TRIM-Device") (at 294.64 158.75 0) (unit 1)
+  (symbol (lib_id "z3340:R_POT_TRIM-Device") (at 294.64 158.75 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000620f7724)
     (property "Reference" "RV1" (at 291.465 156.845 0)
@@ -3294,7 +3294,7 @@
     )
   )
 
-  (symbol (lib_id "as3340:R_POT_TRIM-Device") (at 50.8 31.75 0) (unit 1)
+  (symbol (lib_id "z3340:R_POT_TRIM-Device") (at 50.8 31.75 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000621fdf35)
     (property "Reference" "RV2" (at 49.022 30.5816 0)
