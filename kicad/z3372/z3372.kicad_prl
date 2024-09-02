@@ -5,7 +5,11 @@
     "auto_track_width": false,
     "hidden_netclasses": [],
     "hidden_nets": [
-      "GND"
+      "GND",
+      "-12V",
+      "+12V",
+      "+5V",
+      "-5V"
     ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
@@ -66,7 +70,7 @@
       35,
       36
     ],
-    "visible_layers": "ffcffef_7ffffffc",
+    "visible_layers": "ffcffef_ffffffff",
     "zone_display_mode": 1
   },
   "meta": {
