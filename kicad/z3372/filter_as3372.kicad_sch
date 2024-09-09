@@ -3113,7 +3113,7 @@
     )
   )
 
-  (symbol (lib_id "z3372_lib:AS3360-Audio") (at 85.09 220.98 0) (unit 2)
+  (symbol (lib_id "z3372_lib:AS3360-Audio") (at 85.09 220.98 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 0f4faaee-3b11-4cfe-8018-fba87a413d85)
     (property "Reference" "U6" (at 85.09 210.4857 0)
@@ -3145,7 +3145,7 @@
     (instances
       (project "z3372"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/06519ee5-e3f7-4c1d-97d6-a8703fead30d"
-          (reference "U6") (unit 2)
+          (reference "U6") (unit 1)
         )
       )
     )
@@ -3789,7 +3789,7 @@
     )
   )
 
-  (symbol (lib_id "Analog_Switch:DG442xY") (at 195.58 22.86 0) (unit 2)
+  (symbol (lib_id "Analog_Switch:DG442xY") (at 195.58 22.86 0) (unit 4)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3cd0ef4b-c719-4958-a92f-becc6823487c)
     (property "Reference" "U11" (at 195.58 16.6202 0)
@@ -3826,7 +3826,7 @@
     (instances
       (project "z3372"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/06519ee5-e3f7-4c1d-97d6-a8703fead30d"
-          (reference "U11") (unit 2)
+          (reference "U11") (unit 4)
         )
       )
     )
@@ -3867,7 +3867,7 @@
     )
   )
 
-  (symbol (lib_id "z3372_lib:AS3360-Audio") (at 118.11 54.61 0) (unit 1)
+  (symbol (lib_id "z3372_lib:AS3360-Audio") (at 118.11 54.61 0) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3df354cf-a3a9-4b87-a2e9-621b351e6c74)
     (property "Reference" "U6" (at 118.11 44.1157 0)
@@ -3899,7 +3899,7 @@
     (instances
       (project "z3372"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/06519ee5-e3f7-4c1d-97d6-a8703fead30d"
-          (reference "U6") (unit 1)
+          (reference "U6") (unit 2)
         )
       )
     )
@@ -6750,7 +6750,7 @@
     )
   )
 
-  (symbol (lib_id "Analog_Switch:DG442xY") (at 195.58 58.42 0) (unit 4)
+  (symbol (lib_id "Analog_Switch:DG442xY") (at 195.58 58.42 0) (unit 2)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f735f073-628f-40b5-8d3a-6242d349812b)
     (property "Reference" "U11" (at 195.58 53.975 0)
@@ -6787,7 +6787,7 @@
     (instances
       (project "z3372"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/06519ee5-e3f7-4c1d-97d6-a8703fead30d"
-          (reference "U11") (unit 4)
+          (reference "U11") (unit 2)
         )
       )
     )
