@@ -1,11 +1,14 @@
 {
   "board": {
-    "active_layer": 1,
+    "active_layer": 0,
     "active_layer_preset": "",
     "auto_track_width": false,
     "hidden_netclasses": [],
     "hidden_nets": [
-      "GND"
+      "GND",
+      "-12V",
+      "+12V",
+      "+5V"
     ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
@@ -66,11 +69,11 @@
       35,
       36
     ],
-    "visible_layers": "ffcffef_fffffffb",
+    "visible_layers": "ffcffef_fffffff9",
     "zone_display_mode": 1
   },
   "meta": {
-    "filename": "as3372.kicad_prl",
+    "filename": "z3372.kicad_prl",
     "version": 3
   },
   "project": {
