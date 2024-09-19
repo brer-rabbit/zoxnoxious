@@ -7,8 +7,8 @@
   (paper "A4")
   (title_block
     (title "Z3372 Filter")
-    (date "2023-02-16")
-    (rev "0.2")
+    (date "2024-09-19")
+    (rev "0.4")
     (company "Zoxnoxious Engineering")
   )
 
