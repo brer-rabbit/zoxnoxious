@@ -2,7 +2,7 @@
 #include "zcomponentlib.hpp"
 #include "ZoxnoxiousExpander.hpp"
 
-const static int midiMessageQueueMaxSize = 16;
+static const int midiMessageQueueMaxSize = 16;
 
 // map wired mux inputs to signal from cardOutputNames array
 // (card(N-1) * 2 + (out(N-1))
@@ -14,7 +14,7 @@ const static int midiMessageQueueMaxSize = 16;
 // card2 out2
 // card1 out2
 // card1 out1
-int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
+static const int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 
 // card6 out1
 // card5 out2
@@ -24,10 +24,8 @@ int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 // card2 out1
 // card1 out2
 // card1 out1
-int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
+static const int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
 
-
-static const float noiseVcaThresholdGateLevel = 0.f;
 
 struct Zoxnoxious3372 : ZoxnoxiousModule {
     enum ParamId {
@@ -37,7 +35,9 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         SOURCE_ONE_LEVEL_KNOB_PARAM,
         SOURCE_TWO_LEVEL_KNOB_PARAM,
         RESONANCE_KNOB_PARAM,
+        FILTER_VCA_KNOB_PARAM,
         VCA_MOD_SWITCH_PARAM,
+        PAN_MOD_SWITCH_PARAM,
         NOISE_KNOB_PARAM,
         FILTER_MOD_SWITCH_PARAM,
         SOURCE_ONE_VALUE_HIDDEN_PARAM,
@@ -57,6 +57,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         SOURCE_ONE_LEVEL_INPUT,
         SOURCE_TWO_LEVEL_INPUT,
         RESONANCE_INPUT,
+        FILTER_VCA_INPUT,
         INPUTS_LEN
     };
     enum OutputId {
@@ -69,9 +70,12 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         OUTPUT_PAN_CLIP_LIGHT,
         CUTOFF_CLIP_LIGHT,
         RESONANCE_CLIP_LIGHT,
+        FILTER_VCA_CLIP_LIGHT,
+        OUTPUT_VCA_CLIP_LIGHT,
         VCA_MOD_ENABLE_LIGHT,
         FILTER_MOD_ENABLE_LIGHT,
         REZ_MOD_ENABLE_LIGHT,
+        PAN_MOD_ENABLE_LIGHT,
         SOURCE_ONE_DOWN_BUTTON_LIGHT,
         SOURCE_ONE_UP_BUTTON_LIGHT,
         SOURCE_TWO_DOWN_BUTTON_LIGHT,
@@ -89,6 +93,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
     float outputPanClipTimer;
     float cutoffClipTimer;
     float resonanceClipTimer;
+    float outputVcaClipTimer;
 
     std::deque<midi::Message> midiMessageQueue;
 
@@ -102,25 +107,20 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         enum ParamId button;
         int previousValue;
         uint8_t midiProgram[8];
-    } buttonParamToMidiProgramList[5] =
+    } buttonParamToMidiProgramList[6] =
       {
           { FILTER_MOD_SWITCH_PARAM, INT_MIN, { 0, 1 } },
           { VCA_MOD_SWITCH_PARAM, INT_MIN, { 2, 3 } },
           { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 4, 5, 6, 7, 8, 9, 10, 11 } },
           { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 12, 13, 14, 15, 16, 17, 18, 19 } },
-          { REZ_MOD_SWITCH_PARAM, INT_MIN, { 20, 21 } }
+          { REZ_MOD_SWITCH_PARAM, INT_MIN, { 20, 21 } },
+          { PAN_MOD_SWITCH_PARAM, INT_MIN, { 22, 23 } }
       };
 
-    // midi program changes for enable/disable noise are not mapped to switches
-    // these follow sequentially from the end of the buttonParamToMidiProgramList
-    static const int disable_noise_switch = 22;
-    static const int enable_noise_switch = 23;
-    bool noise_enabled_prev_state = false;
-    bool noise_enabled = false;
 
     Zoxnoxious3372() :
         modAmountClipTimer(0.f), sourceOneLevelClipTimer(0.f), sourceTwoLevelClipTimer(0.f),
-        outputPanClipTimer(0.f), cutoffClipTimer(0.f), resonanceClipTimer(0.f),
+        outputPanClipTimer(0.f), cutoffClipTimer(0.f), resonanceClipTimer(0.f), outputVcaClipTimer(0.f),
         source1NameString(invalidCardOutputName), source2NameString(invalidCardOutputName),
         output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName) {
 
@@ -141,6 +141,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         configSwitch(FILTER_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Filter Mod", {"Off", "On"});
         configSwitch(VCA_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "VCA Mod", {"Off", "On"});
         configSwitch(REZ_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Rez Mod", {"Off", "On"});
+        configSwitch(PAN_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pan Mod", {"Off", "On"});
 
         configInput(MOD_AMOUNT_INPUT, "Modulation Amount");
         configInput(NOISE_LEVEL_INPUT, "Noise Level");
@@ -149,6 +150,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         configInput(OUTPUT_PAN_INPUT, "Pan");
         configInput(CUTOFF_INPUT, "Cutoff");
         configInput(RESONANCE_INPUT, "Resonance");
+        configInput(FILTER_VCA_INPUT, "Output Level");
 
         // no UI elements for these
         configSwitch(SOURCE_ONE_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source One", {"0", "1", "2", "3", "4", "5", "6", "7"} );
@@ -166,6 +168,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
             lights[VCA_MOD_ENABLE_LIGHT].setBrightness( params[VCA_MOD_SWITCH_PARAM].getValue() > 0.f );
             lights[FILTER_MOD_ENABLE_LIGHT].setBrightness( params[FILTER_MOD_SWITCH_PARAM].getValue() > 0.f );
             lights[REZ_MOD_ENABLE_LIGHT].setBrightness( params[REZ_MOD_SWITCH_PARAM].getValue() > 0.f );
+            lights[PAN_MOD_ENABLE_LIGHT].setBrightness( params[PAN_MOD_SWITCH_PARAM].getValue() > 0.f );
 
 
             lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
@@ -194,6 +197,9 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
 
             resonanceClipTimer -= lightTime;
             lights[RESONANCE_CLIP_LIGHT].setBrightnessSmooth(resonanceClipTimer > 0.f, brightnessDeltaTime);
+
+            outputVcaClipTimer -= lightTime;
+            lights[OUTPUT_VCA_CLIP_LIGHT].setBrightnessSmooth(outputVcaClipTimer > 0.f, brightnessDeltaTime);
 
             setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
             setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
@@ -254,14 +260,14 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         const float clipTime = 0.25f;
         int channel = 0;
 
-        // cutoff
-        v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltageSum() / 10.f;
+        // noise
+        v = params[NOISE_KNOB_PARAM].getValue() + inputs[NOISE_LEVEL_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
-            cutoffClipTimer = clipTime;
-        }
+        // no clip LED for noise level
 
         channel++;
+
+        // panning
         v = params[OUTPUT_PAN_KNOB_PARAM].getValue() + inputs[OUTPUT_PAN_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
@@ -269,12 +275,9 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         }
 
         channel++;
-        v = params[NOISE_KNOB_PARAM].getValue() + inputs[NOISE_LEVEL_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        noise_enabled = controlMsg->frame[outputDeviceId][cvChannelOffset + channel] > noiseVcaThresholdGateLevel ? true : false;
-        // no clip LED for noise level
 
-        channel++;
+
+        // resonance
         v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
         v = v < 0.8f ? v * 0.6f : 2.6f * v - 1.6f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
@@ -283,12 +286,34 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         }
 
         channel++;
+
+
+        // output VCA
+        v = params[FILTER_VCA_KNOB_PARAM].getValue() + inputs[FILTER_VCA_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
+            outputVcaClipTimer = clipTime;
+        }
+
+        channel++;
+
+
+        // cutoff
+        v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltageSum() / 10.f;
+        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
+            cutoffClipTimer = clipTime;
+        }
+
+        // sig1 vca
+        channel++;
         v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
         if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
             sourceOneLevelClipTimer = clipTime;
         }
 
+        // sig2 vca
         channel++;
         v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
@@ -296,6 +321,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
             sourceTwoLevelClipTimer = clipTime;
         }
 
+        // modulation vca
         channel++;
         v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
         controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
@@ -312,15 +338,6 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
                 controlMsg->midiMessageSet = true;
                 controlMsg->midiMessage = midiMessageQueue.front();
                 midiMessageQueue.pop_front();
-            }
-            else if (noise_enabled != noise_enabled_prev_state) {
-                controlMsg->midiMessage.setSize(2);
-                controlMsg->midiMessage.setChannel(midiChannel);
-                controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
-                controlMsg->midiMessage.setNote(noise_enabled ? enable_noise_switch : disable_noise_switch);
-                controlMsg->midiMessageSet = true;
-                INFO("zoxnoxious3372: clock %" PRId64 " :  noise switch toggle MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
-                noise_enabled_prev_state = noise_enabled;
             }
         }
 
@@ -409,27 +426,31 @@ struct Zoxnoxious3372Widget : ModuleWidget {
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.4844, 37.8604)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.4767, 88.2485)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_KNOB_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(54.3714, 103.3061)), module, Zoxnoxious3372::OUTPUT_PAN_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(39.1350, 69.9388)), module, Zoxnoxious3372::CUTOFF_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.4240, 70.2092)), module, Zoxnoxious3372::RESONANCE_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(37.401623, 69.93885)), module, Zoxnoxious3372::CUTOFF_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(54.241844, 70.2092)), module, Zoxnoxious3372::RESONANCE_KNOB_PARAM));
+        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(71.198502, 70.2092)), module, Zoxnoxious3372::FILTER_VCA_KNOB_PARAM));
 
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(64.424, 21.475)), module, Zoxnoxious3372::FILTER_MOD_SWITCH_PARAM, Zoxnoxious3372::FILTER_MOD_ENABLE_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(64.424, 33.934)), module, Zoxnoxious3372::REZ_MOD_SWITCH_PARAM, Zoxnoxious3372::REZ_MOD_ENABLE_LIGHT));
-        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(64.424, 45.839)), module, Zoxnoxious3372::VCA_MOD_SWITCH_PARAM, Zoxnoxious3372::VCA_MOD_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(56.341805, 27.8295)), module, Zoxnoxious3372::FILTER_MOD_SWITCH_PARAM, Zoxnoxious3372::FILTER_MOD_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(56.341805, 44.677322)), module, Zoxnoxious3372::REZ_MOD_SWITCH_PARAM, Zoxnoxious3372::REZ_MOD_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(69.608521, 27.829542)), module, Zoxnoxious3372::VCA_MOD_SWITCH_PARAM, Zoxnoxious3372::VCA_MOD_ENABLE_LIGHT));
+        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(69.608521, 44.677322)), module, Zoxnoxious3372::PAN_MOD_SWITCH_PARAM, Zoxnoxious3372::PAN_MOD_ENABLE_LIGHT));
 
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.9018, 39.4336)), module, Zoxnoxious3372::MOD_AMOUNT_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.1233, 117.3152)), module, Zoxnoxious3372::NOISE_LEVEL_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.4844, 51.2228)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.4767, 101.6110)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_INPUT));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.3714, 116.6685)), module, Zoxnoxious3372::OUTPUT_PAN_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.135, 83.401)), module, Zoxnoxious3372::CUTOFF_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.424, 83.401)), module, Zoxnoxious3372::RESONANCE_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(37.401623, 83.571655)), module, Zoxnoxious3372::CUTOFF_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(54.241844, 83.571655)), module, Zoxnoxious3372::RESONANCE_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(71.198502, 83.571655)), module, Zoxnoxious3372::FILTER_VCA_INPUT));
 
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42.8644, 32.0711)), module, Zoxnoxious3372::MOD_AMOUNT_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(20.4471, 43.8603)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(20.2754, 94.2484)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_CLIP_LIGHT));
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(58.1394, 109.3060)), module, Zoxnoxious3372::OUTPUT_PAN_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(43.0976, 75.9387)), module, Zoxnoxious3372::CUTOFF_CLIP_LIGHT));
-        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(68.3866, 76.2091)), module, Zoxnoxious3372::RESONANCE_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(41.364269, 76.2091)), module, Zoxnoxious3372::CUTOFF_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(58.204483, 76.2091)), module, Zoxnoxious3372::RESONANCE_CLIP_LIGHT));
+        addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(75.16114, 76.2091)), module, Zoxnoxious3372::FILTER_VCA_CLIP_LIGHT));
 
         addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.02, 8.219)), module, Zoxnoxious3372::LEFT_EXPANDER_LIGHT));
         addChild(createLightCentered<TriangleRightLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(79.507, 8.219)), module, Zoxnoxious3372::RIGHT_EXPANDER_LIGHT));
