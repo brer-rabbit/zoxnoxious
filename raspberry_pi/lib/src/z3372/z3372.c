@@ -1,4 +1,4 @@
-/* Copyright 2023 Kyle Farrell
+/* Copyright 2024 Kyle Farrell
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License.  You may
@@ -29,7 +29,7 @@
 // chip select zero
 #define SPI_CHANNEL 0
 
-#define NUM_CHANNELS 7
+#define NUM_CHANNELS 8
 
 
 struct z3372_card {
@@ -37,31 +37,30 @@ struct z3372_card {
   int slot;
   int i2c_handle;
   uint8_t pca9555_port[2];  // gpio registers
-  int16_t previous_samples[7];
+  int16_t previous_samples[NUM_CHANNELS];
 };
 
+static const uint8_t port0_init = 0x00; // port0: all off, active low LED on
+static const uint8_t port1_init= 0x00; // port1: all off, select muxes disabled
 static const uint8_t port0_addr = 0x02;
 static const uint8_t port1_addr = 0x03;
 static const uint8_t config_port0_addr = 0x06;
 static const uint8_t config_port1_addr = 0x07;
 static const uint8_t config_port_as_output = 0x00;
 
+
 // seven audio channels mapped
 // signal / audio channel / dac channel
-// VCF cutoff CV / 0 / 0x00
+// Noise level / 0 / 0x00
 // Pan / 1 / 0x01
-// Noise level / 2 / 0x02
-// Resonance Level / 3 / 0x03
-// Source One Level / 4 / 0x04
-// Source Two Level / 5 / 0x05
-// Mod Amount / 6 / 0x07 (yes, channel 0x06 is skipped)
+// Resonance Level / 2 / 0x02
+// Output VCA / 3 / 0x03
+// VCF cutoff CV / 4 / 0x04
+// Source One Level / 5 / 0x05
+// Source Two Level / 6 / 0x06
+// Mod Amount / 7 / 0x07
 // DAC channel is the upper 4 bits of the SPI byte, so set the map up as such
-static const uint8_t channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x70 };
-
-
-// slew rate limit the Noise VCA
-static const int slew_limit = 250;
-static const int noise_vca_id = 2;
+static const uint8_t channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
 
 
 void* init_zcard(struct zhost *zhost, int slot) {
@@ -80,8 +79,8 @@ void* init_zcard(struct zhost *zhost, int slot) {
 
   z3372->zhost = zhost;
   z3372->slot = slot;
-  z3372->pca9555_port[0] = 0x40; // TODO: change this to 0x00; noise is always enabled for now
-  z3372->pca9555_port[1] = 0x00;
+  z3372->pca9555_port[0] = port0_init;
+  z3372->pca9555_port[1] = port1_init;
 
   z3372->i2c_handle = i2cOpen(I2C_BUS, i2c_addr, 0);
   if (z3372->i2c_handle < 0) {
@@ -153,50 +152,21 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   for (int i = 0; i < NUM_CHANNELS; ++i) {
     if (zcard->previous_samples[i] != samples[i] ) {
 
-      if (i == noise_vca_id) {
-        int16_t noise_vca_sample;
-        int slew_delta = samples[i] - zcard->previous_samples[i];
-        if (slew_delta > slew_limit) { // limit positive slew
-          noise_vca_sample = zcard->previous_samples[i] + slew_limit;
-        }
-        else if (slew_delta < -slew_limit) { // limit negative slew
-          noise_vca_sample = zcard->previous_samples[i] - slew_limit;
-        }
-        else {
-          noise_vca_sample = samples[i];
-        }
-
-        if (samples[i] >= 0) {
-          zcard->previous_samples[i] = samples[i];
-          samples_to_dac[0] = channel_map[i] | ((uint16_t) noise_vca_sample) >> 11;
-          samples_to_dac[1] = ((uint16_t) noise_vca_sample) >> 3;
-        }
-        else {
-          zcard->previous_samples[i] = 0;
-          samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
-          samples_to_dac[1] = 0;
-        }
-
+      // DAC write:
+      // bits 15-0:
+      // 0 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0
+      // MSB zero specifies DAC data.  Next three bits are DAC address.  Final 12 are data.
+      // Given a 16-bit signed input, write it to a 12-bit signed values.
+      // Any negative value clips to zero.
+      if (samples[i] >= 0) {
+        zcard->previous_samples[i] = samples[i];
+        samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
+        samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
       }
-      else { // any DAC line except noise VCA
-
-        // DAC write:
-        // bits 15-0:
-        // 0 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0
-        // MSB zero specifies DAC data.  Next three bits are DAC address.  Final 12 are data.
-        // Given a 16-bit signed input, write it to a 12-bit signed values.
-        // Any negative value clips to zero.
-        if (samples[i] >= 0) {
-          zcard->previous_samples[i] = samples[i];
-          samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
-          samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
-        }
-        else {
-          zcard->previous_samples[i] = 0;
-          samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
-          samples_to_dac[1] = 0;
-        }
-
+      else {
+        zcard->previous_samples[i] = 0;
+        samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
+        samples_to_dac[1] = 0;
       }
 
       spiWrite(spi_channel, samples_to_dac, 2);
@@ -221,8 +191,8 @@ struct midi_program_to_gpio {
 
 // array indexed by MIDI program number
 static const struct midi_program_to_gpio midi_program_to_gpio[] = {
-  { 0, port0_addr, 0b00000000, 0b11111110 }, // prog 0 - filter fm off
-  { 0, port0_addr, 0b00000001, 0b11111111 }, // prog 1 - filter fm on
+  { 0, port0_addr, 0b00000000, 0b11111011 }, // prog 0 - filter fm off
+  { 0, port0_addr, 0b00000100, 0b11111111 }, // prog 1 - filter fm on
   { 0, port0_addr, 0b00000000, 0b11101111 }, // prog 2 - vca mod off
   { 0, port0_addr, 0b00010000, 0b11111111 }, // prog 3 - vca mod on
 
@@ -244,10 +214,10 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 1, port1_addr, 0b00110000, 0b00111111 }, // prog 18 - 5/2
   { 1, port1_addr, 0b00010000, 0b00011111 }, // prog 19 - 6/1
 
-  { 0, port0_addr, 0b00000000, 0b11111101 }, // prog 20 - rez mod off
-  { 0, port0_addr, 0b00000010, 0b11111111 }, // prog 21 - rez mod on
-  { 0, port0_addr, 0b00000000, 0b10111111 }, // prog 22 - noise off
-  { 0, port0_addr, 0b01000000, 0b11111111 }  // prog 23 - noise on
+  { 0, port0_addr, 0b00000000, 0b11110111 }, // prog 20 - rez mod off
+  { 0, port0_addr, 0b00001000, 0b11111111 }, // prog 21 - rez mod on
+  { 0, port0_addr, 0b00000000, 0b11011111 }, // prog 22 - panning modulation off
+  { 0, port0_addr, 0b00100000, 0b11111111 }  // prog 23 - panning modulation on
 
 };
 
