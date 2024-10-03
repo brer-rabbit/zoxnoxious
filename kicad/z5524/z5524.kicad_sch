@@ -5051,7 +5051,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 287.02 213.36 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 2ad0ef2b-5e1b-48f7-98a3-bed0020d54f2)
-    (property "Reference" "TP7" (at 288.417 209.034 0)
+    (property "Reference" "TP11" (at 288.417 209.034 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 288.417 211.082 0)
@@ -5066,9 +5066,6 @@
     (pin "1" (uuid cf019aa8-5203-4eb3-ab94-0c29b5ffea06))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/aeb7338b-a37f-4681-9a79-7ea87a0a2e97"
-          (reference "TP7") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
           (reference "TP11") (unit 1)
         )
@@ -6564,9 +6561,6 @@
     (pin "1" (uuid 05b09d29-d7af-405f-bb88-c8d7b53ad3a7))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/aeb7338b-a37f-4681-9a79-7ea87a0a2e97"
-          (reference "TP7") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
           (reference "TP7") (unit 1)
         )

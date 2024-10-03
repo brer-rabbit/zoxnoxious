@@ -2105,7 +2105,7 @@
   (symbol (lib_id "Device:R") (at 355.6 40.64 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 26381918-7325-476a-ae61-3ca235147bbf)
-    (property "Reference" "R48" (at 356.87 38.1 90)
+    (property "Reference" "R85" (at 356.87 38.1 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "20k" (at 356.87 43.18 90)
@@ -2124,9 +2124,6 @@
     (pin "2" (uuid a6f3c606-1f35-42bb-8eb7-fee8fc26afd0))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R48") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
           (reference "R85") (unit 1)
         )
@@ -2166,7 +2163,7 @@
   (symbol (lib_id "Device:R") (at 334.01 49.53 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2cd20533-6c57-46e1-bbb4-4d9ca2f9d9c1)
-    (property "Reference" "R48" (at 335.28 46.99 90)
+    (property "Reference" "R55" (at 335.28 46.99 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "75k" (at 335.28 52.07 90)
@@ -2185,9 +2182,6 @@
     (pin "2" (uuid be814851-377e-44d0-a936-0f05088172fb))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R48") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
           (reference "R55") (unit 1)
         )
@@ -2590,7 +2584,7 @@
   (symbol (lib_id "Device:R") (at 334.01 40.64 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 610cdcbd-0e77-42af-8ce8-7bde2f4f008b)
-    (property "Reference" "R74" (at 335.28 38.1 90)
+    (property "Reference" "R86" (at 335.28 38.1 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "39k" (at 335.28 43.18 90)
@@ -2609,9 +2603,6 @@
     (pin "2" (uuid 328ba914-77bb-4472-b959-ba6b80abc408))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R74") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
           (reference "R86") (unit 1)
         )
@@ -2680,10 +2671,10 @@
   (symbol (lib_id "Device:R") (at 318.77 71.12 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 688cb62d-f434-4fb4-a942-379452c32622)
-    (property "Reference" "R51" (at 320.04 68.58 90)
+    (property "Reference" "R54" (at 320.04 68.58 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "33k" (at 320.04 73.66 90)
+    (property "Value" "20k" (at 320.04 73.66 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 318.77 72.898 90)
@@ -2692,16 +2683,13 @@
     (property "Datasheet" "~" (at 318.77 71.12 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC" "C4216" (at 318.77 71.12 0)
+    (property "LCSC" "" (at 318.77 71.12 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 24fd6d1d-8cd6-4023-aebc-f1da4bef3da8))
     (pin "2" (uuid 824bfbcc-ece2-4be9-a83d-3654e87c2709))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R51") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
           (reference "R54") (unit 1)
         )
@@ -3109,7 +3097,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 388.62 54.61 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid b340e947-59c1-4cb2-b233-b9d043844294)
-    (property "Reference" "TP4" (at 390.017 56.6999 0)
+    (property "Reference" "TP8" (at 390.017 56.6999 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 390.017 59.1241 0)
@@ -3124,9 +3112,6 @@
     (pin "1" (uuid 7230c805-8b39-44a7-8671-b7239251cc42))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP4") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
           (reference "TP8") (unit 1)
         )
@@ -3152,9 +3137,6 @@
     (pin "1" (uuid 1d0aefdf-b6ea-4717-8b5e-7a62c289a1d4))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "#PWR018") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
           (reference "#PWR018") (unit 1)
         )
@@ -3225,7 +3207,7 @@
   (symbol (lib_id "Device:R") (at 334.01 58.42 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid bb4e351c-d62e-42a4-9454-50a01a90fe17)
-    (property "Reference" "R52" (at 335.28 55.88 90)
+    (property "Reference" "R60" (at 335.28 55.88 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "33k" (at 335.28 60.96 90)
@@ -3244,9 +3226,6 @@
     (pin "2" (uuid e997e9cc-17a6-47f8-899c-1be54bead9fa))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R52") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
           (reference "R60") (unit 1)
         )
@@ -3257,7 +3236,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 243.84 127 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid cfeb781e-7a84-4ecf-a6a8-d0aa179335bd)
-    (property "Reference" "TP4" (at 245.237 129.4673 0)
+    (property "Reference" "TP6" (at 245.237 129.4673 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 245.237 132.0042 0)
@@ -3272,9 +3251,6 @@
     (pin "1" (uuid 1ffd72eb-6c1b-4c6c-bf6c-0ca821abc462))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP4") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
           (reference "TP6") (unit 1)
         )
@@ -3635,9 +3611,6 @@
     (pin "5" (uuid ad91fd2d-4bb2-4aa5-b2e2-ce3409d7745f))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U11") (unit 4)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/998834c5-8208-4d7e-a084-854ca45521ff"
           (reference "U11") (unit 4)
         )

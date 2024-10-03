@@ -1601,7 +1601,7 @@
   (symbol (lib_id "Device:R") (at 260.35 194.31 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5a427897-1dd8-4fa8-9531-edf67d867bae)
-    (property "Reference" "R104" (at 257.81 191.77 90)
+    (property "Reference" "R16" (at 257.81 191.77 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "49k9" (at 257.81 196.85 90)
@@ -1620,9 +1620,6 @@
     (pin "2" (uuid da7c6216-025d-4d83-9898-46336269044c))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/21c330a6-81e4-425c-af85-d172a479efcb"
-          (reference "R104") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-000061ff2290"
           (reference "R16") (unit 1)
         )
@@ -2004,7 +2001,7 @@
   (symbol (lib_id "Device:R") (at 260.35 166.37 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid c26037c9-2060-4124-bf89-909fd5b57c91)
-    (property "Reference" "R104" (at 257.81 163.83 90)
+    (property "Reference" "R17" (at 257.81 163.83 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "49k9" (at 257.81 168.91 90)
@@ -2023,9 +2020,6 @@
     (pin "2" (uuid 44a3b0ea-ce3e-42ef-b5f0-e2a43a8cf1e4))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/21c330a6-81e4-425c-af85-d172a479efcb"
-          (reference "R104") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-000061ff2290"
           (reference "R17") (unit 1)
         )
@@ -2231,7 +2225,7 @@
   (symbol (lib_id "Device:R") (at 260.35 134.62 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e3ee56e7-b09f-4e0c-a564-6c39b956b11a)
-    (property "Reference" "R104" (at 257.81 132.08 90)
+    (property "Reference" "R14" (at 257.81 132.08 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "49k9" (at 257.81 137.16 90)
@@ -2250,9 +2244,6 @@
     (pin "2" (uuid f678d905-e23f-4b45-a163-88b275e90606))
     (instances
       (project "z5524"
-        (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/21c330a6-81e4-425c-af85-d172a479efcb"
-          (reference "R104") (unit 1)
-        )
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/00000000-0000-0000-0000-000061ff2290"
           (reference "R14") (unit 1)
         )
