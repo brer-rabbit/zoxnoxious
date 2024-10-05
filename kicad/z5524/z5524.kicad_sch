@@ -3618,7 +3618,7 @@
     (effects (font (size 5.0038 5.0038)) (justify left bottom))
     (uuid be95b25d-ecf4-451a-bca8-edc3132398fa)
   )
-  (text "AS3394" (at 152.4 212.09 0)
+  (text "AS3394" (at 154.94 210.82 0)
     (effects (font (size 5.0038 5.0038)) (justify left bottom))
     (uuid d8124442-48a7-471d-88ba-41da408f22fd)
   )
