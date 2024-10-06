@@ -2995,7 +2995,7 @@
     (property "Reference" "C72" (at 82.55 36.83 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "4.7u" (at 82.55 39.37 90)
+    (property "Value" "4u7" (at 82.55 39.37 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (at 90.17 37.1348 0)
