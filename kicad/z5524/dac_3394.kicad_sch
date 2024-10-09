@@ -2604,7 +2604,7 @@
     (property "Datasheet" "~" (at 355.6 34.29 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC" "" (at 355.6 34.29 0)
+    (property "LCSC" "C31850" (at 355.6 34.29 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 492bb739-7172-4176-a31e-dca881846a5e))

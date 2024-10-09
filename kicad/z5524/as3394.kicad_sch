@@ -2683,7 +2683,7 @@
     (property "Datasheet" "~" (at 318.77 71.12 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC" "" (at 318.77 71.12 0)
+    (property "LCSC" "C4184" (at 318.77 71.12 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 24fd6d1d-8cd6-4023-aebc-f1da4bef3da8))

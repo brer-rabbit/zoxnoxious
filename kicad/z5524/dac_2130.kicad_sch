@@ -978,7 +978,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid c8692ec3-ed20-4219-8d2a-bdc1d7395ee6)
   )
-  (text "Sheet load:\nVref_2.5: 45k || 30k ==> 18k\n" (at 157.48 22.86 0)
+  (text "Sheet load:\nVref_2.5: 45k || 45k || 30k ==> 13k\n" (at 157.48 22.86 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid da4f8615-e36c-42a1-98ee-c91ba745e63e)
   )
