@@ -22,31 +22,16 @@
 // GPIO: PCA9555
 #define PCA9555_BASE_I2C_ADDRESS 0x20
 
-// DAC: Analog Devices AD5328
-// https://www.analog.com/media/en/technical-documentation/data-sheets/ad5308_5318_5328.pdf
-#define SPI_MODE 1
 
-// chip select zero
-#define SPI_CHANNEL 0
+const uint8_t port0_init = 0x00; // port0: all off, active low LED on
+const uint8_t port1_init= 0x00; // port1: all off, select muxes disabled
+const uint8_t port0_addr = 0x02;
+const uint8_t port1_addr = 0x03;
+const uint8_t config_port0_addr = 0x06;
+const uint8_t config_port1_addr = 0x07;
+const uint8_t config_port_as_output = 0x00;
 
-#define NUM_CHANNELS 8
-
-
-struct z3372_card {
-  struct zhost *zhost;
-  int slot;
-  int i2c_handle;
-  uint8_t pca9555_port[2];  // gpio registers
-  int16_t previous_samples[NUM_CHANNELS];
-};
-
-static const uint8_t port0_init = 0x00; // port0: all off, active low LED on
-static const uint8_t port1_init= 0x00; // port1: all off, select muxes disabled
-static const uint8_t port0_addr = 0x02;
-static const uint8_t port1_addr = 0x03;
-static const uint8_t config_port0_addr = 0x06;
-static const uint8_t config_port1_addr = 0x07;
-static const uint8_t config_port_as_output = 0x00;
+void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
 
 
 // seven audio channels mapped
@@ -60,6 +45,7 @@ static const uint8_t config_port_as_output = 0x00;
 // Source Two Level / 6 / 0x06
 // Mod Amount / 7 / 0x07
 // DAC channel is the upper 4 bits of the SPI byte, so set the map up as such
+static const int cutoff_cv_dac = 4;
 static const uint8_t channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
 
 
@@ -112,6 +98,17 @@ void* init_zcard(struct zhost *zhost, int slot) {
     z3372->previous_samples[i] = -1;
   }
 
+
+  z3372->tunable.dac_size = TWELVE_BITS;
+  z3372->tunable.dac_calibration_table = (int16_t*)calloc(TWELVE_BITS, sizeof(int16_t));
+  z3372->tunable.tune_points = (struct tune_point*)calloc(NUM_TUNING_POINTS, sizeof(struct tune_point));
+  z3372->tunable.tune_points_size = NUM_TUNING_POINTS;
+
+  // on init use a linear tuning.  Autotune not in effect.
+  create_linear_tuning(filter_dac_channel,
+                       z3372->tunable.dac_size,
+                       z3372->tunable.dac_calibration_table);
+
   return z3372;
 }
 
@@ -120,6 +117,9 @@ void free_zcard(void *zcard_plugin) {
   struct z3372_card *z3372 = (struct z3372_card*)zcard_plugin;
 
   if (zcard_plugin) {
+    free(z3372->tuneable.dac_calibration_table);
+    free(z3372->tuneable.tune_points);
+
     if (z3372->i2c_handle >= 0) {
       // TODO: turn off LED
       i2cClose(z3372->i2c_handle);
@@ -160,16 +160,22 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       // Any negative value clips to zero.
       if (samples[i] >= 0) {
         zcard->previous_samples[i] = samples[i];
-        samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
-        samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+        if (i == cutof_cv_dac) {
+          spiWrite(spi_channel, (char*) &zcard->tunable.dac_calibration_table[ samples[i] ], 2);
+        }
+        else {
+          samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
+          samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+          spiWrite(spi_channel, samples_to_dac, 2);
+        }
       }
       else {
         zcard->previous_samples[i] = 0;
         samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
         samples_to_dac[1] = 0;
+        spiWrite(spi_channel, samples_to_dac, 2);
       }
 
-      spiWrite(spi_channel, samples_to_dac, 2);
     }
   }
 
@@ -258,4 +264,18 @@ tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement 
 }
 tune_status_t tunereq_restore_state(void *zcard_plugin) {
   return TUNE_COMPLETE_SUCCESS;
+}
+
+
+/** create_linear_tuning
+ * create a linear tuning table - no corrections.  Create it for the passed in DAC channel such that
+ * it can be passed straight to spiWrite.
+ */
+void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
+  for (int i = 0; i < num_elements; ++i) {
+    unsigned char upper, lower;
+    upper = i;
+    lower = dac_channel | (0xf & i >> 8);
+    table[i] = ((int16_t)upper) << 8 | (int16_t)lower;
+  }
 }
