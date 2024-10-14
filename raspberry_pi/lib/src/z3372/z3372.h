@@ -53,5 +53,8 @@ extern const uint8_t config_port0_addr;
 extern const uint8_t config_port1_addr;
 extern const uint8_t config_port_as_output;
 
+extern const uint8_t cutoff_cv_channel;
+extern const uint8_t channel_map[];
+
 
 #endif  // Z3372_H

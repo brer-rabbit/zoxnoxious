@@ -253,20 +253,6 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
 
 
 
-tune_status_t tunereq_save_state(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-tune_status_t tunereq_set_point(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-tune_status_t tunereq_restore_state(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-
-
 /** create_linear_tuning
  * create a linear tuning table - no corrections.  Create it for the passed in DAC channel such that
  * it can be passed straight to spiWrite.
