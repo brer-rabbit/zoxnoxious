@@ -53,3 +53,5 @@ extern const uint8_t config_port0_addr;
 extern const uint8_t config_port1_addr;
 extern const uint8_t config_port_as_output;
 
+
+#endif  // Z3372_H

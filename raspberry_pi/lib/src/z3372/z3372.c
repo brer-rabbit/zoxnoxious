@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 #include "zcard_plugin.h"
-
+#include "z3372.h"
 
 // GPIO: PCA9555
 #define PCA9555_BASE_I2C_ADDRESS 0x20
@@ -45,7 +45,7 @@ void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
 // Source Two Level / 6 / 0x06
 // Mod Amount / 7 / 0x07
 // DAC channel is the upper 4 bits of the SPI byte, so set the map up as such
-static const int cutoff_cv_dac = 4;
+static const uint8_t cutoff_cv_channel = 4;
 static const uint8_t channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
 
 
@@ -105,7 +105,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
   z3372->tunable.tune_points_size = NUM_TUNING_POINTS;
 
   // on init use a linear tuning.  Autotune not in effect.
-  create_linear_tuning(filter_dac_channel,
+  create_linear_tuning(channel_map[cutoff_cv_channel],
                        z3372->tunable.dac_size,
                        z3372->tunable.dac_calibration_table);
 
@@ -117,8 +117,8 @@ void free_zcard(void *zcard_plugin) {
   struct z3372_card *z3372 = (struct z3372_card*)zcard_plugin;
 
   if (zcard_plugin) {
-    free(z3372->tuneable.dac_calibration_table);
-    free(z3372->tuneable.tune_points);
+    free(z3372->tunable.dac_calibration_table);
+    free(z3372->tunable.tune_points);
 
     if (z3372->i2c_handle >= 0) {
       // TODO: turn off LED
@@ -160,8 +160,8 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       // Any negative value clips to zero.
       if (samples[i] >= 0) {
         zcard->previous_samples[i] = samples[i];
-        if (i == cutof_cv_dac) {
-          spiWrite(spi_channel, (char*) &zcard->tunable.dac_calibration_table[ samples[i] ], 2);
+        if (i == cutoff_cv_channel) {
+          spiWrite(spi_channel, (char*) &zcard->tunable.dac_calibration_table[ samples[i] >> 3 ], 2);
         }
         else {
           samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
