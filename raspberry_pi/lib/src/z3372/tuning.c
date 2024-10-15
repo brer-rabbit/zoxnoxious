@@ -26,6 +26,8 @@
 // for tuning: all modulation off, muxes disables
 static const uint8_t tune_gpio_port0_data = 0x00;
 static const uint8_t tune_gpio_port1_data = 0x00;
+static const uint8_t port0_led_bit = 0x01;
+
 // tune_dac_state is in spiWrite order
 // set these values when tuning the 3372
 static const char tune_dac_state[][2] = { { 0x00, 0x00 }, // noise off
@@ -55,9 +57,6 @@ static const uint16_t tune_freq_dac_values[] = { 0x0000,
 // Tuning values
 static const double tuning_vcf_initial_frequency_target = 13.75; // A-1
 static const double expected_dac_as3394_vcf_values_per_octave = 409.6; // for 12 bits / 10 octave range: 13.75Hz - 14080Hz
-
-static const uint8_t led_bit = 0x01;
-
 
 
 
@@ -115,7 +114,8 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
 
   // obligatory "I'm tuning so blink the light"
   i2cWriteByteData(zcard->i2c_handle, port0_addr,
-                   zcard->tuning_index & 0x1 ? tune_gpio_port0_data | led_bit : tune_gpio_port0_data);
+                   zcard->tuning_index & 0x1 ?
+                   tune_gpio_port0_data | port0_led_bit : tune_gpio_port0_data);
 
   return TUNE_CONTINUE;
 }
@@ -124,8 +124,60 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
 
 
 tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
-  return TUNE_COMPLETE_SUCCESS;
+  struct z3372_card *zcard = (struct z3372_card*)zcard_plugin;
+  struct tune_point *tp;
+
+  if (tuning_measurement->samples == 0) {
+    ERROR("tuning measure zero samples for tuning point %d / target %d",
+          zcard->tuning_index, zcard->tune_target);
+    return TUNE_COMPLETE_FAILED;
+  }
+
+  // calculate expected frequency values
+  tp = &zcard->tunable.tune_points[ zcard->tuning_index ];
+  tp->actual_dac = tune_freq_dac_values[ zcard->tuning_index ];
+  tp->frequency = tuning_measurement->frequency;
+  tp->expected_dac = octave_delta(tuning_measurement->frequency,
+                                  tuning_vco_initial_frequency_target) *
+    expected_dac_as3394_vcf_values_per_octave;
+
+
+  // increment to next point
+  if (++zcard->tuning_index == NUM_TUNING_POINTS) {
+    return TUNE_COMPLETE_SUCCESS;
+  }
+
+  return TUNE_CONTINUE;
 }
-tune_status_t tunereq_restore_state(void *zcard_plugin) {
+
+
+
+int tunereq_restore_state(void *zcard_plugin) {
+  struct z3372_card *zcard = (struct z3372_card*)zcard_plugin;
+
+
+  // restore gpio
+  int error = i2cWriteByteData(zcard->i2c_handle, port0_addr, zcard->pca9555_port[0]);
+  error += i2cWriteByteData(zcard->i2c_handle, port1_addr, zcard->pca9555_port[1]);
+  if (error) {
+      ERROR("i2c write error on restore state from tuning");
+      return TUNE_COMPLETE_FAILED;
+  }
+
+  // restore by setting to invalid state
+  for (int i = 0; i < DAC_CHANNELS; ++j) {
+    zcard->previous_samples[i] = -1;
+  }
+
+
+  // then calculate corrections
+  if (zcard->tune_target == TUNE_TARGET_LENGTH) {
+    create_correction_table(&zcard->tunable, tuning_vcf_initial_frequency_target);
+    prep_correction_table_ad5328(&zcard->tunable, channel_map[cutoff_cv_channel]);
+  }
+  else {
+    return TUNE_COMPLETE_FAILED;
+  }
+
   return TUNE_COMPLETE_SUCCESS;
 }
