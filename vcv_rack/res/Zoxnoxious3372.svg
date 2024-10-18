@@ -43,12 +43,12 @@
      showgrid="false"
      height="128.5mm"
      inkscape:zoom="1.23628"
-     inkscape:cx="86.954408"
-     inkscape:cy="254.3922"
+     inkscape:cx="76.438994"
+     inkscape:cy="254.39221"
      inkscape:window-width="1544"
      inkscape:window-height="881"
      inkscape:window-x="32"
-     inkscape:window-y="70"
+     inkscape:window-y="42"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer2"
      width="71.12mm"
@@ -1222,8 +1222,7 @@
        d="m 38.761719,18.662109 v 0.28125 h 0.28125 v -0.28125 z m 0,0.5625 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.283204 h 0.28125 v -0.283204 z m 0,0.564454 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.5625 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564454 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.5625 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.28125 h 0.28125 V 27.6875 Z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.5625 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.283204 h 0.28125 v -0.283204 z m 0,0.564454 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.5625 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564454 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.5625 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 V 38.125 h 0.28125 v -0.283203 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.5625 v 0.283203 h 0.28125 v -0.283203 z m 0,0.564453 v 0.283204 h 0.28125 v -0.283204 z m 0,0.564454 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.564453 v 0.28125 h 0.28125 v -0.28125 z m 0,0.5625 v 0.283203 h 0.28125 v -0.283203 z"
        id="path12445" />
     <g
-       aria-label="
-MOD AMOUNT"
+       aria-label=" MOD AMOUNT"
        id="text12544"
        style="font-size:2.59267px;line-height:1.25;-inkscape-font-specification:'sans-serif, Normal';display:inline;opacity:0.99;stroke-width:0.0932689">
       <path
@@ -1355,8 +1354,7 @@ MOD AMOUNT"
          id="path5645" />
     </g>
     <g
-       aria-label="
-DESTINATION"
+       aria-label=" DESTINATION"
        id="text2493"
        style="font-size:2.59267px;line-height:1.25;-inkscape-font-specification:'sans-serif, Normal';display:inline;opacity:0.99;stroke-width:0.0932689">
       <path
@@ -1453,7 +1451,7 @@ DESTINATION"
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="components"
-     style="display:inline;opacity:0.99">
+     style="display:none;opacity:0.99">
     <circle
        id="b9452edd-6f79-47c8-a395-da97cf0e28c9-8"
        data-name="RGreen1#RedLight"
