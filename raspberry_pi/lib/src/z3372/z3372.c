@@ -45,8 +45,8 @@ void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
 // Source Two Level / 6 / 0x06
 // Mod Amount / 7 / 0x07
 // DAC channel is the upper 4 bits of the SPI byte, so set the map up as such
-static const uint8_t cutoff_cv_channel = 4;
-static const uint8_t channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
+const uint8_t cutoff_cv_channel = 4;
+const uint8_t channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
 
 
 void* init_zcard(struct zhost *zhost, int slot) {
@@ -136,7 +136,7 @@ char* get_plugin_name() {
 struct zcard_properties* get_zcard_properties() {
   struct zcard_properties *props = (struct zcard_properties*) malloc(sizeof(struct zcard_properties));
   props->num_channels = NUM_CHANNELS;
-  props->spi_mode = 0;
+  props->spi_mode = SPI_MODE;
   return props;
 }
 
