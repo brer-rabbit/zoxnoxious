@@ -183,7 +183,7 @@ char* get_plugin_name() {
 struct zcard_properties* get_zcard_properties() {
   struct zcard_properties *props = (struct zcard_properties*) malloc(sizeof(struct zcard_properties));
   props->num_channels = NUM_DAC_CHANNELS;
-  props->spi_mode = 0;
+  props->spi_mode = SPI_MODE;
   return props;
 }
 

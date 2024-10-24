@@ -111,7 +111,7 @@ int autotune_all_cards(struct card_manager *card_mgr) {
 
     // set the monitor and record gpio pins, sleep, then unreg the callback
     gpioSetGetSamplesFuncEx(read_samples, tuning_state.gpio_mask, &tuning_state);
-    usleep(tune_sampling_usec_time);
+    usleep(tuning_iterations < 2 ? tune_sampling_usec_time * 2 : tune_sampling_usec_time);
     gpioSetGetSamplesFuncEx(NULL, 0, NULL);
 
 
