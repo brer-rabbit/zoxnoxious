@@ -29,6 +29,9 @@
 #define TEST_ALL_CARDS_TUNED(card_record) card_record
 
 static const int card_set_sleep_time = 50000;
+static const int tune_iteration_to_switch_to_fast = 3;
+static const int tune_sampling_usec_slow_time = 500000;
+static const int tune_sampling_usec_fast_time = tune_sampling_usec_slow_time * 2;
 
 
 struct tuning_state {
@@ -42,7 +45,6 @@ struct tuning_state {
 
 // callback from gpioSetGetSamplesFuncEx
 static void read_samples(const gpioSample_t *samples, int num_samples, void *userdata);
-static const int tune_sampling_usec_time = 500000;
 
 
 
@@ -111,7 +113,8 @@ int autotune_all_cards(struct card_manager *card_mgr) {
 
     // set the monitor and record gpio pins, sleep, then unreg the callback
     gpioSetGetSamplesFuncEx(read_samples, tuning_state.gpio_mask, &tuning_state);
-    usleep(tuning_iterations < 2 ? tune_sampling_usec_time * 2 : tune_sampling_usec_time);
+    usleep(tuning_iterations < tune_iteration_to_switch_to_fast ?
+           tune_sampling_usec_fast_time : tune_sampling_usec_slow_time);
     gpioSetGetSamplesFuncEx(NULL, 0, NULL);
 
 
