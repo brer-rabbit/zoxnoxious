@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "poledancer_symlib")(type "KiCad")(uri "${KIPRJMOD}/poledancer_symlib.kicad_sym")(options "")(descr ""))
+)
