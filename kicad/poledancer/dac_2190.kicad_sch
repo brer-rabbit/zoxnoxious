@@ -564,6 +564,10 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 7f6870b0-f193-4e58-8113-e494160460ac)
   )
+  (text "Vref sheet impedance: 45k || 45k ==> 22.25k" (at 22.86 90.17 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 9e3fabcb-ca8f-4738-8103-01e9c7e061a3)
+  )
   (text "DAC: 2.5V Reference Voltage\nB grade or better.\nAD5328: B version."
     (at 22.86 25.4 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))

@@ -678,7 +678,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 7c21d193-8ae1-448b-a6a1-6aee74e07bb3)
   )
-  (text "LM4040 resistor rough calc:\nIlm4040 min:  70uA\n" (at 40.64 88.9 0)
+  (text "Vref sheet impedance: 45k || 45k ==> 22.25k" (at 26.67 93.98 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid b2513add-f33e-403e-8909-9bf9d60846d2)
   )
