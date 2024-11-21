@@ -3342,7 +3342,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 8dd80a07-25a0-43c7-a903-48f57ef75d47)
   )
-  (text "Recommended input of 2190 is 10V p-p going into 50k/220\nresistor divider: 40mV p-p at input pin, per datasheet.\nUsing 10k/220 for divider should give about the same level.\n"
+  (text "Recommended input of 2190 is 10V p-p going into 50k/220\nresistor divider: 40mV p-p at input pin, per datasheet.\nUsing 20k/220 for divider should give about the same level.\n"
     (at 234.95 52.07 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 947ee5d2-972b-41cb-847e-455069f1b24b)
