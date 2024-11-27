@@ -2789,7 +2789,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid f0d0b1b9-927b-4145-a275-b0000aa5fdc1)
   )
-  (text "DAC 2140" (at 170.18 160.02 0)
+  (text "DAC VCAs" (at 170.18 160.02 0)
     (effects (font (size 5.0038 5.0038)) (justify left bottom))
     (uuid f716d0b8-7779-4c06-b206-20c078adaea9)
   )
