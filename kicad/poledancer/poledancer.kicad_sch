@@ -3244,7 +3244,7 @@
   (symbol (lib_id "Device:C") (at 195.58 33.02 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000061fa1813)
-    (property "Reference" "C7" (at 196.7484 35.941 0)
+    (property "Reference" "C42" (at 196.7484 35.941 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 194.437 35.941 0)
@@ -3264,7 +3264,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C7") (unit 1)
+          (reference "C42") (unit 1)
         )
       )
     )
@@ -3298,7 +3298,7 @@
   (symbol (lib_id "Interface_Expansion:PCA9555D") (at 185.42 67.31 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062224164)
-    (property "Reference" "U4" (at 184.15 63.5 0)
+    (property "Reference" "U13" (at 184.15 63.5 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "PCA9555D" (at 184.15 67.31 0)
@@ -3340,7 +3340,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U4") (unit 1)
+          (reference "U13") (unit 1)
         )
       )
     )
@@ -3349,7 +3349,7 @@
   (symbol (lib_id "Connector_Generic:Conn_02x20_Odd_Even") (at 74.93 54.61 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006238dc2a)
-    (property "Reference" "J1" (at 76.2 26.2382 0)
+    (property "Reference" "J3" (at 76.2 26.2382 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "Conn_02x20_Odd_Even" (at 76.2 28.5496 0)
@@ -3404,7 +3404,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "J1") (unit 1)
+          (reference "J3") (unit 1)
         )
       )
     )
@@ -3638,7 +3638,7 @@
   (symbol (lib_id "Device:R") (at 223.52 69.85 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062e9aee7)
-    (property "Reference" "R3" (at 223.52 67.31 90)
+    (property "Reference" "R82" (at 223.52 67.31 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 223.52 72.7964 90)
@@ -3658,7 +3658,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R3") (unit 1)
+          (reference "R82") (unit 1)
         )
       )
     )
@@ -3667,7 +3667,7 @@
   (symbol (lib_id "Device:LED") (at 227.33 63.5 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062eac2d4)
-    (property "Reference" "D1" (at 221.8182 63.6778 0)
+    (property "Reference" "D2" (at 221.8182 63.6778 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "LED" (at 224.1296 63.6778 0)
@@ -3687,7 +3687,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "D1") (unit 1)
+          (reference "D2") (unit 1)
         )
       )
     )
@@ -3771,7 +3771,7 @@
   (symbol (lib_id "Device:C") (at 275.59 34.29 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062f683d8)
-    (property "Reference" "C8" (at 276.7584 37.211 0)
+    (property "Reference" "C43" (at 276.7584 37.211 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 274.447 37.211 0)
@@ -3791,7 +3791,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C8") (unit 1)
+          (reference "C43") (unit 1)
         )
       )
     )
@@ -3825,7 +3825,7 @@
   (symbol (lib_id "Memory_EEPROM:M24C02-WMN") (at 269.24 48.26 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000636c2e8e)
-    (property "Reference" "U5" (at 261.62 54.61 0)
+    (property "Reference" "U12" (at 261.62 54.61 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "M24C02-WMN" (at 259.08 40.64 0)
@@ -3851,7 +3851,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U5") (unit 1)
+          (reference "U12") (unit 1)
         )
       )
     )
@@ -3885,7 +3885,7 @@
   (symbol (lib_id "Mechanical:MountingHole") (at 346.71 29.21 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000640c16d6)
-    (property "Reference" "H1" (at 349.25 28.0416 0)
+    (property "Reference" "H4" (at 349.25 28.0416 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "MountingHole" (at 349.25 30.353 0)
@@ -3900,7 +3900,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "H1") (unit 1)
+          (reference "H4") (unit 1)
         )
       )
     )
@@ -3933,7 +3933,7 @@
   (symbol (lib_id "Mechanical:MountingHole") (at 360.68 38.1 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000640c239a)
-    (property "Reference" "H4" (at 363.22 36.9316 0)
+    (property "Reference" "H1" (at 363.22 36.9316 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "MountingHole" (at 363.22 39.243 0)
@@ -3948,7 +3948,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "H4") (unit 1)
+          (reference "H1") (unit 1)
         )
       )
     )
@@ -3981,7 +3981,7 @@
   (symbol (lib_id "Device:C") (at 59.69 196.85 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 0d868d7e-126b-4fed-ab64-7322aa161735)
-    (property "Reference" "C2" (at 60.96 191.135 0)
+    (property "Reference" "C37" (at 60.96 191.135 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 58.42 189.865 0)
@@ -4001,7 +4001,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C2") (unit 1)
+          (reference "C37") (unit 1)
         )
       )
     )
@@ -4060,7 +4060,7 @@
   (symbol (lib_id "Amplifier_Operational:TL074") (at 88.9 135.89 0) (mirror x) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 211c4ea7-d4b7-459a-b44e-a445c4cf6362)
-    (property "Reference" "U3" (at 88.9 127.1102 0)
+    (property "Reference" "U10" (at 88.9 127.1102 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TL074" (at 88.9 129.6471 0)
@@ -4092,7 +4092,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U3") (unit 3)
+          (reference "U10") (unit 3)
         )
       )
     )
@@ -4176,7 +4176,7 @@
   (symbol (lib_id "Device:R") (at 256.54 247.65 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 281011f6-c89d-4c18-8a7e-aacbba31cb58)
-    (property "Reference" "R82" (at 256.54 242.9342 90)
+    (property "Reference" "R58" (at 256.54 242.9342 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "100k" (at 256.54 245.4711 90)
@@ -4196,7 +4196,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R82") (unit 1)
+          (reference "R58") (unit 1)
         )
       )
     )
@@ -4205,7 +4205,7 @@
   (symbol (lib_id "Device:C") (at 59.69 128.27 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3869148c-d561-41b4-9b70-913ae2db9435)
-    (property "Reference" "C1" (at 60.96 122.555 0)
+    (property "Reference" "C35" (at 60.96 122.555 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 58.42 121.285 0)
@@ -4225,7 +4225,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C1") (unit 1)
+          (reference "C35") (unit 1)
         )
       )
     )
@@ -4234,7 +4234,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x01") (at 400.05 29.21 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3bdd9acf-e624-46b6-8487-c2e2595a6ff3)
-    (property "Reference" "J3" (at 402.082 28.3753 90)
+    (property "Reference" "J1" (at 402.082 28.3753 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Conn_01x01" (at 402.082 30.9122 90)
@@ -4250,7 +4250,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "J3") (unit 1)
+          (reference "J1") (unit 1)
         )
       )
     )
@@ -4259,7 +4259,7 @@
   (symbol (lib_id "Device:C") (at 171.45 252.73 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4019d825-a223-4dbb-a9f1-88d8cff9ca8d)
-    (property "Reference" "C17" (at 164.465 251.46 0)
+    (property "Reference" "C21" (at 164.465 251.46 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "2u2" (at 164.465 254 0)
@@ -4279,7 +4279,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C17") (unit 1)
+          (reference "C21") (unit 1)
         )
       )
     )
@@ -4338,7 +4338,7 @@
   (symbol (lib_id "Device:R") (at 349.25 142.24 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 48569334-bca1-4005-abc0-cacd3ae34255)
-    (property "Reference" "R83" (at 350.52 147.32 90)
+    (property "Reference" "R62" (at 350.52 147.32 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "51" (at 350.52 144.78 90)
@@ -4358,7 +4358,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R83") (unit 1)
+          (reference "R62") (unit 1)
         )
       )
     )
@@ -4392,7 +4392,7 @@
   (symbol (lib_id "Diode:1N4148W") (at 270.51 252.73 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 54e65fe7-45a8-4cf5-9411-d6c6488dd39f)
-    (property "Reference" "D2" (at 265.43 251.46 90)
+    (property "Reference" "D1" (at 265.43 251.46 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "1N4148W" (at 259.08 254 90)
@@ -4418,7 +4418,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "D2") (unit 1)
+          (reference "D1") (unit 1)
         )
       )
     )
@@ -4502,7 +4502,7 @@
   (symbol (lib_id "Device:C") (at 118.11 242.57 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6d2f5953-bb30-44b5-92d2-bdfca6729550)
-    (property "Reference" "C6" (at 117.475 246.38 0)
+    (property "Reference" "C29" (at 117.475 246.38 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 116.84 235.585 0)
@@ -4522,7 +4522,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C6") (unit 1)
+          (reference "C29") (unit 1)
         )
       )
     )
@@ -4531,7 +4531,7 @@
   (symbol (lib_id "Device:R") (at 72.39 212.09 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6da990e4-2250-49e8-8e5a-490480ec378c)
-    (property "Reference" "R2" (at 67.945 210.82 0)
+    (property "Reference" "R63" (at 67.945 210.82 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "100k" (at 66.04 213.36 0)
@@ -4551,7 +4551,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R2") (unit 1)
+          (reference "R63") (unit 1)
         )
       )
     )
@@ -4610,7 +4610,7 @@
   (symbol (lib_id "poledancer_symlib:PS508-Analog_Switch") (at 55.88 210.82 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 77c3fcc1-4fef-417a-be6a-e9009793feab)
-    (property "Reference" "U2" (at 57.785 217.17 0)
+    (property "Reference" "U11" (at 57.785 217.17 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "PS508" (at 58.42 214.63 0)
@@ -4644,7 +4644,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U2") (unit 1)
+          (reference "U11") (unit 1)
         )
       )
     )
@@ -4678,7 +4678,7 @@
   (symbol (lib_id "Device:R") (at 281.94 233.68 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 7b52245d-d974-47ef-b810-be3c62653229)
-    (property "Reference" "R84" (at 283.718 232.8453 0)
+    (property "Reference" "R83" (at 283.718 232.8453 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "10k" (at 283.718 235.3822 0)
@@ -4698,7 +4698,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R84") (unit 1)
+          (reference "R83") (unit 1)
         )
       )
     )
@@ -4732,7 +4732,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 175.26 247.65 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 7ed3815e-e1de-4da6-a4d3-e85d13257a25)
-    (property "Reference" "TP11" (at 177.8 241.3 0)
+    (property "Reference" "TP8" (at 177.8 241.3 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 179.07 238.76 0)
@@ -4748,7 +4748,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP11") (unit 1)
+          (reference "TP8") (unit 1)
         )
       )
     )
@@ -4783,7 +4783,7 @@
   (symbol (lib_id "Amplifier_Operational:TL074") (at 109.22 231.14 0) (mirror y) (unit 5)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 81cf854f-d57a-4c29-a21c-d288da8f0fa8)
-    (property "Reference" "U3" (at 112.395 230.3053 0)
+    (property "Reference" "U10" (at 112.395 230.3053 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TL074" (at 112.395 232.8422 0)
@@ -4815,7 +4815,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U3") (unit 5)
+          (reference "U10") (unit 5)
         )
       )
     )
@@ -4878,7 +4878,7 @@
   (symbol (lib_id "Device:C") (at 67.31 168.91 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 93e9460b-700d-444d-9b0a-60f66abeeade)
-    (property "Reference" "C3" (at 66.675 172.72 0)
+    (property "Reference" "C28" (at 66.675 172.72 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 66.04 161.925 0)
@@ -4898,7 +4898,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C3") (unit 1)
+          (reference "C28") (unit 1)
         )
       )
     )
@@ -4932,7 +4932,7 @@
   (symbol (lib_id "Device:C") (at 67.31 237.49 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid a62a7ecb-cab6-4344-8c68-538007673e51)
-    (property "Reference" "C4" (at 66.675 241.3 0)
+    (property "Reference" "C33" (at 66.675 241.3 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 66.04 230.505 0)
@@ -4952,7 +4952,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C4") (unit 1)
+          (reference "C33") (unit 1)
         )
       )
     )
@@ -4961,7 +4961,7 @@
   (symbol (lib_id "Amplifier_Operational:TL074") (at 88.9 204.47 0) (mirror x) (unit 4)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid b12868af-610b-4c83-8574-eebc0364dcdf)
-    (property "Reference" "U3" (at 88.9 195.6902 0)
+    (property "Reference" "U10" (at 88.9 195.6902 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TL074" (at 88.9 198.2271 0)
@@ -4993,7 +4993,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U3") (unit 4)
+          (reference "U10") (unit 4)
         )
       )
     )
@@ -5027,7 +5027,7 @@
   (symbol (lib_id "Device:R") (at 73.66 143.51 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid bc781c05-6e63-4551-b575-541c3a66c48c)
-    (property "Reference" "R1" (at 75.438 142.6753 0)
+    (property "Reference" "R64" (at 75.438 142.6753 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "100k" (at 75.438 145.2122 0)
@@ -5047,7 +5047,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R1") (unit 1)
+          (reference "R64") (unit 1)
         )
       )
     )
@@ -5056,7 +5056,7 @@
   (symbol (lib_id "Device:R") (at 349.25 139.7 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid bda5bf79-f96a-4293-96fe-0a9aaba5c36b)
-    (property "Reference" "R16" (at 347.98 134.62 90)
+    (property "Reference" "R65" (at 347.98 134.62 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "51" (at 347.98 137.16 90)
@@ -5076,7 +5076,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R16") (unit 1)
+          (reference "R65") (unit 1)
         )
       )
     )
@@ -5110,7 +5110,7 @@
   (symbol (lib_id "poledancer_symlib:PS508-Analog_Switch") (at 55.88 142.24 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d32eb503-18da-404e-acc0-f72c46c9133c)
-    (property "Reference" "U1" (at 57.785 147.32 0)
+    (property "Reference" "U9" (at 57.785 147.32 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "PS508" (at 58.42 144.78 0)
@@ -5144,7 +5144,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U1") (unit 1)
+          (reference "U9") (unit 1)
         )
       )
     )
@@ -5233,7 +5233,7 @@
   (symbol (lib_id "Device:C") (at 118.11 220.98 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e2c566b5-0b99-4840-bc0c-26d944e249b4)
-    (property "Reference" "C5" (at 117.475 224.79 0)
+    (property "Reference" "C31" (at 117.475 224.79 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 116.84 213.995 0)
@@ -5253,7 +5253,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C5") (unit 1)
+          (reference "C31") (unit 1)
         )
       )
     )
@@ -5287,7 +5287,7 @@
   (symbol (lib_id "Device:R") (at 288.29 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid fa3bb712-d2fe-4604-976d-427eb47cfbf3)
-    (property "Reference" "R4" (at 292.1 44.45 0)
+    (property "Reference" "R75" (at 292.1 44.45 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "10k" (at 292.1 46.99 0)
@@ -5307,7 +5307,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R4") (unit 1)
+          (reference "R75") (unit 1)
         )
       )
     )
@@ -5341,7 +5341,7 @@
   (symbol (lib_id "Device:R") (at 181.61 240.03 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid fd3c41c1-9b09-4c87-92ec-0fcf1ff83436)
-    (property "Reference" "R30" (at 183.388 238.8616 0)
+    (property "Reference" "R52" (at 183.388 238.8616 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "4k7" (at 183.388 241.173 0)
@@ -5361,7 +5361,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R30") (unit 1)
+          (reference "R52") (unit 1)
         )
       )
     )

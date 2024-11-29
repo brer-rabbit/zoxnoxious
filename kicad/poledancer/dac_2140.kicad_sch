@@ -712,7 +712,7 @@
   (symbol (lib_id "Device:C") (at 224.79 85.09 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 007bf4e4-25fe-44e3-9431-8d1fac608a2f)
-    (property "Reference" "C16" (at 220.345 84.455 0)
+    (property "Reference" "C41" (at 220.345 84.455 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "22n" (at 220.345 87.63 0)
@@ -732,7 +732,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "C16") (unit 1)
+          (reference "C41") (unit 1)
         )
       )
     )
@@ -766,7 +766,7 @@
   (symbol (lib_id "Device:R") (at 201.93 58.42 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 0305ae74-5cbf-40e1-b5f3-427b9240c547)
-    (property "Reference" "R8" (at 200.025 53.975 90)
+    (property "Reference" "R76" (at 200.025 53.975 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "18k" (at 200.025 55.88 90)
@@ -786,7 +786,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "R8") (unit 1)
+          (reference "R76") (unit 1)
         )
       )
     )
@@ -870,7 +870,7 @@
   (symbol (lib_id "Device:R") (at 201.93 35.56 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 48316819-f640-4cdb-a9d6-2aa522ad1c51)
-    (property "Reference" "R9" (at 200.025 31.115 90)
+    (property "Reference" "R77" (at 200.025 31.115 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "18k" (at 200.025 33.02 90)
@@ -890,7 +890,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "R9") (unit 1)
+          (reference "R77") (unit 1)
         )
       )
     )
@@ -899,7 +899,7 @@
   (symbol (lib_id "Device:R") (at 201.93 80.01 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4dbe320d-df10-4091-9196-bee81311b338)
-    (property "Reference" "R11" (at 200.025 75.565 90)
+    (property "Reference" "R74" (at 200.025 75.565 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "18k" (at 200.025 77.47 90)
@@ -919,7 +919,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "R11") (unit 1)
+          (reference "R74") (unit 1)
         )
       )
     )
@@ -928,7 +928,7 @@
   (symbol (lib_id "Device:R") (at 214.63 40.64 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5c586db5-a992-4032-9dc9-7b2babd0a577)
-    (property "Reference" "R13" (at 208.915 40.005 0)
+    (property "Reference" "R81" (at 208.915 40.005 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "82k" (at 208.915 42.545 0)
@@ -948,7 +948,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "R13") (unit 1)
+          (reference "R81") (unit 1)
         )
       )
     )
@@ -957,7 +957,7 @@
   (symbol (lib_id "Device:C") (at 46.99 64.77 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6d8ca010-f6b3-49d5-8abf-44ac546da84d)
-    (property "Reference" "C9" (at 42.545 64.135 0)
+    (property "Reference" "C38" (at 42.545 64.135 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 42.545 67.31 0)
@@ -977,7 +977,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "C9") (unit 1)
+          (reference "C38") (unit 1)
         )
       )
     )
@@ -1011,7 +1011,7 @@
   (symbol (lib_id "Device:C") (at 224.79 40.64 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 776c4a42-0545-475c-84ab-02098e702886)
-    (property "Reference" "C14" (at 220.345 40.005 0)
+    (property "Reference" "C23" (at 220.345 40.005 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "22n" (at 220.345 43.18 0)
@@ -1031,7 +1031,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "C14") (unit 1)
+          (reference "C23") (unit 1)
         )
       )
     )
@@ -1040,7 +1040,7 @@
   (symbol (lib_id "Device:R") (at 214.63 63.5 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 779925d8-1122-4dfd-8111-f24111d8caef)
-    (property "Reference" "R12" (at 208.915 62.865 0)
+    (property "Reference" "R80" (at 208.915 62.865 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "82k" (at 208.915 65.405 0)
@@ -1060,7 +1060,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "R12") (unit 1)
+          (reference "R80") (unit 1)
         )
       )
     )
@@ -1069,7 +1069,7 @@
   (symbol (lib_id "Device:C") (at 86.36 34.29 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 861931ca-fe5e-44d5-a117-47d6453e6647)
-    (property "Reference" "C11" (at 82.55 33.02 90)
+    (property "Reference" "C44" (at 82.55 33.02 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4u7" (at 82.55 35.56 90)
@@ -1089,7 +1089,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "C11") (unit 1)
+          (reference "C44") (unit 1)
         )
       )
     )
@@ -1098,7 +1098,7 @@
   (symbol (lib_id "Device:C") (at 86.36 40.64 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 906b4732-1922-4b66-8d83-a0b229c15d45)
-    (property "Reference" "C12" (at 82.55 39.37 90)
+    (property "Reference" "C45" (at 82.55 39.37 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 82.55 41.91 90)
@@ -1118,7 +1118,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "C12") (unit 1)
+          (reference "C45") (unit 1)
         )
       )
     )
@@ -1152,7 +1152,7 @@
   (symbol (lib_id "Device:C") (at 224.79 63.5 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 9f0ca5c9-dcc2-4248-a9cd-582793270984)
-    (property "Reference" "C13" (at 220.345 62.865 0)
+    (property "Reference" "C39" (at 220.345 62.865 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "22n" (at 220.345 66.04 0)
@@ -1172,7 +1172,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "C13") (unit 1)
+          (reference "C39") (unit 1)
         )
       )
     )
@@ -1206,7 +1206,7 @@
   (symbol (lib_id "poledancer_symlib:AD5328") (at 77.47 58.42 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b5ef88a1-c8b1-4023-8676-53c1a6002a17)
-    (property "Reference" "U7" (at 76.2 58.42 0)
+    (property "Reference" "U14" (at 76.2 58.42 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "AD5328" (at 77.47 58.42 0)
@@ -1240,7 +1240,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "U7") (unit 1)
+          (reference "U14") (unit 1)
         )
       )
     )
@@ -1249,7 +1249,7 @@
   (symbol (lib_id "Device:R") (at 214.63 107.95 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b965c491-25da-4974-9cbb-ab19c70c7555)
-    (property "Reference" "R14" (at 208.915 107.315 0)
+    (property "Reference" "R79" (at 208.915 107.315 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "82k" (at 208.915 109.855 0)
@@ -1269,7 +1269,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "R14") (unit 1)
+          (reference "R79") (unit 1)
         )
       )
     )
@@ -1303,7 +1303,7 @@
   (symbol (lib_id "Device:C") (at 224.79 107.95 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d9502549-1a23-41fe-9df2-70ca9e3c3929)
-    (property "Reference" "C15" (at 220.345 107.315 0)
+    (property "Reference" "C40" (at 220.345 107.315 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "22n" (at 220.345 110.49 0)
@@ -1323,7 +1323,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "C15") (unit 1)
+          (reference "C40") (unit 1)
         )
       )
     )
@@ -1332,7 +1332,7 @@
   (symbol (lib_id "Device:R") (at 214.63 85.09 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid eb8c0946-0c84-415c-81ce-78df240171e9)
-    (property "Reference" "R15" (at 208.915 84.455 0)
+    (property "Reference" "R73" (at 208.915 84.455 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "82k" (at 208.915 86.995 0)
@@ -1352,7 +1352,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "R15") (unit 1)
+          (reference "R73") (unit 1)
         )
       )
     )
@@ -1386,7 +1386,7 @@
   (symbol (lib_id "Device:R") (at 201.93 102.87 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f1e82248-f0be-4ea1-9cff-d4e601542b10)
-    (property "Reference" "R10" (at 200.025 98.425 90)
+    (property "Reference" "R78" (at 200.025 98.425 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "18k" (at 200.025 100.33 90)
@@ -1406,7 +1406,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/a62c7733-d70d-462f-a319-1b36456deaa6"
-          (reference "R10") (unit 1)
+          (reference "R78") (unit 1)
         )
       )
     )
