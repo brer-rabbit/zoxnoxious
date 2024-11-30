@@ -6355,7 +6355,7 @@
     (property "Datasheet" "~" (at 342.9 62.23 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC" "" (at 342.9 62.23 0)
+    (property "LCSC" "C17936" (at 342.9 62.23 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid ac6621bc-7393-42a3-af5f-965549cb8b65))
