@@ -1,0 +1,36 @@
+8656771199749
+project_footprints
+NPTH_3mm_ID
+
+
+0
+0
+0
+project_footprints
+SSOP-20_3.9x8.7mm_P0.635mm_HandSolder
+SSOP20: plastic shrink small outline package; 24 leads; body width 3.9 mm; lead pitch 0.635; (see http://www.ftdichip.com/Support/Documents/DataSheets/ICs/DS_FT231X.pdf)
+SSOP 0.635
+0
+20
+20
+project_footprints
+SSOP-24_3.9x8.7mm_P0.635mm_HandSolder
+SSOP24: plastic shrink small outline package; 24 leads; body width 3.9 mm; lead pitch 0.635; (see NXP SSOP-TSSOP-VSO-REFLOW.pdf and sot556-1_po.pdf)
+SSOP 0.635
+0
+24
+24
+project_footprints
+zoxnoxious
+
+
+0
+0
+0
+project_footprints
+zoxnoxious_small
+
+
+0
+0
+0
