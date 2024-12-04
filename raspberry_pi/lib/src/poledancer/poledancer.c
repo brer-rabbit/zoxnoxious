@@ -136,7 +136,6 @@ void free_zcard(void *zcard_plugin) {
     free(poledancer->tunable.tune_points);
 
     if (poledancer->i2c_handle >= 0) {
-      // TODO: turn off LED
       i2cClose(poledancer->i2c_handle);
     }
     free(poledancer);
@@ -144,7 +143,7 @@ void free_zcard(void *zcard_plugin) {
 }
 
 char* get_plugin_name() {
-  return "Zoxnoxious Poledancer";
+  return "Zoxnoxious Pole Dancer";
 }
 
 
@@ -173,14 +172,14 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
           spiWrite(spi_channel, (char*) &zcard->tunable.dac_calibration_table[ samples[i] >> 3 ], 2);
         }
         else {
-          samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
+          samples_to_dac[0] = channel_map_cs0[i] | ((uint16_t) samples[i]) >> 11;
           samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
           spiWrite(spi_channel, samples_to_dac, 2);
         }
       }
       else {
         zcard->previous_samples_cs0[i] = 0;
-        samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
+        samples_to_dac[0] = channel_map_cs0[i] | (uint16_t) 0;
         samples_to_dac[1] = 0;
         spiWrite(spi_channel, samples_to_dac, 2);
       }
@@ -200,14 +199,14 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
           spiWrite(spi_channel, (char*) &zcard->tunable.dac_calibration_table[ samples[i] >> 3 ], 2);
         }
         else {
-          samples_to_dac[0] = channel_map[i] | ((uint16_t) samples[i]) >> 11;
+          samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples[i]) >> 11;
           samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
           spiWrite(spi_channel, samples_to_dac, 2);
         }
       }
       else {
         zcard->previous_samples_cs1[i] = 0;
-        samples_to_dac[0] = channel_map[i] | (uint16_t) 0;
+        samples_to_dac[0] = channel_map_cs1[i] | (uint16_t) 0;
         samples_to_dac[1] = 0;
         spiWrite(spi_channel, samples_to_dac, 2);
       }
