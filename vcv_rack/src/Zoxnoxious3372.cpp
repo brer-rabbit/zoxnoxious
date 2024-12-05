@@ -467,14 +467,14 @@ struct Zoxnoxious3372Widget : ModuleWidget {
         addChild(source2NameTextField);
 
         // mm2px(Vec(18.0, 3.636))
-        output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(58.827, 111.088)));
+        output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(32.619, 111.088)));
         output1NameTextField->box.size = mm2px(Vec(18.0, 3.636));
         output1NameTextField->setText(module ? &module->output1NameString : NULL);
         addChild(output1NameTextField);
 
 
         // mm2px(Vec(18.0, 3.636))
-        output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(32.619, 111.088)));
+        output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(58.827, 111.088)));
         output2NameTextField->box.size = mm2px(Vec(18.0, 3.636));
         output2NameTextField->setText(module ? &module->output2NameString : NULL);
         addChild(output2NameTextField);
