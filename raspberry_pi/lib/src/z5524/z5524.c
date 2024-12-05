@@ -41,11 +41,6 @@ const char as3394_vcf_dac = 0x70;
 // channel for DAC is upper 4 bits
 static const int channel_map[] = { 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 };
 
-// slew rate limit these signals
-static const int final_vca_cs = 0;
-static const int final_vca_dac = 2;
-static const int slew_limit = 2000; // ~4ms max rise or fall time: 250us * 32768/2000
-
 // helper declarations
 inline static int dac_write(int16_t this_sample, int dac_line, int spi_channel);
 
@@ -180,7 +175,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct z5524_card *zcard = (struct z5524_card*)zcard_plugin;
   int spi_channel;
   int16_t this_sample;
-  int slew_delta;
   int i;
   char samples_to_dac[2];
 
@@ -190,20 +184,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   for (i = 0; i < DAC_CHANNELS - 2; ++i) {
     this_sample = samples[i + spi_channel_as3394 * DAC_CHANNELS];
     if (zcard->previous_samples[spi_channel_as3394][i] != this_sample) {
-
-      // special handling for final_vca with a slew rate limit filter
-      // The 3394 final_vca should be slew rate limited.  From zero to max
-      // should be a couple milliseconds, not 250us.  Avoid clicks.
-      if (i == final_vca_dac) {
-        slew_delta = this_sample - zcard->previous_samples[final_vca_cs][final_vca_dac];
-        if (slew_delta > slew_limit) { // limit positive
-          this_sample = zcard->previous_samples[final_vca_cs][final_vca_dac] + slew_limit;
-        }
-        else if (slew_delta < -slew_limit) {
-          this_sample = zcard->previous_samples[final_vca_cs][final_vca_dac] - slew_limit;
-        }
-      }
-
       zcard->previous_samples[spi_channel_as3394][i] = this_sample;
       dac_write(this_sample, channel_map[i], spi_channel);
     }
@@ -230,9 +210,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   }
 
 
-  // and the DAC out for CS1, the SSI2130.  Yes, this could be a loop for chip
-  // select but this pulls the check for 3394 final_vca_dac out.  No need to
-  // check that condition here.
+  // and the DAC out for CS1, the SSI2130
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_ssi2130, SPI_MODE, zcard->slot);
 
   for (i = 0; i < DAC_CHANNELS; ++i) {
