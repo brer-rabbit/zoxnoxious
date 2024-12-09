@@ -55,6 +55,7 @@ void init(Plugin* p) {
 	pluginInstance = p;
 
 	// Add modules here
+        p->addModel(modelPoleDancer);
         p->addModel(modelZoxnoxious3340);
         p->addModel(modelZoxnoxious3372);
         p->addModel(modelZoxnoxious5524);
