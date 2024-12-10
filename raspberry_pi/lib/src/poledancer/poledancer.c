@@ -304,3 +304,17 @@ void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
     table[i] = ((int16_t)upper) << 8 | (int16_t)lower;
   }
 }
+
+
+
+tune_status_t tunereq_set_point(void *zcard_plugin) {
+  return TUNE_COMPLETE_SUCCESS;
+}
+
+tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
+  return TUNE_COMPLETE_SUCCESS;
+}
+
+int tunereq_restore_state(void *zcard_plugin) {
+  return TUNE_COMPLETE_SUCCESS;
+}

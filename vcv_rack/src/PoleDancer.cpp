@@ -1,106 +1,219 @@
 #include "plugin.hpp"
 #include "zcomponentlib.hpp"
+#include "ZoxnoxiousExpander.hpp"
 
-struct PoleDancer : Module {
-	enum ParamId {
-		SOURCE_ONE_DOWN_BUTTON_PARAM,
-		SOURCE_ONE_UP_BUTTON_PARAM,
-		SOURCE_TWO_DOWN_BUTTON_PARAM,
-		SOURCE_TWO_UP_BUTTON_PARAM,
-		SOURCE_ONE_LEVEL_KNOB_PARAM,
-		SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM,
-		SOURCE_TWO_LEVEL_KNOB_PARAM,
-		SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM,
-		CUTOFF_KNOB_PARAM,
-		REZ_COMP_P1_SWITCH_PARAM,
-		REZ_COMP_P2_SWITCH_PARAM,
-		REZ_COMP_P3_SWITCH_PARAM,
-		REZ_COMP_INV_SWITCH_PARAM,
-		RESONANCE_KNOB_PARAM,
-		FILTER_VCA_KNOB_PARAM,
-		DRY_MIX_KNOB_PARAM,
-		POLE1_MIX_KNOB_PARAM,
-		POLE2_MIX_KNOB_PARAM,
-		POLE3_MIX_KNOB_PARAM,
-		POLE4_MIX_KNOB_PARAM,
-		PARAMS_LEN
-	};
-	enum InputId {
-		SOURCE_ONE_LEVEL_INPUT,
-		SOURCE_ONE_MOD_AMOUNT_INPUT,
-		SOURCE_TWO_LEVEL_INPUT,
-		SOURCE_TWO_MOD_AMOUNT_INPUT,
-		CUTOFF_INPUT,
-		RESONANCE_INPUT,
-		FILTER_VCA_INPUT,
-		POLE_MIX_INPUT,
-		INPUTS_LEN
-	};
-	enum OutputId {
-		OUTPUTS_LEN
-	};
-	enum LightId {
-		LEFT_EXPANDER_LIGHT,
-		RIGHT_EXPANDER_LIGHT,
-		SOURCE_ONE_LEVEL_CLIP_LIGHT,
-		SOURCE_ONE_MOD_AMOUNT_CLIP_LIGHT,
-		SOURCE_TWO_LEVEL_CLIP_LIGHT,
-		SOURCE_TWO_MOD_AMOUNT_CLIP_LIGHT,
-		CUTOFF_CLIP_LIGHT,
-		RESONANCE_CLIP_LIGHT,
-		FILTER_VCA_CLIP_LIGHT,
-                SOURCE_ONE_DOWN_BUTTON_LIGHT,
-                SOURCE_ONE_UP_BUTTON_LIGHT,
-                SOURCE_TWO_DOWN_BUTTON_LIGHT,
-                SOURCE_TWO_UP_BUTTON_LIGHT,
-                REZ_COMP_P1_SWITCH_LIGHT,
-                REZ_COMP_P2_SWITCH_LIGHT,
-                REZ_COMP_P3_SWITCH_LIGHT,
-                REZ_COMP_INV_SWITCH_LIGHT,
-		LIGHTS_LEN
-	};
+static const int midiMessageQueueMaxSize = 16;
+// map wired mux inputs to signal from cardOutputNames array
+// (card(N-1) * 2 + (out(N-1))
+// card7 out1
+// card6 out2
+// card5 out1
+// card4 out2
+// card3 out1
+// card2 out2
+// card1 out2
+// card1 out1
+static const int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 
-	PoleDancer() {
-		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+// card6 out1
+// card5 out2
+// card4 out1
+// card3 out2
+// card2 out2
+// card2 out1
+// card1 out2
+// card1 out1
+static const int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
 
-                // buttons for inputs select
-		configButton(SOURCE_ONE_DOWN_BUTTON_PARAM, "Previous");
-		configButton(SOURCE_ONE_UP_BUTTON_PARAM, "Next");
-		configButton(SOURCE_TWO_DOWN_BUTTON_PARAM, "Previous");
-		configButton(SOURCE_TWO_UP_BUTTON_PARAM, "Next");
+struct PoleDancer : ZoxnoxiousModule {
+  enum ParamId {
+    SOURCE_ONE_LEVEL_KNOB_PARAM,
+    SOURCE_TWO_LEVEL_KNOB_PARAM,
+    SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM,
+    SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM,
+    POLE1_MIX_KNOB_PARAM,
+    POLE2_MIX_KNOB_PARAM,
+    POLE3_MIX_KNOB_PARAM,
+    POLE4_MIX_KNOB_PARAM,
+    CUTOFF_KNOB_PARAM,
+    RESONANCE_KNOB_PARAM,
+    FILTER_VCA_KNOB_PARAM,
+    DRY_MIX_KNOB_PARAM,
+    SOURCE_ONE_VALUE_HIDDEN_PARAM,
+    SOURCE_ONE_DOWN_BUTTON_PARAM,
+    SOURCE_ONE_UP_BUTTON_PARAM,
+    SOURCE_TWO_VALUE_HIDDEN_PARAM,
+    SOURCE_TWO_DOWN_BUTTON_PARAM,
+    SOURCE_TWO_UP_BUTTON_PARAM,
+    REZ_COMP_INV_SWITCH_PARAM,
+    REZ_COMP_P1_SWITCH_PARAM,
+    REZ_COMP_P2_SWITCH_PARAM,
+    REZ_COMP_P3_SWITCH_PARAM,
+    PARAMS_LEN
+  };
+  enum InputId {
+    SOURCE_ONE_LEVEL_INPUT,
+    SOURCE_TWO_LEVEL_INPUT,
+    SOURCE_ONE_MOD_AMOUNT_INPUT,
+    SOURCE_TWO_MOD_AMOUNT_INPUT,
+    POLE_MIX_INPUT,
+    CUTOFF_INPUT,
+    RESONANCE_INPUT,
+    FILTER_VCA_INPUT,
+    INPUTS_LEN
+  };
+  enum OutputId {
+    OUTPUTS_LEN
+  };
+  enum LightId {
+    SOURCE_ONE_LEVEL_CLIP_LIGHT,
+    SOURCE_ONE_MOD_AMOUNT_CLIP_LIGHT,
+    SOURCE_TWO_LEVEL_CLIP_LIGHT,
+    SOURCE_TWO_MOD_AMOUNT_CLIP_LIGHT,
+    CUTOFF_CLIP_LIGHT,
+    RESONANCE_CLIP_LIGHT,
+    FILTER_VCA_CLIP_LIGHT,
+    SOURCE_ONE_DOWN_BUTTON_LIGHT,
+    SOURCE_ONE_UP_BUTTON_LIGHT,
+    SOURCE_TWO_DOWN_BUTTON_LIGHT,
+    SOURCE_TWO_UP_BUTTON_LIGHT,
+    REZ_COMP_P1_SWITCH_LIGHT,
+    REZ_COMP_P2_SWITCH_LIGHT,
+    REZ_COMP_P3_SWITCH_LIGHT,
+    REZ_COMP_INV_SWITCH_LIGHT,
+    ENUMS(LEFT_EXPANDER_LIGHT, 3),
+    ENUMS(RIGHT_EXPANDER_LIGHT, 3),
+    LIGHTS_LEN
+  };
 
-		configParam(SOURCE_ONE_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Source One Level", "%", 0.f, 100.f);
-		configParam(SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Source One Mod", "%", 0.f, 100.f);
-		configParam(SOURCE_TWO_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Source Two Level", "%", 0.f, 100.f);
-		configParam(SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Source Two Mod", "%", 0.f, 100.f);
 
-		configParam(CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff", "V", 0.f, 10.f, -1.f);
-		configSwitch(REZ_COMP_P1_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 1 Rez Comp", {"Off", "On"});
-		configSwitch(REZ_COMP_P2_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 2 Rez Comp", {"Off", "On"});
-		configSwitch(REZ_COMP_P3_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 3 Rez Comp", {"Off", "On"});
-		configSwitch(REZ_COMP_INV_SWITCH_PARAM, 0.f, 1.f, 0.f, "Invert Rez Comp", {"Off", "On"});
+  dsp::ClockDivider lightDivider;
+  float sourceOneLevelClipTimer;
+  float sourceOneModAmountClipTimer;
+  float sourceTwoLevelClipTimer;
+  float sourceTwoModAmountClipTimer;
+  float cutoffClipTimer;
+  float resonanceClipTimer;
+  float filterVcaClipTimer;
 
-		configParam(RESONANCE_KNOB_PARAM, 0.f, 1.f, 0.f, "Resonance", "%", 0.f, 100.f);
-		configParam(FILTER_VCA_KNOB_PARAM, 0.f, 1.f, 0.5f, "Output VCA", "%", 0.f, 100.f);
+  std::deque<midi::Message> midiMessageQueue;
 
-		configParam(DRY_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Dry Mix", "%", 0.f, 100.f);
-		configParam(POLE1_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 1 Mix", "%", 0.f, 100.f);
-		configParam(POLE2_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 2 Mix", "%", 0.f, 100.f);
-		configParam(POLE3_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 3 Mix", "%", 0.f, 100.f);
-		configParam(POLE4_MIX_KNOB_PARAM, 0.f, 1.f, 0.2f, "POle 4 Mix", "%", 0.f, 100.f);
+  std::string source1NameString;
+  std::string source2NameString;
+  std::string output1NameString;
+  std::string output2NameString;
 
-		configInput(SOURCE_ONE_LEVEL_INPUT, "Source One Level");
-		configInput(SOURCE_ONE_MOD_AMOUNT_INPUT, "Source One Mod Amount");
-		configInput(SOURCE_TWO_LEVEL_INPUT, "Source Two Level");
-		configInput(SOURCE_TWO_MOD_AMOUNT_INPUT, "Source Two Mod Amount");
-		configInput(CUTOFF_INPUT, "Filter Cutoff");
-		configInput(RESONANCE_INPUT, "Resonance");
-		configInput(FILTER_VCA_INPUT, "Output VCA");
-		configInput(POLE_MIX_INPUT, "Pole Mix");
-	}
 
-	void process(const ProcessArgs& args) override {
-	}
+    struct buttonParamMidiProgram {
+        enum ParamId button;
+        int previousValue;
+        uint8_t midiProgram[8];
+    } buttonParamToMidiProgramList[6] =
+      {
+        { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 0, 1, 2, 3, 4, 5, 6, 7 } },
+        { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 8, 9, 10, 11, 12, 13, 14, 15 } },
+        { REZ_COMP_INV_SWITCH_PARAM, INT_MIN, { 16, 17 } },
+        { REZ_COMP_P1_SWITCH_PARAM, INT_MIN, { 18, 19 } },
+        { REZ_COMP_P3_SWITCH_PARAM, INT_MIN, { 20, 21 } },
+        { REZ_COMP_P2_SWITCH_PARAM, INT_MIN, { 22, 23 } }
+      };
+
+
+  PoleDancer() :
+    sourceOneLevelClipTimer(0.f), sourceOneModAmountClipTimer(0.f),
+    sourceTwoLevelClipTimer(0.f), sourceTwoModAmountClipTimer(0.f),
+    cutoffClipTimer(0.f), resonanceClipTimer(0.f),
+    filterVcaClipTimer(0.f),
+    source1NameString(invalidCardOutputName), source2NameString(invalidCardOutputName),
+    output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName) {
+
+    config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+
+    // buttons for inputs select
+    configButton(SOURCE_ONE_DOWN_BUTTON_PARAM, "Previous");
+    configButton(SOURCE_ONE_UP_BUTTON_PARAM, "Next");
+    configButton(SOURCE_TWO_DOWN_BUTTON_PARAM, "Previous");
+    configButton(SOURCE_TWO_UP_BUTTON_PARAM, "Next");
+
+    configParam(SOURCE_ONE_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Source One Level", "%", 0.f, 100.f);
+    configParam(SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Source One Mod", "%", 0.f, 100.f);
+    configParam(SOURCE_TWO_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Source Two Level", "%", 0.f, 100.f);
+    configParam(SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Source Two Mod", "%", 0.f, 100.f);
+
+    configParam(CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff", "V", 0.f, 10.f, -1.f);
+    configSwitch(REZ_COMP_P1_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 1 Rez Comp", {"Off", "On"});
+    configSwitch(REZ_COMP_P2_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 2 Rez Comp", {"Off", "On"});
+    configSwitch(REZ_COMP_P3_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 3 Rez Comp", {"Off", "On"});
+    configSwitch(REZ_COMP_INV_SWITCH_PARAM, 0.f, 1.f, 0.f, "Invert Rez Comp", {"Off", "On"});
+
+    configParam(RESONANCE_KNOB_PARAM, 0.f, 1.f, 0.f, "Resonance", "%", 0.f, 100.f);
+    configParam(FILTER_VCA_KNOB_PARAM, 0.f, 1.f, 0.5f, "Output VCA", "%", 0.f, 100.f);
+
+    configParam(DRY_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Dry Mix", "%", 0.f, 100.f);
+    configParam(POLE1_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 1 Mix", "%", 0.f, 100.f);
+    configParam(POLE2_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 2 Mix", "%", 0.f, 100.f);
+    configParam(POLE3_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 3 Mix", "%", 0.f, 100.f);
+    configParam(POLE4_MIX_KNOB_PARAM, 0.f, 1.f, 0.2f, "POle 4 Mix", "%", 0.f, 100.f);
+
+    configInput(SOURCE_ONE_LEVEL_INPUT, "Source One Level");
+    configInput(SOURCE_ONE_MOD_AMOUNT_INPUT, "Source One Mod Amount");
+    configInput(SOURCE_TWO_LEVEL_INPUT, "Source Two Level");
+    configInput(SOURCE_TWO_MOD_AMOUNT_INPUT, "Source Two Mod Amount");
+    configInput(CUTOFF_INPUT, "Filter Cutoff");
+    configInput(RESONANCE_INPUT, "Resonance");
+    configInput(FILTER_VCA_INPUT, "Output VCA");
+    configInput(POLE_MIX_INPUT, "Pole Mix");
+
+    // no UI elements for these
+    configSwitch(SOURCE_ONE_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source One", {"0", "1", "2", "3", "4", "5", "6", "7"} );
+    configSwitch(SOURCE_TWO_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source Two", {"0", "1", "2", "3", "4", "5", "6", "7"} );
+    lightDivider.setDivision(512);
+  }
+
+  void process(const ProcessArgs& args) override {
+    processExpander(args);
+
+    if (lightDivider.process()) {
+      setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
+      setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
+    }
+
+  }
+
+
+  void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
+  }
+
+
+  /** getCardHardwareId
+   * return the hardware Id of the poledancer card
+   */
+  static const uint8_t hardwareId = 0x05;
+  uint8_t getHardwareId() override {
+    return hardwareId;
+  }
+
+
+  void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) override {
+    ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
+    output1NameString = getCardOutputName(hardwareId, 1, slot);
+    output2NameString = getCardOutputName(hardwareId, 2, slot);
+    int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
+    source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
+    int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
+    source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
+  }
+
+  void onChannelAssignmentLost() override {
+    ZoxnoxiousModule::onChannelAssignmentLost();
+    output1NameString = invalidCardOutputName;
+    output2NameString = invalidCardOutputName;
+    // should do something better with source{1,2}NameString here since
+    // user can still click on the buttons to change them
+    source1NameString = invalidCardOutputName;
+    source2NameString = invalidCardOutputName;
+  }
+
 };
 
 
@@ -162,22 +275,22 @@ struct PoleDancerWidget : ModuleWidget {
     // Text fields
     source1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(7.185, 13.839)));
     source1NameTextField->box.size = mm2px(Vec(18.388, 3.636));
-    source1NameTextField->setText(NULL); // module ? &module->source1NameString : NULL);
+    source1NameTextField->setText(module ? &module->source1NameString : NULL);
     addChild(source1NameTextField);
 
     source2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(44.142, 13.839)));
     source2NameTextField->box.size = mm2px(Vec(18.388, 3.636));
-    source2NameTextField->setText(NULL); // module ? &module->source2NameString : NULL);
+    source2NameTextField->setText(module ? &module->source2NameString : NULL);
     addChild(source2NameTextField);
 
     output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(57.788, 117.012)));
     output1NameTextField->box.size = mm2px(Vec(18.388, 3.636));
-    output1NameTextField->setText(NULL); // module ? &module->output1NameString : NULL);
+    output1NameTextField->setText(module ? &module->output1NameString : NULL);
     addChild(output1NameTextField);
 
     output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(19.135, 117.012)));
     output2NameTextField->box.size = mm2px(Vec(18.388, 3.636));
-    output2NameTextField->setText(NULL); //module ? &module->output2NameString : NULL);
+    output2NameTextField->setText(module ? &module->output2NameString : NULL);
     addChild(output2NameTextField);
   }
 
