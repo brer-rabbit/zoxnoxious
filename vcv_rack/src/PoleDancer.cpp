@@ -319,7 +319,7 @@ struct PoleDancer : ZoxnoxiousModule {
   /** getCardHardwareId
    * return the hardware Id of the poledancer card
    */
-  static const uint8_t hardwareId = 0x05;
+  static const uint8_t hardwareId = 0x06;
   uint8_t getHardwareId() override {
     return hardwareId;
   }

@@ -41,6 +41,9 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
     else if (cardId == 0x05) {
         cardName = "3340Legacy";
     }
+    else if (cardId == 0x06) {
+        cardName = "Pole Dancer";
+    }
     else {
         return "----";
     }
