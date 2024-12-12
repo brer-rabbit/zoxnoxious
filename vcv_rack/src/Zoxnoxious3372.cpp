@@ -366,7 +366,7 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
                     midiMessageQueue.push_back(queuedMessage);
                 }
                 else {
-                    INFO("Zoxnoxioius3340: dropping MIDI message, bus full and queue full");
+                    INFO("zoxnoxious3372: dropping MIDI message, bus full and queue full");
                 }
             }
         }

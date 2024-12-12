@@ -25,12 +25,29 @@ static const int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 // card1 out1
 static const int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
 
+// cv channels to send over the audio device.  This must match the receiver, and is
+// offset by what the expander provides with cvChannelOffset.
+enum cvChannel {
+  VCF_CUTOFF = 0,
+  SOURCE_ONE_LEVEL,
+  SOURCE_TWO_LEVEL,
+  SOURCE_ONE_MOD_AMOUNT,
+  SOURCE_TWO_MOD_AMOUNT,
+  POLE2_LEVEL,
+  POLE4_LEVEL,
+  POLE3_LEVEL,
+  POLE1_LEVEL,
+  Q_VCA,
+  DRY_LEVEL
+};
+
 struct PoleDancer : ZoxnoxiousModule {
   enum ParamId {
     SOURCE_ONE_LEVEL_KNOB_PARAM,
     SOURCE_TWO_LEVEL_KNOB_PARAM,
     SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM,
     SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM,
+    DRY_MIX_KNOB_PARAM,
     POLE1_MIX_KNOB_PARAM,
     POLE2_MIX_KNOB_PARAM,
     POLE3_MIX_KNOB_PARAM,
@@ -38,7 +55,6 @@ struct PoleDancer : ZoxnoxiousModule {
     CUTOFF_KNOB_PARAM,
     RESONANCE_KNOB_PARAM,
     FILTER_VCA_KNOB_PARAM,
-    DRY_MIX_KNOB_PARAM,
     SOURCE_ONE_VALUE_HIDDEN_PARAM,
     SOURCE_ONE_DOWN_BUTTON_PARAM,
     SOURCE_ONE_UP_BUTTON_PARAM,
@@ -182,6 +198,122 @@ struct PoleDancer : ZoxnoxiousModule {
 
 
   void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
+
+    if (!hasChannelAssignment) {
+      return;
+    }
+
+    float v;
+    const float clipTime = 0.25f;
+
+    // vcf cutoff
+    v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltageSum() / 10.f;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + VCF_CUTOFF] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId][cvChannelOffset + VCF_CUTOFF] != v) {
+      cutoffClipTimer = clipTime;
+    }
+
+    // source one audio
+    v = params[SOURCE_ONE_LEVEL_INPUT].getValue() + inputs[SOURCE_ONE_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_LEVEL] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_LEVEL] != v) {
+      sourceOneLevelClipTimer = clipTime;
+    }
+
+    // source two audio
+    v = params[SOURCE_TWO_LEVEL_INPUT].getValue() + inputs[SOURCE_TWO_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_LEVEL] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_LEVEL] != v) {
+      sourceTwoLevelClipTimer = clipTime;
+    }
+
+    // source one modulation
+    v = params[SOURCE_ONE_MOD_AMOUNT_INPUT].getValue() + inputs[SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] != v) {
+      sourceOneModAmountClipTimer = clipTime;
+    }
+
+    // source two modulation
+    v = params[SOURCE_TWO_MOD_AMOUNT_INPUT].getValue() + inputs[SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] != v) {
+      sourceTwoModAmountClipTimer = clipTime;
+    }
+
+    // qvca
+    v = params[RESONANCE_INPUT].getValue() + inputs[RESONANCE_KNOB_PARAM].getVoltageSum() / 10.f;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + Q_VCA] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId][cvChannelOffset + Q_VCA] != v) {
+      resonanceClipTimer = clipTime;
+    }
+
+
+    // pole levels:
+    // these are scaled by the Filter VCA, so get that first
+    float filterVcaGain = params[FILTER_VCA_INPUT].getValue() + inputs[FILTER_VCA_KNOB_PARAM].getVoltageSum() / 10.f;
+    if (filterVcaGain !=
+        params[FILTER_VCA_INPUT].getValue() + inputs[FILTER_VCA_KNOB_PARAM].getVoltageSum() / 10.f) {
+      filterVcaClipTimer = clipTime;
+    }
+
+    v = (params[DRY_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(0) / 10.f) * filterVcaGain;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + DRY_LEVEL] = clamp(v, 0.f, 1.f);
+
+    v = (params[POLE1_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(1) / 10.f) * filterVcaGain;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + POLE1_LEVEL] = clamp(v, 0.f, 1.f);
+
+    v = (params[POLE2_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(2) / 10.f) * filterVcaGain;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + POLE2_LEVEL] = clamp(v, 0.f, 1.f);
+
+    v = (params[POLE3_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(3) / 10.f) * filterVcaGain;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + POLE3_LEVEL] = clamp(v, 0.f, 1.f);
+
+    v = (params[POLE4_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(4) / 10.f) * filterVcaGain;
+    controlMsg->frame[outputDeviceId][cvChannelOffset + POLE4_LEVEL] = clamp(v, 0.f, 1.f);
+
+
+
+
+    // if we have any queued midi messages, send them it
+    if (controlMsg->midiMessageSet == false) {
+      if (midiMessageQueue.size() > 0) {
+        controlMsg->midiMessageSet = true;
+        controlMsg->midiMessage = midiMessageQueue.front();
+        midiMessageQueue.pop_front();
+      }
+    }
+
+
+    for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
+      int newValue = static_cast<int>(std::round(params[ buttonParamToMidiProgramList[i].button ].getValue()));
+
+      if (buttonParamToMidiProgramList[i].previousValue != newValue) {
+        buttonParamToMidiProgramList[i].previousValue = newValue;
+        if (controlMsg->midiMessageSet == false) {
+          // send direct
+          controlMsg->midiMessage.setSize(2);
+          controlMsg->midiMessage.setChannel(midiChannel);
+          controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
+          controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
+          controlMsg->midiMessageSet = true;
+          INFO("poledancer: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
+        }
+        else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
+          midi::Message queuedMessage;
+          queuedMessage.setSize(2);
+          queuedMessage.setChannel(midiChannel);
+          queuedMessage.setStatus(midiProgramChangeStatus);
+          queuedMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
+          midiMessageQueue.push_back(queuedMessage);
+        }
+        else {
+          INFO("poledancer: dropping MIDI message, bus full and queue full");
+        }
+      }
+    }
+
+
   }
 
 
