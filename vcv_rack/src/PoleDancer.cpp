@@ -275,7 +275,7 @@ struct PoleDancer : ZoxnoxiousModule {
 
 
 
-    // if we have any queued midi messages, send them it
+    // if we have any queued midi messages, send them
     if (controlMsg->midiMessageSet == false) {
       if (midiMessageQueue.size() > 0) {
         controlMsg->midiMessageSet = true;
@@ -312,7 +312,6 @@ struct PoleDancer : ZoxnoxiousModule {
         }
       }
     }
-
 
   }
 
