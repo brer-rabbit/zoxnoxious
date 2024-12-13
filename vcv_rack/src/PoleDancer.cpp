@@ -120,19 +120,19 @@ struct PoleDancer : ZoxnoxiousModule {
   std::string output2NameString;
 
 
-    struct buttonParamMidiProgram {
-        enum ParamId button;
-        int previousValue;
-        uint8_t midiProgram[8];
-    } buttonParamToMidiProgramList[6] =
-      {
-        { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 0, 1, 2, 3, 4, 5, 6, 7 } },
-        { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 8, 9, 10, 11, 12, 13, 14, 15 } },
-        { REZ_COMP_INV_SWITCH_PARAM, INT_MIN, { 16, 17 } },
-        { REZ_COMP_P1_SWITCH_PARAM, INT_MIN, { 18, 19 } },
-        { REZ_COMP_P3_SWITCH_PARAM, INT_MIN, { 20, 21 } },
-        { REZ_COMP_P2_SWITCH_PARAM, INT_MIN, { 22, 23 } }
-      };
+  struct buttonParamMidiProgram {
+      enum ParamId button;
+      int previousValue;
+      uint8_t midiProgram[8];
+  } buttonParamToMidiProgramList[6] =
+    {
+      { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 0, 1, 2, 3, 4, 5, 6, 7 } },
+      { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 8, 9, 10, 11, 12, 13, 14, 15 } },
+      { REZ_COMP_INV_SWITCH_PARAM, INT_MIN, { 16, 17 } },
+      { REZ_COMP_P1_SWITCH_PARAM, INT_MIN, { 18, 19 } },
+      { REZ_COMP_P3_SWITCH_PARAM, INT_MIN, { 20, 21 } },
+      { REZ_COMP_P2_SWITCH_PARAM, INT_MIN, { 22, 23 } }
+    };
 
 
   PoleDancer() :
@@ -286,35 +286,35 @@ struct PoleDancer : ZoxnoxiousModule {
     }
 
     // source one audio
-    v = params[SOURCE_ONE_LEVEL_INPUT].getValue() + inputs[SOURCE_ONE_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f;
+    v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltageSum() / 10.f;
     controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_LEVEL] = clamp(v, 0.f, 1.f);
     if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_LEVEL] != v) {
       sourceOneLevelClipTimer = clipTime;
     }
 
     // source two audio
-    v = params[SOURCE_TWO_LEVEL_INPUT].getValue() + inputs[SOURCE_TWO_LEVEL_KNOB_PARAM].getVoltageSum() / 10.f;
+    v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltageSum() / 10.f;
     controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_LEVEL] = clamp(v, 0.f, 1.f);
     if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_LEVEL] != v) {
       sourceTwoLevelClipTimer = clipTime;
     }
 
     // source one modulation
-    v = params[SOURCE_ONE_MOD_AMOUNT_INPUT].getValue() + inputs[SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
+    v = params[SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
     controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
     if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] != v) {
       sourceOneModAmountClipTimer = clipTime;
     }
 
     // source two modulation
-    v = params[SOURCE_TWO_MOD_AMOUNT_INPUT].getValue() + inputs[SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM].getVoltageSum() / 10.f;
+    v = params[SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
     controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
     if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] != v) {
       sourceTwoModAmountClipTimer = clipTime;
     }
 
     // qvca
-    v = params[RESONANCE_INPUT].getValue() + inputs[RESONANCE_KNOB_PARAM].getVoltageSum() / 10.f;
+    v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
     controlMsg->frame[outputDeviceId][cvChannelOffset + Q_VCA] = clamp(v, 0.f, 1.f);
     if (controlMsg->frame[outputDeviceId][cvChannelOffset + Q_VCA] != v) {
       resonanceClipTimer = clipTime;
@@ -323,28 +323,31 @@ struct PoleDancer : ZoxnoxiousModule {
 
     // pole levels:
     // these are scaled by the Filter VCA, so get that first
-    float filterVcaGain = params[FILTER_VCA_INPUT].getValue() + inputs[FILTER_VCA_KNOB_PARAM].getVoltageSum() / 10.f;
+    float filterVcaGain = params[FILTER_VCA_KNOB_PARAM].getValue() + inputs[FILTER_VCA_INPUT].getVoltageSum() / 10.f;
+    // FIXME CLIP
     if (filterVcaGain !=
-        params[FILTER_VCA_INPUT].getValue() + inputs[FILTER_VCA_KNOB_PARAM].getVoltageSum() / 10.f) {
+        params[FILTER_VCA_KNOB_PARAM].getValue() + inputs[FILTER_VCA_INPUT].getVoltageSum() / 10.f) {
       filterVcaClipTimer = clipTime;
     }
 
-    v = (params[DRY_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(0) / 10.f) * filterVcaGain;
+    //v = (params[DRY_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(0) / 10.f) * filterVcaGain;
+    v = (params[DRY_MIX_KNOB_PARAM].getValue());
     controlMsg->frame[outputDeviceId][cvChannelOffset + DRY_LEVEL] = clamp(v, 0.f, 1.f);
 
-    v = (params[POLE1_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(1) / 10.f) * filterVcaGain;
+    //v = (params[POLE1_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(1) / 10.f) * filterVcaGain;
+    v = params[POLE1_MIX_KNOB_PARAM].getValue();
     controlMsg->frame[outputDeviceId][cvChannelOffset + POLE1_LEVEL] = clamp(v, 0.f, 1.f);
 
-    v = (params[POLE2_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(2) / 10.f) * filterVcaGain;
+    //v = (params[POLE2_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(2) / 10.f) * filterVcaGain;
+    v = params[POLE2_MIX_KNOB_PARAM].getValue();
     controlMsg->frame[outputDeviceId][cvChannelOffset + POLE2_LEVEL] = clamp(v, 0.f, 1.f);
-
-    v = (params[POLE3_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(3) / 10.f) * filterVcaGain;
+    //v = (params[POLE3_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(3) / 10.f) * filterVcaGain;
+    v = params[POLE3_MIX_KNOB_PARAM].getValue();
     controlMsg->frame[outputDeviceId][cvChannelOffset + POLE3_LEVEL] = clamp(v, 0.f, 1.f);
 
-    v = (params[POLE4_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(4) / 10.f) * filterVcaGain;
+    //v = (params[POLE4_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(4) / 10.f) * filterVcaGain;
+    v = params[POLE4_MIX_KNOB_PARAM].getValue();
     controlMsg->frame[outputDeviceId][cvChannelOffset + POLE4_LEVEL] = clamp(v, 0.f, 1.f);
-
-
 
 
     // if we have any queued midi messages, send them
