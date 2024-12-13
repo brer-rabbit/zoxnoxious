@@ -312,6 +312,9 @@ void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
 }
 
 
+int tunereq_save_state(void *zcard_plugin) {
+  return TUNE_COMPLETE_SUCCESS;
+}
 
 tune_status_t tunereq_set_point(void *zcard_plugin) {
   return TUNE_COMPLETE_SUCCESS;
