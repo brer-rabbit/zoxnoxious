@@ -1,4 +1,4 @@
-TARGET = "zpoledancer.plugin.so"
+TARGET = "poledancer.plugin.so"
 INCLUDE = -I../../../include
 LIBS = -shared -lpigpio -lzlog -ldl
 #config -lasound -lpthread -lzlog
