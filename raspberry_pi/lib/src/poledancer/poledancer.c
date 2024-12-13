@@ -201,7 +201,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   for (int i = 0; i < DAC_CHANNELS_CS1; ++i) {
     if (zcard->previous_samples_cs1[i] != samples[i + DAC_CHANNELS_CS0] ) {
 
-      if (samples[i] >= 0) {
+      if (samples[i + DAC_CHANNELS_CS0] >= 0) {
         if (i == 1) {
           INFO("Poledancer: new pole4 value %hd", samples[i + DAC_CHANNELS_CS0]);
         }
