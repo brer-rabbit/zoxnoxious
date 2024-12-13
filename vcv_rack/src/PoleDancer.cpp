@@ -190,8 +190,80 @@ struct PoleDancer : ZoxnoxiousModule {
     processExpander(args);
 
     if (lightDivider.process()) {
+      // light up any buttons
+      lights[REZ_COMP_P1_SWITCH_LIGHT].setBrightness( params[REZ_COMP_P1_SWITCH_PARAM].getValue() > 0.f );
+      lights[REZ_COMP_P2_SWITCH_LIGHT].setBrightness( params[REZ_COMP_P2_SWITCH_PARAM].getValue() > 0.f );
+      lights[REZ_COMP_P3_SWITCH_LIGHT].setBrightness( params[REZ_COMP_P3_SWITCH_PARAM].getValue() > 0.f );
+      lights[REZ_COMP_INV_SWITCH_LIGHT].setBrightness( params[REZ_COMP_INV_SWITCH_PARAM].getValue() > 0.f );
+
+      lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
+      lights[SOURCE_ONE_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_UP_BUTTON_PARAM].getValue());
+      lights[SOURCE_TWO_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_DOWN_BUTTON_PARAM].getValue());
+      lights[SOURCE_TWO_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_UP_BUTTON_PARAM].getValue());
+
+      // clipping
+      const float lightTime = args.sampleTime * lightDivider.getDivision();
+      const float brightnessDeltaTime = 1 / lightTime;
+
+
+      sourceOneLevelClipTimer -= lightTime;
+      lights[SOURCE_ONE_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceOneLevelClipTimer > 0.f, brightnessDeltaTime);
+
+      sourceOneModAmountClipTimer -= lightTime;
+      lights[SOURCE_ONE_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(sourceOneModAmountClipTimer > 0.f, brightnessDeltaTime);
+
+      sourceTwoLevelClipTimer -= lightTime;
+      lights[SOURCE_TWO_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceTwoLevelClipTimer > 0.f, brightnessDeltaTime);
+
+      sourceTwoModAmountClipTimer -= lightTime;
+      lights[SOURCE_TWO_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(sourceTwoModAmountClipTimer > 0.f, brightnessDeltaTime);
+
+      cutoffClipTimer -= lightTime;
+      lights[CUTOFF_CLIP_LIGHT].setBrightnessSmooth(cutoffClipTimer > 0.f, brightnessDeltaTime);
+
+      resonanceClipTimer -= lightTime;
+      lights[RESONANCE_CLIP_LIGHT].setBrightnessSmooth(resonanceClipTimer > 0.f, brightnessDeltaTime);
+
+      filterVcaClipTimer -= lightTime;
+      lights[FILTER_VCA_CLIP_LIGHT].setBrightnessSmooth(filterVcaClipTimer > 0.f, brightnessDeltaTime);
+
       setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
       setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
+
+      // add/subtract the up/down buttons and set a string that
+      // the UI can use.  There ought to be some todos here to
+      // make/fix this.
+      if (params[ SOURCE_ONE_UP_BUTTON_PARAM ].getValue()) {
+        params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0.f);
+        int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
+        sourceOneInt = sourceOneInt == 7 ? 0 : sourceOneInt + 1;
+        params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
+        source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
+      }
+      if (params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].getValue()) {
+        params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].setValue(0);
+        int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
+        sourceOneInt = sourceOneInt == 0 ? 7 : sourceOneInt - 1;
+        params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
+        source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
+      }
+
+
+      if (params[ SOURCE_TWO_UP_BUTTON_PARAM ].getValue()) {
+        params[ SOURCE_TWO_UP_BUTTON_PARAM ].setValue(0);
+        int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
+        sourceTwoInt = sourceTwoInt == 7 ? 0 : sourceTwoInt + 1;
+        params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
+        source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
+      }
+      if (params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].getValue()) {
+        params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].setValue(0);
+        int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
+        sourceTwoInt = sourceTwoInt == 0 ? 7 : sourceTwoInt - 1;
+        params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
+        source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
+      }
+
     }
 
   }
