@@ -175,11 +175,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         }
         else {
         */
-        if (i == cutoff_cv_channel) {
-          INFO("Poledancer: new cutoff value %hd", samples[i]);
-        } else if (i == 1) {
-          INFO("Poledancer: new source 1 level %hd", samples[i]);
-        }
         samples_to_dac[0] = channel_map_cs0[i] | ((uint16_t) samples[i]) >> 11;
         samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
         spiWrite(spi_channel, samples_to_dac, 2);
@@ -202,9 +197,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (zcard->previous_samples_cs1[i] != samples[i + DAC_CHANNELS_CS0] ) {
 
       if (samples[i + DAC_CHANNELS_CS0] >= 0) {
-        if (i == 1) {
-          INFO("Poledancer: new pole4 value %hd", samples[i + DAC_CHANNELS_CS0]);
-        }
         zcard->previous_samples_cs1[i] = samples[i + DAC_CHANNELS_CS0];
         samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples[i + DAC_CHANNELS_CS0]) >> 11;
         samples_to_dac[1] = ((uint16_t) samples[i + DAC_CHANNELS_CS0]) >> 3;
