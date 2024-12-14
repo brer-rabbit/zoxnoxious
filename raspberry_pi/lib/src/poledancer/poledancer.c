@@ -166,7 +166,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 
   for (int i = 0; i < DAC_CHANNELS_CS0; ++i) {
     if (zcard->previous_samples_cs0[i] != samples[i] ) {
-
       if (samples[i] >= 0) {
         zcard->previous_samples_cs0[i] = samples[i];
         /*
@@ -191,15 +190,15 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 
 
   // offset samples index by number of channels CS0 took
+  const int16_t *samples_cs1 = &samples[DAC_CHANNELS_CS0];
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_cs1, SPI_MODE, zcard->slot);
 
   for (int i = 0; i < DAC_CHANNELS_CS1; ++i) {
-    if (zcard->previous_samples_cs1[i] != samples[i + DAC_CHANNELS_CS0] ) {
-
-      if (samples[i + DAC_CHANNELS_CS0] >= 0) {
-        zcard->previous_samples_cs1[i] = samples[i + DAC_CHANNELS_CS0];
-        samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples[i + DAC_CHANNELS_CS0]) >> 11;
-        samples_to_dac[1] = ((uint16_t) samples[i + DAC_CHANNELS_CS0]) >> 3;
+    if (zcard->previous_samples_cs1[i] != samples_cs1[i] ) {
+      if (samples_cs1[i] >= 0) {
+        zcard->previous_samples_cs1[i] = samples_cs1[i];
+        samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples_cs1[i]) >> 11;
+        samples_to_dac[1] = ((uint16_t) samples_cs1[i]) >> 3;
         spiWrite(spi_channel, samples_to_dac, 2);
       }
       else {
