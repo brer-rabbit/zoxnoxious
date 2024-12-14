@@ -169,7 +169,7 @@ struct PoleDancer : ZoxnoxiousModule {
     configParam(POLE1_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 1 Mix", "%", 0.f, 100.f);
     configParam(POLE2_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 2 Mix", "%", 0.f, 100.f);
     configParam(POLE3_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 3 Mix", "%", 0.f, 100.f);
-    configParam(POLE4_MIX_KNOB_PARAM, 0.f, 1.f, 0.2f, "POle 4 Mix", "%", 0.f, 100.f);
+    configParam(POLE4_MIX_KNOB_PARAM, 0.f, 1.f, 0.2f, "Pole 4 Mix", "%", 0.f, 100.f);
 
     configInput(SOURCE_ONE_LEVEL_INPUT, "Source One Level");
     configInput(SOURCE_ONE_MOD_AMOUNT_INPUT, "Source One Mod Amount");
@@ -348,7 +348,6 @@ struct PoleDancer : ZoxnoxiousModule {
     //v = (params[POLE4_MIX_KNOB_PARAM].getValue() + inputs[POLE_MIX_INPUT].getVoltage(4) / 10.f) * filterVcaGain;
     v = params[POLE4_MIX_KNOB_PARAM].getValue();
     controlMsg->frame[outputDeviceId][cvChannelOffset + POLE4_LEVEL] = clamp(v, 0.f, 1.f);
-
 
     // if we have any queued midi messages, send them
     if (controlMsg->midiMessageSet == false) {
