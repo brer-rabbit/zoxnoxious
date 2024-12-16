@@ -62,7 +62,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
   int spi_channel;
   // AD5328: control register
   char dac_ctrl0_reg[2] = { 0b11110000, 0b00000000 };  // full reset, data and control
-  char dac_ctrl1_reg[2] = { 0b10000000, 0b00110000 };  // power on, gain 2x, unbuffered Vref input
+  char dac_ctrl1_reg[2] = { 0b10000000, 0b00000000 };  // power on, gain 1x, unbuffered Vref input
 
   assert(slot >= 0 && slot < 8);
   struct poledancer_card *poledancer = (struct poledancer_card*)calloc(1, sizeof(struct poledancer_card));
