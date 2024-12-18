@@ -41,8 +41,8 @@ static const int spi_channel_cs1 = 1;
 // 0 : 0x50 : source2 audio vca
 // 0 : 0x60 : source1 mod vca
 // 0 : 0x70 : source2 mod vca
-// 1 : 0x10 : pole2 level
-// 1 : 0x20 : pole4 level
+// 1 : 0x10 : pole4 level
+// 1 : 0x20 : pole2 level
 // 1 : 0x30 : pole3 level
 // 1 : 0x40 : pole1 level
 // 1 : 0x60 : q vca
