@@ -263,15 +263,15 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
 
         // noise
         v = params[NOISE_KNOB_PARAM].getValue() + inputs[NOISE_LEVEL_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
         // no clip LED for noise level
 
         channel++;
 
         // panning
         v = params[OUTPUT_PAN_KNOB_PARAM].getValue() + inputs[OUTPUT_PAN_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] != v) {
             outputPanClipTimer = clipTime;
         }
 
@@ -281,8 +281,8 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
         // resonance
         v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltageSum() / 10.f;
         v = v < 0.8f ? v * 0.6f : 2.6f * v - 1.6f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] != v) {
             resonanceClipTimer = clipTime;
         }
 
@@ -291,8 +291,8 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
 
         // output VCA
         v = params[FILTER_VCA_KNOB_PARAM].getValue() + inputs[FILTER_VCA_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] != v) {
             outputVcaClipTimer = clipTime;
         }
 
@@ -301,32 +301,32 @@ struct Zoxnoxious3372 : ZoxnoxiousModule {
 
         // cutoff
         v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] != v) {
             cutoffClipTimer = clipTime;
         }
 
         // sig1 vca
         channel++;
         v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] != v) {
             sourceOneLevelClipTimer = clipTime;
         }
 
         // sig2 vca
         channel++;
         v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] != v) {
             sourceTwoLevelClipTimer = clipTime;
         }
 
         // modulation vca
         channel++;
         v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channel] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channel] != v) {
             modAmountClipTimer = clipTime;
         }
 

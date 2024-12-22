@@ -319,64 +319,64 @@ struct Zoxnoxious3340 : ZoxnoxiousModule {
 
         // linear
         v = params[LINEAR_KNOB_PARAM].getValue() + inputs[LINEAR_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] != v) {
             linearClipTimer = clipTime;
         }
         channelIndex--;
 
         // pulse width
         v = params[PULSE_WIDTH_KNOB_PARAM].getValue() + inputs[PULSE_WIDTH_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] != v) {
             pulseWidthClipTimer = clipTime;
         }
         channelIndex--;
 
         // mix1 saw
         v = params[MIX1_SAW_KNOB_PARAM].getValue() + inputs[MIX1_SAW_VCA_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] != v) {
             mix1SawVcaClipTimer = clipTime;
         }
         channelIndex--;
 
         // mix1 triangle
         v = params[MIX1_TRIANGLE_KNOB_PARAM].getValue() + inputs[MIX1_TRIANGLE_VCA_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] != v) {
             mix1TriangleVcaClipTimer = clipTime;
         }
         channelIndex--;
 
         // external mod amount
         v = params[EXT_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[EXT_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] != v) {
             extModAmountClipTimer = clipTime;
         }
         channelIndex--;
 
         // mix1 pulse
         v = params[MIX1_PULSE_KNOB_PARAM].getValue() + inputs[MIX1_PULSE_VCA_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] != v) {
             mix1PulseVcaClipTimer = clipTime;
         }
         channelIndex--;
 
         // sync phase
         v = params[SYNC_PHASE_KNOB_PARAM].getValue() + inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] != v) {
             syncPhaseClipTimer = clipTime;
         }
         channelIndex--;
 
         // frequency
         v = params[FREQ_KNOB_PARAM].getValue() + inputs[FREQ_INPUT].getVoltageSum() / 8.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + channelIndex] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + channelIndex] != v) {
             freqClipTimer = clipTime;
         }
 

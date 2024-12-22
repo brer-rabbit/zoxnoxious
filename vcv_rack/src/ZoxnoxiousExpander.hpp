@@ -20,7 +20,7 @@ static const uint8_t midiProgramChangeStatus = 0xC;
  */
 
 struct ZoxnoxiousControlMsg {
-    float frame[maxDevices][maxChannels];
+    dsp::Frame<maxChannels> frame[maxDevices];
     bool midiMessageSet;
     midi::Message midiMessage;
 };

@@ -446,16 +446,8 @@ private:
                 float v;
                 const float clipTime = 0.25f;
 
-                // copy expander control voltages to Frame
-                int minChannels = audioPorts[deviceNum]->deviceNumOutputs < maxChannels ?
-                                  audioPorts[deviceNum]->deviceNumOutputs : maxChannels;
-                for (int channel = 0; channel < minChannels; ++channel) {
-                    inputFrame.samples[channel] = controlMsg->frame[deviceNum][channel];
-                }
-
                 // add in local control voltages if deviceNum is our device
                 if (deviceNum == static_cast<std::size_t>(outputDeviceId)) {
-
                     // left level
                     v = params[LEFT_LEVEL_KNOB_PARAM].getValue() + inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f;
                     inputFrame.samples[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
@@ -472,7 +464,7 @@ private:
                 }
                 
                 if (!audioPorts[deviceNum]->engineInputBuffer.full()) {
-                    audioPorts[deviceNum]->engineInputBuffer.push(inputFrame);
+                    audioPorts[deviceNum]->engineInputBuffer.push(controlMsg->frame[deviceNum]);
                 }
             }
         } // for deviceNum

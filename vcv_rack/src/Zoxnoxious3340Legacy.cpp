@@ -300,43 +300,43 @@ struct Zoxnoxious3340Legacy : ZoxnoxiousModule {
 
         // linear
         v = params[LINEAR_KNOB_PARAM].getValue() + inputs[LINEAR_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 5] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 5] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 5] != v) {
             linearClipTimer = clipTime;
         }
                     
         // external mod amount
         v = params[EXT_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[EXT_MOD_AMOUNT_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 4] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 4] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 4] != v) {
             extModAmountClipTimer = clipTime;
         }
 
         // mix1 triangle
         v = params[MIX1_TRIANGLE_KNOB_PARAM].getValue() + inputs[MIX1_TRIANGLE_VCA_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 3] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 3] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 3] != v) {
             mix1TriangleVcaClipTimer = clipTime;
         }
             
         // pulse width
         v = params[PULSE_WIDTH_KNOB_PARAM].getValue() + inputs[PULSE_WIDTH_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 2] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 2] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 2] != v) {
             pulseWidthClipTimer = clipTime;
         }
 
         // sync phase
         v = params[SYNC_PHASE_KNOB_PARAM].getValue() + inputs[SYNC_PHASE_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 1] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 1] != v) {
             syncPhaseClipTimer = clipTime;
         }
 
         // frequency
         v = params[FREQ_KNOB_PARAM].getValue() + inputs[FREQ_INPUT].getVoltageSum() / 10.f;
-        controlMsg->frame[outputDeviceId][cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId][cvChannelOffset + 0] != v) {
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
+        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + 0] != v) {
             freqClipTimer = clipTime;
         }
     }

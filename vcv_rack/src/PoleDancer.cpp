@@ -280,43 +280,43 @@ struct PoleDancer : ZoxnoxiousModule {
 
     // vcf cutoff
     v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId][cvChannelOffset + VCF_CUTOFF] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId][cvChannelOffset + VCF_CUTOFF] != v) {
+    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCF_CUTOFF] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCF_CUTOFF] != v) {
       cutoffClipTimer = clipTime;
     }
 
     // source one audio
     v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_LEVEL] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_LEVEL] != v) {
+    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_LEVEL] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_LEVEL] != v) {
       sourceOneLevelClipTimer = clipTime;
     }
 
     // source two audio
     v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_LEVEL] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_LEVEL] != v) {
+    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_LEVEL] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_LEVEL] != v) {
       sourceTwoLevelClipTimer = clipTime;
     }
 
     // source one modulation
     v = params[SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_MOD_AMOUNT_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] != v) {
+    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] != v) {
       sourceOneModAmountClipTimer = clipTime;
     }
 
     // source two modulation
     v = params[SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_MOD_AMOUNT_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId][cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] != v) {
+    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] != v) {
       sourceTwoModAmountClipTimer = clipTime;
     }
 
     // qvca
     v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId][cvChannelOffset + Q_VCA] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId][cvChannelOffset + Q_VCA] != v) {
+    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 1.f);
+    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] != v) {
       resonanceClipTimer = clipTime;
     }
 
@@ -331,34 +331,34 @@ struct PoleDancer : ZoxnoxiousModule {
 
 
     if (inputs[POLE_MIX_INPUT].isConnected()) {
-      controlMsg->frame[outputDeviceId][cvChannelOffset + DRY_LEVEL] =
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + DRY_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(0) / 10.f) * filterVcaGain;
 
-      controlMsg->frame[outputDeviceId][cvChannelOffset + POLE1_LEVEL] =
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE1_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(1) / 10.f) * filterVcaGain;
 
-      controlMsg->frame[outputDeviceId][cvChannelOffset + POLE2_LEVEL] =
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE2_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(2) / 10.f) * filterVcaGain;
 
-      controlMsg->frame[outputDeviceId][cvChannelOffset + POLE3_LEVEL] =
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE3_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(3) / 10.f) * filterVcaGain;
 
-      controlMsg->frame[outputDeviceId][cvChannelOffset + POLE4_LEVEL] =
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE4_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(4) / 10.f) * filterVcaGain;
     } else {
-      controlMsg->frame[outputDeviceId][cvChannelOffset + DRY_LEVEL] = filterVcaGain *
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + DRY_LEVEL] = filterVcaGain *
         clamp(params[DRY_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
 
-      controlMsg->frame[outputDeviceId][cvChannelOffset + POLE1_LEVEL] = filterVcaGain *
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE1_LEVEL] = filterVcaGain *
         clamp(params[POLE1_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
 
-      controlMsg->frame[outputDeviceId][cvChannelOffset + POLE2_LEVEL] = filterVcaGain *
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE2_LEVEL] = filterVcaGain *
         clamp(params[POLE2_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
 
-      controlMsg->frame[outputDeviceId][cvChannelOffset + POLE3_LEVEL] = filterVcaGain *
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE3_LEVEL] = filterVcaGain *
         clamp(params[POLE3_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
 
-      controlMsg->frame[outputDeviceId][cvChannelOffset + POLE4_LEVEL] = filterVcaGain *
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE4_LEVEL] = filterVcaGain *
         clamp(params[POLE4_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
     }
 
