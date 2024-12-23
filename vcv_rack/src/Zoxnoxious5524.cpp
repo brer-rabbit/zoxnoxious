@@ -157,6 +157,10 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
     // minimum value.  Track that outside of buttonParamToMidiProgramList.
     bool vcoTwoPulseEnabled = false;
 
+    // limit pulse width to prevent it from going to DC
+    // 0 => limit
+    // 1 => allow DC
+    int pwLimit = 0;
 
     Zoxnoxious5524() :
         vcoOneVoctClipTimer(0.f),
@@ -512,8 +516,6 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         vcoTwoPulseEnabled = static_cast<bool>(std::round(params[VCO_TWO_WAVE_PULSE_BUTTON_PARAM].getValue()));
         if (vcoTwoPulseEnabled) {
             v = params[VCO_TWO_PW_KNOB_PARAM].getValue() + inputs[VCO_TWO_PW_INPUT].getVoltageSum() / 10.f;
-            // TODO: Handle the PWM tuning on the Pi, allow for clamp(v, 0.f, 1.f)
-            v = v * 0.9 + 0.05;
             controlMsg->frame[outputDeviceId][cvChannelOffset + 1] = clamp(v, 0.05f, 0.95f);
             if (controlMsg->frame[outputDeviceId][cvChannelOffset + 1] != v) {
                 vcoTwoPwClipTimer = clipTime;
@@ -554,7 +556,23 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         output2NameString = invalidCardOutputName;
     }
 
+    void onReset(const ResetEvent& e) override {
+        Module::onReset(e);
+        pwLimit = 0;
+    }
 
+    json_t* dataToJson() override {
+        json_t* rootJ = json_object();
+        json_object_set_new(rootJ, "pwLimit", json_integer(pwLimit));
+        return rootJ;
+    }
+
+    void dataFromJson(json_t* rootJ) override {
+        json_t* panLawJ = json_object_get(rootJ, "pwLimit");
+        if (pwLimitJ) {
+            panLaw = json_integer_value(pwLimitJ);
+        }
+    }
 
     private:
     void sendOrQueueMidiMessage(ZoxnoxiousControlMsg *controlMsg, int newValue, int index) {
@@ -675,6 +693,12 @@ struct Zoxnoxious5524Widget : ModuleWidget {
         mix2OutputTextField->box.size = (mm2px(Vec(18.0, 3.636)));
         mix2OutputTextField->setText(module ? &module->output2NameString : NULL);
         addChild(mix2OutputTextField);
+    }
+
+    void appendContextMenu(Menu* menu) override {
+        Zoxnoxious5524* module = getModule<Zoxnoxious5524>();
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createIndexPtrSubmenuItem("Pulse Width", {"Limit", "Allow DC"}, &module->pwLimit));
     }
 
     CardTextDisplay *mix1OutputTextField;
