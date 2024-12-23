@@ -460,9 +460,14 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
 
         // VCO One Pulse Width
         v = params[VCO_ONE_PW_KNOB_PARAM].getValue() + inputs[VCO_ONE_PW_INPUT].getVoltage() / 10.f;
-        // TODO: Handle the PWM tuning on the Pi, allow for clamp(v, 0.f, 1.f)
-        v = v * 0.9 + 0.05;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_ONE_PW] = clamp(v, 0.05f, 0.95f); 
+
+        if (pwLimit) {
+            v = v * 0.9 + 0.05;
+            controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_ONE_PW] = clamp(v, 0.05f, 0.95f);
+        } else {
+            controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_ONE_PW] = clamp(v, 0.00f, 1.f);
+        }
+
         if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_ONE_PW] != v) {
             vcoOnePwClipTimer = clipTime;
         }
@@ -538,9 +543,13 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         vcoTwoPulseEnabled = static_cast<bool>(std::round(params[VCO_TWO_WAVE_PULSE_BUTTON_PARAM].getValue()));
         if (vcoTwoPulseEnabled) {
             v = params[VCO_TWO_PW_KNOB_PARAM].getValue() + inputs[VCO_TWO_PW_INPUT].getVoltage() / 10.f;
-            // TODO: Handle the PWM tuning on the Pi, allow for clamp(v, 0.f, 1.f)
-            v = v * 0.9 + 0.05;
-            controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_TWO_PW] = clamp(v, 0.05f, 0.95f);
+            if (pwLimit) {
+                v = v * 0.9 + 0.05;
+                controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_TWO_PW] = clamp(v, 0.05f, 0.95f);
+            } else {
+                controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_TWO_PW] = clamp(v, 0.00f, 1.f);
+            }
+
             if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_TWO_PW] != v) {
                 vcoTwoPwClipTimer = clipTime;
             }
@@ -592,9 +601,9 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
     }
 
     void dataFromJson(json_t* rootJ) override {
-        json_t* panLawJ = json_object_get(rootJ, "pwLimit");
+        json_t* pwLimitJ = json_object_get(rootJ, "pwLimit");
         if (pwLimitJ) {
-            panLaw = json_integer_value(pwLimitJ);
+            pwLimit = json_integer_value(pwLimitJ);
         }
     }
 
