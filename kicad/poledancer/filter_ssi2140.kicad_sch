@@ -3334,7 +3334,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 58f9a9b5-3475-41fe-8892-bde122379a44)
   )
-  (text "A questionably weighted selection is used for resonance compensation.\nSSI app note AN701 details using SSI2164.  This attempts the concept.\nPole 1 switchable with a weight of 1.\nPole 2 switchable with a weight of 1.\nPole 3 switchable with a weight of 2.\nPole 4 hardwired in the 2140 with a weight of 1.\nUsed in conjuntion with QVCA_INVERT to phase correct the output.\nUseful combinations in the form (weight pole 1, 2, 3, 4):\n1LP, 1HP: 1, 0, 0, 1 (REZ_STAGE1 set) (not quite the right BP, but close)\n2LP, 2HP: 0, 1, 2, 1 (REZ_STAGE2, REZ_STAGE3 set, QVCA_INVERT set)\nuncompensated: 0, 0, 0, 1 (hardwired, all off)\nThese are approximate filter equivalents as the weights aren't quite right.\n"
+  (text "A questionably weighted selection is used for resonance compensation.\nSSI app note AN701 details using SSI2164.  This attempts the concept.\nPole 1 switchable with a weight of 1.\nPole 2 switchable with a weight of 1.\nPole 3 switchable with a weight of 2.\nPole 4 hardwired in the 2140 with a weight of 1.\nUsed in conjuntion with QVCA_INVERT to phase correct the output.\nUseful combinations in the form (weight pole 1, 2, 3, 4):\n1LP, 1HP: 1, 0, 0, 1 (REZ_STAGE1 set, QVCA_INVERT set) (not quite the right BP, but close)\n2LP, 2HP: 0, 1, 2, 1 (REZ_STAGE2, REZ_STAGE3 set, QVCA_INVERT unset)\nuncompensated: 0, 0, 0, 1 (hardwired, QVCA_INVERT set)\nThese are approximate filter equivalents as the weights aren't quite right.\n"
     (at 320.04 106.68 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 7239f453-4043-4e99-9017-31f21340cc60)
