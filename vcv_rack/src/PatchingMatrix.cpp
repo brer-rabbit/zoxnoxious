@@ -5,6 +5,11 @@
 #include "ZoxnoxiousExpander.hpp"
 
 
+enum cvChannel {
+    RIGHT_CHANNEL = 0,
+    LEFT_CHANNEL
+};
+
 struct PatchingMatrix : ZoxnoxiousModule {
     enum ParamId {
         MIX_LEFT_SELECT_PARAM,
@@ -442,7 +447,6 @@ private:
         for (std::size_t deviceNum = 0; deviceNum < audioPorts.size(); ++deviceNum) {
 
             if (audioPorts[deviceNum]->deviceNumOutputs > 0) {
-                dsp::Frame<maxChannels> inputFrame = {};
                 float v;
                 const float clipTime = 0.25f;
 
@@ -450,15 +454,15 @@ private:
                 if (deviceNum == static_cast<std::size_t>(outputDeviceId)) {
                     // left level
                     v = params[LEFT_LEVEL_KNOB_PARAM].getValue() + inputs[LEFT_LEVEL_INPUT].getVoltageSum() / 10.f;
-                    inputFrame.samples[cvChannelOffset + 1] = clamp(v, 0.f, 1.f);
-                    if (inputFrame.samples[cvChannelOffset + 1] != v) {
+                    controlMsg->frame[deviceNum].samples[cvChannelOffset + LEFT_CHANNEL] = clamp(v, 0.f, 1.f);
+                    if (controlMsg->frame[deviceNum].samples[cvChannelOffset + LEFT_CHANNEL] != v) {
                         leftLevelClipTimer = clipTime;
                     }
 
                     // right level
                     v = params[RIGHT_LEVEL_KNOB_PARAM].getValue() + inputs[RIGHT_LEVEL_INPUT].getVoltageSum() / 10.f;
-                    inputFrame.samples[cvChannelOffset + 0] = clamp(v, 0.f, 1.f);
-                    if (inputFrame.samples[cvChannelOffset + 0] != v) {
+                     controlMsg->frame[deviceNum].samples[cvChannelOffset + RIGHT_CHANNEL] = clamp(v, 0.f, 1.f);
+                    if (controlMsg->frame[deviceNum].samples[cvChannelOffset + RIGHT_CHANNEL] != v) {
                         rightLevelClipTimer = clipTime;
                     }
                 }
