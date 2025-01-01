@@ -59,6 +59,12 @@
       "name": "PoleDancer",
       "description": "morphing multimode analog filter",
       "tags": []
+    },
+    {
+      "slug": "PoleDancerPersonality",
+      "name": "PoleDancerPersonality",
+      "description": "Personality module for Pole Dancer",
+      "tags": []
     }
   ]
 }

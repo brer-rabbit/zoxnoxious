@@ -59,6 +59,7 @@ void init(Plugin* p) {
 
 	// Add modules here
         p->addModel(modelPoleDancer);
+        p->addModel(modelPoleDancerPersonality);
         p->addModel(modelZoxnoxious3340);
         p->addModel(modelZoxnoxious3372);
         p->addModel(modelZoxnoxious5524);
