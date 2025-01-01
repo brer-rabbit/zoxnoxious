@@ -461,12 +461,7 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         // VCO One Pulse Width
         v = params[VCO_ONE_PW_KNOB_PARAM].getValue() + inputs[VCO_ONE_PW_INPUT].getVoltage() / 10.f;
 
-        if (pwLimit) {
-            v = v * 0.9 + 0.05;
-            controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_ONE_PW] = clamp(v, 0.05f, 0.95f);
-        } else {
-            controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_ONE_PW] = clamp(v, 0.00f, 1.f);
-        }
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_ONE_PW] = clamp(v, 0.00f, 1.f);
 
         if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_ONE_PW] != v) {
             vcoOnePwClipTimer = clipTime;
@@ -517,6 +512,7 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         }
 
         // 3394 VCF Resonance
+        // dual-linear response.  One slope upto 0.8, then a greater slope to max
         v = params[VCF_RESONANCE_KNOB_PARAM].getValue() + inputs[VCF_RESONANCE_INPUT].getVoltage() / 10.f;
         v = v < 0.8f ? v * 0.6f : 2.6f * v - 1.6f;
         controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCF_RESONANCE] = clamp(v, 0.f, 1.f);
@@ -544,8 +540,8 @@ struct Zoxnoxious5524 : ZoxnoxiousModule {
         if (vcoTwoPulseEnabled) {
             v = params[VCO_TWO_PW_KNOB_PARAM].getValue() + inputs[VCO_TWO_PW_INPUT].getVoltage() / 10.f;
             if (pwLimit) {
-                v = v * 0.9 + 0.05;
-                controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_TWO_PW] = clamp(v, 0.05f, 0.95f);
+                v = v * 0.88;
+                controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_TWO_PW] = clamp(v, 0.00f, 0.88f);
             } else {
                 controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCO_TWO_PW] = clamp(v, 0.00f, 1.f);
             }
@@ -731,7 +727,7 @@ struct Zoxnoxious5524Widget : ModuleWidget {
     void appendContextMenu(Menu* menu) override {
         Zoxnoxious5524* module = getModule<Zoxnoxious5524>();
         menu->addChild(new MenuSeparator);
-        menu->addChild(createIndexPtrSubmenuItem("Pulse Width", {"Limit", "Allow DC"}, &module->pwLimit));
+        menu->addChild(createIndexPtrSubmenuItem("Pulse Width", {"Allow DC", "Limit"}, &module->pwLimit));
     }
 
     CardTextDisplay *mix1OutputTextField;
