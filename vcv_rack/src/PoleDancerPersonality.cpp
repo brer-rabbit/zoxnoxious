@@ -32,7 +32,7 @@ struct PoleDancerPersonality : Module {
   float voltages[numVoltages];
 
   PoleDancerPersonality() :
-    personalityNameString(names[rand() % sizeof(names)/sizeof(std::string)]), dirty(true) {
+    personalityNameString(names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)]), dirty(true) {
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     configParam(DRY_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Dry Mix", "%", 0.f, 10.f);
@@ -60,7 +60,8 @@ struct PoleDancerPersonality : Module {
 
 
   void onReset() override {
-    personalityNameString = names[rand() % sizeof(names)/sizeof(std::string)];
+    // using getFrame as a rand source
+    personalityNameString = names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)];
     dirty = true;
   }
 
@@ -92,8 +93,17 @@ struct PoleDancerPersonality : Module {
 };
 
 
+static const int fontSize = 9;
+
 struct PersonalityTextField : LedDisplayTextField {
   PoleDancerPersonality* module;
+
+  // override to set color & posiiton
+  PersonalityTextField() {
+    LedDisplayTextField();
+    color = nvgRGB(255, 105, 180);
+    textOffset = math::Vec(0, -6);
+  }
 
   void step() override {
     LedDisplayTextField::step();
@@ -104,52 +114,60 @@ struct PersonalityTextField : LedDisplayTextField {
   }
 
   void onChange(const ChangeEvent& e) override {
-    LedDisplayTextField::onChange(e);
     if (module) {
       module->personalityNameString = getText();
     }
   }
 
-  // this isn't quite right- cursor position doesn't match where
-  // characters go.  Not sure how to fix that just yet.
-  void draw(const DrawArgs& args) override {
-    LedDisplayTextField::draw(args);
-    const auto vg = args.vg;
+  // override here to set text size
+  void drawLayer(const DrawArgs& args, int layer) override {
+    nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
-    // Save the drawing context to restore later
-    nvgSave(vg);
+    if (layer == 1) {
+      // Text
+      std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
+      if (font && font->handle >= 0) {
+        bndSetFont(font->handle);
 
-    // Draw dark background
-    nvgBeginPath(vg);
-    nvgRect(vg, 0, 0, box.size.x, box.size.y);
-    nvgFillColor(vg, nvgRGBA(20, 20, 20, 255));
-    nvgFill(vg);
+        NVGcolor highlightColor = color;
+        highlightColor.a = 0.5;
+        int begin = std::min(cursor, selection);
+        int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
+        bndIconLabelCaret(args.vg,
+                          textOffset.x, textOffset.y,
+                          box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
+                          -1, color, fontSize, text.c_str(), highlightColor, begin, end);
 
-    // If the track name is not empty, then display it
-    if (module)  {
-      // Set up font parameters
-      nvgFontSize(vg, 9);
-      nvgTextLetterSpacing(vg, 0);
-
-      //nvgFillColor(vg, nvgRGBA(255, 215, 20, 0xff));
-      nvgFillColor(vg, nvgRGBA(255, 105, 180, 0xff));
-      nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-
-      float bounds[4];
-      nvgTextBoxBounds(vg, 2, 10, 100.0, getText().c_str(), NULL, bounds);
-      float textHeight = bounds[3];
-      nvgTextBox(vg, 2, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, getText().c_str(), NULL);
+        bndSetFont(APP->window->uiFont->handle);
+      }
     }
 
-    nvgRestore(vg);
+    Widget::drawLayer(args, layer);
+    nvgResetScissor(args.vg);
   }
+
+
+  // override here to set text size
+  int getTextPosition(math::Vec mousePos) override {
+    std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
+    if (!font || !font->handle)
+      return 0;
+
+    bndSetFont(font->handle);
+    int textPos = bndIconLabelTextPosition(APP->window->vg,
+                                           textOffset.x, textOffset.y,
+                                           box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
+                                           -1, fontSize, text.c_str(), mousePos.x, mousePos.y);
+    bndSetFont(APP->window->uiFont->handle);
+    return textPos;
+  }
+
 
 
 };
 
 
 struct PersonalityDisplay : LedDisplay {
-
   void setModule(PoleDancerPersonality* module) {
     PersonalityTextField *textField = createWidget<PersonalityTextField>(Vec(0, 0));
     textField->box.size = box.size;
@@ -157,7 +175,6 @@ struct PersonalityDisplay : LedDisplay {
     textField->module = module;
     addChild(textField);
   }
-
 };
 
 
@@ -177,6 +194,7 @@ struct PoleDancerPersonalityWidget : ModuleWidget {
     // personality name
     PersonalityDisplay *personalityDisplay = createWidget<PersonalityDisplay>(mm2px(Vec(3.457, 8.411)));
     personalityDisplay->box.size = mm2px(Vec(23.513, 3.636));
+    //personalityDisplay->box.size = mm2px(Vec(35, 10));
     personalityDisplay->setModule(module);
     addChild(personalityDisplay);
 
