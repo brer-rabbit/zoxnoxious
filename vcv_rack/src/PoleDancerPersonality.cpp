@@ -168,6 +168,23 @@ struct PersonalityTextField : LedDisplayTextField {
 
 
 struct PersonalityDisplay : LedDisplay {
+  void draw(const DrawArgs& args) override {
+    // override this so we don't get the grey lines around the text box like the Notes module has
+    math::Rect r = box.zeroPos();
+
+    // Black background
+    nvgBeginPath(args.vg);
+    nvgRect(args.vg, RECT_ARGS(r));
+    NVGcolor fillColor = nvgRGB(0x12, 0x12, 0x12);
+    nvgFillColor(args.vg, fillColor);
+    nvgFill(args.vg);
+
+    // Draw children inside box
+    nvgScissor(args.vg, RECT_ARGS(args.clipBox));
+    Widget::draw(args);
+    nvgResetScissor(args.vg);
+  }
+
   void setModule(PoleDancerPersonality* module) {
     PersonalityTextField *textField = createWidget<PersonalityTextField>(Vec(0, 0));
     textField->box.size = box.size;
