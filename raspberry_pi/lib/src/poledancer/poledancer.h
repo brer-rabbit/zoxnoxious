@@ -45,14 +45,15 @@ struct poledancer_card {
 };
 
 
-extern const int spi_channel_ssi2130;
-extern const int spi_channel_as3394;
+extern const int spi_channel_cs0;
+extern const int spi_channel_cs1;
 
 extern const uint8_t port0_addr;
 extern const uint8_t port1_addr;
 extern const uint8_t config_port0_addr;
 extern const uint8_t config_port1_addr;
 extern const uint8_t config_port_as_output;
+extern const uint8_t cutoff_cv_channel;
 
 void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
 

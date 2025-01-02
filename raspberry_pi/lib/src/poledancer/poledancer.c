@@ -31,8 +31,8 @@ const uint8_t config_port0_addr = 0x06;
 const uint8_t config_port1_addr = 0x07;
 const uint8_t config_port_as_output = 0x00;
 
-static const int spi_channel_cs0 = 0;
-static const int spi_channel_cs1 = 1;
+const int spi_channel_cs0 = 0;
+const int spi_channel_cs1 = 1;
 
 // dac lines to use for chip select zero, one
 // cs : dac addr : signal
