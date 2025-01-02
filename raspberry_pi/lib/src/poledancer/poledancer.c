@@ -50,7 +50,7 @@ const int spi_channel_cs1 = 1;
 
 static const uint8_t channel_map_cs0[] = { 0x00, 0x40, 0x50, 0x60, 0x70 };
 static const uint8_t channel_map_cs1[] = { 0x10, 0x20, 0x30, 0x40, 0x60, 0x70 };
-const uint8_t cutoff_cv_channel = channel_map_cs0[0];
+const uint8_t cutoff_cv_channel = 0;
 
 /* init_zcard
  * set gpio & dac initial values.  
@@ -120,9 +120,9 @@ void* init_zcard(struct zhost *zhost, int slot) {
   poledancer->tunable.tune_points_size = NUM_TUNING_POINTS;
 
   // on init use a linear tuning.  Autotune not in effect.
-  //create_linear_tuning(channel_map[cutoff_cv_channel],
-//                       poledancer->tunable.dac_size,
-//                       poledancer->tunable.dac_calibration_table);
+  create_linear_tuning(channel_map_cs0[cutoff_cv_channel],
+                       poledancer->tunable.dac_size,
+                       poledancer->tunable.dac_calibration_table);
 
   return poledancer;
 }
@@ -168,15 +168,15 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (zcard->previous_samples_cs0[i] != samples[i] ) {
       if (samples[i] >= 0) {
         zcard->previous_samples_cs0[i] = samples[i];
-        /*
+
         if (i == cutoff_cv_channel) {
           spiWrite(spi_channel, (char*) &zcard->tunable.dac_calibration_table[ samples[i] >> 3 ], 2);
         }
         else {
-        */
-        samples_to_dac[0] = channel_map_cs0[i] | ((uint16_t) samples[i]) >> 11;
-        samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
-        spiWrite(spi_channel, samples_to_dac, 2);
+          samples_to_dac[0] = channel_map_cs0[i] | ((uint16_t) samples[i]) >> 11;
+          samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
+          spiWrite(spi_channel, samples_to_dac, 2);
+        }
       }
       else {
         zcard->previous_samples_cs0[i] = 0;
@@ -302,19 +302,3 @@ void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
   }
 }
 
-
-int tunereq_save_state(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-
-tune_status_t tunereq_set_point(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-
-tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
-  return TUNE_COMPLETE_SUCCESS;
-}
-
-int tunereq_restore_state(void *zcard_plugin) {
-  return TUNE_COMPLETE_SUCCESS;
-}

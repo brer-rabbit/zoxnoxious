@@ -23,7 +23,7 @@
 //
 
 
-// for tuning: all modulation off, muxes disabled
+// for tuning: all modulation off, muxes disabled.  QVCA Invert should be set.
 static const uint8_t tune_gpio_port0_data = 0x00;
 static const uint8_t tune_gpio_port1_data = 0x02;
 static const uint8_t port1_led_bit = 0x01;
@@ -82,11 +82,11 @@ int tunereq_save_state(void *zcard_plugin) {
 
   // set DAC values for tuning
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_cs0, SPI_MODE, zcard->slot);
-  for (int i = 0; i < DAC_CHANNELS; ++i) {
+  for (int i = 0; i < DAC_CHANNELS_CS0; ++i) {
     spiWrite(spi_channel, (char*)tune_dac_state_2140[i], 2);
   }
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_cs1, SPI_MODE, zcard->slot);
-  for (int i = 0; i < DAC_CHANNELS; ++i) {
+  for (int i = 0; i < DAC_CHANNELS_CS1; ++i) {
     spiWrite(spi_channel, (char*)tune_dac_state_2190[i], 2);
   }
 
@@ -113,17 +113,17 @@ tune_status_t tunereq_set_point(void *zcard_plugin) {
 
   // This defines the test point data to send to the DAC.
   // Determine which DAC line we're writing to and OR that into the right place.
-  dac_values[0] = channel_map[cutoff_cv_channel] |
+  dac_values[0] = cutoff_cv_channel << 4 |
     tune_freq_dac_values[ zcard->tuning_index ] >> 8;
   dac_values[1] = tune_freq_dac_values[ zcard->tuning_index ];
 
-  spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
+  spi_channel = set_spi_interface(zcard->zhost, spi_channel_cs0, SPI_MODE, zcard->slot);
   spiWrite(spi_channel, dac_values, 2);
 
   // obligatory "I'm tuning so blink the light"
-  i2cWriteByteData(zcard->i2c_handle, port0_addr,
+  i2cWriteByteData(zcard->i2c_handle, port1_addr,
                    zcard->tuning_index & 0x1 ?
-                   tune_gpio_port0_data | port0_led_bit : tune_gpio_port0_data);
+                   tune_gpio_port1_data | port1_led_bit : tune_gpio_port1_data);
 
   INFO("poledancer tune set point complete");
 
@@ -177,15 +177,18 @@ int tunereq_restore_state(void *zcard_plugin) {
   }
 
   // restore by setting to invalid state
-  for (int i = 0; i < DAC_CHANNELS; ++i) {
-    zcard->previous_samples[i] = -1;
+  for (int i = 0; i < DAC_CHANNELS_CS0; ++i) {
+    zcard->previous_samples_cs0[i] = -1;
+  }
+  for (int i = 0; i < DAC_CHANNELS_CS1; ++i) {
+    zcard->previous_samples_cs1[i] = -1;
   }
 
 
   // then calculate corrections
   if (zcard->tuning_index >= NUM_TUNING_POINTS) {
     create_correction_table(&zcard->tunable, tuning_vcf_initial_frequency_target);
-    prep_correction_table_ad5328(&zcard->tunable, channel_map[cutoff_cv_channel]);
+    prep_correction_table_ad5328(&zcard->tunable, cutoff_cv_channel << 4);
   }
   else {
     return TUNE_COMPLETE_FAILED;
