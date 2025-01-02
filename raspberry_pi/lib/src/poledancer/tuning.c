@@ -24,28 +24,23 @@
 
 
 // for tuning: all modulation off, muxes disabled.  QVCA Invert should be set.
-static const uint8_t tune_gpio_port0_data = 0x00;
+static const uint8_t tune_gpio_port0_data = 0x11;
 static const uint8_t tune_gpio_port1_data = 0x02;
 static const uint8_t port1_led_bit = 0x01;
 
 // tune_dac_state is in spiWrite order
 // set these values when tuning the 2140; spi channel 0
 static const char tune_dac_state_2140[][2] = { { 0x00, 0x00 }, // vcf cutoff
-                                               { 0x10, 0x00 }, // N/C
-                                               { 0x20, 0x00 }, // N/C
-                                               { 0x30, 0x00 }, // N/C
                                                { 0x40, 0x00 }, // source1 audio
                                                { 0x50, 0x00 }, // source1 mod
                                                { 0x60, 0x00 }, // source2 audio
                                                { 0x70, 0x00 } }; // source2 mod
 
 // set these values when on the 2190 (well, qctrl is on the 2140, crosses over) using spi channel 1
-static const char tune_dac_state_2190[][2] = { { 0x00, 0x00 }, // N/C
-                                               { 0x1f, 0xff }, // pole4
+static const char tune_dac_state_2190[][2] = { { 0x1f, 0xff }, // pole4
                                                { 0x20, 0x00 }, // pole2
                                                { 0x30, 0x00 }, // pole3
                                                { 0x40, 0x00 }, // pole1
-                                               { 0x50, 0x00 }, // N/C
                                                { 0x6f, 0xff }, // Qctrl CV
                                                { 0x70, 0x00 } }; // Dry Ctrl
 
