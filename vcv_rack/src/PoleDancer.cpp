@@ -41,7 +41,7 @@ enum cvChannel {
   DRY_LEVEL
 };
 
-static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Bandpass1", "Alt Bandpass2" };
+static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Mode 1", "Alt Mode 2" };
 
 
 struct PoleDancer : ZoxnoxiousModule {
@@ -316,9 +316,31 @@ struct PoleDancer : ZoxnoxiousModule {
 
     // qvca
     v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 1.f);
+    // Resonance slope & max will vary depending on Resonance Compensation mode
+    // for consistency between modes, try to get oscillation to start around 80%.
+    // From 80% then ramp up to the max allowable value.
+    switch( int(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue() + 0.5f) ) {
+    case 2: // modified 2P-bandpass
+        // oscillation starts at 16%, max rez is at 33%
+        // map 80% --> 16% and 100% --> 33%
+        v = v < 0.80f ? 0.20f * v : 0.85f * v - 0.52f;
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 0.34f);
+        break;
+    case 3: // oddball comp
+        // oscillation starts at 26%, max rez is at 50%
+        // map 80% --> 26% and 100% --> 50%
+        v = v < 0.80f ? 0.325f * v : 1.2f * v - 0.7f;
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 0.51f);
+        break;
+    default: // uncomp and 4P-bandpass
+        // map 80% --> 70% and 100% --> 100%
+        v = v < 0.80f ? 0.875f * v : 1.5f * v - 0.5f;
+        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 1.f);
+        break;
+    }
+
     if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] != v) {
-      resonanceClipTimer = clipTime;
+        resonanceClipTimer = clipTime;
     }
 
 
@@ -500,13 +522,13 @@ struct PoleDancerWidget : ModuleWidget {
     source2NameTextField->setText(module ? &module->source2NameString : NULL);
     addChild(source2NameTextField);
 
-    output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(57.024, 115.355)));
-    output1NameTextField->box.size = mm2px(Vec(18.388, 3.636));
+    output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(56.024, 115.355)));
+    output1NameTextField->box.size = mm2px(Vec(20.0, 3.636));
     output1NameTextField->setText(module ? &module->output1NameString : NULL);
     addChild(output1NameTextField);
 
-    output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(19.135, 115.355)));
-    output2NameTextField->box.size = mm2px(Vec(18.388, 3.636));
+    output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(18.135, 115.355)));
+    output2NameTextField->box.size = mm2px(Vec(20.0, 3.636));
     output2NameTextField->setText(module ? &module->output2NameString : NULL);
     addChild(output2NameTextField);
 
