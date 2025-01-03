@@ -65,6 +65,11 @@ struct PoleDancerPersonality : Module {
     dirty = true;
   }
 
+  void onRandomize() override {
+    personalityNameString = names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)];
+    dirty = true;
+  }
+
 
   void fromJson(json_t* rootJ) override {
     Module::fromJson(rootJ);
