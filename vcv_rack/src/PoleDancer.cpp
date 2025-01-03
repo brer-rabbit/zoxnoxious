@@ -41,17 +41,15 @@ enum cvChannel {
   DRY_LEVEL
 };
 
+static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Bandpass1", "Alt Bandpass2" };
+
+
 struct PoleDancer : ZoxnoxiousModule {
   enum ParamId {
     SOURCE_ONE_LEVEL_KNOB_PARAM,
     SOURCE_TWO_LEVEL_KNOB_PARAM,
     SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM,
     SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM,
-    DRY_MIX_KNOB_PARAM,
-    POLE1_MIX_KNOB_PARAM,
-    POLE2_MIX_KNOB_PARAM,
-    POLE3_MIX_KNOB_PARAM,
-    POLE4_MIX_KNOB_PARAM,
     CUTOFF_KNOB_PARAM,
     RESONANCE_KNOB_PARAM,
     FILTER_VCA_KNOB_PARAM,
@@ -61,10 +59,9 @@ struct PoleDancer : ZoxnoxiousModule {
     SOURCE_TWO_VALUE_HIDDEN_PARAM,
     SOURCE_TWO_DOWN_BUTTON_PARAM,
     SOURCE_TWO_UP_BUTTON_PARAM,
-    REZ_COMP_INV_SWITCH_PARAM,
-    REZ_COMP_P1_SWITCH_PARAM,
-    REZ_COMP_P2_SWITCH_PARAM,
-    REZ_COMP_P3_SWITCH_PARAM,
+    REZ_COMP_VALUE_HIDDEN_PARAM,
+    REZ_COMP_DOWN_BUTTON_PARAM,
+    REZ_COMP_UP_BUTTON_PARAM,
     PARAMS_LEN
   };
   enum InputId {
@@ -93,10 +90,8 @@ struct PoleDancer : ZoxnoxiousModule {
     SOURCE_ONE_UP_BUTTON_LIGHT,
     SOURCE_TWO_DOWN_BUTTON_LIGHT,
     SOURCE_TWO_UP_BUTTON_LIGHT,
-    REZ_COMP_P1_SWITCH_LIGHT,
-    REZ_COMP_P2_SWITCH_LIGHT,
-    REZ_COMP_P3_SWITCH_LIGHT,
-    REZ_COMP_INV_SWITCH_LIGHT,
+    REZ_COMP_DOWN_BUTTON_LIGHT,
+    REZ_COMP_UP_BUTTON_LIGHT,
     ENUMS(LEFT_EXPANDER_LIGHT, 3),
     ENUMS(RIGHT_EXPANDER_LIGHT, 3),
     LIGHTS_LEN
@@ -118,7 +113,7 @@ struct PoleDancer : ZoxnoxiousModule {
   std::string source2NameString;
   std::string output1NameString;
   std::string output2NameString;
-
+  std::string rezCompModeNameString;
 
   struct buttonParamMidiProgram {
       enum ParamId button;
@@ -128,10 +123,7 @@ struct PoleDancer : ZoxnoxiousModule {
     {
       { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 0, 1, 2, 3, 4, 5, 6, 7 } },
       { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 8, 9, 10, 11, 12, 13, 14, 15 } },
-      { REZ_COMP_INV_SWITCH_PARAM, INT_MIN, { 16, 17 } },
-      { REZ_COMP_P1_SWITCH_PARAM, INT_MIN, { 18, 19 } },
-      { REZ_COMP_P3_SWITCH_PARAM, INT_MIN, { 20, 21 } },
-      { REZ_COMP_P2_SWITCH_PARAM, INT_MIN, { 22, 23 } }
+      { REZ_COMP_VALUE_HIDDEN_PARAM, INT_MIN, { 24, 25, 26, 27 } }
     };
 
 
@@ -141,7 +133,9 @@ struct PoleDancer : ZoxnoxiousModule {
     cutoffClipTimer(0.f), resonanceClipTimer(0.f),
     filterVcaClipTimer(0.f),
     source1NameString(invalidCardOutputName), source2NameString(invalidCardOutputName),
-    output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName) {
+    output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName),
+    rezCompModeNameString(rezCompModes[0])
+    {
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -151,25 +145,18 @@ struct PoleDancer : ZoxnoxiousModule {
     configButton(SOURCE_TWO_DOWN_BUTTON_PARAM, "Previous");
     configButton(SOURCE_TWO_UP_BUTTON_PARAM, "Next");
 
+    configButton(REZ_COMP_DOWN_BUTTON_PARAM, "Previous");
+    configButton(REZ_COMP_UP_BUTTON_PARAM, "Next");
+
     configParam(SOURCE_ONE_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Source One Level", "%", 0.f, 100.f);
     configParam(SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Source One Mod", "%", 0.f, 100.f);
     configParam(SOURCE_TWO_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Source Two Level", "%", 0.f, 100.f);
     configParam(SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Source Two Mod", "%", 0.f, 100.f);
 
     configParam(CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff", "V", 0.f, 10.f, -1.f);
-    configSwitch(REZ_COMP_P1_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 1 Rez Comp", {"Off", "On"});
-    configSwitch(REZ_COMP_P2_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 2 Rez Comp", {"Off", "On"});
-    configSwitch(REZ_COMP_P3_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 3 Rez Comp", {"Off", "On"});
-    configSwitch(REZ_COMP_INV_SWITCH_PARAM, 0.f, 1.f, 0.f, "Invert Rez Comp", {"Off", "On"});
 
     configParam(RESONANCE_KNOB_PARAM, 0.f, 1.f, 0.f, "Resonance", "%", 0.f, 100.f);
     configParam(FILTER_VCA_KNOB_PARAM, 0.f, 1.f, 0.5f, "Output VCA", "%", 0.f, 100.f);
-
-    configParam(DRY_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Dry Mix", "%", 0.f, 100.f);
-    configParam(POLE1_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 1 Mix", "%", 0.f, 100.f);
-    configParam(POLE2_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 2 Mix", "%", 0.f, 100.f);
-    configParam(POLE3_MIX_KNOB_PARAM, 0.f, 1.f, 0.f, "Pole 3 Mix", "%", 0.f, 100.f);
-    configParam(POLE4_MIX_KNOB_PARAM, 0.f, 1.f, 0.2f, "Pole 4 Mix", "%", 0.f, 100.f);
 
     configInput(SOURCE_ONE_LEVEL_INPUT, "Source One Level");
     configInput(SOURCE_ONE_MOD_AMOUNT_INPUT, "Source One Mod Amount");
@@ -183,6 +170,7 @@ struct PoleDancer : ZoxnoxiousModule {
     // no UI elements for these
     configSwitch(SOURCE_ONE_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source One", {"0", "1", "2", "3", "4", "5", "6", "7"} );
     configSwitch(SOURCE_TWO_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source Two", {"0", "1", "2", "3", "4", "5", "6", "7"} );
+    configSwitch(REZ_COMP_VALUE_HIDDEN_PARAM, 0.f, 3.f, 0.f, "Rez Compensation", {"0", "1", "2", "3"} );
     lightDivider.setDivision(512);
   }
 
@@ -191,15 +179,12 @@ struct PoleDancer : ZoxnoxiousModule {
 
     if (lightDivider.process()) {
       // light up any buttons
-      lights[REZ_COMP_P1_SWITCH_LIGHT].setBrightness( params[REZ_COMP_P1_SWITCH_PARAM].getValue() > 0.f );
-      lights[REZ_COMP_P2_SWITCH_LIGHT].setBrightness( params[REZ_COMP_P2_SWITCH_PARAM].getValue() > 0.f );
-      lights[REZ_COMP_P3_SWITCH_LIGHT].setBrightness( params[REZ_COMP_P3_SWITCH_PARAM].getValue() > 0.f );
-      lights[REZ_COMP_INV_SWITCH_LIGHT].setBrightness( params[REZ_COMP_INV_SWITCH_PARAM].getValue() > 0.f );
-
       lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
       lights[SOURCE_ONE_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_UP_BUTTON_PARAM].getValue());
       lights[SOURCE_TWO_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_DOWN_BUTTON_PARAM].getValue());
       lights[SOURCE_TWO_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_UP_BUTTON_PARAM].getValue());
+      lights[REZ_COMP_DOWN_BUTTON_LIGHT].setBrightness(params[REZ_COMP_DOWN_BUTTON_PARAM].getValue());
+      lights[REZ_COMP_UP_BUTTON_LIGHT].setBrightness(params[REZ_COMP_UP_BUTTON_PARAM].getValue());
 
       // clipping
       const float lightTime = args.sampleTime * lightDivider.getDivision();
@@ -262,6 +247,22 @@ struct PoleDancer : ZoxnoxiousModule {
         sourceTwoInt = sourceTwoInt == 0 ? 7 : sourceTwoInt - 1;
         params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
         source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
+      }
+
+      // rez compensation mode selection buttons
+      if (params[ REZ_COMP_UP_BUTTON_PARAM ].getValue()) {
+        params[ REZ_COMP_UP_BUTTON_PARAM ].setValue(0);
+        int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
+        rezCompModeInt = rezCompModeInt == 3 ? 0 : rezCompModeInt + 1;
+        params[ REZ_COMP_VALUE_HIDDEN_PARAM ].setValue(rezCompModeInt);
+        rezCompModeNameString = rezCompModes[ rezCompModeInt ];
+      }
+      if (params[ REZ_COMP_DOWN_BUTTON_PARAM ].getValue()) {
+        params[ REZ_COMP_DOWN_BUTTON_PARAM ].setValue(0);
+        int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
+        rezCompModeInt = rezCompModeInt == 0 ? 3 : rezCompModeInt - 1;
+        params[ REZ_COMP_VALUE_HIDDEN_PARAM ].setValue(rezCompModeInt);
+        rezCompModeNameString = rezCompModes[ rezCompModeInt ];
       }
 
     }
@@ -346,20 +347,11 @@ struct PoleDancer : ZoxnoxiousModule {
       controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE4_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(4) / 10.f) * filterVcaGain;
     } else {
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + DRY_LEVEL] = filterVcaGain *
-        clamp(params[DRY_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
-
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE1_LEVEL] = filterVcaGain *
-        clamp(params[POLE1_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
-
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE2_LEVEL] = filterVcaGain *
-        clamp(params[POLE2_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
-
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE3_LEVEL] = filterVcaGain *
-        clamp(params[POLE3_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
-
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE4_LEVEL] = filterVcaGain *
-        clamp(params[POLE4_MIX_KNOB_PARAM].getValue(), 0.f, 1.f);
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + DRY_LEVEL] = 0.f;
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE1_LEVEL] = 0.f;
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE2_LEVEL] = 0.f;
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE3_LEVEL] = 0.f;
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE4_LEVEL] = filterVcaGain;
     }
 
 
@@ -452,45 +444,50 @@ struct PoleDancerWidget : ModuleWidget {
     addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(47.604, 21.599)), module, PoleDancer::SOURCE_TWO_DOWN_BUTTON_PARAM, PoleDancer::SOURCE_TWO_DOWN_BUTTON_LIGHT));
     addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(58.965, 21.599)), module, PoleDancer::SOURCE_TWO_UP_BUTTON_PARAM, PoleDancer::SOURCE_TWO_UP_BUTTON_LIGHT));
 
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(15.131, 110.166)), module, PoleDancer::REZ_COMP_DOWN_BUTTON_PARAM, PoleDancer::REZ_COMP_DOWN_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(26.737, 110.166)), module, PoleDancer::REZ_COMP_UP_BUTTON_PARAM, PoleDancer::REZ_COMP_UP_BUTTON_LIGHT));
+
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(13.639, 39.831)), module, PoleDancer::SOURCE_ONE_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(32.373, 39.831)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(29.210, 39.831)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(50.462, 39.831)), module, PoleDancer::SOURCE_TWO_LEVEL_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(68.8, 39.831)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(12.37, 77.109)), module, PoleDancer::CUTOFF_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(29.21, 77.379)), module, PoleDancer::RESONANCE_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(66.982, 77.379)), module, PoleDancer::FILTER_VCA_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(68.474, 77.415)), module, PoleDancer::FILTER_VCA_KNOB_PARAM));
 
+
+    /*
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.666, 76.946)), module, PoleDancer::REZ_COMP_P1_SWITCH_PARAM, PoleDancer::REZ_COMP_P1_SWITCH_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(52.616, 76.946)), module, PoleDancer::REZ_COMP_P2_SWITCH_PARAM, PoleDancer::REZ_COMP_P2_SWITCH_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.666, 91.072)), module, PoleDancer::REZ_COMP_P3_SWITCH_PARAM, PoleDancer::REZ_COMP_P3_SWITCH_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(52.616, 91.072)), module, PoleDancer::REZ_COMP_INV_SWITCH_PARAM, PoleDancer::REZ_COMP_INV_SWITCH_LIGHT));
-
 
     addParam(createParamCentered<Trimpot>(mm2px(Vec(23.754, 109.044)), module, PoleDancer::DRY_MIX_KNOB_PARAM));
     addParam(createParamCentered<Trimpot>(mm2px(Vec(35.331, 109.044)), module, PoleDancer::POLE1_MIX_KNOB_PARAM));
     addParam(createParamCentered<Trimpot>(mm2px(Vec(46.907, 109.044)), module, PoleDancer::POLE2_MIX_KNOB_PARAM));
     addParam(createParamCentered<Trimpot>(mm2px(Vec(58.483, 109.044)), module, PoleDancer::POLE3_MIX_KNOB_PARAM));
     addParam(createParamCentered<Trimpot>(mm2px(Vec(70.06, 109.044)), module, PoleDancer::POLE4_MIX_KNOB_PARAM));
+    */
 
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(13.639, 53.193)), module, PoleDancer::SOURCE_ONE_LEVEL_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.373, 53.193)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(29.210, 53.193)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50.462, 53.194)), module, PoleDancer::SOURCE_TWO_LEVEL_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(68.8, 53.194)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.37, 90.742)), module, PoleDancer::CUTOFF_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(29.21, 90.742)), module, PoleDancer::RESONANCE_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(66.982, 90.742)), module, PoleDancer::FILTER_VCA_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.847, 109.044)), module, PoleDancer::POLE_MIX_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(68.47, 90.742)), module, PoleDancer::FILTER_VCA_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(68.473, 108.151)), module, PoleDancer::POLE_MIX_INPUT));
 
     addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.02, 8.219)), module, PoleDancer::LEFT_EXPANDER_LIGHT));
     addChild(createLightCentered<TriangleRightLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(79.507, 8.219)), module, PoleDancer::RIGHT_EXPANDER_LIGHT));
 
     addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(17.687, 45.831)), module, PoleDancer::SOURCE_ONE_LEVEL_CLIP_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(36.421, 45.831)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_CLIP_LIGHT));
+    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(33.172, 45.831)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_CLIP_LIGHT));
     addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(54.425, 45.831)), module, PoleDancer::SOURCE_TWO_LEVEL_CLIP_LIGHT));
     addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(72.763, 45.831)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_CLIP_LIGHT));
     addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(16.332, 83.379)), module, PoleDancer::CUTOFF_CLIP_LIGHT));
     addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(33.173, 83.379)), module, PoleDancer::RESONANCE_CLIP_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(70.945, 83.379)), module, PoleDancer::FILTER_VCA_CLIP_LIGHT));
+    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(72.436, 83.379)), module, PoleDancer::FILTER_VCA_CLIP_LIGHT));
 
     // Text fields
     source1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(7.185, 13.839)));
@@ -503,15 +500,20 @@ struct PoleDancerWidget : ModuleWidget {
     source2NameTextField->setText(module ? &module->source2NameString : NULL);
     addChild(source2NameTextField);
 
-    output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(57.788, 117.012)));
+    output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(57.024, 115.355)));
     output1NameTextField->box.size = mm2px(Vec(18.388, 3.636));
     output1NameTextField->setText(module ? &module->output1NameString : NULL);
     addChild(output1NameTextField);
 
-    output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(19.135, 117.012)));
+    output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(19.135, 115.355)));
     output2NameTextField->box.size = mm2px(Vec(18.388, 3.636));
     output2NameTextField->setText(module ? &module->output2NameString : NULL);
     addChild(output2NameTextField);
+
+    rezCompTextField = createWidget<CardTextDisplay>(mm2px(Vec(7.283, 102.406)));
+    rezCompTextField->box.size = mm2px(Vec(25.0, 3.636));
+    rezCompTextField->setText(module ? &module->rezCompModeNameString : NULL);
+    addChild(rezCompTextField);
   }
 
 
@@ -519,6 +521,7 @@ struct PoleDancerWidget : ModuleWidget {
   CardTextDisplay *source2NameTextField;
   CardTextDisplay *output1NameTextField;
   CardTextDisplay *output2NameTextField;
+  CardTextDisplay *rezCompTextField;
 
 };
 
