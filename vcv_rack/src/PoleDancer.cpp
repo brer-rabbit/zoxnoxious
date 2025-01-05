@@ -448,6 +448,17 @@ struct PoleDancer : ZoxnoxiousModule {
     source2NameString = invalidCardOutputName;
   }
 
+
+  json_t* dataToJson() override {
+    json_t* rootJ = json_object();
+    return rootJ;
+  }
+
+  void dataFromJson(json_t* rootJ) override {
+    int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
+    rezCompModeNameString = rezCompModes[ rezCompModeInt ];
+    INFO("poledancer: setting comp mode to %s", rezCompModeNameString.c_str());
+  }
 };
 
 
