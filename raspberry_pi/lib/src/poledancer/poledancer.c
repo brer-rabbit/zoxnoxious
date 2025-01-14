@@ -251,7 +251,7 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 0, port0_addr, 0b00110000, 0b00111111 }, // prog 14 - sig2 select card6/out2
   { 0, port0_addr, 0b00010000, 0b00011111 }, // prog 15 - sig2 select card7/out1
 
-  // resonance compensation selection
+  // resonance compensation selection: midi program 16 - 23
   { 1, port1_addr, 0b00000000, 0b11111101 }, // prog 16 - QVCA noninvert
   { 1, port1_addr, 0b00000010, 0b11111111 }, // prog 17 - QVCA invert
   { 1, port1_addr, 0b00000000, 0b11111011 }, // prog 18 - rez stage 1 disable
@@ -259,7 +259,13 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 1, port1_addr, 0b00000000, 0b11101111 }, // prog 20 - rez stage 3 disable
   { 1, port1_addr, 0b00010000, 0b11111111 }, // prog 21 - rez stage 3 enable
   { 1, port1_addr, 0b00000000, 0b10111111 }, // prog 22 - rez stage 2 disable
-  { 1, port1_addr, 0b01000000, 0b11111111 }  // prog 23 - rez stage 2 enable
+  { 1, port1_addr, 0b01000000, 0b11111111 },  // prog 23 - rez stage 2 enable
+
+  // program shortcuts for the usable resonance compensation modes
+  { 1, port1_addr, 0b00000010, 0b00000010 }, // prog 24 - no compensation
+  { 1, port1_addr, 0b01010000, 0b01010000 }, // prog 25 - 4P bandpass
+  { 1, port1_addr, 0b00000110, 0b00000110 }, // prog 26 - 2P alt bandpass
+  { 1, port1_addr, 0b01000110, 0b01000110 }, // prog 27 - alt compensation
 
 };
 
