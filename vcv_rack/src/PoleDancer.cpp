@@ -44,6 +44,8 @@ enum cvChannel {
 static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Mode 1", "Alt Mode 2" };
 
 
+static const float mixerGain = 8.f;
+
 struct PoleDancer : ZoxnoxiousModule {
   enum ParamId {
     SOURCE_ONE_LEVEL_KNOB_PARAM,
@@ -373,7 +375,7 @@ struct PoleDancer : ZoxnoxiousModule {
       controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE1_LEVEL] = 0.f;
       controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE2_LEVEL] = 0.f;
       controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE3_LEVEL] = 0.f;
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE4_LEVEL] = filterVcaGain;
+      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE4_LEVEL] = filterVcaGain / mixerGain;
     }
 
 
