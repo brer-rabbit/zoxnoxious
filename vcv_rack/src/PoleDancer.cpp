@@ -121,7 +121,7 @@ struct PoleDancer : ZoxnoxiousModule {
       enum ParamId button;
       int previousValue;
       uint8_t midiProgram[8];
-  } buttonParamToMidiProgramList[6] =
+  } buttonParamToMidiProgramList[3] =
     {
       { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 0, 1, 2, 3, 4, 5, 6, 7 } },
       { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 8, 9, 10, 11, 12, 13, 14, 15 } },
@@ -174,6 +174,7 @@ struct PoleDancer : ZoxnoxiousModule {
     configSwitch(SOURCE_TWO_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source Two", {"0", "1", "2", "3", "4", "5", "6", "7"} );
     configSwitch(REZ_COMP_VALUE_HIDDEN_PARAM, 0.f, 3.f, 0.f, "Rez Compensation", {"0", "1", "2", "3"} );
     lightDivider.setDivision(512);
+
   }
 
   void process(const ProcessArgs& args) override {
