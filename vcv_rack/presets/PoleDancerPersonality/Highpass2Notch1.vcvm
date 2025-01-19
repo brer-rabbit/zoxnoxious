@@ -4,27 +4,27 @@
   "version": "2.0.0",
   "params": [
     {
-      "value": 0.0,
+      "value": 1.25,
       "id": 0
     },
     {
-      "value": 0.0,
+      "value": 5.0,
       "id": 1
     },
     {
-      "value": 10.0,
+      "value": 8.75,
       "id": 2
     },
     {
-      "value": 10.0,
+      "value": 7.5,
       "id": 3
     },
     {
-      "value": 0.0,
+      "value": 2.5,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "HP1 + LP2"
+    "personalityNameString": "Highpass2Notch1"
   }
 }

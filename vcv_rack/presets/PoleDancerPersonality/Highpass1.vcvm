@@ -4,11 +4,11 @@
   "version": "2.0.0",
   "params": [
     {
-      "value": 10.0,
+      "value": 1.25,
       "id": 0
     },
     {
-      "value": 10.0,
+      "value": 1.25,
       "id": 1
     },
     {
@@ -25,6 +25,6 @@
     }
   ],
   "data": {
-    "personalityNameString": "Highpass1"
+    "personalityNameString": "HIghpass1"
   }
 }

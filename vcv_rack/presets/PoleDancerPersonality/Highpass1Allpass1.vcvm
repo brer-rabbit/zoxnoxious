@@ -4,19 +4,19 @@
   "version": "2.0.0",
   "params": [
     {
-      "value": 0.0,
+      "value": 1.25,
       "id": 0
     },
     {
-      "value": 2.5,
+      "value": 3.75,
       "id": 1
     },
     {
-      "value": 10.0,
+      "value": 2.5,
       "id": 2
     },
     {
-      "value": 10.0,
+      "value": 0.0,
       "id": 3
     },
     {
@@ -25,6 +25,6 @@
     }
   ],
   "data": {
-    "personalityNameString": "LP1 + AP2"
+    "personalityNameString": "HP1 AP1"
   }
 }

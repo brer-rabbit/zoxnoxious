@@ -20,11 +20,11 @@
       "id": 3
     },
     {
-      "value": 10.0,
+      "value": 1.25,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "Lowpass 4"
+    "personalityNameString": "Lowpass4"
   }
 }

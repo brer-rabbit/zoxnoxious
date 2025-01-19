@@ -4,15 +4,15 @@
   "version": "2.0.0",
   "params": [
     {
-      "value": 2.5,
+      "value": 1.25,
       "id": 0
     },
     {
-      "value": 10.0,
+      "value": 5.0,
       "id": 1
     },
     {
-      "value": 10.0,
+      "value": 5.0,
       "id": 2
     },
     {

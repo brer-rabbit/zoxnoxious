@@ -4,27 +4,27 @@
   "version": "2.0.0",
   "params": [
     {
-      "value": 1.6666666269302368,
+      "value": 0.0,
       "id": 0
     },
     {
-      "value": 6.6666665077209473,
+      "value": 3.0,
       "id": 1
     },
     {
-      "value": 10.0,
+      "value": 9.0,
       "id": 2
     },
     {
-      "value": 6.6666665077209473,
+      "value": 10.0,
       "id": 3
     },
     {
-      "value": 0.0,
+      "value": 4.0,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "AP1 + Notch1"
+    "personalityNameString": "BP NotchLow"
   }
 }

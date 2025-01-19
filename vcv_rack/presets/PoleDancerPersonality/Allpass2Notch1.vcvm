@@ -4,15 +4,15 @@
   "version": "2.0.0",
   "params": [
     {
-      "value": 0.0,
+      "value": 0.625,
       "id": 0
     },
     {
-      "value": 0.0,
+      "value": 3.75,
       "id": 1
     },
     {
-      "value": 0.0,
+      "value": 8.75,
       "id": 2
     },
     {
@@ -20,11 +20,11 @@
       "id": 3
     },
     {
-      "value": 10.0,
+      "value": 5.0,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "HP1 + LP3"
+    "personalityNameString": "Allpass2Notch1"
   }
 }

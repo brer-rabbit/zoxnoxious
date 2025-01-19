@@ -4,27 +4,27 @@
   "version": "2.0.0",
   "params": [
     {
-      "value": 0.0,
+      "value": 1.111111044883728,
       "id": 0
     },
     {
-      "value": 0.0,
+      "value": 5.5555558204650879,
       "id": 1
     },
     {
-      "value": 5.0,
+      "value": 10.0,
       "id": 2
     },
     {
-      "value": 10.0,
+      "value": 7.7777776718139648,
       "id": 3
     },
     {
-      "value": 10.0,
+      "value": 2.2222220897674561,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "LP2 + Notch"
+    "personalityNameString": "Highpass3 AP1"
   }
 }

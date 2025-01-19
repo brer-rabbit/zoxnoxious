@@ -4,15 +4,15 @@
   "version": "2.0.0",
   "params": [
     {
-      "value": 3.3333332538604736,
+      "value": 1.25,
       "id": 0
     },
     {
-      "value": 10.0,
+      "value": 2.5,
       "id": 1
     },
     {
-      "value": 6.6666665077209473,
+      "value": 2.5,
       "id": 2
     },
     {
@@ -25,6 +25,6 @@
     }
   ],
   "data": {
-    "personalityNameString": "HP1 + AP1"
+    "personalityNameString": "Lowpass1Notch"
   }
 }

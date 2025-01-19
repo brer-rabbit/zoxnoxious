@@ -8,23 +8,23 @@
       "id": 0
     },
     {
-      "value": 1.6666666269302368,
+      "value": 0.0,
       "id": 1
     },
     {
-      "value": 5.0,
+      "value": 0.375,
       "id": 2
     },
     {
-      "value": 10.0,
+      "value": 0.75,
       "id": 3
     },
     {
-      "value": 6.6666665077209473,
+      "value": 1.875,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "BP OffsetNotch"
+    "personalityNameString": "LP2 Brickwall"
   }
 }

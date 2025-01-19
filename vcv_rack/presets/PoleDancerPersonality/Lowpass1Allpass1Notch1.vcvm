@@ -8,23 +8,23 @@
       "id": 0
     },
     {
-      "value": 3.3299999237060547,
+      "value": 1.25,
       "id": 1
     },
     {
-      "value": 10.0,
+      "value": 5.0,
       "id": 2
     },
     {
-      "value": 10.0,
+      "value": 7.5,
       "id": 3
     },
     {
-      "value": 3.3299999237060547,
+      "value": 5.0,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "HP3 + LP1"
+    "personalityNameString": "LP1 AP1 NT1"
   }
 }

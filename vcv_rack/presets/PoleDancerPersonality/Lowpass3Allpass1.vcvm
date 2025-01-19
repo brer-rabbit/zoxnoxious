@@ -8,23 +8,23 @@
       "id": 0
     },
     {
-      "value": 5.0,
+      "value": 0.0,
       "id": 1
     },
     {
-      "value": 10.0,
+      "value": 0.0,
       "id": 2
     },
     {
-      "value": 0.0,
+      "value": 1.25,
       "id": 3
     },
     {
-      "value": 0.0,
+      "value": 2.5,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "LP1 + AP1"
+    "personalityNameString": "LP3 AP1"
   }
 }

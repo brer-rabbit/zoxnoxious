@@ -16,7 +16,7 @@
       "id": 2
     },
     {
-      "value": 10.0,
+      "value": 1.25,
       "id": 3
     },
     {
@@ -25,6 +25,6 @@
     }
   ],
   "data": {
-    "personalityNameString": "Lowpass 3"
+    "personalityNameString": "Lowpass3"
   }
 }

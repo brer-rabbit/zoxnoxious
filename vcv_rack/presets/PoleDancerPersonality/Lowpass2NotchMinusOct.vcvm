@@ -8,11 +8,11 @@
       "id": 0
     },
     {
-      "value": 5.0,
+      "value": 0.0,
       "id": 1
     },
     {
-      "value": 10.0,
+      "value": 5.0,
       "id": 2
     },
     {
@@ -20,11 +20,11 @@
       "id": 3
     },
     {
-      "value": 0.0,
+      "value": 6.25,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "LP1 + Notch"
+    "personalityNameString": "LP2 Notch-Oct"
   }
 }

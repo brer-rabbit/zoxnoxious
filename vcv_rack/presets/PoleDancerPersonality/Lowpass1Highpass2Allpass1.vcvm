@@ -8,11 +8,11 @@
       "id": 0
     },
     {
-      "value": 0.0,
+      "value": 2.0,
       "id": 1
     },
     {
-      "value": 2.5,
+      "value": 8.0,
       "id": 2
     },
     {
@@ -20,11 +20,11 @@
       "id": 3
     },
     {
-      "value": 10.0,
+      "value": 4.0,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "LP2 + 2AP"
+    "personalityNameString": "LP1 HP2 AP1"
   }
 }

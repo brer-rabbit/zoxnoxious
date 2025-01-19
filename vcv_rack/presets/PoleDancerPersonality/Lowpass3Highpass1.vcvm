@@ -8,7 +8,7 @@
       "id": 0
     },
     {
-      "value": 1.25,
+      "value": 0.0,
       "id": 1
     },
     {
@@ -16,15 +16,15 @@
       "id": 2
     },
     {
-      "value": 0.0,
+      "value": 1.25,
       "id": 3
     },
     {
-      "value": 0.0,
+      "value": 1.25,
       "id": 4
     }
   ],
   "data": {
-    "personalityNameString": "Lowpass1"
+    "personalityNameString": "LP3 HP1"
   }
 }
