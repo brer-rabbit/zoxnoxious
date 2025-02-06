@@ -1169,8 +1169,8 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 9114b46a-406a-421d-a621-800964b676f7)
   )
-  (text "For current thru LM4040 of: 1000uA to 75uA\nGiven VREF_2.5 load of: (45k || 100k) 31k ==> 80uA\nTarget ~200uA through Rs ==> 12k R, 208uA, 0.5mW\n"
-    (at 20.32 168.275 0)
+  (text "Datasheet current thru LM4040:\n1000uA to 75uA: shoot for ~120uA\nGiven VREF_2.5 load: (45k||45k||100k) 18k4 ==> 136uA\nGive the R about 250uA: 2.5V/250uA => 10k\n\n"
+    (at 18.415 170.18 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid b7fcdd94-2d56-4920-b854-5f4c71543644)
   )
@@ -1184,7 +1184,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid f103b9e2-e0f3-4ee8-9c38-269f5cf4af17)
   )
-  (text "DAC: 2.5V Reference Voltage\nVref load: 45k\n--> design for unbuffered 0:Vref range"
+  (text "DAC: 2.5V Reference Voltage\nVref load: 45k || 45k ==> 22.5k\n--> design for unbuffered 0:Vref range"
     (at 49.53 41.91 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid f9cdf5da-db86-4b3a-a169-cee2874bc0ff)
@@ -1891,7 +1891,7 @@
     (property "Reference" "R17" (at 43.688 134.7216 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "12k" (at 43.688 137.033 0)
+    (property "Value" "10k" (at 43.688 137.033 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 40.132 135.89 90)
@@ -1900,7 +1900,7 @@
     (property "Datasheet" "~" (at 41.91 135.89 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC Part" "C22790" (at 41.91 135.89 0)
+    (property "LCSC Part" "C25804" (at 41.91 135.89 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 1989b28f-e111-4b52-9578-89aef826c960))
