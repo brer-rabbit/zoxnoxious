@@ -13,7 +13,8 @@ A card is a circuit board that plugs into the Zoxnoxious backplane.  Each card r
 
 * AS3340 VCO
 * AS3372 Signal Processor (VCF, VCA)
-* SSI2130/AS3394 Dual VCO Synth Voice
+* SSI2130/AS3394 Dual VCO + VCF Synth Voice
+* Pole Dancer multimode filter with morphing/crossfade
 
 The design allows for up to 8 cards to be controlled.  The backplane counts as one of the eight.  The current physical board is designed with 6 slots.
 
