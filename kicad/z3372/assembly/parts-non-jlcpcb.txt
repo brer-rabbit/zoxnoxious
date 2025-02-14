@@ -1,0 +1,8 @@
+"2u2","C34,C38","Capacitor_THT:C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2",""
+"Conn_01x01","J1","Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",""
+"Conn_02x20_Odd_Even","J2","Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Horizontal",""
+"Conn_01x02","J3","Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",""
+"TestPoint","TP1,TP2,TP3,TP4,TP5,TP6,TP7,TP8,TP9,TP10,TP11","TestPoint:TestPoint_Pad_2.0x2.0mm",""
+"AS3360-Audio","U1","Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",""
+"AS3372","U3","Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm",""
+"L79L05_TO92","U9","Package_TO_SOT_THT:TO-92_Inline_Wide",""

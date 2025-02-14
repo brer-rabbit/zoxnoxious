@@ -7,8 +7,8 @@
   (paper "B")
   (title_block
     (title "Zoxnoxious Pole Dancer Mixing Filter")
-    (date "2024-11-17")
-    (rev "0.1")
+    (date "2025-02-13")
+    (rev "0.2")
     (company "Zoxnoxious Engineering")
   )
 
@@ -12262,10 +12262,10 @@
   (gr_text "40" (at 78.35 96.85 90) (layer "F.SilkS") (tstamp 558928d2-a78b-4684-8261-cdf2d87b3d3f)
     (effects (font (size 1 1) (thickness 0.15)))
   )
-  (gr_text "SCALING" (at 114.2 63.6 90) (layer "F.SilkS") (tstamp 56a431ae-40c6-4f2c-a4e2-4216df431c1f)
+  (gr_text "SCALE" (at 114.2 62.6 90) (layer "F.SilkS") (tstamp 56a431ae-40c6-4f2c-a4e2-4216df431c1f)
     (effects (font (size 0.8 0.8) (thickness 0.09)) (justify left bottom))
   )
-  (gr_text "POLE DANCER V0.1 2/2025" (at 143.4 57.4 90) (layer "F.SilkS") (tstamp 71dd7484-79cd-46f8-93b6-1739f8a9f3b5)
+  (gr_text "POLE DANCER V0.2 2/2025" (at 143.4 57.4 90) (layer "F.SilkS") (tstamp 71dd7484-79cd-46f8-93b6-1739f8a9f3b5)
     (effects (font (size 1 1) (thickness 0.15)))
   )
   (gr_text "BEYOND OBNOXIOUS" (at 67 66.2 90) (layer "F.SilkS") (tstamp 82677c46-e134-4386-9eeb-6bb83422cf0f)
