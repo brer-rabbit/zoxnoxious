@@ -968,6 +968,11 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 521fad1d-c460-44ad-87e1-ef963668cd51)
   )
+  (text "These lowpass RC numbers are off; they're a bit low.\nOnly took into account source side R in most calcs.\nI'm not going to recalc them though; they're close enough.\n"
+    (at 245.745 257.175 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid b489876b-83ec-465a-a6c2-f6e03c1f16f0)
+  )
   (text "CV for AS3364 VCAs with max level 2.08V (or 1.93V typ)\nLowpass @ 1585 Hz"
     (at 324.485 127 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
