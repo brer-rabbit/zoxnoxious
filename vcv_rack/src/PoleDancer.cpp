@@ -326,18 +326,18 @@ struct PoleDancer : ZoxnoxiousModule {
     case 2: // modified 2P-bandpass
         // oscillation starts at 16%, max rez is at 33%
         // map 80% --> 16% and 100% --> 33%
-        v = 0.5 * (v < 0.80f ? 0.20f * v : 0.85f * v - 0.52f);
+        v = v < 0.80f ? 0.20f * v : 0.85f * v - 0.52f;
         controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 0.34f);
         break;
     case 3: // oddball comp
         // oscillation starts at 26%, max rez is at 50%
         // map 80% --> 26% and 100% --> 50%
-        v = 0.5 * (v < 0.80f ? 0.325f * v : 1.2f * v - 0.7f);
+        v = v < 0.80f ? 0.325f * v : 1.2f * v - 0.7f;
         controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 0.51f);
         break;
     default: // uncomp and 4P-bandpass
         // map 80% --> 70% and 100% --> 100%
-        v = 0.5 * (v < 0.80f ? 0.875f * v : 1.5f * v - 0.5f);
+        v = v < 0.80f ? 0.875f * v : 1.5f * v - 0.5f;
         controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 1.f);
         break;
     }
