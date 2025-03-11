@@ -35,7 +35,7 @@ Comment,Designator,Footprint,LCSC Part #
 "30k","R45,R91,R97","Resistor_SMD:R_0603_1608Metric","C22984"
 "240","R46","Resistor_SMD:R_0805_2012Metric","C17572"
 "1k","R4,R10,R12,R15,R47,R65,R78,R79,R80,R83,R103","Resistor_SMD:R_0603_1608Metric","C21190"
-"267k","R48","Resistor_SMD:R_0603_1608Metric","C705753"
+"267k","R48","Resistor_SMD:R_0603_1608Metric","C22963"
 "22k","R5,R49,R100","Resistor_SMD:R_0603_1608Metric","C31850"
 "270","R50","Resistor_SMD:R_0603_1608Metric","C22966"
 "75k","R55,R74","Resistor_SMD:R_0603_1608Metric","C23242"
