@@ -20,10 +20,12 @@
  */
 
 #include <alsa/asoundlib.h>
+#include <errno.h>
 #include <getopt.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <pigpio.h>
+#include <poll.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,7 +53,8 @@
 #define EXPIRATIONS_MISSED_GTE_TEN 3
 #define DISCOVERY_REPORT_SIZE_BYTES 28
 
-
+// midi thread polls with a timeout to check for thread termination condition
+#define MIDI_TIMEOUT_MS 10000
 
 /* globals-  mainly so they can be accessed by signal handler  */
 static struct card_manager *card_mgr = NULL;
@@ -78,7 +81,7 @@ static void* read_pcm_and_call_plugins(void *);
 static void* midi_in_to_plugins(void *);
 static void generate_discovery_report(uint8_t discovery_report_sysex[]);
 static int z_midi_write(uint8_t *buffer, int buffer_size);
-
+static int get_midi_input_fd();
 
 
 int main(int argc, char **argv, char **envp) {
@@ -587,143 +590,178 @@ struct midi_state {
 
 // Discovered card number maps to MIDI channel number.  Not actual slot number.
 
+
+/* get_midi_input_fd gets the midi file descriptor such that it can be polled for input
+ * Return <0 on error.
+ */
+static int get_midi_input_fd() {
+  int midi_fd = -1;
+  int num_descriptors = snd_rawmidi_poll_descriptors_count(midi_in);
+
+  if (num_descriptors <= 0) {
+    ERROR("Error: No poll descriptors available for MIDI input.");
+    return -1;
+  }
+
+  // initialization only- I'll allow for calloc here
+  struct pollfd *pfds = calloc(num_descriptors, sizeof(struct pollfd));
+  if (!pfds) {
+    ERROR("Error allocating memory for MIDI poll descriptors");
+    return -1; // Indicate error
+  }
+
+  if (snd_rawmidi_poll_descriptors(midi_in, pfds, num_descriptors) > 0) {
+    // Assuming only one readable descriptor for MIDI input
+    for (int i = 0; i < num_descriptors; ++i) {
+      if (pfds[i].events & POLLIN) {
+        midi_fd = pfds[i].fd;
+        break;
+      }
+    }
+    if (midi_fd == -1) {
+      ERROR("Error: Could not find a readable MIDI input descriptor");
+    }
+  }
+  else {
+    ERROR("Error: Failed to get MIDI poll descriptors: %s", snd_strerror(snd_rawmidi_poll_descriptors(midi_in, pfds, num_descriptors)));
+  }
+
+  free(pfds);
+  return midi_fd;
+}
+
+
 // read the midi stream, pass along to cards.  To be called as a thread.
+// Poll the MIDI in stream with a timeout of MIDI_TIMEOUT_MS.  Timeout allows
+// periodic checking of whether the thread should terminate or not.
 static void* midi_in_to_plugins(void *arg) {
+  int midi_fd = get_midi_input_fd();
   int midi_read_status = 0;
   uint8_t buffer[256];
-  // 1ms timer for polling midi
-  int timerfd_midi_clock;
-  struct itimerspec itimerspec_midi_clock = {
-    .it_interval.tv_sec = 0,
-    .it_interval.tv_nsec = 2000000,
-    .it_value.tv_sec = 0,
-    .it_value.tv_nsec = 2000000
-  };
-  uint64_t expirations;
   struct midi_state midi_state = { 0 };
   uint8_t discovery_report_sysex[DISCOVERY_REPORT_SIZE_BYTES] = { 0 };
 
+  if (midi_fd < 0) {
+    ERROR("Failed to obtain MIDI input file descriptor. MIDI input will not be processed.");
+    return NULL; // Or handle how exactly?
+  }
+
   generate_discovery_report(discovery_report_sysex);
 
-
-  if ( (timerfd_midi_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
-    char error[256];
-    strerror_r(errno, error, 256);
-    ERROR("failed to create midi timer: %s", error);
-  }
-
-  if ( (timerfd_settime(timerfd_midi_clock, 0, &itimerspec_midi_clock, 0) ) == -1) {
-    char error[256];
-    strerror_r(errno, error, 256);
-    ERROR("failed to start midi timer: %s", error);
-  }
-
-  INFO("starting MIDI In event loop: timing %" PRId64 " usec",
-       itimerspec_midi_clock.it_interval.tv_nsec / 1000LL);
+  INFO("starting MIDI In event loop");
 
   while (alsa_thread_run) {
 
-    // non-blocking read so we can periodically query the alsa_thread_run flag.
-    // try not to be too busy loop by only running this loop periodically (2.5 ms maybe?)
-    midi_read_status = snd_rawmidi_read(midi_in, buffer, sizeof(buffer));
-    if (midi_read_status == -EAGAIN || midi_read_status == -EBUSY) {
+    struct pollfd fds[1];
+    fds[0].fd = midi_fd;
+    fds[0].events = POLLIN;
+    fds[0].revents = 0;
+
+    int retval = poll(fds, 1, MIDI_TIMEOUT_MS);
+
+    if (retval == -1) {
+      if (errno == EINTR) {
+        continue;
+      }
+      else {
+        ERROR("Error in poll(): %s", strerror(errno));
+        break;
+      }
     }
-    else if (midi_read_status < 0) { // non-EAGAIN non-EBUSY error
-      ERROR("Error reading MIDI input: %s", snd_strerror(midi_read_status));
-      return NULL;
-    }
-    else {
-      INFO("MIDI read received %d bytes", midi_read_status);
-      INFO("Tune in progress: %d", system_tune_in_progress);
-      // read the midi stream. could be starting anywhere in the stream,
-      // account for that by tracking stream state. This makes the stream parsing a
-      // bit obtuse but we need to account for fragmented reads and such.
-      for (int i = 0; i < midi_read_status; ++i) {
+    else if (retval > 0) {
+      if (fds[0].revents & POLLIN) {
 
-        if ( (buffer[i] & 0xF0) == MIDI_PROGRAM_CHANGE) {
-          midi_state.status = MIDI_PROGRAM_CHANGE;
-          midi_state.channel = buffer[i] & 0x0F;
-        }
-        else if (midi_state.status == MIDI_PROGRAM_CHANGE) {
-          // get program change and call plugin
-          INFO("MIDI: channel 0x%X program change: 0x%X",
-               midi_state.channel,
-               buffer[i]);
-          // card numbering maps to midi channel.  So check we've got a valid
-          // midi channel against how many cards we've got to ensure we can
-          // dispatch the midi message.
-          if (midi_state.channel < card_mgr->num_cards) {
-            struct plugin_card *card = &card_mgr->cards[ midi_state.channel ];
-            // leap of faith into the function
-            card->process_midi_program_change(card->plugin_object, buffer[i]);
-          }
-          else {
-            WARN("Expected midi message on channel 0x%X to map to a user card",
-                 midi_state.channel);
-          }
+        midi_read_status = snd_rawmidi_read(midi_in, buffer, sizeof(buffer));
+        if (midi_read_status > 0) {
+          INFO("MIDI read received %d bytes", midi_read_status);
 
-          // then clear state
-          midi_state.status = MIDI_STATUS_NOT_SET;
-        }
-        else if (buffer[i] == MIDI_SYSEX_START) {  // no channel for sysex
-          midi_state.status = MIDI_SYSEX_START;
-          INFO("MIDI: sysex start received");
-          midi_state.channel = 0;
-          midi_state.sysex_message_type = TYPE_UNSET;
-          midi_state.sysex_buffer_size = 0;
-        }
-        else if (midi_state.status == MIDI_SYSEX_START &&
-                 midi_state.sysex_message_type == TYPE_UNSET) {
-          if (buffer[i] == VALID_MANUFACTURER_ID) {
-            midi_state.sysex_message_type = VALID_MANUFACTURER_ID;
-            INFO("MIDI: sysex manufacturer message correct");
-          }
-          else {
-            midi_state.status = MIDI_STATUS_NOT_SET;
-          }
-        }
-        else if (midi_state.status == MIDI_SYSEX_START &&
-                 midi_state.sysex_message_type == VALID_MANUFACTURER_ID) {
-          if (buffer[i] == DISCOVERY_REQUEST) {
-            // no additional data required for a discovery request
-            // action is to send a discovery response
-            INFO("MIDI: discovery sysex request received, sending %d bytes",
-                 sizeof(discovery_report_sysex) / sizeof(uint8_t));
-            z_midi_write(discovery_report_sysex, sizeof(discovery_report_sysex) / sizeof(uint8_t));
-          }
-          else if (buffer[i] == SHUTDOWN_REQUEST) {
-            INFO("Shutdown request received");
-            system("sudo poweroff --poweroff");
-          }
-          else if (buffer[i] == RESTART_REQUEST) {
-            INFO("Restart request received");
-            system("sudo reboot --reboot");
-          }
-          else {
-            INFO("MIDI: sysex unknown request received");
-          }
+          // read the midi stream. could be starting anywhere in the stream,
+          // account for that by tracking stream state. This makes the stream parsing a
+          // bit obtuse but we need to account for fragmented reads and such.
+          for (int i = 0; i < midi_read_status; ++i) {
 
-          midi_state.status = MIDI_STATUS_NOT_SET;
-        }
-        else if (buffer[i] == MIDI_TUNE_REQUEST) {  // no channel for sysex
-          INFO("MIDI tune requested");
-          if (!system_tune_in_progress) {
-            system_tune_requested = 1;
+            if ( (buffer[i] & 0xF0) == MIDI_PROGRAM_CHANGE) {
+              midi_state.status = MIDI_PROGRAM_CHANGE;
+              midi_state.channel = buffer[i] & 0x0F;
+            }
+            else if (midi_state.status == MIDI_PROGRAM_CHANGE) {
+              // get program change and call plugin
+              INFO("MIDI: channel 0x%X program change: 0x%X",
+                   midi_state.channel,
+                   buffer[i]);
+              // card numbering maps to midi channel.  So check we've got a valid
+              // midi channel against how many cards we've got to ensure we can
+              // dispatch the midi message.
+              if (midi_state.channel < card_mgr->num_cards) {
+                struct plugin_card *card = &card_mgr->cards[ midi_state.channel ];
+                // leap of faith into the function
+                card->process_midi_program_change(card->plugin_object, buffer[i]);
+              }
+              else {
+                WARN("Expected midi message on channel 0x%X to map to a user card",
+                     midi_state.channel);
+              }
+
+              // then clear state
+              midi_state.status = MIDI_STATUS_NOT_SET;
+            }
+            else if (buffer[i] == MIDI_SYSEX_START) {  // no channel for sysex
+              midi_state.status = MIDI_SYSEX_START;
+              INFO("MIDI: sysex start received");
+              midi_state.channel = 0;
+              midi_state.sysex_message_type = TYPE_UNSET;
+              midi_state.sysex_buffer_size = 0;
+            }
+            else if (midi_state.status == MIDI_SYSEX_START &&
+                     midi_state.sysex_message_type == TYPE_UNSET) {
+              if (buffer[i] == VALID_MANUFACTURER_ID) {
+                midi_state.sysex_message_type = VALID_MANUFACTURER_ID;
+                INFO("MIDI: sysex manufacturer message correct");
+              }
+              else {
+                midi_state.status = MIDI_STATUS_NOT_SET;
+              }
+            }
+            else if (midi_state.status == MIDI_SYSEX_START &&
+                     midi_state.sysex_message_type == VALID_MANUFACTURER_ID) {
+              if (buffer[i] == DISCOVERY_REQUEST) {
+                // no additional data required for a discovery request
+                // action is to send a discovery response
+                INFO("MIDI: discovery sysex request received, sending %d bytes",
+                     sizeof(discovery_report_sysex) / sizeof(uint8_t));
+                z_midi_write(discovery_report_sysex, sizeof(discovery_report_sysex) / sizeof(uint8_t));
+              }
+              else if (buffer[i] == SHUTDOWN_REQUEST) {
+                INFO("Shutdown request received");
+                system("sudo poweroff --poweroff");
+              }
+              else if (buffer[i] == RESTART_REQUEST) {
+                INFO("Restart request received");
+                system("sudo reboot --reboot");
+              }
+              else {
+                INFO("MIDI: sysex unknown request received");
+              }
+
+              midi_state.status = MIDI_STATUS_NOT_SET;
+            }
+            else if (buffer[i] == MIDI_TUNE_REQUEST) {  // no channel for sysex
+              INFO("MIDI tune requested");
+              if (!system_tune_in_progress) {
+                system_tune_requested = 1;
+              }
+            }
+            // future: check for other status messages
           }
         }
-        else {  // future: check for other status messages
-          // ignore for now
+        else if (midi_read_status < 0 && midi_read_status != -EAGAIN) {
+          ERROR("Error reading MIDI input: %s", snd_strerror(midi_read_status));
+          break;
         }
       }
-
-    }
-
-    do {
-      read(timerfd_midi_clock, &expirations, sizeof(expirations));
-      // allow MIDI messages to queue in the system while tuning is in progress
-    } while (system_tune_in_progress);
+    } // else - Can do other non-MIDI related tasks here if needed
   }
-
+  INFO("Exiting MIDI input thread.");
   return NULL;
 }
 
