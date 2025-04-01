@@ -72,6 +72,10 @@ static _Atomic long nsec_pcm_write_idle = 0;
 static _Atomic int system_tune_requested = 0;
 static _Atomic int system_tune_in_progress = 0;
 
+// Signal handling: handlers just set flags and return
+static volatile sig_atomic_t sig_cleanup_received = 0;
+static volatile sig_atomic_t sig_dump_stats_received = 0;
+
 
 // static functions
 static void help();
@@ -298,6 +302,40 @@ int main(int argc, char **argv, char **envp) {
   sigaction(SIGUSR1, &signal_action_stats, NULL);
 
   while (alsa_thread_run) {
+    if (sig_cleanup_received) {
+      INFO("Signal received, initiating shutdown...");
+      alsa_thread_run = 0; // Signal worker threads to exit
+
+      if (munlockall() == -1) {
+        char error[256];
+        strerror_r(errno, error, 256);
+        ERROR("munlockall failed in main loop: %s", error);
+      } else {
+        INFO("Memory unlocked in main loop.");
+      }
+      sig_cleanup_received = 0; // reset - best practice
+      break;
+    }
+
+    if (sig_dump_stats_received) {
+      INFO("requested stats: %ld.%.9ld / %" PRId64 "; pcm[0] xrun recovery: %d; pcm[1] xrun recovery: %d",
+           sec_pcm_write_idle, nsec_pcm_write_idle,
+           missed_expirations[EXPIRATIONS_ONTIME],
+           pcm_state[0] ? pcm_state[0]->xrun_recovery_count : -1,
+           pcm_state[1] ? pcm_state[1]->xrun_recovery_count : -1);
+
+      for (int i = 1; i < NUM_MISSED_EXPIRATIONS_STATS; ++i) {
+        if (missed_expirations[i]) {
+          INFO("  missed %d expirations %" PRId64 " times", i, missed_expirations[i]);
+        }
+      }
+
+      if (missed_expirations[NUM_MISSED_EXPIRATIONS_STATS -1]) {
+        INFO("  missed at least %d expirations %" PRId64 " times", NUM_MISSED_EXPIRATIONS_STATS - 1, missed_expirations[NUM_MISSED_EXPIRATIONS_STATS -1]);
+      }
+      sig_dump_stats_received = 0;
+    }
+
     sleep(1);
   }
 
@@ -350,51 +388,14 @@ static void help() {
 }
 
 
-// Signal handling
-static volatile sig_atomic_t in_aborting = 0;
 
 // this isn't a very safe signal handler...
 void sig_cleanup_and_exit(int signum) {
-  if (in_aborting) {
-    return;
-  }
-  in_aborting = 1;
-
-  // message threads to abort
-  alsa_thread_run = 0;
-
-  if (munlockall() == -1) {
-    char error[256];
-    strerror_r(errno, error, 256);
-    ERROR("munlockall failed in signal handler: %s", error);
-  }
+  sig_cleanup_received = 1;
 }
 
-
-static volatile sig_atomic_t in_dump_stats = 0;
 static void sig_dump_stats(int signum) {
-  if (in_dump_stats) {
-    return;
-  }
-  in_dump_stats = 1;
-
-  INFO("requested stats: %ld.%.9ld / %" PRId64 "; pcm[0] xrun recovery: %d; pcm[1] xrun recovery: %d",
-       sec_pcm_write_idle, nsec_pcm_write_idle,
-       missed_expirations[EXPIRATIONS_ONTIME],
-       pcm_state[0] ? pcm_state[0]->xrun_recovery_count : -1,
-       pcm_state[1] ? pcm_state[1]->xrun_recovery_count : -1);
-
-  for (int i = 1; i < NUM_MISSED_EXPIRATIONS_STATS; ++i) {
-    if (missed_expirations[i]) {
-      INFO("  missed %d expirations %" PRId64 " times", i, missed_expirations[i]);
-    }
-  }
-
-    if (missed_expirations[NUM_MISSED_EXPIRATIONS_STATS -1]) {
-      INFO("  missed at least %d expirations %" PRId64 " times", NUM_MISSED_EXPIRATIONS_STATS - 1, missed_expirations[NUM_MISSED_EXPIRATIONS_STATS -1]);
-    }
-
-  in_dump_stats = 0;
+  sig_dump_stats_received = 1;
 }
 
 
