@@ -16,7 +16,8 @@
 #include "zcard_plugin.h"
 
 //#define SPI_RATE 12000000
-#define SPI_RATE 30000000
+// my scope shows 24000000 to be 28MHz
+#define SPI_RATE 24000000
 
 #define INITIAL_SPI_FLAGS 1
 #define INITIAL_SLOT 5

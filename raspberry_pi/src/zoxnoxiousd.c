@@ -55,7 +55,7 @@
 #define DISCOVERY_REPORT_SIZE_BYTES 28
 
 // midi thread polls with a timeout to check for thread termination condition
-#define MIDI_TIMEOUT_MS 10000
+#define MIDI_TIMEOUT_MS 10
 
 /* globals-  mainly so they can be accessed by signal handler  */
 static struct card_manager *card_mgr = NULL;
