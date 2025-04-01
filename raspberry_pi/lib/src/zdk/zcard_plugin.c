@@ -16,7 +16,7 @@
 #include "zcard_plugin.h"
 
 //#define SPI_RATE 12000000
-#define SPI_RATE 16000000
+#define SPI_RATE 30000000
 
 #define INITIAL_SPI_FLAGS 1
 #define INITIAL_SLOT 5

@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/timerfd.h>
@@ -250,6 +251,17 @@ int main(int argc, char **argv, char **envp) {
   }
 
 
+  // lock memory to prevent swapping.  Must run as root for this to work (pigpio already has this requirement).
+  // This may be of dubious value: the amount of memory available is pretty huge and swap isn't ever used.
+  if (mlockall(MCL_CURRENT | MCL_FUTURE) == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("mlockall failed: %s. Continuing without memory locking.", error);
+  }
+  else {
+    INFO("Successfully locked memory into main memory");
+  }
+
 
   sigemptyset(&signal_set);
   sigaddset(&signal_set, SIGUSR1);
@@ -312,6 +324,15 @@ int main(int argc, char **argv, char **envp) {
   gpioTerminate();
 
 
+  // Unlock memory before exiting
+  if (munlockall() == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("munlockall failed: %s", error);
+  } else {
+    INFO("Successfully unlocked memory");
+  }
+
   // fall through to exit
   zlog_fini();
   config_destroy(cfg);
@@ -341,6 +362,12 @@ void sig_cleanup_and_exit(int signum) {
 
   // message threads to abort
   alsa_thread_run = 0;
+
+  if (munlockall() == -1) {
+    char error[256];
+    strerror_r(errno, error, 256);
+    ERROR("munlockall failed in signal handler: %s", error);
+  }
 }
 
 
