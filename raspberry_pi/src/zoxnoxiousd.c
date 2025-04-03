@@ -87,6 +87,8 @@ static void* midi_in_to_plugins(void *);
 static void generate_discovery_report(uint8_t discovery_report_sysex[]);
 static int z_midi_write(uint8_t *buffer, int buffer_size);
 static int get_midi_input_fd();
+static int start_pcm(struct alsa_pcm_state *pcm, int *err_var, const char *name);
+
 
 
 int main(int argc, char **argv, char **envp) {
@@ -484,16 +486,29 @@ static void* read_pcm_and_call_plugins(void *arg) {
        pcm_state[0]->sampling_rate);
   // logging from here forward may be tricky / time sensitive
 
-  if ( alsa_start_stream(pcm_state[0]) ) {
-    ERROR("pcm0: error from alsa_pcm_ensure_ready");
-  }
+  int err_pcm0 = -EAGAIN, err_pcm1 = -EAGAIN;
+  while (alsa_thread_run && (err_pcm0 == -EAGAIN || err_pcm1 == -EAGAIN)) {
+    if (start_pcm(pcm_state[0], &err_pcm0, "pcm0")) {
+      break;
+    }
+    if (pcm_state[1]) {
+      if (start_pcm(pcm_state[1], &err_pcm1, "pcm1")) {
+        break;
+      }
+    }
+    else {
+      err_pcm1 = 0;
+    }
 
-  if (pcm_state[1]) {
-    if ( alsa_start_stream(pcm_state[1]) ) {
-      ERROR("pcm1: error from alsa_pcm_ensure_ready");
+    if (err_pcm0 == -EAGAIN || err_pcm1 == -EAGAIN) {
+      usleep(1000); // 1 millisecond, don't get greedy and keep it too busy
     }
   }
 
+  if (err_pcm0) alsa_thread_run = 0;
+  if (err_pcm1 && pcm_state[1]) alsa_thread_run = 0;
+
+  // all PCM streams should be good now
 
   if ( (timerfd_settime(timerfd_sample_clock, 0, &itimerspec_sample_clock, 0) ) == -1) {
     char error[256];
@@ -835,4 +850,17 @@ static int z_midi_write(uint8_t *buffer, int buffer_size) {
   }
 
   return midi_write_status;
+}
+
+
+// start_pcm: alsa_start_stream helper
+static int start_pcm(struct alsa_pcm_state *pcm, int *err_var, const char *name) {
+  if (*err_var == -EAGAIN && pcm) {
+    *err_var = alsa_start_stream(pcm);
+    if (*err_var != 0 && *err_var != -EAGAIN) {
+      ERROR("%s: error starting stream: %d", name, *err_var);
+      return 1; // Indicate an error
+    }
+  }
+  return 0; // Success or still -EAGAIN
 }

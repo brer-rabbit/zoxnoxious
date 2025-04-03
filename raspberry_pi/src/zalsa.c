@@ -14,6 +14,7 @@
  */
 
 #include <alsa/asoundlib.h>
+#include <errno.h>
 #include <libconfig.h>
 #include <zlog.h>
 
@@ -21,6 +22,8 @@
 #include "zalsa.h"
 
 #define INVALID_CHANNEL_STEP_SIZE -1
+/* wait up to 100ms timeout for the PCM stream */
+#define SND_PCM_WAIT_TIMEOUT 100
 
 static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err);
 
@@ -170,7 +173,12 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
 
 
 int alsa_start_stream(struct alsa_pcm_state *pcm_state) {
-  if ( alsa_pcm_ensure_ready(pcm_state) ) {
+  int err;
+  err = alsa_pcm_ensure_ready(pcm_state);
+  if (err == -EAGAIN) {
+    return -EAGAIN;
+  }
+  else if (err) {
     ERROR("zalsa: %s alsa_pcm_ensure_ready error", pcm_state->device_name);
     return 1;
   }
@@ -186,6 +194,7 @@ int alsa_start_stream(struct alsa_pcm_state *pcm_state) {
 
 int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames) {
   int retval = 0;
+  int err;
 
   if (pcm_state->frames_remaining > frames) {
     // advance sample pointer by frames --
@@ -201,7 +210,11 @@ int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames) 
       retval = 1;
     }
 
-    if ( alsa_pcm_ensure_ready(pcm_state) ) {
+    err = alsa_pcm_ensure_ready(pcm_state);
+    if (err == -EAGAIN) {
+      return -EAGAIN;
+    }
+    else if (err) {
       ERROR("alsa_pcm_ensure_ready returned non-zero");
       retval += 2;
     }
@@ -271,8 +284,11 @@ int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
         }
       }
       else {
-        ret = snd_pcm_wait(pcm_state->pcm_handle, -1);
-        if (ret < 0) {
+        ret = snd_pcm_wait(pcm_state->pcm_handle, SND_PCM_WAIT_TIMEOUT);
+        if (ret == 0) {
+          return -EAGAIN;
+        }
+        else if (ret < 0) {
           ret = xrun_recovery(pcm_state, -ret);
           if (ret < 0) {
             return ret;
