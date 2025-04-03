@@ -71,6 +71,9 @@ static _Atomic long nsec_pcm_write_idle = 0;
 
 static _Atomic int system_tune_requested = 0;
 static _Atomic int system_tune_in_progress = 0;
+static _Atomic int midi_request_shutdown = 0;
+static _Atomic int midi_request_restart = 0;
+
 
 // Signal handling: handlers just set flags and return
 static volatile sig_atomic_t sig_cleanup_received = 0;
@@ -303,6 +306,7 @@ int main(int argc, char **argv, char **envp) {
   signal_action_stats.sa_handler = sig_dump_stats;
   sigaction(SIGUSR1, &signal_action_stats, NULL);
 
+  // main loop thread: check if we need to respond to signals, sleep, loop
   while (alsa_thread_run) {
     if (sig_cleanup_received) {
       INFO("Signal received, initiating shutdown...");
@@ -341,6 +345,7 @@ int main(int argc, char **argv, char **envp) {
     sleep(1);
   }
 
+
   int retval;
   pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
   pthread_join(midi_in_plugin_thread, (void**)&retval);
@@ -377,6 +382,16 @@ int main(int argc, char **argv, char **envp) {
   zlog_fini();
   config_destroy(cfg);
   free(cfg);
+
+  // are we here 'cause we were asked to shutdown or restart?
+  if (midi_request_shutdown) {
+    execl("/sbin/poweroff", "--poweroff", (char*)NULL);
+    perror("execl failed, system not shutdown");
+  }
+  else if (midi_request_restart) {
+    execl("/sbin/reboot", "--reboot", (char*)NULL);
+    perror("execl failed, system not restarted");
+  }
 
   return 0;
 }
@@ -592,6 +607,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
        missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
        missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
 
+  INFO("Exiting PCM Audio thread.");
   return NULL;
 }
 
@@ -775,12 +791,15 @@ static void* midi_in_to_plugins(void *arg) {
                 z_midi_write(discovery_report_sysex, sizeof(discovery_report_sysex) / sizeof(uint8_t));
               }
               else if (buffer[i] == SHUTDOWN_REQUEST) {
+                // set flag, main thread will handle
                 INFO("Shutdown request received");
-                system("sudo poweroff --poweroff");
+                midi_request_shutdown = 1;
+                alsa_thread_run = 0;
               }
               else if (buffer[i] == RESTART_REQUEST) {
                 INFO("Restart request received");
-                system("sudo reboot --reboot");
+                midi_request_restart = 1;
+                alsa_thread_run = 0;
               }
               else {
                 INFO("MIDI: sysex unknown request received");
