@@ -26,3 +26,7 @@ A Raspberry Pi attaches to the Zoxnoxious backplane.  To a host computer, the Pi
 # Zoxnoxious plugins for VCV Rack #
 
 The user interacts with the synth through a VCV Rack plugin.  Zoxnoxious VCV Rack plugins map the Rack modules to audio channels and MIDI events that are sent via USB to the synthesizer.
+
+# Deep Dive Videos
+
+[![YouTube Zoxnoxious Deep Dive Video](https://img.youtube.com/vi/LsGcW3EjFYo/sddefault.jpg)](https://www.youtube.com/watch?v=LsGcW3EjFYo)
