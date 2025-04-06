@@ -1,3 +1,5 @@
+INSTALL_PREFIX ?= /usr/local/zoxnoxious
+
 TARGET = "audio_out.plugin.so"
 INCLUDE = -I../../../include
 LIBS = -shared -lpigpio -lzlog -ldl
@@ -25,3 +27,7 @@ $(TARGET): $(OBJECTS)
 clean:
 	-rm -f *.o
 	-rm -f $(TARGET)
+
+install: $(TARGET)
+	mkdir -p $(INSTALL_PREFIX)/lib
+	install -m 755 $(TARGET) $(INSTALL_PREFIX)/lib/
