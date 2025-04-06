@@ -8,7 +8,7 @@ The Z3340 VCO is based around Alfa Rpar's AS3340 clone of the Curtis chip.  This
 
 # Datasheet
 
-![Datasheet](datasheet_z3340.pdf)
+![Datasheet](datasheet_3340.pdf)
 
 # Demo
 
