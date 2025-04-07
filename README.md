@@ -29,4 +29,11 @@ The user interacts with the synth through a VCV Rack plugin.  Zoxnoxious VCV Rac
 
 # Deep Dive Videos
 
+Deep dive 1: Project background and user interface
 [![YouTube Zoxnoxious Deep Dive Video](https://img.youtube.com/vi/LsGcW3EjFYo/sddefault.jpg)](https://www.youtube.com/watch?v=LsGcW3EjFYo)
+
+Deep dive 2: Raspberry Pi and Gadget mode
+[![YouTube Zoxnoxious Deep Dive Video](https://img.youtube.com/vi/pGoO3mSk7ao/sddefault.jpg)](https://www.youtube.com/watch?v=pGoO3mSk7ao)
+
+Deep dive 3: Hardware detail and autotune
+[![YouTube Zoxnoxious Deep Dive Video](https://img.youtube.com/vi/C-MREijqNOM/sddefault.jpg)](https://www.youtube.com/watch?v=C-MREijqNOM)
