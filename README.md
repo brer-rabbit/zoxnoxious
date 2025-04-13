@@ -9,14 +9,16 @@ Zoxnoxious is a hardware analog music synthesizer with a software interface.  Th
 
 # Z-Cards #
 
-A Z-Card is a circuit board that plugs into the Zoxnoxious backplane.  Each card receives digital signals such as I2C and SPI, and the card drives a defined set of pins with analog signals.  The Z-Cards are agnostic to the microcontroller; the interface being I2C and SPI most any microcontroller can do that.  While I'm using a Raspberry Pi in this project, these cards are ripe for anyone developing an analog synth with a microcontroller.  Cards developed to date include:
+A Z-Card is a voice card that plugs into the Zoxnoxious backplane.  Each card receives digital signals such as I2C and SPI along with analog signals from other Z-Cards.  Then each Z-Card drives a defined set of pins with its own analog output.  The Z-Cards are agnostic to the microcontroller; the interface being I2C and SPI most any microcontroller can do that.  These cards are ripe for re-use in developing an analog synth with a microcontroller if you want to do your own thing and not use a Raspberry Pi like I have done in this project.
+
+Cards developed to date include:
 
 * AS3340 VCO
 * AS3372 Signal Processor (VCF, VCA)
 * SSI2130/AS3394 Dual VCO + VCF Synth Voice
 * Pole Dancer multimode filter with morphing/crossfade
 
-The backplane design allows for up to 8 cards to be controlled.  The backplane requires addressing so that counts as one of the eight.  The backplane board is designed with 6 slots, so one of the control addresses goes unused.
+The backplane design allows for up to 8 cards to be addressed with itself counting as one.  One control address goes unused as the backplane board design only has 6 physical slots.
 
 # Raspberry Pi Host #
 
