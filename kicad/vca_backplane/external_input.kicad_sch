@@ -625,7 +625,7 @@
   (symbol (lib_id "vca_backplane:AudioJack_729JH") (at 93.98 119.38 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3e509080-a633-4676-b4eb-52cb380d13ca)
-    (property "Reference" "J10" (at 93.345 111.4257 0)
+    (property "Reference" "J9" (at 93.345 111.4257 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "AudioJack_729JH" (at 93.345 113.8499 0)
@@ -644,7 +644,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/5428edbd-a37e-4081-9b79-56dfae2e2a66"
-          (reference "J10") (unit 1)
+          (reference "J9") (unit 1)
         )
       )
     )
@@ -703,7 +703,7 @@
   (symbol (lib_id "Device:C") (at 67.31 158.75 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 612c2136-a062-4393-9e4a-46d3486166fa)
-    (property "Reference" "C21" (at 67.31 152.3492 90)
+    (property "Reference" "C4" (at 67.31 152.3492 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 67.31 154.6606 90)
@@ -723,7 +723,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/5428edbd-a37e-4081-9b79-56dfae2e2a66"
-          (reference "C21") (unit 1)
+          (reference "C4") (unit 1)
         )
       )
     )
@@ -762,7 +762,7 @@
   (symbol (lib_id "Device:R") (at 153.67 120.65 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 6cbc71d8-33f5-4816-8f30-cc555d356bed)
-    (property "Reference" "R8" (at 153.67 115.4897 90)
+    (property "Reference" "R13" (at 153.67 115.4897 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "51" (at 153.67 117.9139 90)
@@ -782,7 +782,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/5428edbd-a37e-4081-9b79-56dfae2e2a66"
-          (reference "R8") (unit 1)
+          (reference "R13") (unit 1)
         )
       )
     )
@@ -841,7 +841,7 @@
   (symbol (lib_id "Amplifier_Operational:TL072") (at 135.89 120.65 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ba372c9e-d979-4ccb-8427-1a4362616310)
-    (property "Reference" "U13" (at 135.89 129.8743 0)
+    (property "Reference" "U2" (at 135.89 129.8743 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TL072" (at 135.89 127.4501 0)
@@ -867,7 +867,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/5428edbd-a37e-4081-9b79-56dfae2e2a66"
-          (reference "U13") (unit 1)
+          (reference "U2") (unit 1)
         )
       )
     )
@@ -901,7 +901,7 @@
   (symbol (lib_id "Device:C") (at 67.31 180.34 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid bf3f51e1-553c-4aaf-a089-6539ed099c25)
-    (property "Reference" "C29" (at 67.31 173.9392 90)
+    (property "Reference" "C14" (at 67.31 173.9392 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 67.31 176.2506 90)
@@ -921,7 +921,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/5428edbd-a37e-4081-9b79-56dfae2e2a66"
-          (reference "C29") (unit 1)
+          (reference "C14") (unit 1)
         )
       )
     )
@@ -930,7 +930,7 @@
   (symbol (lib_id "Amplifier_Operational:TL072") (at 62.23 168.91 0) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid caf10d40-af54-48c4-8f3a-33244c2a0a16)
-    (property "Reference" "U13" (at 60.325 167.6979 0)
+    (property "Reference" "U2" (at 60.325 167.6979 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TL072" (at 60.325 170.1221 0)
@@ -956,7 +956,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/5428edbd-a37e-4081-9b79-56dfae2e2a66"
-          (reference "U13") (unit 3)
+          (reference "U2") (unit 3)
         )
       )
     )
@@ -990,7 +990,7 @@
   (symbol (lib_id "Amplifier_Operational:TL072") (at 176.53 162.56 0) (mirror x) (unit 2)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ee628e7c-eeab-4fb2-aee6-946837779eee)
-    (property "Reference" "U13" (at 176.53 154.94 0)
+    (property "Reference" "U2" (at 176.53 154.94 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TL072" (at 176.53 157.48 0)
@@ -1016,7 +1016,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/5428edbd-a37e-4081-9b79-56dfae2e2a66"
-          (reference "U13") (unit 2)
+          (reference "U2") (unit 2)
         )
       )
     )

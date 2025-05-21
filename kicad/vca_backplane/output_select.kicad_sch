@@ -3248,7 +3248,7 @@
   (symbol (lib_id "Device:C") (at 64.77 139.7 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000626ccae4)
-    (property "Reference" "C9" (at 64.77 135.89 90)
+    (property "Reference" "C3" (at 64.77 135.89 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 64.77 143.51 90)
@@ -3268,7 +3268,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C9") (unit 1)
+          (reference "C3") (unit 1)
         )
       )
     )
@@ -3277,7 +3277,7 @@
   (symbol (lib_id "Device:C") (at 69.85 132.08 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000626ccd8d)
-    (property "Reference" "C10" (at 69.85 128.27 90)
+    (property "Reference" "C1" (at 69.85 128.27 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4.7u" (at 69.85 135.89 90)
@@ -3297,7 +3297,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C10") (unit 1)
+          (reference "C1") (unit 1)
         )
       )
     )
@@ -3356,7 +3356,7 @@
   (symbol (lib_id "Interface_Expansion:PCA9555PW") (at 49.53 62.23 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000626dc1f5)
-    (property "Reference" "U5" (at 49.53 59.69 0)
+    (property "Reference" "U8" (at 49.53 59.69 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "PCA9555PW" (at 48.26 62.23 0)
@@ -3398,7 +3398,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U5") (unit 1)
+          (reference "U8") (unit 1)
         )
       )
     )
@@ -3407,7 +3407,7 @@
   (symbol (lib_id "Device:C") (at 53.34 30.48 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006276d068)
-    (property "Reference" "C6" (at 53.34 24.0792 90)
+    (property "Reference" "C18" (at 53.34 24.0792 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 53.34 26.3906 90)
@@ -3427,7 +3427,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C6") (unit 1)
+          (reference "C18") (unit 1)
         )
       )
     )
@@ -3511,7 +3511,7 @@
   (symbol (lib_id "vca_backplane:AS3360") (at 276.86 146.05 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000627b73d0)
-    (property "Reference" "U7" (at 276.86 135.4582 0)
+    (property "Reference" "U5" (at 276.86 135.4582 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "AS3360" (at 276.86 137.7696 0)
@@ -3540,7 +3540,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U7") (unit 1)
+          (reference "U5") (unit 1)
         )
       )
     )
@@ -3549,7 +3549,7 @@
   (symbol (lib_id "vca_backplane:AS3360") (at 276.86 185.42 0) (unit 2)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000627b81a0)
-    (property "Reference" "U7" (at 276.86 174.8282 0)
+    (property "Reference" "U5" (at 276.86 174.8282 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "AS3360" (at 276.86 177.1396 0)
@@ -3578,7 +3578,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U7") (unit 2)
+          (reference "U5") (unit 2)
         )
       )
     )
@@ -3587,7 +3587,7 @@
   (symbol (lib_id "vca_backplane:AS3360") (at 38.1 241.3 0) (unit 3)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000628010a3)
-    (property "Reference" "U7" (at 42.672 241.4016 0)
+    (property "Reference" "U5" (at 42.672 241.4016 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "AS3360" (at 42.672 243.713 0)
@@ -3616,7 +3616,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U7") (unit 3)
+          (reference "U5") (unit 3)
         )
       )
     )
@@ -3625,7 +3625,7 @@
   (symbol (lib_id "Device:C") (at 44.45 227.33 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000628032c4)
-    (property "Reference" "C7" (at 44.45 220.98 90)
+    (property "Reference" "C13" (at 44.45 220.98 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 44.45 223.52 90)
@@ -3645,7 +3645,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C7") (unit 1)
+          (reference "C13") (unit 1)
         )
       )
     )
@@ -3704,7 +3704,7 @@
   (symbol (lib_id "Device:C") (at 44.45 255.27 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006280b113)
-    (property "Reference" "C8" (at 44.45 248.92 90)
+    (property "Reference" "C10" (at 44.45 248.92 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 44.45 251.46 90)
@@ -3724,7 +3724,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C8") (unit 1)
+          (reference "C10") (unit 1)
         )
       )
     )
@@ -3808,7 +3808,7 @@
   (symbol (lib_id "Device:C") (at 29.21 247.65 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062814cdb)
-    (property "Reference" "C5" (at 22.86 247.65 90)
+    (property "Reference" "C11" (at 22.86 247.65 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4.7n" (at 25.4 247.65 90)
@@ -3828,7 +3828,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C5") (unit 1)
+          (reference "C11") (unit 1)
         )
       )
     )
@@ -3837,7 +3837,7 @@
   (symbol (lib_id "Amplifier_Operational:NE5532") (at 298.45 144.78 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062823348)
-    (property "Reference" "U10" (at 299.72 148.59 0)
+    (property "Reference" "U13" (at 299.72 148.59 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "NE5532" (at 298.45 144.78 0)
@@ -3863,7 +3863,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U10") (unit 1)
+          (reference "U13") (unit 1)
         )
       )
     )
@@ -3872,7 +3872,7 @@
   (symbol (lib_id "Amplifier_Operational:NE5532") (at 298.45 184.15 0) (mirror x) (unit 2)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006293cc1d)
-    (property "Reference" "U10" (at 300.99 187.96 0)
+    (property "Reference" "U13" (at 300.99 187.96 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "NE5532" (at 297.18 184.15 0)
@@ -3898,7 +3898,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U10") (unit 2)
+          (reference "U13") (unit 2)
         )
       )
     )
@@ -3932,7 +3932,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 90.17 160.02 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000632a6e27)
-    (property "Reference" "TP14" (at 91.6432 160.6804 0)
+    (property "Reference" "TP7" (at 91.6432 160.6804 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 91.6432 162.9918 0)
@@ -3951,7 +3951,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "TP14") (unit 1)
+          (reference "TP7") (unit 1)
         )
       )
     )
@@ -3960,7 +3960,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 90.17 146.05 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000632a78cf)
-    (property "Reference" "TP13" (at 91.6432 143.0528 0)
+    (property "Reference" "TP8" (at 91.6432 143.0528 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 91.6432 145.3642 0)
@@ -3979,7 +3979,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "TP13") (unit 1)
+          (reference "TP8") (unit 1)
         )
       )
     )
@@ -4017,7 +4017,7 @@
   (symbol (lib_id "Device:R") (at 69.85 59.69 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006330ecd5)
-    (property "Reference" "R11" (at 69.85 57.658 90)
+    (property "Reference" "R18" (at 69.85 57.658 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 69.596 62.23 90)
@@ -4037,7 +4037,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R11") (unit 1)
+          (reference "R18") (unit 1)
         )
       )
     )
@@ -4071,7 +4071,7 @@
   (symbol (lib_id "Device:R") (at 262.89 31.75 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000639e3c64)
-    (property "Reference" "R5" (at 262.89 26.4922 90)
+    (property "Reference" "R4" (at 262.89 26.4922 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 262.89 28.8036 90)
@@ -4091,7 +4091,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R5") (unit 1)
+          (reference "R4") (unit 1)
         )
       )
     )
@@ -4100,7 +4100,7 @@
   (symbol (lib_id "Device:R") (at 116.84 53.34 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063a1e7f0)
-    (property "Reference" "R7" (at 116.84 48.0822 90)
+    (property "Reference" "R9" (at 116.84 48.0822 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 116.84 50.3936 90)
@@ -4120,7 +4120,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R7") (unit 1)
+          (reference "R9") (unit 1)
         )
       )
     )
@@ -4129,7 +4129,7 @@
   (symbol (lib_id "Device:R") (at 262.89 71.12 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063a271b2)
-    (property "Reference" "R9" (at 262.89 65.8622 90)
+    (property "Reference" "R12" (at 262.89 65.8622 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 262.89 68.1736 90)
@@ -4149,7 +4149,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R9") (unit 1)
+          (reference "R12") (unit 1)
         )
       )
     )
@@ -4158,7 +4158,7 @@
   (symbol (lib_id "Device:R") (at 182.88 33.02 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063a46833)
-    (property "Reference" "R12" (at 182.88 27.7622 90)
+    (property "Reference" "R17" (at 182.88 27.7622 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 182.88 30.0736 90)
@@ -4178,7 +4178,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R12") (unit 1)
+          (reference "R17") (unit 1)
         )
       )
     )
@@ -4187,7 +4187,7 @@
   (symbol (lib_id "Device:R") (at 182.88 53.34 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063a4684e)
-    (property "Reference" "R30" (at 182.88 48.0822 90)
+    (property "Reference" "R21" (at 182.88 48.0822 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 182.88 50.3936 90)
@@ -4207,7 +4207,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R30") (unit 1)
+          (reference "R21") (unit 1)
         )
       )
     )
@@ -4216,7 +4216,7 @@
   (symbol (lib_id "Device:R") (at 182.88 72.39 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063a46869)
-    (property "Reference" "R14" (at 182.88 67.1322 90)
+    (property "Reference" "R22" (at 182.88 67.1322 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 182.88 69.4436 90)
@@ -4236,7 +4236,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R14") (unit 1)
+          (reference "R22") (unit 1)
         )
       )
     )
@@ -4245,7 +4245,7 @@
   (symbol (lib_id "Device:C") (at 72.39 220.98 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063ab7662)
-    (property "Reference" "C16" (at 72.39 214.63 90)
+    (property "Reference" "C8" (at 72.39 214.63 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 72.39 217.17 90)
@@ -4265,7 +4265,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C16") (unit 1)
+          (reference "C8") (unit 1)
         )
       )
     )
@@ -4349,7 +4349,7 @@
   (symbol (lib_id "Device:C") (at 68.58 256.54 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063abf7ad)
-    (property "Reference" "C15" (at 67.945 262.255 90)
+    (property "Reference" "C17" (at 67.945 262.255 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 67.31 260.35 90)
@@ -4369,7 +4369,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C15") (unit 1)
+          (reference "C17") (unit 1)
         )
       )
     )
@@ -4403,7 +4403,7 @@
   (symbol (lib_id "Device:C") (at 100.33 220.98 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063af3798)
-    (property "Reference" "C18" (at 100.33 214.63 90)
+    (property "Reference" "C23" (at 100.33 214.63 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 100.33 217.17 90)
@@ -4423,7 +4423,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C18") (unit 1)
+          (reference "C23") (unit 1)
         )
       )
     )
@@ -4507,7 +4507,7 @@
   (symbol (lib_id "Device:C") (at 96.52 256.54 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000063af37b6)
-    (property "Reference" "C17" (at 96.52 261.62 90)
+    (property "Reference" "C22" (at 96.52 261.62 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 96.52 259.715 90)
@@ -4527,7 +4527,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C17") (unit 1)
+          (reference "C22") (unit 1)
         )
       )
     )
@@ -4611,7 +4611,7 @@
   (symbol (lib_id "Device:R") (at 297.18 135.89 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006400017c)
-    (property "Reference" "R15" (at 297.18 130.6322 90)
+    (property "Reference" "R25" (at 297.18 130.6322 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 297.18 132.9436 90)
@@ -4631,7 +4631,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R15") (unit 1)
+          (reference "R25") (unit 1)
         )
       )
     )
@@ -4640,7 +4640,7 @@
   (symbol (lib_id "Device:C") (at 297.18 125.73 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000064000817)
-    (property "Reference" "C19" (at 297.18 119.38 90)
+    (property "Reference" "C24" (at 297.18 119.38 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "100p" (at 297.18 121.92 90)
@@ -4660,7 +4660,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C19") (unit 1)
+          (reference "C24") (unit 1)
         )
       )
     )
@@ -4669,7 +4669,7 @@
   (symbol (lib_id "Device:R") (at 298.45 175.26 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006402aa00)
-    (property "Reference" "R16" (at 298.45 170.0022 90)
+    (property "Reference" "R24" (at 298.45 170.0022 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 298.45 172.3136 90)
@@ -4689,7 +4689,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R16") (unit 1)
+          (reference "R24") (unit 1)
         )
       )
     )
@@ -4698,7 +4698,7 @@
   (symbol (lib_id "Device:C") (at 298.45 165.1 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006402aa0a)
-    (property "Reference" "C20" (at 298.45 158.75 90)
+    (property "Reference" "C25" (at 298.45 158.75 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "100p" (at 298.45 161.29 90)
@@ -4718,7 +4718,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C20") (unit 1)
+          (reference "C25") (unit 1)
         )
       )
     )
@@ -4727,7 +4727,7 @@
   (symbol (lib_id "Device:R") (at 320.04 144.78 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006404258d)
-    (property "Reference" "R19" (at 320.04 139.5222 90)
+    (property "Reference" "R28" (at 320.04 139.5222 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "100" (at 320.04 141.8336 90)
@@ -4747,7 +4747,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R19") (unit 1)
+          (reference "R28") (unit 1)
         )
       )
     )
@@ -4756,7 +4756,7 @@
   (symbol (lib_id "Device:R") (at 320.04 184.15 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000064042c05)
-    (property "Reference" "R20" (at 320.04 178.8922 90)
+    (property "Reference" "R27" (at 320.04 178.8922 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "100" (at 320.04 181.2036 90)
@@ -4776,7 +4776,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R20") (unit 1)
+          (reference "R27") (unit 1)
         )
       )
     )
@@ -4785,7 +4785,7 @@
   (symbol (lib_id "Amplifier_Operational:NE5532") (at 147.32 241.3 0) (mirror y) (unit 3)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000648f2945)
-    (property "Reference" "U10" (at 144.78 237.49 0)
+    (property "Reference" "U13" (at 144.78 237.49 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "NE5532" (at 148.59 241.3 0)
@@ -4811,7 +4811,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U10") (unit 3)
+          (reference "U13") (unit 3)
         )
       )
     )
@@ -4820,7 +4820,7 @@
   (symbol (lib_id "Device:C") (at 156.21 228.6 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000648f6094)
-    (property "Reference" "C23" (at 156.21 222.25 90)
+    (property "Reference" "C26" (at 156.21 222.25 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 156.21 224.79 90)
@@ -4840,7 +4840,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C23") (unit 1)
+          (reference "C26") (unit 1)
         )
       )
     )
@@ -4924,7 +4924,7 @@
   (symbol (lib_id "Device:C") (at 156.21 255.27 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006491a7f9)
-    (property "Reference" "C22" (at 156.21 248.92 90)
+    (property "Reference" "C27" (at 156.21 248.92 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 156.21 251.46 90)
@@ -4944,7 +4944,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C22") (unit 1)
+          (reference "C27") (unit 1)
         )
       )
     )
@@ -4978,7 +4978,7 @@
   (symbol (lib_id "Analog_DAC:MCP4822") (at 58.42 153.67 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000064b2e3b6)
-    (property "Reference" "U4" (at 49.53 140.97 0)
+    (property "Reference" "U3" (at 49.53 140.97 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "MCP4822" (at 52.07 143.51 0)
@@ -5004,7 +5004,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U4") (unit 1)
+          (reference "U3") (unit 1)
         )
       )
     )
@@ -5046,7 +5046,7 @@
   (symbol (lib_id "Device:R") (at 82.55 151.13 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006528de73)
-    (property "Reference" "R4" (at 82.55 145.8722 90)
+    (property "Reference" "R3" (at 82.55 145.8722 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "10k" (at 82.55 148.1836 90)
@@ -5066,7 +5066,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R4") (unit 1)
+          (reference "R3") (unit 1)
         )
       )
     )
@@ -5075,7 +5075,7 @@
   (symbol (lib_id "Device:R") (at 82.55 158.75 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006529d554)
-    (property "Reference" "R10" (at 82.55 161.29 90)
+    (property "Reference" "R2" (at 82.55 161.29 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "10k" (at 82.55 163.83 90)
@@ -5095,7 +5095,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R10") (unit 1)
+          (reference "R2") (unit 1)
         )
       )
     )
@@ -5104,7 +5104,7 @@
   (symbol (lib_id "Device:C") (at 105.41 142.24 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006545b379)
-    (property "Reference" "C4" (at 109.22 142.24 90)
+    (property "Reference" "C6" (at 109.22 142.24 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 101.6 142.24 90)
@@ -5124,7 +5124,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C4") (unit 1)
+          (reference "C6") (unit 1)
         )
       )
     )
@@ -5133,7 +5133,7 @@
   (symbol (lib_id "Device:C") (at 105.41 162.56 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000065497150)
-    (property "Reference" "C26" (at 109.22 162.56 90)
+    (property "Reference" "C5" (at 109.22 162.56 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 101.6 162.56 90)
@@ -5153,7 +5153,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C26") (unit 1)
+          (reference "C5") (unit 1)
         )
       )
     )
@@ -5230,7 +5230,7 @@
   (symbol (lib_id "Device:R") (at 259.08 160.02 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 21ddf592-18d2-4c67-9010-cc1e88e7460f)
-    (property "Reference" "R23" (at 260.858 159.1853 0)
+    (property "Reference" "R20" (at 260.858 159.1853 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "2k" (at 260.858 161.7222 0)
@@ -5250,7 +5250,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R23") (unit 1)
+          (reference "R20") (unit 1)
         )
       )
     )
@@ -5259,7 +5259,7 @@
   (symbol (lib_id "Device:R") (at 116.84 33.02 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2b551ba3-807d-4707-8bca-d77ca730e657)
-    (property "Reference" "R17" (at 116.84 27.7622 90)
+    (property "Reference" "R1" (at 116.84 27.7622 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 116.84 30.0736 90)
@@ -5279,7 +5279,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R17") (unit 1)
+          (reference "R1") (unit 1)
         )
       )
     )
@@ -5288,7 +5288,7 @@
   (symbol (lib_id "Device:R") (at 322.58 31.75 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 31106a1b-e21c-4483-8e45-9e5c95e7a75b)
-    (property "Reference" "R22" (at 322.58 26.4922 90)
+    (property "Reference" "R19" (at 322.58 26.4922 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 322.58 28.8036 90)
@@ -5308,7 +5308,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R22") (unit 1)
+          (reference "R19") (unit 1)
         )
       )
     )
@@ -5317,7 +5317,7 @@
   (symbol (lib_id "Device:R") (at 262.89 50.8 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 321ab39c-4e53-4226-b6e9-81e114e47f73)
-    (property "Reference" "R18" (at 262.89 45.5422 90)
+    (property "Reference" "R14" (at 262.89 45.5422 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 262.89 47.8536 90)
@@ -5337,7 +5337,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R18") (unit 1)
+          (reference "R14") (unit 1)
         )
       )
     )
@@ -5371,7 +5371,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 336.55 31.75 180) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 4273d08e-8fde-404e-b58d-10c74a013dfc)
-    (property "Reference" "U6" (at 336.55 36.0101 0)
+    (property "Reference" "U9" (at 336.55 36.0101 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "DG442xY" (at 336.55 38.4343 0)
@@ -5405,7 +5405,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U6") (unit 2)
+          (reference "U9") (unit 2)
         )
       )
     )
@@ -5414,7 +5414,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 196.85 33.02 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 4370b409-bfcf-4014-b8d3-debf93f5abaf)
-    (property "Reference" "U6" (at 196.85 26.3357 0)
+    (property "Reference" "U9" (at 196.85 26.3357 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "DG442xY" (at 196.85 28.7599 0)
@@ -5448,7 +5448,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U6") (unit 1)
+          (reference "U9") (unit 1)
         )
       )
     )
@@ -5457,7 +5457,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 130.81 72.39 0) (unit 4)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 4386c0b5-87d5-4481-81c7-064739a520a6)
-    (property "Reference" "U6" (at 130.81 65.7057 0)
+    (property "Reference" "U9" (at 130.81 65.7057 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "DG442xY" (at 130.81 68.1299 0)
@@ -5491,7 +5491,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U6") (unit 4)
+          (reference "U9") (unit 4)
         )
       )
     )
@@ -5525,7 +5525,7 @@
   (symbol (lib_id "Device:R") (at 322.58 50.8 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 49eb5706-a4f2-4f26-99f3-3fd130ec0b2c)
-    (property "Reference" "R13" (at 322.58 45.5422 90)
+    (property "Reference" "R23" (at 322.58 45.5422 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 322.58 47.8536 90)
@@ -5545,7 +5545,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R13") (unit 1)
+          (reference "R23") (unit 1)
         )
       )
     )
@@ -5554,7 +5554,7 @@
   (symbol (lib_id "Device:C_Polarized") (at 265.43 156.21 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 4ade82eb-3efe-4a31-9263-266eaf773db9)
-    (property "Reference" "C27" (at 264.541 150.3512 90)
+    (property "Reference" "C19" (at 264.541 150.3512 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47u" (at 264.541 152.8881 90)
@@ -5574,7 +5574,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C27") (unit 1)
+          (reference "C19") (unit 1)
         )
       )
     )
@@ -5583,7 +5583,7 @@
   (symbol (lib_id "Device:C") (at 128.27 220.98 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4c0a34ca-dbe0-4f2d-a717-06eac2a4762f)
-    (property "Reference" "C14" (at 128.27 214.63 90)
+    (property "Reference" "C2" (at 128.27 214.63 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 128.27 217.17 90)
@@ -5603,7 +5603,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C14") (unit 1)
+          (reference "C2") (unit 1)
         )
       )
     )
@@ -5662,7 +5662,7 @@
   (symbol (lib_id "Device:R") (at 322.58 71.12 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5d5942b9-841a-4044-9ff1-3b67db440882)
-    (property "Reference" "R31" (at 322.58 65.8622 90)
+    (property "Reference" "R26" (at 322.58 65.8622 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 322.58 68.1736 90)
@@ -5682,7 +5682,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R31") (unit 1)
+          (reference "R26") (unit 1)
         )
       )
     )
@@ -5691,7 +5691,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 130.81 53.34 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5f864120-559a-4238-bafb-db7244469ac6)
-    (property "Reference" "U9" (at 130.81 46.6557 0)
+    (property "Reference" "U1" (at 130.81 46.6557 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "DG442xY" (at 130.81 49.0799 0)
@@ -5725,7 +5725,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U9") (unit 1)
+          (reference "U1") (unit 1)
         )
       )
     )
@@ -5734,7 +5734,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 121.92 238.76 0) (unit 5)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 6ae591c5-4273-4bc0-879a-194aa9aba07b)
-    (property "Reference" "U9" (at 129.032 237.5479 0)
+    (property "Reference" "U1" (at 129.032 237.5479 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "DG442xY" (at 129.032 239.9721 0)
@@ -5768,7 +5768,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U9") (unit 5)
+          (reference "U1") (unit 5)
         )
       )
     )
@@ -5777,7 +5777,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 276.86 31.75 0) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 75cd8d14-7b95-4c3c-a779-c0ba7dbc98e6)
-    (property "Reference" "U9" (at 276.86 25.0657 0)
+    (property "Reference" "U1" (at 276.86 25.0657 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "DG442xY" (at 276.86 27.4899 0)
@@ -5811,7 +5811,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U9") (unit 3)
+          (reference "U1") (unit 3)
         )
       )
     )
@@ -5863,7 +5863,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 276.86 71.12 0) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8dab2483-c7c3-4b07-afdc-baf5ed2015fa)
-    (property "Reference" "U6" (at 276.86 64.4357 0)
+    (property "Reference" "U9" (at 276.86 64.4357 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "DG442xY" (at 276.86 66.8599 0)
@@ -5897,7 +5897,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U6") (unit 3)
+          (reference "U9") (unit 3)
         )
       )
     )
@@ -5906,7 +5906,7 @@
   (symbol (lib_id "Device:R") (at 256.54 198.12 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8f1645a9-4b88-4056-ad01-9ebdea298a4d)
-    (property "Reference" "R25" (at 258.318 197.2853 0)
+    (property "Reference" "R11" (at 258.318 197.2853 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "2k" (at 258.318 199.8222 0)
@@ -5926,7 +5926,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R25") (unit 1)
+          (reference "R11") (unit 1)
         )
       )
     )
@@ -5960,7 +5960,7 @@
   (symbol (lib_id "vca_backplane:AudioJack_729JH") (at 339.09 144.78 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid b23db2bc-e17e-4821-8252-dca1e497ffc2)
-    (property "Reference" "J13" (at 343.662 142.9329 0)
+    (property "Reference" "J12" (at 343.662 142.9329 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "AudioJack_729JH" (at 343.662 145.3571 0)
@@ -5979,7 +5979,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "J13") (unit 1)
+          (reference "J12") (unit 1)
         )
       )
     )
@@ -6038,7 +6038,7 @@
   (symbol (lib_id "Device:C") (at 124.46 256.54 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid c6967a38-1999-46c3-902a-d2d6e1865f15)
-    (property "Reference" "C13" (at 124.46 261.62 90)
+    (property "Reference" "C9" (at 124.46 261.62 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "0.1u" (at 124.46 259.715 90)
@@ -6058,7 +6058,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C13") (unit 1)
+          (reference "C9") (unit 1)
         )
       )
     )
@@ -6135,7 +6135,7 @@
   (symbol (lib_id "Device:C_Polarized") (at 264.16 194.31 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid ccd6ddb8-c466-4c18-8c40-517d78da2efd)
-    (property "Reference" "C28" (at 263.271 188.4512 90)
+    (property "Reference" "C12" (at 263.271 188.4512 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47u" (at 263.271 190.9881 90)
@@ -6155,7 +6155,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "C28") (unit 1)
+          (reference "C12") (unit 1)
         )
       )
     )
@@ -6164,7 +6164,7 @@
   (symbol (lib_id "Device:R") (at 116.84 72.39 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d84a9df1-573a-4045-a565-f19be08f0f40)
-    (property "Reference" "R21" (at 116.84 67.1322 90)
+    (property "Reference" "R10" (at 116.84 67.1322 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 116.84 69.4436 90)
@@ -6184,7 +6184,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "R21") (unit 1)
+          (reference "R10") (unit 1)
         )
       )
     )
@@ -6193,7 +6193,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 66.04 238.76 0) (unit 5)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid d9017226-dcb4-4561-8472-516fa60d7822)
-    (property "Reference" "U6" (at 73.152 237.5479 0)
+    (property "Reference" "U9" (at 73.152 237.5479 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "DG442xY" (at 73.152 239.9721 0)
@@ -6227,7 +6227,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U6") (unit 5)
+          (reference "U9") (unit 5)
         )
       )
     )
@@ -6236,7 +6236,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 276.86 50.8 180) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid dc1fb86a-c673-482d-a881-551fc0a9c78c)
-    (property "Reference" "U9" (at 276.86 55.0601 0)
+    (property "Reference" "U1" (at 276.86 55.0601 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "DG442xY" (at 276.86 57.4843 0)
@@ -6270,7 +6270,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U9") (unit 2)
+          (reference "U1") (unit 2)
         )
       )
     )
@@ -6304,7 +6304,7 @@
   (symbol (lib_id "Analog_Switch:DG442xY") (at 130.81 33.02 0) (unit 4)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid dd6b1582-47eb-4cb9-bcf1-bc9c6a2cc393)
-    (property "Reference" "U9" (at 130.81 26.3357 0)
+    (property "Reference" "U1" (at 130.81 26.3357 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "DG442xY" (at 130.81 28.7599 0)
@@ -6338,7 +6338,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "U9") (unit 4)
+          (reference "U1") (unit 4)
         )
       )
     )
@@ -6390,7 +6390,7 @@
   (symbol (lib_id "vca_backplane:AudioJack_729JH") (at 339.09 184.15 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid ea462c29-995c-4915-bb8e-eb43df2bf234)
-    (property "Reference" "J9" (at 343.662 182.3029 0)
+    (property "Reference" "J8" (at 343.662 182.3029 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "AudioJack_729JH" (at 343.662 184.7271 0)
@@ -6409,7 +6409,7 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000624dd88e"
-          (reference "J9") (unit 1)
+          (reference "J8") (unit 1)
         )
       )
     )

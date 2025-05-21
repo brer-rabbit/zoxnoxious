@@ -992,7 +992,7 @@
   (symbol (lib_id "Connector_Generic:Conn_02x20_Odd_Even") (at 69.85 48.26 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-00006238dc2a)
-    (property "Reference" "J6" (at 71.12 19.8882 0)
+    (property "Reference" "J7" (at 71.12 19.8882 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "Conn_02x20_Odd_Even" (at 71.12 22.1996 0)
@@ -1050,19 +1050,19 @@
     (instances
       (project "vca_backplane"
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-0000625442ef"
-          (reference "J6") (unit 1)
+          (reference "J7") (unit 1)
         )
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-000062525dc6"
           (reference "J3") (unit 1)
         )
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-000062544309"
-          (reference "J7") (unit 1)
+          (reference "J10") (unit 1)
         )
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-00006252a02b"
-          (reference "J4") (unit 1)
+          (reference "J2") (unit 1)
         )
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-000062544323"
-          (reference "J8") (unit 1)
+          (reference "J11") (unit 1)
         )
         (path "/bdbd6910-8f28-459f-89ba-e6dd447d59a9/00000000-0000-0000-0000-00006252a045"
           (reference "J5") (unit 1)
