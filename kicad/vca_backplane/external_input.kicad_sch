@@ -4,6 +4,13 @@
 
   (paper "B")
 
+  (title_block
+    (title "Zoxnoxious Backplane and VCA")
+    (date "2025-06-03")
+    (rev "0.3")
+    (company "Zoxnoxious Engineering")
+  )
+
   (lib_symbols
     (symbol "Amplifier_Operational:TL072" (pin_names (offset 0.127)) (in_bom yes) (on_board yes)
       (property "Reference" "U" (at 0 5.08 0)
