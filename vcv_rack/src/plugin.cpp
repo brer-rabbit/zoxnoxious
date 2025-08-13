@@ -44,6 +44,9 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
     else if (cardId == 0x06) {
         cardName = "Pole Dancer";
     }
+    else if (cardId == 0x07) {
+        cardName = "Audio IO";
+    }
     else {
         return "----";
     }
@@ -65,6 +68,7 @@ void init(Plugin* p) {
         p->addModel(modelZoxnoxious5524);
         p->addModel(modelPatchingMatrix);
         p->addModel(modelZoxnoxious3340Legacy);
+        p->addModel(modelAudioIO);
 
 	// Any other plugin initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
