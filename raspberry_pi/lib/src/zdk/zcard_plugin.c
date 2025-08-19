@@ -22,10 +22,10 @@
 #define INITIAL_SPI_FLAGS 1
 #define INITIAL_SLOT 5
 
-// GPIOs 13, 19, 26 mux the chip select to the different cards
-#define MUXOUT_0 13
-#define MUXOUT_1 19
-#define MUXOUT_2 26
+// GPIOs to mux the SPI chip selects to the different cards
+#define MUXOUT_0 20
+#define MUXOUT_1 26
+#define MUXOUT_2 21
 
 
 #define NUM_SPI_CHIP_SELECTS 2

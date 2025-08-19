@@ -97,12 +97,12 @@ struct AudioIO : ZoxnoxiousModule {
           { CARD_D_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 6, 7 } },
           { CARD_E_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 8, 9 } },
           { CARD_F_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 10, 11 } },
-          { CARD_A_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 13, 14 } },
-          { CARD_B_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 15, 16 } },
-          { CARD_C_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 17, 18 } },
-          { CARD_D_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 19, 20 } },
-          { CARD_E_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 21, 22 } },
-          { CARD_F_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 23, 24 } }
+          { CARD_A_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 12, 13 } },
+          { CARD_B_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 14, 15 } },
+          { CARD_C_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 16, 17 } },
+          { CARD_D_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 18, 19 } },
+          { CARD_E_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 20, 21 } },
+          { CARD_F_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 22, 23 } }
       };
 
     // Discovery related variables
