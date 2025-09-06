@@ -14,13 +14,13 @@ struct AudioIO : ZoxnoxiousModule {
     enum ParamId {
         OUT1_LEVEL_KNOB_PARAM,
         OUT2_LEVEL_KNOB_PARAM,
+        // the MIX1 and MIX2 enums need to be sequential
         CARD_A_MIX1_OUTPUT_BUTTON_PARAM,
         CARD_B_MIX1_OUTPUT_BUTTON_PARAM,
         CARD_C_MIX1_OUTPUT_BUTTON_PARAM,
         CARD_D_MIX1_OUTPUT_BUTTON_PARAM,
         CARD_E_MIX1_OUTPUT_BUTTON_PARAM,
         CARD_F_MIX1_OUTPUT_BUTTON_PARAM,
-        // the MIX2 enums need to be ordered:
         CARD_A_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_B_MIX2_OUTPUT_BUTTON_PARAM,
         CARD_C_MIX2_OUTPUT_BUTTON_PARAM,
@@ -40,13 +40,13 @@ struct AudioIO : ZoxnoxiousModule {
     enum LightId {
         OUT1_LEVEL_CLIP_LIGHT,
         OUT2_LEVEL_CLIP_LIGHT,
+        // the MIX1 and MIX2 enums need to be sequential
         CARD_A_MIX1_OUTPUT_BUTTON_LIGHT,
         CARD_B_MIX1_OUTPUT_BUTTON_LIGHT,
         CARD_C_MIX1_OUTPUT_BUTTON_LIGHT,
         CARD_D_MIX1_OUTPUT_BUTTON_LIGHT,
         CARD_E_MIX1_OUTPUT_BUTTON_LIGHT,
         CARD_F_MIX1_OUTPUT_BUTTON_LIGHT,
-        // the MIX2 enums need to be ordered:
         CARD_A_MIX2_OUTPUT_BUTTON_LIGHT,
         CARD_B_MIX2_OUTPUT_BUTTON_LIGHT,
         CARD_C_MIX2_OUTPUT_BUTTON_LIGHT,
@@ -116,17 +116,19 @@ struct AudioIO : ZoxnoxiousModule {
 
 
     AudioIO() : cardAOutput1NameString(invalidCardOutputName),
-                       cardAOutput2NameString(invalidCardOutputName),
-                       cardBOutput1NameString(invalidCardOutputName),
-                       cardBOutput2NameString(invalidCardOutputName),
-                       cardCOutput1NameString(invalidCardOutputName),
-                       cardCOutput2NameString(invalidCardOutputName),
-                       cardDOutput1NameString(invalidCardOutputName),
-                       cardDOutput2NameString(invalidCardOutputName),
-                       cardEOutput1NameString(invalidCardOutputName),
-                       cardEOutput2NameString(invalidCardOutputName),
-                       cardFOutput1NameString(invalidCardOutputName),
-                       cardFOutput2NameString(invalidCardOutputName) {
+                cardAOutput2NameString(invalidCardOutputName),
+                cardBOutput1NameString(invalidCardOutputName),
+                cardBOutput2NameString(invalidCardOutputName),
+                cardCOutput1NameString(invalidCardOutputName),
+                cardCOutput2NameString(invalidCardOutputName),
+                cardDOutput1NameString(invalidCardOutputName),
+                cardDOutput2NameString(invalidCardOutputName),
+                cardEOutput1NameString(invalidCardOutputName),
+                cardEOutput2NameString(invalidCardOutputName),
+                cardFOutput1NameString(invalidCardOutputName),
+                cardFOutput2NameString(invalidCardOutputName),
+                out1LevelClipTimer(0.f),
+                out2LevelClipTimer(0.f) {
 
         setExpanderPrimary();
         AudioIO::initCommandMsgState();
@@ -241,40 +243,18 @@ struct AudioIO : ZoxnoxiousModule {
 
             // only do midi stuff if we have an assigned channel
             if (hasChannelAssignment) { 
-                // MIX1 buttons to midi programs
+                // MIX1 and MIX2 buttons to midi programs
                 //
                 // check for any MIX1 buttons changing state and send midi
                 // messages for them.  Toggle light if so.  Do this by
                 // indexing the enums -- just don't re-order the enums
 
-                for (int i = 0; i < 6; ++i) {
+                for (int i = 0; i < 12; ++i) {
                     int buttonParam = CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i;
                     int lightParam = CARD_A_MIX1_OUTPUT_BUTTON_LIGHT + i;
 
-                    if (params[buttonParam].getValue() !=
-                        buttonParamToMidiProgramList[i].previousValue) {
-
-                        buttonParamToMidiProgramList[i].previousValue =
-                            params[buttonParam].getValue();
-
-                        int buttonParamValue = (params[buttonParam].getValue() > 0.f);
-                        lights[lightParam].setBrightness(buttonParamValue);
-                        int midiProgram = buttonParamToMidiProgramList[i].midiProgram[buttonParamValue];
-                        sendMidiProgramChangeMessage(midiProgram);
-                    }
-                }
-
-                // MIX2 buttons to midi programs
-                // this is exactly like MIX1, just different indices
-                for (int i = 0; i < 6; ++i) {
-                    int buttonParam = CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i;
-                    int lightParam = CARD_A_MIX2_OUTPUT_BUTTON_LIGHT + i;
-
-                    if (params[buttonParam].getValue() !=
-                        buttonParamToMidiProgramList[i].previousValue) {
-
-                        buttonParamToMidiProgramList[i].previousValue =
-                            params[buttonParam].getValue();
+                    if (params[buttonParam].getValue() != buttonParamToMidiProgramList[i].previousValue) {
+                        buttonParamToMidiProgramList[i].previousValue = params[buttonParam].getValue();
 
                         int buttonParamValue = (params[buttonParam].getValue() > 0.f);
                         lights[lightParam].setBrightness(buttonParamValue);
