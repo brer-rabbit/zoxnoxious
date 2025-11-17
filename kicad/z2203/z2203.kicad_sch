@@ -3497,7 +3497,7 @@
   (symbol (lib_id "Device:R") (at 199.39 205.74 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062e9aee7)
-    (property "Reference" "R56" (at 199.39 203.2 90)
+    (property "Reference" "R1" (at 199.39 203.2 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 199.39 208.6864 90)
@@ -3517,7 +3517,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R56") (unit 1)
+          (reference "R1") (unit 1)
         )
       )
     )
@@ -3526,7 +3526,7 @@
   (symbol (lib_id "Device:LED") (at 189.23 205.74 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062eac2d4)
-    (property "Reference" "D4" (at 189.23 203.2 0)
+    (property "Reference" "D1" (at 189.23 203.2 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "LED" (at 189.4078 208.9404 0)
@@ -3546,7 +3546,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "D4") (unit 1)
+          (reference "D1") (unit 1)
         )
       )
     )
@@ -3630,7 +3630,7 @@
   (symbol (lib_id "Device:C") (at 151.13 30.48 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062f683d8)
-    (property "Reference" "C37" (at 152.2984 33.401 0)
+    (property "Reference" "C9" (at 152.2984 33.401 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 149.987 33.401 0)
@@ -3650,7 +3650,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C37") (unit 1)
+          (reference "C9") (unit 1)
         )
       )
     )
@@ -3684,7 +3684,7 @@
   (symbol (lib_id "Memory_EEPROM:M24C02-WMN") (at 146.05 43.18 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000636c2e8e)
-    (property "Reference" "U15" (at 138.43 49.53 0)
+    (property "Reference" "U6" (at 138.43 49.53 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "M24C02-WMN" (at 135.89 35.56 0)
@@ -3710,7 +3710,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U15") (unit 1)
+          (reference "U6") (unit 1)
         )
       )
     )
@@ -3744,7 +3744,7 @@
   (symbol (lib_id "Mechanical:MountingHole") (at 195.58 24.13 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000640c16d6)
-    (property "Reference" "H1" (at 198.12 22.9616 0)
+    (property "Reference" "H4" (at 198.12 22.9616 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "MountingHole" (at 198.12 25.273 0)
@@ -3759,7 +3759,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "H1") (unit 1)
+          (reference "H4") (unit 1)
         )
       )
     )
@@ -3792,7 +3792,7 @@
   (symbol (lib_id "Mechanical:MountingHole") (at 209.55 33.02 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000640c239a)
-    (property "Reference" "H4" (at 212.09 31.8516 0)
+    (property "Reference" "H1" (at 212.09 31.8516 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "MountingHole" (at 212.09 34.163 0)
@@ -3807,7 +3807,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "H4") (unit 1)
+          (reference "H1") (unit 1)
         )
       )
     )
@@ -3840,7 +3840,7 @@
   (symbol (lib_id "74xx:74HC00") (at 73.66 207.01 0) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 049fa8f8-37b4-46ac-9bef-bdeeb7f0368a)
-    (property "Reference" "U7" (at 73.6517 199.0557 0)
+    (property "Reference" "U3" (at 73.6517 199.0557 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "74HC00" (at 73.6517 201.4799 0)
@@ -3872,7 +3872,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U7") (unit 3)
+          (reference "U3") (unit 3)
         )
       )
     )
@@ -3881,7 +3881,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 73.66 217.17 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 06748bc0-84f9-4cfa-9ed3-7689d8344baa)
-    (property "Reference" "TP8" (at 74.93 222.25 0)
+    (property "Reference" "TP4" (at 74.93 222.25 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 74.93 224.79 0)
@@ -3900,7 +3900,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP8") (unit 1)
+          (reference "TP4") (unit 1)
         )
       )
     )
@@ -3959,7 +3959,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 81.28 207.01 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 0e9a20c8-f9f5-4624-a30c-77ba04a0d448)
-    (property "Reference" "TP6" (at 80.01 201.93 0)
+    (property "Reference" "TP7" (at 80.01 201.93 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 80.01 199.39 0)
@@ -3978,7 +3978,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP6") (unit 1)
+          (reference "TP7") (unit 1)
         )
       )
     )
@@ -3987,7 +3987,7 @@
   (symbol (lib_id "Device:R") (at 308.61 200.66 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 0ec19f5d-202e-423d-9d6a-0b772c419022)
-    (property "Reference" "R5" (at 308.864 202.946 90)
+    (property "Reference" "R8" (at 308.864 202.946 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 308.61 198.374 90)
@@ -4007,7 +4007,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R5") (unit 1)
+          (reference "R8") (unit 1)
         )
       )
     )
@@ -4016,7 +4016,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 121.92 204.47 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 1c1bc81f-46fc-487a-8ab6-146543a96893)
-    (property "Reference" "TP2" (at 123.3932 201.4728 0)
+    (property "Reference" "TP6" (at 123.3932 201.4728 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 123.3932 203.7842 0)
@@ -4035,7 +4035,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP2") (unit 1)
+          (reference "TP6") (unit 1)
         )
       )
     )
@@ -4044,7 +4044,7 @@
   (symbol (lib_id "Device:R") (at 346.71 203.2 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 1c252be9-029d-41ec-957c-17ba977d0c23)
-    (property "Reference" "R6" (at 346.71 205.74 90)
+    (property "Reference" "R9" (at 346.71 205.74 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 346.71 200.2536 90)
@@ -4064,7 +4064,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R6") (unit 1)
+          (reference "R9") (unit 1)
         )
       )
     )
@@ -4073,7 +4073,7 @@
   (symbol (lib_id "Amplifier_Operational:TL074") (at 355.6 165.1 0) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 1ccf0636-0bf4-476b-b658-c307371670dc)
-    (property "Reference" "U6" (at 355.6 155.8757 0)
+    (property "Reference" "U5" (at 355.6 155.8757 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TL074" (at 355.6 158.2999 0)
@@ -4105,7 +4105,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U6") (unit 2)
+          (reference "U5") (unit 2)
         )
       )
     )
@@ -4214,7 +4214,7 @@
   (symbol (lib_id "Device:R") (at 308.61 208.28 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2a245155-0e21-4084-9546-13ce5ad9a6df)
-    (property "Reference" "R4" (at 308.864 210.566 90)
+    (property "Reference" "R5" (at 308.864 210.566 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 308.61 205.994 90)
@@ -4234,7 +4234,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R4") (unit 1)
+          (reference "R5") (unit 1)
         )
       )
     )
@@ -4243,7 +4243,7 @@
   (symbol (lib_id "Device:C") (at 204.47 124.46 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2a4ab7d6-1556-4400-b3cb-7562207ac507)
-    (property "Reference" "C10" (at 205.74 120.65 90)
+    (property "Reference" "C4" (at 205.74 120.65 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 207.01 128.27 90)
@@ -4263,7 +4263,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C10") (unit 1)
+          (reference "C4") (unit 1)
         )
       )
     )
@@ -4372,7 +4372,7 @@
   (symbol (lib_id "Amplifier_Operational:TL074") (at 313.69 43.18 0) (unit 5)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 38015336-3d67-40af-b188-18da78b439a7)
-    (property "Reference" "U6" (at 311.785 41.9679 0)
+    (property "Reference" "U5" (at 311.785 41.9679 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TL074" (at 311.785 44.3921 0)
@@ -4404,7 +4404,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U6") (unit 5)
+          (reference "U5") (unit 5)
         )
       )
     )
@@ -4538,7 +4538,7 @@
   (symbol (lib_id "Amplifier_Operational:TL074") (at 368.3 134.62 0) (mirror x) (unit 3)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4dc5f4f2-4204-44aa-bcc8-db9156f67790)
-    (property "Reference" "U6" (at 369.57 139.065 0)
+    (property "Reference" "U5" (at 369.57 139.065 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TL074" (at 369.57 130.175 0)
@@ -4570,7 +4570,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U6") (unit 3)
+          (reference "U5") (unit 3)
         )
       )
     )
@@ -4579,7 +4579,7 @@
   (symbol (lib_id "Device:R") (at 382.27 205.74 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5251f42d-006c-4280-9685-29dfa785cb79)
-    (property "Reference" "R8" (at 381.254 208.026 90)
+    (property "Reference" "R3" (at 381.254 208.026 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "51" (at 381 203.2 90)
@@ -4602,7 +4602,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R8") (unit 1)
+          (reference "R3") (unit 1)
         )
       )
     )
@@ -4611,7 +4611,7 @@
   (symbol (lib_id "74xx:74HC00") (at 55.88 217.17 0) (unit 4)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 560756a5-77ad-44ab-a78e-fa9800e594c6)
-    (property "Reference" "U7" (at 55.8717 209.2157 0)
+    (property "Reference" "U3" (at 55.8717 209.2157 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "74HC00" (at 55.8717 211.6399 0)
@@ -4643,7 +4643,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U7") (unit 4)
+          (reference "U3") (unit 4)
         )
       )
     )
@@ -4652,7 +4652,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 82.55 147.32 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 563003be-e372-492c-a31f-9c17e53d6151)
-    (property "Reference" "TP9" (at 81.28 142.24 0)
+    (property "Reference" "TP10" (at 81.28 142.24 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 81.28 139.7 0)
@@ -4671,7 +4671,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP9") (unit 1)
+          (reference "TP10") (unit 1)
         )
       )
     )
@@ -4680,7 +4680,7 @@
   (symbol (lib_id "Device:LED") (at 121.92 147.32 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5b474265-9877-4940-bf2d-b7d6be9ceabc)
-    (property "Reference" "D1" (at 121.92 144.78 0)
+    (property "Reference" "D2" (at 121.92 144.78 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "LED" (at 121.92 142.24 0)
@@ -4700,7 +4700,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "D1") (unit 1)
+          (reference "D2") (unit 1)
         )
       )
     )
@@ -4709,7 +4709,7 @@
   (symbol (lib_id "Device:R") (at 382.27 165.1 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5b88ca63-e5a7-477c-84f2-05a16eec3a8e)
-    (property "Reference" "R2" (at 381.254 167.386 90)
+    (property "Reference" "R6" (at 381.254 167.386 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "51" (at 381 162.56 90)
@@ -4732,7 +4732,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R2") (unit 1)
+          (reference "R6") (unit 1)
         )
       )
     )
@@ -4791,7 +4791,7 @@
   (symbol (lib_id "Device:R") (at 130.81 142.24 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5ff0168b-4962-4e2c-8564-965baa3dd5fc)
-    (property "Reference" "R1" (at 128.27 142.24 90)
+    (property "Reference" "R11" (at 128.27 142.24 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 133.35 142.24 90)
@@ -4811,7 +4811,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R1") (unit 1)
+          (reference "R11") (unit 1)
         )
       )
     )
@@ -4874,7 +4874,7 @@
   (symbol (lib_id "Device:C") (at 97.79 193.04 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6feb36e2-2783-40ec-b554-42b1b8c0dc65)
-    (property "Reference" "C4" (at 99.06 189.23 90)
+    (property "Reference" "C5" (at 99.06 189.23 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 100.33 196.85 90)
@@ -4894,7 +4894,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C4") (unit 1)
+          (reference "C5") (unit 1)
         )
       )
     )
@@ -5042,7 +5042,7 @@
   (symbol (lib_id "Amplifier_Operational:TL074") (at 363.22 205.74 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 7d1954df-1b38-4200-8cab-881d1e5179cc)
-    (property "Reference" "U6" (at 365.125 201.93 0)
+    (property "Reference" "U5" (at 365.125 201.93 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TL074" (at 365.125 199.39 0)
@@ -5074,7 +5074,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U6") (unit 1)
+          (reference "U5") (unit 1)
         )
       )
     )
@@ -5134,7 +5134,7 @@
   (symbol (lib_id "Device:C") (at 307.34 33.02 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 83357ad3-5f66-4cee-a257-f2637e050876)
-    (property "Reference" "C7" (at 308.61 29.21 90)
+    (property "Reference" "C8" (at 308.61 29.21 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 309.88 36.83 90)
@@ -5154,7 +5154,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C7") (unit 1)
+          (reference "C8") (unit 1)
         )
       )
     )
@@ -5295,7 +5295,7 @@
   (symbol (lib_id "Device:C") (at 355.6 142.24 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 923db49d-b203-4dfb-8576-c8151a0013e0)
-    (property "Reference" "C9" (at 358.521 141.0279 0)
+    (property "Reference" "C6" (at 358.521 141.0279 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10u" (at 358.521 143.4521 0)
@@ -5315,7 +5315,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C9") (unit 1)
+          (reference "C6") (unit 1)
         )
       )
     )
@@ -5324,7 +5324,7 @@
   (symbol (lib_id "74xx:74HC595") (at 104.14 214.63 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 97a5e194-d451-4172-b8ea-fb57edd34b48)
-    (property "Reference" "U3" (at 106.3341 197.7857 0)
+    (property "Reference" "U4" (at 106.3341 197.7857 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "74HC595" (at 106.3341 200.2099 0)
@@ -5358,7 +5358,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U3") (unit 1)
+          (reference "U4") (unit 1)
         )
       )
     )
@@ -5367,7 +5367,7 @@
   (symbol (lib_id "Device:C") (at 307.34 55.88 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 9c251744-c2a7-4237-8475-b11d634a43c6)
-    (property "Reference" "C8" (at 308.61 52.07 90)
+    (property "Reference" "C7" (at 308.61 52.07 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 309.88 59.69 90)
@@ -5387,7 +5387,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C8") (unit 1)
+          (reference "C7") (unit 1)
         )
       )
     )
@@ -5396,7 +5396,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 294.64 200.66 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 9e26527a-a1c7-486a-b899-795bdd7d1933)
-    (property "Reference" "TP12" (at 293.1668 203.6572 0)
+    (property "Reference" "TP2" (at 293.1668 203.6572 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 293.1668 201.3458 0)
@@ -5415,7 +5415,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP12") (unit 1)
+          (reference "TP2") (unit 1)
         )
       )
     )
@@ -5424,7 +5424,7 @@
   (symbol (lib_id "Device:R") (at 328.93 191.77 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid a7265577-12e2-4b37-9f54-209dde8ff637)
-    (property "Reference" "R9" (at 329.184 194.056 90)
+    (property "Reference" "R4" (at 329.184 194.056 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 328.93 189.484 90)
@@ -5444,7 +5444,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R9") (unit 1)
+          (reference "R4") (unit 1)
         )
       )
     )
@@ -5453,7 +5453,7 @@
   (symbol (lib_id "Amplifier_Operational:TL074") (at 330.2 203.2 0) (mirror x) (unit 4)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ac80cff7-83bc-4c6f-afad-69e6b44fc325)
-    (property "Reference" "U6" (at 333.375 200.025 0)
+    (property "Reference" "U5" (at 333.375 200.025 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TL074" (at 332.105 197.485 0)
@@ -5485,7 +5485,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U6") (unit 4)
+          (reference "U5") (unit 4)
         )
       )
     )
@@ -5494,7 +5494,7 @@
   (symbol (lib_id "Device:C") (at 278.13 30.48 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ad8fb45e-51ba-473f-adfd-9b375e78c049)
-    (property "Reference" "C6" (at 279.4 26.67 90)
+    (property "Reference" "C3" (at 279.4 26.67 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 280.67 34.29 90)
@@ -5514,7 +5514,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C6") (unit 1)
+          (reference "C3") (unit 1)
         )
       )
     )
@@ -5523,7 +5523,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 121.92 165.1 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ae0b8885-c955-4079-b058-316f26fc28af)
-    (property "Reference" "TP4" (at 123.3932 162.1028 0)
+    (property "Reference" "TP8" (at 123.3932 162.1028 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 123.3932 164.4142 0)
@@ -5542,7 +5542,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP4") (unit 1)
+          (reference "TP8") (unit 1)
         )
       )
     )
@@ -5551,7 +5551,7 @@
   (symbol (lib_id "74xx:74HC00") (at 35.56 214.63 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid aef5290a-a2e7-4d9c-b09e-0430e73f89bc)
-    (property "Reference" "U7" (at 35.5517 206.6757 0)
+    (property "Reference" "U3" (at 35.5517 206.6757 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "74HC00" (at 35.5517 209.0999 0)
@@ -5583,7 +5583,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U7") (unit 1)
+          (reference "U3") (unit 1)
         )
       )
     )
@@ -5592,7 +5592,7 @@
   (symbol (lib_id "74xx:74HC00") (at 347.98 31.75 0) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid b2118110-2687-4b6d-a2f6-fb96c98d2ab2)
-    (property "Reference" "U7" (at 347.9717 23.7957 0)
+    (property "Reference" "U3" (at 347.9717 23.7957 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "74HC00" (at 347.9717 26.2199 0)
@@ -5624,7 +5624,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U7") (unit 2)
+          (reference "U3") (unit 2)
         )
       )
     )
@@ -5687,7 +5687,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 128.27 207.01 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b788d5d4-11b4-48a2-925d-5e8fa021ec68)
-    (property "Reference" "TP3" (at 131.2672 208.4832 0)
+    (property "Reference" "TP1" (at 131.2672 208.4832 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 128.9558 208.4832 0)
@@ -5706,7 +5706,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP3") (unit 1)
+          (reference "TP1") (unit 1)
         )
       )
     )
@@ -5715,7 +5715,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 220.98 137.16 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid bb982496-77ad-496a-8340-0d855bd6004b)
-    (property "Reference" "TP1" (at 222.4532 134.1628 0)
+    (property "Reference" "TP5" (at 222.4532 134.1628 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 222.4532 136.4742 0)
@@ -5734,7 +5734,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP1") (unit 1)
+          (reference "TP5") (unit 1)
         )
       )
     )
@@ -5818,7 +5818,7 @@
   (symbol (lib_id "Device:R") (at 308.61 215.9 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid bee63b2e-04b6-464f-ae37-5861975c752a)
-    (property "Reference" "R3" (at 308.61 218.44 90)
+    (property "Reference" "R2" (at 308.61 218.44 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "47k" (at 308.61 213.868 90)
@@ -5838,7 +5838,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R3") (unit 1)
+          (reference "R2") (unit 1)
         )
       )
     )
@@ -5847,7 +5847,7 @@
   (symbol (lib_id "Device:C") (at 97.79 137.16 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid c5d47105-ab86-4f2b-9908-8ca64b332b04)
-    (property "Reference" "C3" (at 99.06 133.35 90)
+    (property "Reference" "C10" (at 99.06 133.35 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "0.1u" (at 100.33 140.97 90)
@@ -5867,7 +5867,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "C3") (unit 1)
+          (reference "C10") (unit 1)
         )
       )
     )
@@ -6057,7 +6057,7 @@
   (symbol (lib_id "74xx:74HC00") (at 281.94 45.72 0) (unit 5)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid eb8ada55-7a3c-4a31-b322-acd578beac97)
-    (property "Reference" "U7" (at 287.782 44.5079 0)
+    (property "Reference" "U3" (at 287.782 44.5079 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "74HC00" (at 287.782 46.9321 0)
@@ -6089,7 +6089,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U7") (unit 5)
+          (reference "U3") (unit 5)
         )
       )
     )
@@ -6098,7 +6098,7 @@
   (symbol (lib_id "74xx:74HC595") (at 104.14 157.48 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid f15574f2-894c-4711-90a7-f2ae11e71c97)
-    (property "Reference" "U4" (at 106.3341 140.6357 0)
+    (property "Reference" "U7" (at 106.3341 140.6357 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "74HC595" (at 106.3341 143.0599 0)
@@ -6132,7 +6132,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "U4") (unit 1)
+          (reference "U7") (unit 1)
         )
       )
     )
@@ -6216,7 +6216,7 @@
   (symbol (lib_id "Device:R") (at 163.83 41.91 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid fa3bb712-d2fe-4604-976d-427eb47cfbf3)
-    (property "Reference" "R20" (at 169.0878 41.91 90)
+    (property "Reference" "R10" (at 169.0878 41.91 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "5k1" (at 166.7764 41.91 90)
@@ -6236,7 +6236,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "R20") (unit 1)
+          (reference "R10") (unit 1)
         )
       )
     )
@@ -6245,7 +6245,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 17.78 217.17 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid fc156242-5a1b-4ac7-af70-157ac2338de1)
-    (property "Reference" "TP11" (at 21.59 222.25 0)
+    (property "Reference" "TP3" (at 21.59 222.25 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 26.67 224.79 0)
@@ -6264,7 +6264,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP11") (unit 1)
+          (reference "TP3") (unit 1)
         )
       )
     )
@@ -6273,7 +6273,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 119.38 149.86 270) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid fd8a5aad-13de-4910-9808-7c6fdf373bac)
-    (property "Reference" "TP5" (at 122.3772 151.3332 0)
+    (property "Reference" "TP9" (at 122.3772 151.3332 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "TestPoint" (at 120.0658 151.3332 0)
@@ -6292,7 +6292,7 @@
     (instances
       (project "z2203"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP5") (unit 1)
+          (reference "TP9") (unit 1)
         )
       )
     )
