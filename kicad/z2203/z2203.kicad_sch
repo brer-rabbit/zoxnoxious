@@ -2965,10 +2965,10 @@
     (uuid ffb9a905-b75c-406c-a40c-d0d04c25dcc5)
   )
 
-  (text "Elim glue logic-\njust use CS0 and CLK\nthen move CS1 logic to NAND\neliminate one chip"
-    (at 38.1 172.72 0)
+  (text "The glue logic is to clock/shift the output at the\nsame rate as the SPI clock.  Alternating clock edges\nused for RCLK and SRCLK.  Assuming the SPI CS has a\nsufficient lead and follow time to the SPI CLK, this\nallows the SPI CS to be used for YM2203 CS.\n\nThis logic is _not_ needed for the other shift register\nas it only controls YM2203 A0.  The A0 is set as SPI CS\ntransitions form low to high state at the end of a SPI\ntransaction."
+    (at 27.94 254 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 4488cb51-7c92-4d70-adca-6f8c9e7c8ded)
+    (uuid 499633a6-af4a-4c5f-a707-2e87a7762cdd)
   )
   (text "2x20 connection interface" (at 17.272 19.05 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
