@@ -2,7 +2,7 @@
 "Conn_01x02","J2","Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",""
 "Conn_02x20_Odd_Even","J3","Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Horizontal",""
 "5k","RV1,RV2","Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical",""
-"TestPoint","TP1,TP2,TP3,TP4,TP5,TP6,TP7,TP8,TP9,TP10,TP11","TestPoint:TestPoint_Pad_2.0x2.0mm",""
+"TestPoint","TP1,TP2,TP3,TP4,TP5,TP6,TP7,TP8,TP9,TP10,TP11,TP12,TP13,TP14,TP15","TestPoint:TestPoint_Pad_2.0x2.0mm",""
 "SSI2190","U2","Package_SO:SSOP-24_3.9x8.7mm_P0.635mm",""
 "AS3364","U3","Package_SO:SOIC-16_3.9x9.9mm_P1.27mm",""
 "SSI2140","U5","Package_SO:SSOP-20_4.4x6.5mm_P0.65mm",""
