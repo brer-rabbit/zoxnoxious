@@ -3887,7 +3887,7 @@
   )
 
   (symbol (lib_id "Mechanical:MountingHole") (at 346.71 29.21 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000640c16d6)
     (property "Reference" "H4" (at 349.25 28.0416 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -3911,7 +3911,7 @@
   )
 
   (symbol (lib_id "Mechanical:MountingHole") (at 360.68 29.21 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000640c1f92)
     (property "Reference" "H3" (at 363.22 28.0416 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -3935,7 +3935,7 @@
   )
 
   (symbol (lib_id "Mechanical:MountingHole") (at 360.68 38.1 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000640c239a)
     (property "Reference" "H1" (at 363.22 36.9316 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -3959,7 +3959,7 @@
   )
 
   (symbol (lib_id "Mechanical:MountingHole") (at 346.71 38.1 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-0000640c295f)
     (property "Reference" "H2" (at 349.25 36.9316 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -4840,7 +4840,7 @@
     (property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm4040-n.pdf" (at 181.61 252.73 0)
       (effects (font (size 1.27 1.27) italic) hide)
     )
-    (property "LCSC" "C460725" (at 181.61 252.73 0)
+    (property "LCSC" "C111866" (at 181.61 252.73 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid d9b02832-062b-4eaa-902b-01bc01f8c9d8))
@@ -5266,7 +5266,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 264.16 247.65 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f2ef553c-7d46-4272-820b-10738ce6ff86)
-    (property "Reference" "TP9" (at 266.7 241.3 0)
+    (property "Reference" "TP4" (at 266.7 241.3 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 267.97 238.76 0)
@@ -5282,7 +5282,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6"
-          (reference "TP9") (unit 1)
+          (reference "TP4") (unit 1)
         )
       )
     )

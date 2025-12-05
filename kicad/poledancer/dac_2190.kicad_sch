@@ -815,7 +815,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 196.85 38.1 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 229e7ae6-f752-4006-876b-b10464490b11)
-    (property "Reference" "TP5" (at 199.39 31.75 0)
+    (property "Reference" "TP10" (at 199.39 31.75 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 200.66 29.21 0)
@@ -831,7 +831,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/57b4b86d-6fc2-4a90-985c-9520b039cd33"
-          (reference "TP5") (unit 1)
+          (reference "TP10") (unit 1)
         )
       )
     )
@@ -1157,7 +1157,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 105.41 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 57fd03b2-7761-42ce-b518-e4792d40de10)
-    (property "Reference" "TP4" (at 107.95 40.64 0)
+    (property "Reference" "TP9" (at 107.95 40.64 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 109.22 38.1 0)
@@ -1173,7 +1173,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/57b4b86d-6fc2-4a90-985c-9520b039cd33"
-          (reference "TP4") (unit 1)
+          (reference "TP9") (unit 1)
         )
       )
     )
@@ -1207,7 +1207,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 195.58 130.81 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6cca5b00-2e90-4245-93b0-c1b158610543)
-    (property "Reference" "TP15" (at 198.12 124.46 0)
+    (property "Reference" "TP14" (at 198.12 124.46 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 199.39 121.92 0)
@@ -1223,7 +1223,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/57b4b86d-6fc2-4a90-985c-9520b039cd33"
-          (reference "TP15") (unit 1)
+          (reference "TP14") (unit 1)
         )
       )
     )
@@ -1427,7 +1427,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 195.58 85.09 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid adc8c09b-2ce9-46e1-93c6-ce93ece84015)
-    (property "Reference" "TP13" (at 198.12 78.74 0)
+    (property "Reference" "TP12" (at 198.12 78.74 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 199.39 76.2 0)
@@ -1443,7 +1443,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/57b4b86d-6fc2-4a90-985c-9520b039cd33"
-          (reference "TP13") (unit 1)
+          (reference "TP12") (unit 1)
         )
       )
     )
@@ -1452,7 +1452,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 195.58 107.95 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid af2d5883-b598-4b87-a0af-8c411e897991)
-    (property "Reference" "TP14" (at 198.12 101.6 0)
+    (property "Reference" "TP13" (at 198.12 101.6 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 199.39 99.06 0)
@@ -1468,7 +1468,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/57b4b86d-6fc2-4a90-985c-9520b039cd33"
-          (reference "TP14") (unit 1)
+          (reference "TP13") (unit 1)
         )
       )
     )
@@ -1701,7 +1701,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 195.58 60.96 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e4db42f9-5ed2-4b1a-84ea-c997302ec5af)
-    (property "Reference" "TP12" (at 198.12 54.61 0)
+    (property "Reference" "TP11" (at 198.12 54.61 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 199.39 52.07 0)
@@ -1717,7 +1717,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/57b4b86d-6fc2-4a90-985c-9520b039cd33"
-          (reference "TP12") (unit 1)
+          (reference "TP11") (unit 1)
         )
       )
     )

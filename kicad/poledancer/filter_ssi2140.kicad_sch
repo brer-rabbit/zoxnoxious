@@ -4384,7 +4384,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 60.96 134.62 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2739ed88-c24f-41aa-bd5d-071ac0927349)
-    (property "Reference" "TP10" (at 60.96 129.54 0)
+    (property "Reference" "TP5" (at 60.96 129.54 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 63.5 127.635 0)
@@ -4400,7 +4400,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/8b6d26b9-bac9-4c69-a064-2c31c4393978"
-          (reference "TP10") (unit 1)
+          (reference "TP5") (unit 1)
         )
       )
     )
@@ -7858,7 +7858,7 @@
   (symbol (lib_id "Connector:TestPoint") (at 105.41 55.88 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d4cda0c7-a9ff-4f33-8ddb-97480ecce500)
-    (property "Reference" "TP11" (at 102.87 62.23 0)
+    (property "Reference" "TP15" (at 102.87 62.23 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "TestPoint" (at 101.6 64.77 0)
@@ -7874,7 +7874,7 @@
     (instances
       (project "poledancer"
         (path "/7079bdb0-a00e-4bac-b257-cbcf2c91bbd6/8b6d26b9-bac9-4c69-a064-2c31c4393978"
-          (reference "TP11") (unit 1)
+          (reference "TP15") (unit 1)
         )
       )
     )
