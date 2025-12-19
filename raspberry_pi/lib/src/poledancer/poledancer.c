@@ -41,6 +41,7 @@ const int spi_channel_cs1 = 1;
 // 0 : 0x50 : source2 audio vca
 // 0 : 0x60 : source1 mod vca
 // 0 : 0x70 : source2 mod vca
+// 1 : 0x00 : ctrl ref (calibration - not mapped to an audio channel)
 // 1 : 0x10 : pole4 level
 // 1 : 0x20 : pole2 level
 // 1 : 0x30 : pole3 level
@@ -51,6 +52,10 @@ const int spi_channel_cs1 = 1;
 static const uint8_t channel_map_cs0[] = { 0x00, 0x40, 0x50, 0x60, 0x70 };
 static const uint8_t channel_map_cs1[] = { 0x10, 0x20, 0x30, 0x40, 0x60, 0x70 };
 const uint8_t cutoff_cv_channel = 0;
+
+static void create_linear_tuning(int, int, int16_t*) {
+static void calibrate_vca2190_dac(struct poledancer_card*);
+
 
 /* init_zcard
  * set gpio & dac initial values.  
@@ -123,6 +128,9 @@ void* init_zcard(struct zhost *zhost, int slot) {
   create_linear_tuning(channel_map_cs0[cutoff_cv_channel],
                        poledancer->tunable.dac_size,
                        poledancer->tunable.dac_calibration_table);
+
+  calibrate_vca2190_dac(poledancer);
+
 
   return poledancer;
 }
@@ -299,7 +307,7 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
  * create a linear tuning table - no corrections.  Create it for the passed in DAC channel such that
  * it can be passed straight to spiWrite.
  */
-void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
+static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
   for (int i = 0; i < num_elements; ++i) {
     unsigned char upper, lower;
     upper = i;
@@ -308,3 +316,25 @@ void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
   }
 }
 
+
+static void calibrate_vca2190_dac(struct poledancer_card *poledancer) {
+  if (poledancer == NULL) {
+    return;
+  }
+
+  // these should be read from I2C ROM
+  struct dac_channel_descriptor dac_channel_descriptors[6] =
+    {
+      {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f},
+      {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f},
+      {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f},
+      {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f},
+      {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f},
+      {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f}
+    };
+
+  poledancer->dac_characterization = init_vca_dac2190_calibration(dac_channel_descriptors);
+  calculate_calibration_parameters(poledancer->dac_characterization);
+  int result = generate_channel_calibrated_codes(poledancer->dac_characterization);
+
+}
