@@ -90,8 +90,33 @@ struct dac_device {
  * used for calibration.
  */
 struct dac_device* init_vca_dac2190_calibration(const struct dac_channel_descriptor channels[DAC2190_NUM_CHANNELS]);
-void calculate_calibration_parameters(struct dac_device *dac_device);
+
+/* calculate_calibration_parameters
+ *
+ * perform intermediary steps to calculate the range for the calibration.  Internal
+ * params for min and max of each channel are calculated.
+ * To be called after init_vca_dac2190_calibration().
+ * Return value is non-zero if calibration of parameters fails and
+ * must fallback to non-calibrated linear slope.  Zero on success.
+ */
+int calculate_calibration_parameters(struct dac_device *dac_device);
+
+/* generate_channel_calibrated_codes
+ *
+ * after calling calculate_calibration_parameters(), this function generates
+ * lookup tables calibrated for worst-case channel calibration.  No channel
+ * produces values beloe the worst channel's minnumum, and no channel produces
+ * values greater than the worst channel's maximum.  The table values are formatted
+ * per the wire_prefix for direct hardware output.
+ * Return value is zero is the calibration succeeded.  Non-zero on failure.
+ */
 int generate_channel_calibrated_codes(struct dac_device *dac_device);
+
+/* free_vca_dac_calibration
+ *
+ * free all memory associated with the dac_device struct.  On return the object is free'd
+ * and one would be wise not to dereference the pointer.
+ */
 void free_vca_dac_calibration(struct dac_device *dac_device);
 
 #endif // VCA_DAC_CALIBRATION_H

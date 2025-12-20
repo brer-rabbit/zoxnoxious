@@ -83,8 +83,7 @@ struct dac_device* init_vca_dac2190_calibration(const struct dac_channel_descrip
 
 
 
-
-void calculate_calibration_parameters(struct dac_device *dac_device) {
+int calculate_calibration_parameters(struct dac_device *dac_device) {
   int use_fallback_range = 0;
 
   // 1. Pre-calculate physical slope (volts/code) and intercept for each channel
@@ -127,7 +126,7 @@ void calculate_calibration_parameters(struct dac_device *dac_device) {
       dac_device->channels_coeffs[i].Dmax_calc = DAC2190_MAX_CODE;
     }
         
-    return; // Calibration is done, using fallback limits
+    return use_fallback_range; // Calibration is done, using fallback limits
   }
     
   // Valid Calibration Path

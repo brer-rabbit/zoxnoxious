@@ -322,7 +322,7 @@ static void calibrate_vca2190_dac(struct poledancer_card *poledancer) {
     return;
   }
 
-  // these should be read from I2C ROM
+  // these should be read from I2C ROM.  Add channel.
   struct dac_channel_descriptor dac_channel_descriptors[6] =
     {
       {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f},
@@ -333,8 +333,12 @@ static void calibrate_vca2190_dac(struct poledancer_card *poledancer) {
       {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f}
     };
 
-  poledancer->dac_characterization = init_vca_dac2190_calibration(dac_channel_descriptors);
+  if (poledancer->dac_characterization = init_vca_dac2190_calibration(dac_channel_descriptors) == NULL) {
+    ERROR("failed to init calibration for DAC / SSI2190");
+  }
+
   calculate_calibration_parameters(poledancer->dac_characterization);
-  int result = generate_channel_calibrated_codes(poledancer->dac_characterization);
+  generate_channel_calibrated_codes(poledancer->dac_characterization);
+
 
 }
