@@ -8,7 +8,7 @@ The directories below contain KiCad files for the Zoxnoxious synthesizer.  This 
 * [Pole Dancer](poledancer/): pole mixing filter utilizing an SSI2140 and SSI2190
 * [Z3340](z3340/): Oscillator based around an AS3340 with four sync modes that can be combined
 * [Z3372](z3372/): Lowpass filter with AS3372 filter chip.  Stereo panning, filter and resonance modulation.
-* [Z5524](z5524/): dual VCO voice card.  SSI2130 oscillator for TZFM, AS3194 for second VCO and filter.  Powerful.
+* [Z5524](z5524/): dual VCO voice card.  SSI2130 oscillator for TZFM, AS3394 for second VCO and filter.  Powerful.
 
 
 # Backplane
