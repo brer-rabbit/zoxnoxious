@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "zcard_plugin.h"
 #include "vca_dac_calibration.h"
 
 // Calibration for the DAC channels that control the SSI2190.  This is for
@@ -63,7 +64,7 @@ static uint16_t voltage_to_code(float V_target, float V_slope, float V_min_inter
 struct dac_device* init_dac_calibration(const struct dac_channel_descriptor *channels, size_t num_channels) {
   struct dac_device *dac_device = (struct dac_device*) malloc(sizeof(struct dac_device));
   if (dac_device == NULL) {
-    printf("error string goes here");
+    ERROR("memmory alloc error for DAC calibration");
     return NULL;
   }
 
@@ -92,7 +93,7 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
       (dac_device->channels_descriptor[i].Vmax_measured - dac_device->channels_descriptor[i].Vmin_measured) / DAC2190_MAX_CODE;
     if (dac_device->channels_coeffs[i].Vslope < VSLOPE_MIN_EXPECTED ||
         dac_device->channels_coeffs[i].Vslope > VSLOPE_MAX_EXPECTED) {
-      printf("channel %d unexpected Vslope %.3f\n", i, dac_device->channels_coeffs[i].Vslope * 1000);
+      WARN("channel %d unexpected Vslope %.3f.  Falling back to non-calibrated values", i, dac_device->channels_coeffs[i].Vslope * 1000);
       use_fallback_range = 1;
     }
   }
@@ -112,13 +113,13 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
 
   if (dac_device->Vhigh_device <= dac_device->Vlow_device) {
     // Fallback Scenario: The calibrated range is invalid
+    WARN("a channel's low voltage (%.3fV) is greater than a channel's high voltage (%.3fV)", 
+         dac_device->Vhigh_device, dac_device->Vlow_device);
     use_fallback_range = 1;
-    printf("WARN: a channel's low voltage (%.3fV) is greater than a channel's high voltage (%.3fV)\n", 
-           dac_device->Vhigh_device, dac_device->Vlow_device);
   }
 
   if (use_fallback_range == 1) {
-    printf("INFO: falling back to raw DAC range [0, %u] for all channels.\n", DAC2190_MAX_CODE);
+    INFO("falling back to raw DAC range [0, %u] for all channels.", DAC2190_MAX_CODE);
 
     // Set Dmin/Dmax to the raw full range for the LUT generation (Steps 4 & 5 Fallback)
     for (int i = 0; i < DAC2190_NUM_CHANNELS; ++i) {
@@ -130,7 +131,7 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
   }
     
   // Valid Calibration Path
-  printf("INFO: Calibration success. Global Operating Range: [%.3fV, %.3fV]\n", 
+  INFO("Calibration success. Global Operating Range: [%.3fV, %.3fV]", 
          dac_device->Vlow_device, dac_device->Vhigh_device);
 
   // --- STEPS 4 & 5: Calculate New Dmin and Dmax (Valid Path) ---
@@ -147,11 +148,12 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
                       dac_device->channels_coeffs[i].Vslope,
                       dac_device->channels_descriptor[i].Vmin_measured);
         
-    printf("INFO: Ch %d: D_min_calc=%u, D_max_calc=%u\n",
-           i,
-           dac_device->channels_coeffs[i].Dmin_calc, 
-           dac_device->channels_coeffs[i].Dmax_calc);
+    INFO("INFO: Ch %d: D_min_calc=%u, D_max_calc=%u",
+         i,
+         dac_device->channels_coeffs[i].Dmin_calc, 
+         dac_device->channels_coeffs[i].Dmax_calc);
   }
+
   return use_fallback_range;
 }
 
@@ -162,7 +164,6 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
  * Return zero on success.
  */
 int generate_channel_calibrated_codes(struct dac_device *dac_device) {
-  printf("INFO --- Step 6: Generating Lookup Tables ---\n");
     
   for (int i = 0; i < DAC2190_NUM_CHANNELS; ++i) {
     uint16_t Dmin_calc = dac_device->channels_coeffs[i].Dmin_calc;
@@ -171,7 +172,7 @@ int generate_channel_calibrated_codes(struct dac_device *dac_device) {
     // 1. Allocate memory for the calibrated table
     uint16_t *lut = (uint16_t*) malloc(CORRECTION_TABLE_SIZE * sizeof(uint16_t));
     if (lut == NULL) {
-      fprintf(stderr, "FATAL ERROR: Failed to allocate memory for LUT for Channel %d.\n", i);
+      ERROR("Failed to allocate memory for LUT for Channel %d", i);
       // cleanup any allocated resources
       for (int j = 0; j < i; ++j) {
         free(dac_device->calibrated_codes[j]);
@@ -218,7 +219,7 @@ int generate_channel_calibrated_codes(struct dac_device *dac_device) {
     }
         
 
-    printf("INFO: Ch %d LUT generated. Maps normalized code [0, %u] to actual code [%u, %u].\n", 
+    INFO("Channel %d LUT generated. Maps normalized code [0, %u] to actual code [%u, %u]", 
            i, 
            DAC2190_MAX_CODE, 
            lut[0],  
@@ -226,7 +227,9 @@ int generate_channel_calibrated_codes(struct dac_device *dac_device) {
       );
   }
     
-  printf("INFO: All %d DAC Lookup Tables successfully calculated and stored.\n", DAC2190_NUM_CHANNELS);
+  INFO("All %d DAC Lookup Tables successfully calculated and stored",
+       DAC2190_NUM_CHANNELS);
+
   return 0; // Success
 }
 
