@@ -152,6 +152,7 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
            dac_device->channels_coeffs[i].Dmin_calc, 
            dac_device->channels_coeffs[i].Dmax_calc);
   }
+  return use_fallback_range;
 }
 
 
@@ -211,7 +212,9 @@ int generate_channel_calibrated_codes(struct dac_device *dac_device) {
         actual_code = DAC2190_MAX_CODE;
       }
             
-      lut[k] = actual_code;
+      // take the actual code and prefix first four bits with wire prefix.
+      // Now it's ready to take to the DAC.
+      lut[k] =  (dac_device->channels_descriptor[i].wire_prefix << 12) | (actual_code & 0x0FFF);
     }
         
 

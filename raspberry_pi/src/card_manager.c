@@ -52,7 +52,7 @@ static const char *config_lookup_eeprom_base_i2c_address = CARD_MANAGER_KEY_NAME
  * initialize a card manager.  Takes an open libconfig to start.
  */
 struct card_manager* init_card_manager(config_t *cfg) {
-  struct card_manager *mgr = (struct card_manager *)calloc(sizeof(struct card_manager), 1);
+  struct card_manager *mgr = (struct card_manager *)calloc(1, sizeof(struct card_manager));
   if (!mgr) {
     FATAL("failed to alloc for card_manager");
     return 0;
@@ -304,7 +304,7 @@ static int zcard_compare_spi_f(const void *name1, const void *name2) {
 void assign_update_order(struct card_manager *card_mgr) {
   struct zcard_properties *zcard_props;
   struct card_spi_sort_criteria *cards;
-  cards = (struct card_spi_sort_criteria*)calloc(sizeof(struct card_spi_sort_criteria), card_mgr->num_cards);
+  cards = (struct card_spi_sort_criteria*)calloc(card_mgr->num_cards, sizeof(struct card_spi_sort_criteria));
 
   // initialize order by just copying
   for (int i = 0; i < card_mgr->num_cards; ++i) {
@@ -338,7 +338,7 @@ void assign_update_order(struct card_manager *card_mgr) {
  */
 
 void assign_hw_audio_channels(struct card_manager *card_mgr, int *channels, int num_devices) {
-  int *bin_current_index = (int*)calloc(sizeof(int), num_devices);
+  int *bin_current_index = (int*)calloc(num_devices, sizeof(int));
   int card_idx, bin_num;
 
   for (card_idx = 0; card_idx < card_mgr->num_cards; ++card_idx) {
