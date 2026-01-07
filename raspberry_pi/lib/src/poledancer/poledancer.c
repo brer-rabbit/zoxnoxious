@@ -51,7 +51,7 @@ const int spi_channel_cs1 = 1;
 // 1 : 0x60 : 10 : q vca
 
 static const uint8_t channel_map_cs0[] = { 0x00, 0x40, 0x50, 0x60, 0x70 };
-static const uint8_t channel_map_cs1[] = { 0x10, 0x20, 0x30, 0x40, 0x60, 0x70 };
+static const uint8_t channel_map_cs1[] = { 0x70, 0x40, 0x20, 0x30, 0x10, 0x60 };
 const uint8_t cutoff_cv_channel = 0;
 
 static void create_linear_tuning(int, int, int16_t*);
@@ -78,8 +78,8 @@ static void calibrate_vca2190_dac(struct poledancer_card*, int i2c_rom_handle);
 //
 static const unsigned int load_rom_address = 0x01;
 static const int8_t min_board_version = 1;
-#define NUM_CHANNEL_DESCRIPTORS 6
-#define ROM_READ_SIZE_BYTES NUM_CHANNEL_DESCRIPTORS * 4 + 1
+#define NUM_VCA_CHANNEL_DESCRIPTORS 6
+#define ROM_READ_SIZE_BYTES NUM_VCA_CHANNEL_DESCRIPTORS * 4 + 1
 
 /* init_zcard
  * set gpio & dac initial values.  
@@ -246,13 +246,23 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   const int16_t *samples_cs1 = &samples[DAC_CHANNELS_CS0];
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_cs1, SPI_MODE, zcard->slot);
 
+  // this will handle all the 2190 VCAs
   for (int i = 0; i < DAC_CHANNELS_CS1; ++i) {
     if (zcard->previous_samples_cs1[i] != samples_cs1[i] ) {
       if (samples_cs1[i] >= 0) {
-        zcard->previous_samples_cs1[i] = samples_cs1[i];
-        samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples_cs1[i]) >> 11;
-        samples_to_dac[1] = ((uint16_t) samples_cs1[i]) >> 3;
-        spiWrite(spi_channel, samples_to_dac, 2);
+        if (i < NUM_VCA_CHANNEL_DESCRIPTORS - 1) { // exclude ctrl ref
+          zcard->previous_samples_cs1[i] = samples_cs1[i];
+          spiWrite(spi_channel,
+                   (char*) &zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ],
+                   2);
+        }
+        else { // q vca
+          samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples_cs1[i]) >> 11;
+          samples_to_dac[1] = ((uint16_t) samples_cs1[i]) >> 3;
+          spiWrite(spi_channel, samples_to_dac, 2);
+        }
+
+
       }
       else {
         zcard->previous_samples_cs1[i] = 0;
@@ -263,6 +273,8 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 
     }
   }
+
+
 
   return 0;
 }
@@ -373,7 +385,7 @@ static void calibrate_vca2190_dac(struct poledancer_card *zcard, int i2c_rom_han
   }
 
   // these should be read from I2C ROM.  Add channel.
-  struct dac_channel_descriptor dac_channel_descriptors[NUM_CHANNEL_DESCRIPTORS] = {
+  struct dac_channel_descriptor dac_channel_descriptors[NUM_VCA_CHANNEL_DESCRIPTORS] = {
     {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x00 }, // ctrl ref
     {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x07 }, // dry
     {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x04 }, // pole 1
@@ -391,7 +403,7 @@ static void calibrate_vca2190_dac(struct poledancer_card *zcard, int i2c_rom_han
   board_version_number = (int8_t)rom_data[0];
 
   if (board_version_number >= min_board_version) {
-    for (int i = 0; i < NUM_CHANNEL_DESCRIPTORS; ++i) {
+    for (int i = 0; i < NUM_VCA_CHANNEL_DESCRIPTORS; ++i) {
       // using memcpy: storage happened on this architecture,
       // restoring here shouldn't need to worry about endianness.
       int16_t tmp1, tmp2;
