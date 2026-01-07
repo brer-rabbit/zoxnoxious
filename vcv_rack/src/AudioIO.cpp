@@ -278,7 +278,7 @@ struct AudioIO : ZoxnoxiousModule {
      * where we're processing the control messages.
      */
     void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
-        // this ought to be the case -- consider making this an assertion
+
         if (!hasChannelAssignment) {
             if (APP->engine->getFrame() % 60000 == 0) {
                 INFO("zoxnoxious: module id %" PRId64 " no channel assignment", getId());
@@ -299,9 +299,11 @@ struct AudioIO : ZoxnoxiousModule {
 
 
     /** getCardHardwareId
-     * return the hardware Id of the 3340 card
+     * return the hardware Id of this card.
+     * This must match the numeric identifier the Pi has in the etc/zoxnoxiousd.cfg file.
+     * If it doesn't match ZoxnoxiousControlMsg will not have a channel assignment for this card.
      */
-    static const uint8_t hardwareId = 0x01;
+    static const uint8_t hardwareId = 0x07;
     uint8_t getHardwareId() override {
         return hardwareId;
     }
@@ -498,7 +500,7 @@ private:
                 leftExpanderProducerMessage->channelAssignments[i].outputDeviceId = msg.bytes[i * 3 + bytesOffset + 2];
                 leftExpanderProducerMessage->channelAssignments[i].midiChannel = assignedMidiChannel++;
                 leftExpanderProducerMessage->channelAssignments[i].assignmentOwned = false;
-                INFO("Discovery Report: card 0x%X device %d offset %d midi %d",
+                INFO("Discovery Report: card 0x%X; audio device id: %d; channel offset %d; midi channel %d",
                      leftExpanderProducerMessage->channelAssignments[i].cardId,
                      leftExpanderProducerMessage->channelAssignments[i].outputDeviceId,
                      leftExpanderProducerMessage->channelAssignments[i].cvChannelOffset,
