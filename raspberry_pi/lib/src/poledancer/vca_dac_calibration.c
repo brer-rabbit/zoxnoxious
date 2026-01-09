@@ -191,12 +191,10 @@ int generate_channel_calibrated_codes(struct dac_device *dac_device) {
 
     // 2. Populate the table entries
     // First, ensure endpoint correctness:
-    lut[0] = Dmin_calc;
-    lut[DAC2190_MAX_CODE] = Dmax_calc;
-    // then the rest of the entries from 1..DAC2190_MAX_CODE-1:
-    for (uint16_t k = 1; k < DAC2190_MAX_CODE; ++k) {
+    lut[0] = __builtin_bswap16(Dmin_calc | (dac_device->channels_descriptor[i].wire_prefix << 8));
+    // then the rest of the entries from 1..DAC2190_MAX_CODE:
+    for (uint16_t k = 1; k <= DAC2190_MAX_CODE; ++k) {
       // k is the Normalized Code (0 to 4095) that the user writes
-            
       // Calculate the fractional position in the normalized range (0.0 to 1.0)
       float fractional_position = (float)k / D_norm_max_f;
 
@@ -215,20 +213,38 @@ int generate_channel_calibrated_codes(struct dac_device *dac_device) {
             
       // take the actual code and prefix first four bits with wire prefix.
       // Now it's ready to take to the DAC.
-      lut[k] =  (dac_device->channels_descriptor[i].wire_prefix << 12) | (actual_code & 0x0FFF);
+      uint16_t tmp =  (dac_device->channels_descriptor[i].wire_prefix << 8) | (actual_code & 0x0FFF);
+      lut[k] = __builtin_bswap16(tmp);
+
+      if (k < 10) {
+        INFO("wire ready %d: %4hx --> %4hx", i, actual_code, lut[k]);
+      }
+
     }
-        
 
     INFO("Channel %d LUT generated. Maps normalized code [0, %u] to actual code [%u, %u]", 
-           i, 
-           DAC2190_MAX_CODE, 
-           lut[0],  
-           lut[DAC2190_MAX_CODE] 
-      );
+         i, 
+         DAC2190_MAX_CODE, 
+         lut[0],  
+         lut[DAC2190_MAX_CODE] 
+         );
   }
     
   INFO("All %d DAC Lookup Tables successfully calculated and stored",
        DAC2190_NUM_CHANNELS);
+
+  for (int i = 0; i < DAC2190_NUM_CHANNELS; ++i) {
+    INFO("Values: %d", i);
+    for (int k = 0; k < 5; ++k) {
+      INFO("wire ready %d: %4x --> %4hx", i, k, dac_device->calibrated_codes[i][k]);
+    }
+
+    INFO("...");
+
+    for (int k = DAC2190_MAX_CODE - 4; k <= DAC2190_MAX_CODE; ++k) {
+      INFO("wire ready %d: %4x --> %4hx", i, k, dac_device->calibrated_codes[i][k]);
+    }
+  }
 
   return 0; // Success
 }

@@ -23,6 +23,7 @@
 #define PCA9555_BASE_I2C_ADDRESS 0x20
 #define EEPROM_BASE_I2C_ADDRESS 0x50
 
+#define USE_VCACALIBRATION
 
 const uint8_t port0_init = 0x00; // port0: select muxes disabled
 const uint8_t port1_init= 0x00; // port1: all switches off, active low LED on
@@ -42,13 +43,13 @@ const int spi_channel_cs1 = 1;
 // 0 : 0x50 : 2 : source2 audio vca
 // 0 : 0x60 : 3 : source1 mod vca
 // 0 : 0x70 : 4 : source2 mod vca
-// 1 : 0x00 : N/A : ctrl ref (calibration - not mapped to an audio channel)
-// 1 : 0x10 : 9 : pole4 level
+// 1 : 0x70 : 5 : dry level
+// 1 : 0x40 : 6 : pole1 level
 // 1 : 0x20 : 7 : pole2 level
 // 1 : 0x30 : 8 : pole3 level
-// 1 : 0x40 : 6 : pole1 level
-// 1 : 0x70 : 5 : dry level
+// 1 : 0x10 : 9 : pole4 level
 // 1 : 0x60 : 10 : q vca
+// 1 : 0x00 : N/A : ctrl ref (calibration - not mapped to an audio channel)
 
 static const uint8_t channel_map_cs0[] = { 0x00, 0x40, 0x50, 0x60, 0x70 };
 static const uint8_t channel_map_cs1[] = { 0x70, 0x40, 0x20, 0x30, 0x10, 0x60 };
@@ -224,6 +225,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 
         if (i == cutoff_cv_channel) {
           spiWrite(spi_channel, (char*) &zcard->tunable.dac_calibration_table[ samples[i] >> 3 ], 2);
+          INFO("cutoff: sample %4hx --> dac %4hx", samples[i] >> 3, zcard->tunable.dac_calibration_table[ samples[i] >> 3 ]);
         }
         else {
           samples_to_dac[0] = channel_map_cs0[i] | ((uint16_t) samples[i]) >> 11;
@@ -233,7 +235,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       }
       else {
         zcard->previous_samples_cs0[i] = 0;
-        samples_to_dac[0] = channel_map_cs0[i] | (uint16_t) 0;
+        samples_to_dac[0] = channel_map_cs0[i];
         samples_to_dac[1] = 0;
         spiWrite(spi_channel, samples_to_dac, 2);
       }
@@ -252,9 +254,20 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       if (samples_cs1[i] >= 0) {
         if (i < NUM_VCA_CHANNEL_DESCRIPTORS - 1) { // exclude ctrl ref
           zcard->previous_samples_cs1[i] = samples_cs1[i];
+#ifdef USE_VCACALIBRATION
           spiWrite(spi_channel,
                    (char*) &zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ],
                    2);
+#else
+          samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples_cs1[i]) >> 11;
+          samples_to_dac[1] = ((uint16_t) samples_cs1[i]) >> 3;
+          spiWrite(spi_channel, samples_to_dac, 2);
+          INFO("VCA DAC[%d]: sample %4hx --> dac %4hx unmapped: %hhx%hhx", i, samples_cs1[i] >> 3,
+               zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ],
+               samples_to_dac[1], samples_to_dac[0]);
+#endif
+
+
         }
         else { // q vca
           samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples_cs1[i]) >> 11;
@@ -266,7 +279,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       }
       else {
         zcard->previous_samples_cs1[i] = 0;
-        samples_to_dac[0] = channel_map_cs1[i] | (uint16_t) 0;
+        samples_to_dac[0] = channel_map_cs1[i];
         samples_to_dac[1] = 0;
         spiWrite(spi_channel, samples_to_dac, 2);
       }
@@ -386,12 +399,12 @@ static void calibrate_vca2190_dac(struct poledancer_card *zcard, int i2c_rom_han
 
   // these should be read from I2C ROM.  Add channel.
   struct dac_channel_descriptor dac_channel_descriptors[NUM_VCA_CHANNEL_DESCRIPTORS] = {
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x00 }, // ctrl ref
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x07 }, // dry
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x04 }, // pole 1
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x02 }, // pole 2
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x03 }, // pole 3
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x01 }  // pole 4
+    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x70 }, // dry
+    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x40 }, // pole 1
+    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x20 }, // pole 2
+    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x30 }, // pole 3
+    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x10 }, // pole 4
+    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x00 }  // ctrl ref
   };
 
 
