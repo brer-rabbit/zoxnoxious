@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <float.h> 
-#include <math.h> 
+#include <float.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,7 +55,7 @@ static uint16_t voltage_to_code(float V_target, float V_slope, float V_min_inter
     // clamp to legal value
     if (raw_code < 0.0f) raw_code = 0.0f;
     if (raw_code > DAC2190_MAX_CODE) raw_code = DAC2190_MAX_CODE;
-    
+
     return (uint16_t)roundf(raw_code);
 }
 
@@ -89,7 +89,7 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
 
   // 1. Pre-calculate physical slope (volts/code) and intercept for each channel
   for (int i = 0; i < DAC2190_NUM_CHANNELS; ++i) {
-    dac_device->channels_coeffs[i].Vslope = 
+    dac_device->channels_coeffs[i].Vslope =
       (dac_device->channels_descriptor[i].Vmax_measured - dac_device->channels_descriptor[i].Vmin_measured) / DAC2190_MAX_CODE;
     if (dac_device->channels_coeffs[i].Vslope < VSLOPE_MIN_EXPECTED ||
         dac_device->channels_coeffs[i].Vslope > VSLOPE_MAX_EXPECTED) {
@@ -113,7 +113,7 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
 
   if (dac_device->Vhigh_device <= dac_device->Vlow_device) {
     // Fallback Scenario: The calibrated range is invalid
-    WARN("a channel's low voltage (%.3fV) is greater than a channel's high voltage (%.3fV)", 
+    WARN("a channel's low voltage (%.3fV) is greater than a channel's high voltage (%.3fV)",
          dac_device->Vhigh_device, dac_device->Vlow_device);
     use_fallback_range = 1;
   }
@@ -126,12 +126,12 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
       dac_device->channels_coeffs[i].Dmin_calc = 0;
       dac_device->channels_coeffs[i].Dmax_calc = DAC2190_MAX_CODE;
     }
-        
+
     return use_fallback_range; // Calibration is done, using fallback limits
   }
-    
+
   // Valid Calibration Path
-  INFO("Calibration success. Global Operating Range: [%.3fV, %.3fV]", 
+  INFO("Calibration success. Global Operating Range: [%.3fV, %.3fV]",
          dac_device->Vlow_device, dac_device->Vhigh_device);
 
   // --- STEPS 4 & 5: Calculate New Dmin and Dmax (Valid Path) ---
@@ -147,10 +147,10 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
       voltage_to_code(dac_device->Vhigh_device,
                       dac_device->channels_coeffs[i].Vslope,
                       dac_device->channels_descriptor[i].Vmin_measured);
-        
+
     INFO("INFO: Ch %d: D_min_calc=%u, D_max_calc=%u",
          i,
-         dac_device->channels_coeffs[i].Dmin_calc, 
+         dac_device->channels_coeffs[i].Dmin_calc,
          dac_device->channels_coeffs[i].Dmax_calc);
   }
 
@@ -164,10 +164,11 @@ int calculate_calibration_parameters(struct dac_device *dac_device) {
  * Return zero on success.
  */
 int generate_channel_calibrated_codes(struct dac_device *dac_device) {
-    
+
   for (int i = 0; i < DAC2190_NUM_CHANNELS; ++i) {
     uint16_t Dmin_calc = dac_device->channels_coeffs[i].Dmin_calc;
     uint16_t Dmax_calc = dac_device->channels_coeffs[i].Dmax_calc;
+    uint16_t wire_prefix = dac_device->channels_descriptor[i].wire_prefix << 8;
 
     // 1. Allocate memory for the calibrated table
     uint16_t *lut = (uint16_t*) malloc(CORRECTION_TABLE_SIZE * sizeof(uint16_t));
@@ -187,64 +188,37 @@ int generate_channel_calibrated_codes(struct dac_device *dac_device) {
 
     // Define the span and constant factors for the calculation
     const float D_span = (float)Dmax_calc - (float)Dmin_calc;
-    const float D_norm_max_f = (float)DAC2190_MAX_CODE;
+    const float step_size = D_span / (float)DAC2190_MAX_CODE;
 
-    // 2. Populate the table entries
-    // First, ensure endpoint correctness:
-    lut[0] = __builtin_bswap16(Dmin_calc | (dac_device->channels_descriptor[i].wire_prefix << 8));
-    // then the rest of the entries from 1..DAC2190_MAX_CODE:
-    for (uint16_t k = 1; k <= DAC2190_MAX_CODE; ++k) {
+    // 2. Populate the table entries -- explicit start endpoint
+    uint16_t start_packet = (Dmin_calc & 0x0FFF) | wire_prefix;
+    lut[0] = __builtin_bswap16(start_packet);
+
+    // 3. interpolate the rest of the entries from 1..DAC2190_MAX_CODE-1:
+    for (uint16_t k = 1; k < DAC2190_MAX_CODE; ++k) {
       // k is the Normalized Code (0 to 4095) that the user writes
-      // Calculate the fractional position in the normalized range (0.0 to 1.0)
-      float fractional_position = (float)k / D_norm_max_f;
-
       // Linear mapping: D_actual = D_min + (Fractional Position * D_span)
-      float actual_code_f = (float)Dmin_calc + (fractional_position * D_span);
-
-      // Clamp and round the result to the nearest integer DAC code
-      // Since we clamped Dmin/Dmax, this should naturally stay in range, 
-      // but we rely on roundf and cast to uint16_t.
+      float actual_code_f = (float)Dmin_calc + ((float)k * step_size);
       uint16_t actual_code = (uint16_t)roundf(actual_code_f);
 
-      // Final safety clamp for robustness (even though rounding should handle it)
+      // Clamp and round the result to the nearest integer DAC code
+      // Since we clamped Dmin/Dmax, this should naturally stay in range,
+      // but we rely on roundf and cast to uint16_t.
       if (actual_code > DAC2190_MAX_CODE) {
         actual_code = DAC2190_MAX_CODE;
       }
-            
+
       // take the actual code and prefix first four bits with wire prefix.
       // Now it's ready to take to the DAC.
-      uint16_t tmp =  (dac_device->channels_descriptor[i].wire_prefix << 8) | (actual_code & 0x0FFF);
+      uint16_t tmp =  wire_prefix | (actual_code & 0x0FFF);
       lut[k] = __builtin_bswap16(tmp);
-
-      if (k < 10) {
-        INFO("wire ready %d: %4hx --> %4hx", i, actual_code, lut[k]);
-      }
-
     }
 
-    INFO("Channel %d LUT generated. Maps normalized code [0, %u] to actual code [%u, %u]", 
-         i, 
-         DAC2190_MAX_CODE, 
-         lut[0],  
-         lut[DAC2190_MAX_CODE] 
-         );
+    // 4. Explicit endpoint
+    uint16_t end_packet = (Dmax_calc & 0x0FFF) | wire_prefix;
+    lut[DAC2190_MAX_CODE] = __builtin_bswap16(end_packet);
   }
-    
-  INFO("All %d DAC Lookup Tables successfully calculated and stored",
-       DAC2190_NUM_CHANNELS);
 
-  for (int i = 0; i < DAC2190_NUM_CHANNELS; ++i) {
-    INFO("Values: %d", i);
-    for (int k = 0; k < 5; ++k) {
-      INFO("wire ready %d: %4x --> %4hx", i, k, dac_device->calibrated_codes[i][k]);
-    }
-
-    INFO("...");
-
-    for (int k = DAC2190_MAX_CODE - 4; k <= DAC2190_MAX_CODE; ++k) {
-      INFO("wire ready %d: %4x --> %4hx", i, k, dac_device->calibrated_codes[i][k]);
-    }
-  }
 
   return 0; // Success
 }

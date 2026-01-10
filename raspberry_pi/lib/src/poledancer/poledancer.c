@@ -82,6 +82,17 @@ static const int8_t min_board_version = 1;
 #define NUM_VCA_CHANNEL_DESCRIPTORS 6
 #define ROM_READ_SIZE_BYTES NUM_VCA_CHANNEL_DESCRIPTORS * 4 + 1
 
+
+static const struct dac_channel_descriptor dac_channel_descriptors_template[NUM_VCA_CHANNEL_DESCRIPTORS] = {
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x70 }, // dry
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x40 }, // pole 1
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x20 }, // pole 2
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x30 }, // pole 3
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x10 }, // pole 4
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x00 }  // ctrl ref
+};
+
+
 /* init_zcard
  * set gpio & dac initial values.  
  */
@@ -225,7 +236,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 
         if (i == cutoff_cv_channel) {
           spiWrite(spi_channel, (char*) &zcard->tunable.dac_calibration_table[ samples[i] >> 3 ], 2);
-          INFO("cutoff: sample %4hx --> dac %4hx", samples[i] >> 3, zcard->tunable.dac_calibration_table[ samples[i] >> 3 ]);
         }
         else {
           samples_to_dac[0] = channel_map_cs0[i] | ((uint16_t) samples[i]) >> 11;
@@ -262,9 +272,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
           samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples_cs1[i]) >> 11;
           samples_to_dac[1] = ((uint16_t) samples_cs1[i]) >> 3;
           spiWrite(spi_channel, samples_to_dac, 2);
-          INFO("VCA DAC[%d]: sample %4hx --> dac %4hx unmapped: %hhx%hhx", i, samples_cs1[i] >> 3,
-               zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ],
-               samples_to_dac[1], samples_to_dac[0]);
 #endif
 
 
@@ -398,15 +405,8 @@ static void calibrate_vca2190_dac(struct poledancer_card *zcard, int i2c_rom_han
   }
 
   // these should be read from I2C ROM.  Add channel.
-  struct dac_channel_descriptor dac_channel_descriptors[NUM_VCA_CHANNEL_DESCRIPTORS] = {
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x70 }, // dry
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x40 }, // pole 1
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x20 }, // pole 2
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x30 }, // pole 3
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x10 }, // pole 4
-    {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x00 }  // ctrl ref
-  };
-
+  struct dac_channel_descriptor dac_channel_descriptors[NUM_VCA_CHANNEL_DESCRIPTORS];
+  memcpy(&dac_channel_descriptors, &dac_channel_descriptors_template, sizeof(struct dac_channel_descriptor[NUM_VCA_CHANNEL_DESCRIPTORS]));
 
   i2cReadI2CBlockData(i2c_rom_handle,
                       load_rom_address,
