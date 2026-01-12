@@ -33,6 +33,34 @@
 // 4. Software calculates the DAC minimum for each channel to match the maximum low
 // 5. Software calculates the DAC maximum for each channel to match the minimum high
 // 6. Software calculates a linear interpolation table for each channel going from low to high
+//
+// Motivation for the calibration.  Uncalibrated, the DAC levels on
+// the AD5308 vary quite a bit between channels.  Calibration can
+// bring these in quite tight.  Here are measurements of 5 channels used to control filter mixing.
+// Measurements are in milliVolts from DAC zero to full scale.
+//
+// uncal:
+//       0%        25%     50%     75%     100%
+// Dry    0        623     1245    1870    2491
+// P1     1        624     1244    1869    2486
+// P2     0        624     1244    1866    2488
+// P3     0        621     1243    1866    2487
+// P4    13        634     1257    1880    2504
+// 
+// calibrated:
+//       0%        25%     50%     75%     100%
+// Dry   20        635     1251    1869    2485
+// P1    20        636     1252    1872    2485
+// P2    20        637     1252    1866    2485
+// P3    16        634     1252    1868    2485
+// P4    20        635     1251    1867    2485
+//
+// The calibrated values are correct since the reference is set to the minumum, 20mV.
+// To go from P1's 25% to 50% should be an effective doubling:
+//  (P1 @ 25% - Ref) * 2 = (P1 @ 50% - Ref)
+//    (636    -  20) * 2 = 1252 - 20
+//
+
 
 
 // Calibration constants

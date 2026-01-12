@@ -265,6 +265,11 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         if (i < NUM_VCA_CHANNEL_DESCRIPTORS - 1) { // exclude ctrl ref
           zcard->previous_samples_cs1[i] = samples_cs1[i];
 #ifdef USE_VCACALIBRATION
+          /*
+          INFO("channel %d : %hx",
+               i + DAC_CHANNELS_CS0,
+               zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ]);
+          */
           spiWrite(spi_channel,
                    (char*) &zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ],
                    2);
@@ -424,7 +429,7 @@ static void calibrate_vca2190_dac(struct poledancer_card *zcard, int i2c_rom_han
       dac_channel_descriptors[i].Vmin_measured = tmp1 / 1000.f;
       memcpy(&tmp2, &rom_data[1 + (2 * i + 1) * sizeof(int16_t)], sizeof(int16_t));
       dac_channel_descriptors[i].Vmax_measured = tmp2 / 1000.f;
-      INFO("dac %d: %g -- %g (%hd -- %hd)",
+      INFO("dac %x: %g -- %g (%hd -- %hd)",
            dac_channel_descriptors[i].wire_prefix,
            dac_channel_descriptors[i].Vmin_measured,
            dac_channel_descriptors[i].Vmax_measured,
