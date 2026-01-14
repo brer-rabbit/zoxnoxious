@@ -203,6 +203,11 @@ void free_zcard(void *zcard_plugin) {
     if (poledancer->i2c_handle >= 0) {
       i2cClose(poledancer->i2c_handle);
     }
+
+    if (zcard_plugin->dac_characterization) {
+      free_vca_dac_calibration(zcard_plugin->dac_characterization);
+    }
+
     free(poledancer);
   }
 }
