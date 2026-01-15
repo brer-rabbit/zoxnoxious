@@ -16,6 +16,7 @@
 #ifndef POLEDANCER_H
 #define POLEDANCER_H
 
+#include "vca_dac_calibration.h"
 #include "zcard_plugin.h"
 #include "tune_utils.h"
 
@@ -31,6 +32,7 @@
 #define SPI_MODE 1
 
 
+
 struct poledancer_card {
   struct zhost *zhost;
   int slot;
@@ -39,9 +41,10 @@ struct poledancer_card {
   int16_t previous_samples_cs0[DAC_CHANNELS_CS0];
   int16_t previous_samples_cs1[DAC_CHANNELS_CS1];
 
-  // tuning params
+  // vcf tuning params
   struct tunable tunable;
   int tuning_index; // which dac value to apply on the next set and record the measurement
+  struct dac_device *dac_characterization;
 };
 
 
@@ -54,8 +57,5 @@ extern const uint8_t config_port0_addr;
 extern const uint8_t config_port1_addr;
 extern const uint8_t config_port_as_output;
 extern const uint8_t cutoff_cv_channel;
-
-void create_linear_tuning(int dac_channel, int num_elements, int16_t *table);
-
 
 #endif // POLEDANCER_H

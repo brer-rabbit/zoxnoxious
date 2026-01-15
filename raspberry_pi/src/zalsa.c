@@ -279,7 +279,7 @@ int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
         pcm_state->first_period = 0;
         ret = snd_pcm_start(pcm_state->pcm_handle);
         if (ret < 0) {
-          ERROR("snd_pcm_start: %s\n", snd_strerror(errno));
+          ERROR("snd_pcm_start: %s", snd_strerror(errno));
           return ret;
         }
       }

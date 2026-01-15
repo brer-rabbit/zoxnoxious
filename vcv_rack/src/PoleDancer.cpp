@@ -33,12 +33,12 @@ enum cvChannel {
   SOURCE_TWO_LEVEL,
   SOURCE_ONE_MOD_AMOUNT,
   SOURCE_TWO_MOD_AMOUNT,
-  POLE4_LEVEL,
+  DRY_LEVEL,
+  POLE1_LEVEL,
   POLE2_LEVEL,
   POLE3_LEVEL,
-  POLE1_LEVEL,
+  POLE4_LEVEL,
   Q_VCA,
-  DRY_LEVEL
 };
 
 static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Mode 1", "Alt Mode 2" };

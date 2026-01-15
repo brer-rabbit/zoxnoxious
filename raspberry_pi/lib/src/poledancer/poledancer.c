@@ -21,7 +21,9 @@
 
 // GPIO: PCA9555
 #define PCA9555_BASE_I2C_ADDRESS 0x20
+#define EEPROM_BASE_I2C_ADDRESS 0x50
 
+#define USE_VCACALIBRATION
 
 const uint8_t port0_init = 0x00; // port0: select muxes disabled
 const uint8_t port1_init= 0x00; // port1: all switches off, active low LED on
@@ -35,22 +37,61 @@ const int spi_channel_cs0 = 0;
 const int spi_channel_cs1 = 1;
 
 // dac lines to use for chip select zero, one
-// cs : dac addr : signal
-// 0 : 0x00 : vcf cutoff
-// 0 : 0x40 : source1 audio vca
-// 0 : 0x50 : source2 audio vca
-// 0 : 0x60 : source1 mod vca
-// 0 : 0x70 : source2 mod vca
-// 1 : 0x10 : pole4 level
-// 1 : 0x20 : pole2 level
-// 1 : 0x30 : pole3 level
-// 1 : 0x40 : pole1 level
-// 1 : 0x60 : q vca
-// 1 : 0x70 : dry level
+// cs : dac addr : audio channel : signal
+// 0 : 0x00 : 0 : vcf cutoff
+// 0 : 0x40 : 1 : source1 audio vca
+// 0 : 0x50 : 2 : source2 audio vca
+// 0 : 0x60 : 3 : source1 mod vca
+// 0 : 0x70 : 4 : source2 mod vca
+// 1 : 0x70 : 5 : dry level
+// 1 : 0x40 : 6 : pole1 level
+// 1 : 0x20 : 7 : pole2 level
+// 1 : 0x30 : 8 : pole3 level
+// 1 : 0x10 : 9 : pole4 level
+// 1 : 0x60 : 10 : q vca
+// 1 : 0x00 : N/A : ctrl ref (calibration - not mapped to an audio channel)
 
 static const uint8_t channel_map_cs0[] = { 0x00, 0x40, 0x50, 0x60, 0x70 };
-static const uint8_t channel_map_cs1[] = { 0x10, 0x20, 0x30, 0x40, 0x60, 0x70 };
+static const uint8_t channel_map_cs1[] = { 0x70, 0x40, 0x20, 0x30, 0x10, 0x60 };
 const uint8_t cutoff_cv_channel = 0;
+
+static void create_linear_tuning(int, int, int16_t*);
+static void calibrate_vca2190_dac(struct poledancer_card*, int i2c_rom_handle);
+
+// I2C EEPROM layout
+// address zero, like all z-cards, has the board identifier.
+// In addition to that Pole Dancer also stores DAC calibration values.
+// Address | Value
+// 0x00    | 0x06 (Pole Dancer identifier)
+// 0x01    | 0x01 (Pole Dancer version number)
+// 0x02    | Ctrl Ref DAC calib values Min
+// 0x04    | Ctrl Ref DAC calib values Max
+// 0x06    | Dry VCA DAC calib values Min
+// 0x08    | Dry VCA DAC calib values Max
+// 0x0A    | Pole1 VCA DAC calib values Min
+// 0x0C    | Pole1 VCA DAC calib values Max
+// 0x0E    | Pole2 VCA DAC calib values Min
+// 0x10    | Pole2 VCA DAC calib values Max
+// 0x12    | Pole3 VCA DAC calib values Min
+// 0x14    | Pole3 VCA DAC calib values Max
+// 0x16    | Pole4 VCA DAC calib values Min
+// 0x18    | Pole4 VCA DAC calib values Max
+//
+static const unsigned int load_rom_address = 0x01;
+static const int8_t min_board_version = 1;
+#define NUM_VCA_CHANNEL_DESCRIPTORS 6
+#define ROM_READ_SIZE_BYTES NUM_VCA_CHANNEL_DESCRIPTORS * 4 + 1
+
+
+static const struct dac_channel_descriptor dac_channel_descriptors_template[NUM_VCA_CHANNEL_DESCRIPTORS] = {
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x70 }, // dry
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x40 }, // pole 1
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x20 }, // pole 2
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x30 }, // pole 3
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x10 }, // pole 4
+  {.Vmin_measured = 0.0f, .Vmax_measured = 2.5f, .wire_prefix = 0x00 }  // ctrl ref
+};
+
 
 /* init_zcard
  * set gpio & dac initial values.  
@@ -96,6 +137,19 @@ void* init_zcard(struct zhost *zhost, int slot) {
     return NULL;
   }
 
+
+  // VCA calibration call - needs ROM i2c handle
+  int i2c_rom = i2cOpen(I2C_BUS, slot + EEPROM_BASE_I2C_ADDRESS, 0);
+  if (i2c_rom < 0) {
+    ERROR("poledancer: unable to open i2c for address %d\n",
+          slot + EEPROM_BASE_I2C_ADDRESS);
+    return NULL;
+  }
+  calibrate_vca2190_dac(poledancer, i2c_rom);
+
+  i2cClose(i2c_rom);
+
+
   // configure DAC
   spi_channel = set_spi_interface(zhost, spi_channel_cs0, SPI_MODE, slot);
   spiWrite(spi_channel, dac_ctrl0_reg, 2);
@@ -114,6 +168,16 @@ void* init_zcard(struct zhost *zhost, int slot) {
   }
 
 
+  // set DAC Ctrl Ref to minimum value
+  // this can only happen after:
+  // (1) VCA calibration call
+  // (2) DAC ctrl reg init
+  // spi_channel should be set to spi_channel_cs1
+  spiWrite(spi_channel,
+           (char*) &poledancer->dac_characterization->calibrated_codes[0][0],
+           2);
+
+
   poledancer->tunable.dac_size = TWELVE_BITS;
   poledancer->tunable.dac_calibration_table = (int16_t*)calloc(TWELVE_BITS, sizeof(int16_t));
   poledancer->tunable.tune_points = (struct tune_point*)calloc(NUM_TUNING_POINTS, sizeof(struct tune_point));
@@ -123,6 +187,7 @@ void* init_zcard(struct zhost *zhost, int slot) {
   create_linear_tuning(channel_map_cs0[cutoff_cv_channel],
                        poledancer->tunable.dac_size,
                        poledancer->tunable.dac_calibration_table);
+
 
   return poledancer;
 }
@@ -138,6 +203,11 @@ void free_zcard(void *zcard_plugin) {
     if (poledancer->i2c_handle >= 0) {
       i2cClose(poledancer->i2c_handle);
     }
+
+    if (poledancer->dac_characterization) {
+      free_vca_dac_calibration(poledancer->dac_characterization);
+    }
+
     free(poledancer);
   }
 }
@@ -180,7 +250,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       }
       else {
         zcard->previous_samples_cs0[i] = 0;
-        samples_to_dac[0] = channel_map_cs0[i] | (uint16_t) 0;
+        samples_to_dac[0] = channel_map_cs0[i];
         samples_to_dac[1] = 0;
         spiWrite(spi_channel, samples_to_dac, 2);
       }
@@ -193,23 +263,48 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   const int16_t *samples_cs1 = &samples[DAC_CHANNELS_CS0];
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_cs1, SPI_MODE, zcard->slot);
 
+  // this will handle all the 2190 VCAs
   for (int i = 0; i < DAC_CHANNELS_CS1; ++i) {
     if (zcard->previous_samples_cs1[i] != samples_cs1[i] ) {
       if (samples_cs1[i] >= 0) {
-        zcard->previous_samples_cs1[i] = samples_cs1[i];
-        samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples_cs1[i]) >> 11;
-        samples_to_dac[1] = ((uint16_t) samples_cs1[i]) >> 3;
-        spiWrite(spi_channel, samples_to_dac, 2);
+        if (i < NUM_VCA_CHANNEL_DESCRIPTORS - 1) { // exclude ctrl ref
+          zcard->previous_samples_cs1[i] = samples_cs1[i];
+#ifdef USE_VCACALIBRATION
+          /*
+          INFO("channel %d : %hx",
+               i + DAC_CHANNELS_CS0,
+               zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ]);
+          */
+          spiWrite(spi_channel,
+                   (char*) &zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ],
+                   2);
+#else
+          samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples_cs1[i]) >> 11;
+          samples_to_dac[1] = ((uint16_t) samples_cs1[i]) >> 3;
+          spiWrite(spi_channel, samples_to_dac, 2);
+#endif
+
+
+        }
+        else { // q vca
+          samples_to_dac[0] = channel_map_cs1[i] | ((uint16_t) samples_cs1[i]) >> 11;
+          samples_to_dac[1] = ((uint16_t) samples_cs1[i]) >> 3;
+          spiWrite(spi_channel, samples_to_dac, 2);
+        }
+
+
       }
       else {
         zcard->previous_samples_cs1[i] = 0;
-        samples_to_dac[0] = channel_map_cs1[i] | (uint16_t) 0;
+        samples_to_dac[0] = channel_map_cs1[i];
         samples_to_dac[1] = 0;
         spiWrite(spi_channel, samples_to_dac, 2);
       }
 
     }
   }
+
+
 
   return 0;
 }
@@ -299,7 +394,7 @@ int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
  * create a linear tuning table - no corrections.  Create it for the passed in DAC channel such that
  * it can be passed straight to spiWrite.
  */
-void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
+static void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
   for (int i = 0; i < num_elements; ++i) {
     unsigned char upper, lower;
     upper = i;
@@ -308,3 +403,62 @@ void create_linear_tuning(int dac_channel, int num_elements, int16_t *table) {
   }
 }
 
+
+
+static void calibrate_vca2190_dac(struct poledancer_card *zcard, int i2c_rom_handle) {
+  char rom_data[ROM_READ_SIZE_BYTES];
+  int8_t board_version_number;
+
+
+  if (zcard == NULL) {
+    return;
+  }
+
+  // these should be read from I2C ROM.  Add channel.
+  struct dac_channel_descriptor dac_channel_descriptors[NUM_VCA_CHANNEL_DESCRIPTORS];
+  memcpy(&dac_channel_descriptors, &dac_channel_descriptors_template, sizeof(struct dac_channel_descriptor[NUM_VCA_CHANNEL_DESCRIPTORS]));
+
+  i2cReadI2CBlockData(i2c_rom_handle,
+                      load_rom_address,
+                      rom_data,
+                      sizeof(rom_data));
+
+  board_version_number = (int8_t)rom_data[0];
+
+  if (board_version_number >= min_board_version) {
+    for (int i = 0; i < NUM_VCA_CHANNEL_DESCRIPTORS; ++i) {
+      // using memcpy: storage happened on this architecture,
+      // restoring here shouldn't need to worry about endianness.
+      int16_t tmp1, tmp2;
+      memcpy(&tmp1, &rom_data[1 + (2 * i) * sizeof(int16_t)], sizeof(int16_t));
+      dac_channel_descriptors[i].Vmin_measured = tmp1 / 1000.f;
+      memcpy(&tmp2, &rom_data[1 + (2 * i + 1) * sizeof(int16_t)], sizeof(int16_t));
+      dac_channel_descriptors[i].Vmax_measured = tmp2 / 1000.f;
+      INFO("dac %x: %g -- %g (%hd -- %hd)",
+           dac_channel_descriptors[i].wire_prefix,
+           dac_channel_descriptors[i].Vmin_measured,
+           dac_channel_descriptors[i].Vmax_measured,
+           tmp1, tmp2);
+    }
+  }
+  else {
+    INFO("invalid board version num (%d), defaulting DAC calibration", board_version_number);
+  }
+
+  if ((zcard->dac_characterization = init_vca_dac2190_calibration(dac_channel_descriptors)) == NULL) {
+    ERROR("failed to init calibration for DAC / SSI2190");
+    return;
+  }
+
+  if (calculate_calibration_parameters(zcard->dac_characterization)) {
+    WARN("VCA calibration measurements inconsistent-- falling back to sane values");
+  }
+
+  if (generate_channel_calibrated_codes(zcard->dac_characterization)) {
+    WARN("VCA calibration failed -- uncertain results ahead");
+  }
+  else {
+    INFO("VCA calibration complete");
+  }
+
+}
