@@ -1,0 +1,6 @@
+"Conn_01x01","J1","Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",""
+"Conn_01x02","J2","Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",""
+"Conn_02x20_Odd_Even","J3","Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Horizontal",""
+"TestPoint","TP1,TP2,TP3,TP4,TP5,TP6,TP7,TP8,TP9,TP10","TestPoint:TestPoint_Pad_2.0x2.0mm",""
+"YM2203","U1","Package_DIP:DIP-40_W15.24mm",""
+"YM3014","U2","Package_DIP:DIP-8_W7.62mm",""
