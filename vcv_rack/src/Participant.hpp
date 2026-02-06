@@ -64,7 +64,13 @@ private:
 struct Participant {
   virtual ~Participant() = default;
 
+  // the rack moduleId for the instance
   virtual int64_t getModuleId() = 0;
+
+  // Zoxnoxious hardware Id set in voice card ROM
+  virtual uint8_t getHardwareId() const = 0;
+
+
 
   // Participants requiring Rack's ProcessArgs will instead use methods provided here.
 
@@ -77,7 +83,9 @@ struct Participant {
   // true signals midi message is set and to be returned.  Client to return
   // false is no message is set.
   // Called at 100-200 Hz (TBD).
+  // This is also a good place to do any module state changes for UI elements such as lights.
   virtual bool pullMidi(const rack::engine::Module::ProcessArgs& args, int midiChannel, rack::midi::Message &midiMessage) = 0;
+
 };
 
 

@@ -17,12 +17,10 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot);
 extern Plugin* pluginInstance;
 
 // Declare each Model, defined in each module source file
-//extern Model* modelMyModule;
-extern Model* modelPoleDancer;
-extern Model* modelPoleDancerPersonality;
-extern Model* modelZoxnoxious3340Legacy;
+// extern Model* modelPoleDancer;
+// extern Model* modelPoleDancerPersonality;
 extern Model* modelZoxnoxious3340;
-extern Model* modelZoxnoxious3372;
-extern Model* modelZoxnoxious5524;
-extern Model* modelPatchingMatrix;
+// extern Model* modelZoxnoxious3372;
+// extern Model* modelZoxnoxious5524;
+// extern Model* modelPatchingMatrix;
 extern Model* modelAudioIO;

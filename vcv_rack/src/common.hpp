@@ -1,0 +1,19 @@
+#pragma once
+
+namespace zox {
+  
+// maximum number of channels on a USB Audio interface
+static constexpr int8_t maxChannels = 27;
+static constexpr int8_t maxDevices = 2;
+static constexpr size_t maxCards = 6;
+
+static constexpr int8_t invalidSlot = -1;
+static constexpr int8_t invalidOutputDeviceId = -1;
+static constexpr int8_t invalidCvChannelOffset = -1;
+static constexpr int8_t invalidMidiChannel = -1;
+static constexpr uint8_t invalidCardId = 0;
+static constexpr int invalidPrimaryDepth = -1;
+
+static const std::string invalidCardOutputName = "----";
+//static std::vector<std::string> cardOutputNames;
+}
