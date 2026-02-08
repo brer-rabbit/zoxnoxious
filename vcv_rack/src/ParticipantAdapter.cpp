@@ -3,8 +3,10 @@
 
 namespace zox {
 
+static constexpr int invalidLightEnum = -1;
 
-ParticipantAdapter::ParticipantAdapter() {
+ParticipantAdapter::ParticipantAdapter() : myLightEnum(invalidLightEnum) {
+  // TODO: 10000 ?
   tryAttachDivider.setDivision(10000);
 }
 
@@ -20,6 +22,9 @@ void ParticipantAdapter::setParticipant(Participant* p) {
 void ParticipantAdapter::process(const ProcessArgs& args) {
   if (tryAttachDivider.process()) {
     lifecycle.tryAttach(participant);
+    if (myLightEnum != invalidLightEnum) {
+      setAttachedLightStatus();
+    }
   }
 }
 
@@ -31,6 +36,31 @@ void ParticipantAdapter::onAdd(const AddEvent& e) {
 void ParticipantAdapter::onRemove(const RemoveEvent& e) {
   lifecycle.detach();
   Module::onRemove(e);
+}
+
+
+void ParticipantAdapter::setLightEnum(int lightEnum) {
+  myLightEnum = lightEnum;
+}
+
+void ParticipantAdapter::setAttachedLightStatus() { 
+  if (lifecycle.attached) {
+    lights[myLightEnum + 0].setBrightness(0.f);
+    lights[myLightEnum + 1].setBrightness(1.f);
+    lights[myLightEnum + 2].setBrightness(0.f);
+  }
+  /* yellow case
+     else if (validRightExpander) {
+     lights[myLightEnum + 0].setBrightness(1.f);
+     lights[myLightEnum + 1].setBrightness(1.f);
+     lights[myLightEnum + 2].setBrightness(0.f);
+     }
+  */
+  else {
+    lights[myLightEnum + 0].setBrightness(1.f);
+    lights[myLightEnum + 1].setBrightness(0.f);
+    lights[myLightEnum + 2].setBrightness(0.f);
+  }
 }
 
 

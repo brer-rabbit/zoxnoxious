@@ -8,7 +8,8 @@
 namespace zox {
 
 std::atomic<AudioIO*> AudioIO::instance { nullptr };
-static constexpr int midiPollRateHz = 1; // TODO set to 100~200
+// TODO: THIS WILL NEED TO BE SET TO 100~200 ONCE DONE HERE
+static constexpr int midiPollRateHz = 1;
 
 enum cvChannel {
     OUT2_CHANNEL = 0,

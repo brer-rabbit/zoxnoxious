@@ -111,7 +111,6 @@ const Broker::Snapshot& Broker::snapshot() const {
 
 
 
-
 // tryAttach() may be called from audio thread or GUI thread.  For the common case of
 // the module is attached and a valid AudioIO instance exists return quick.
 void ParticipantLifecycle::tryAttach(Participant *p) {
