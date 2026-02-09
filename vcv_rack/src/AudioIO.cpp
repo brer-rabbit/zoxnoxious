@@ -10,6 +10,7 @@ namespace zox {
 std::atomic<AudioIO*> AudioIO::instance { nullptr };
 // TODO: THIS WILL NEED TO BE SET TO 100~200 ONCE DONE HERE
 static constexpr int midiPollRateHz = 1;
+static constexpr int lightRateHz = 60;
 
 enum cvChannel {
     OUT2_CHANNEL = 0,
@@ -61,7 +62,7 @@ AudioIO::AudioIO() : cardAOutput1NameString(invalidCardOutputName),
 
   onReset();
 
-  lightDivider.setDivision(512);
+  lightDivider.setDivision(APP->engine->getSampleRate() / lightRateHz);
   discoveryRequestClockDivider.setDivision(APP->engine->getSampleRate());  // once per second
   midiPollClockDivider.setDivision(static_cast<int>(APP->engine->getSampleRate()) / midiPollRateHz);
 
@@ -126,6 +127,8 @@ void AudioIO::onSampleRateChange(const SampleRateChangeEvent& e) {
 
   midiPollClockDivider.setDivision(static_cast<int>(e.sampleRate) / midiPollRateHz);
   INFO("midi polling set to %d", midiPollClockDivider.getDivision());
+  // discoveryRequestClockDivider: no need to change, it's acted on once only
+  lightDivider.setDivision(static_cast<int>(e.sampleRate) / lightRateHz);
 }
 
 
@@ -135,13 +138,15 @@ void AudioIO::process(const ProcessArgs& args) {
 
   auto snap = broker.snapshot();
 
-  for (size_t i = 0; i < snap.count; ++i) {
-    const auto entry = snap.participants[i];
-    entry->pullSamples(args, sharedFrame, 0);
+  for (size_t i = 0; i < maxCards; ++i) {
+    const auto entry = snap.slots[i].participant;
+    if (entry != nullptr) {
+      entry->pullSamples(args, sharedFrame, 0);
 
-    if (midiPollClockDivider.process()) {
-      entry->pullMidi(args, 0, midiMessage);
-      //processMidiMessage(midiMeesage);
+      if (midiPollClockDivider.process()) {
+          entry->pullMidi(args, 0, midiMessage);
+          //processMidiMessage(midiMeesage);
+      }
     }
   }
 
@@ -152,14 +157,13 @@ void AudioIO::process(const ProcessArgs& args) {
   }
 
   if (discoveryReportReceived == false && discoveryRequestClockDivider.process()) {
-//    INFO("Sending MIDI message discovery request");
+    INFO("Sending MIDI message discovery request");
     midiOutput.sendMidiMessage(MIDI_DISCOVERY_REQUEST_SYSEX);
   }
 
 
   if (lightDivider.process()) {
-    // slower moving stuff here
-    // LEDs: clipping and expander connections
+    // purely UI related state changes
     const float lightTime = args.sampleTime * lightDivider.getDivision();
     const float brightnessDeltaTime = 1 / lightTime;
 
@@ -191,7 +195,6 @@ void AudioIO::process(const ProcessArgs& args) {
           sendMidiProgramChangeMessage(midiProgram);
         }
       }
-
     }
   }
 }

@@ -10,16 +10,23 @@ namespace zox {
 
 struct Participant;
 
+struct ParticipantProperty {
+  int64_t moduleId;
+  uint8_t hardwareId;
+  int8_t cvChannelOffset;
+  int8_t outputDeviceId;
+  bool isAllocated;
+};
+
+struct Slot {
+  Participant *participant = nullptr;
+  ParticipantProperty props{};
+};
+
+
 struct Broker {
 
   Broker();
-
-  struct Snapshot {
-    Participant* participants[maxCards] = {nullptr};
-    int64_t moduleIds[maxCards] = {0};
-    size_t count = 0;
-  };
-
 
   // Broker snapshot ownership & threading model
   // - The Broker maintains TWO Snapshot buffers (stoargeA and storageB)
@@ -40,13 +47,12 @@ struct Broker {
   // Violating this invariant results in bad things.
   // -----------------------------------------------------------------------------
 
+  struct Snapshot {
+    Slot slots[maxCards];
+  } storageA, storageB;
 
   // Audio-thread to accesses Snapshot via this pointer
   std::atomic<const Snapshot*> published { nullptr };
-
-  // pre-allocated work areas
-  Snapshot storageA;
-  Snapshot storageB;
 
 
   bool registerParticipant(int64_t moduleId, Participant *p);
@@ -56,7 +62,7 @@ struct Broker {
   const Snapshot& snapshot() const;
 
 private:
-  bool addAndSort(Snapshot& s, int64_t id, Participant* p);
+  bool findSlot(Snapshot& s, int64_t moduleId, Participant* p);
 };
 
 
@@ -93,6 +99,9 @@ struct Participant {
 struct ParticipantLifecycle {
   Participant *participant = nullptr;
   Broker* broker = nullptr;
+  // ParticipantLifecycle::attached:
+  // Module-local cache of whether this Participant currently owns
+  // a hardware allocation in the Broker. May lag behind Snapshot.
   bool attached = false;
 
   void tryAttach(Participant *p);

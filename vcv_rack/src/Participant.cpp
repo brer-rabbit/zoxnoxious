@@ -16,6 +16,11 @@ Broker::Broker() {
 // pointer to a published stable version.
 
 bool Broker::registerParticipant(int64_t moduleId, Participant *p) {
+  if (p == nullptr) {
+    WARN("Broker received a null pointer for registration: moduleId %lld", moduleId);
+    return false;
+  }
+
   // 1. Grab the "other" snapshot (the one the audio thread isn't using)
   const Snapshot &current = *published.load(std::memory_order_acquire);
   Snapshot &next = (&current == &storageA) ? storageB : storageA;
@@ -23,11 +28,12 @@ bool Broker::registerParticipant(int64_t moduleId, Participant *p) {
   // 2. Clone current state into the next snapshot
   next = current; 
 
-  // 3. Perform your logic (Add/Remove/Sort) on the 'next' snapshot
-  // Since 'next' is not being read by the audio thread yet, we can sort freely
-  bool retval = addAndSort(next, moduleId, p);
+  // 3. Perform bizlogic to determine if we can register participant.
+  // Any manipulation is allowed on next since it is not used by audio thread.
+  bool retval = findSlot(next, moduleId, p);
 
-  // 4. Atomic Swap: Now the audio thread sees the new, perfectly sorted list
+  // 4. Atomic Swap: Now the audio thread sees the new participant
+  // (and yes, still do this even if the previous step failed)
   published.store(&next, std::memory_order_release);
         
   return retval;
@@ -45,16 +51,11 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
   // clone current state into next published state
   next = current;
 
-  // find then remove moduleId, shifting remainder left
-  for (size_t i = 0; i < next.count; ++i) {
-    if (next.moduleIds[i] == moduleId) {
+  // find then remove moduleId but clearing isAllocated flag
+  for (size_t i = 0; i < maxCards; ++i) {
+    if (next.slots[i].props.moduleId == moduleId) {
+      next.slots[i].props.isAllocated = false;
       removed = true;
-      // Shift left
-      for (size_t j = i; j + 1 < next.count; ++j) {
-        next.moduleIds[j] = next.moduleIds[j + 1];
-        next.participants[j] = next.participants[j + 1];
-      }
-      --next.count;
       break;
     }
   }
@@ -64,41 +65,22 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
 }
 
 
-// simple sort routine given we only have maxCards elements.  Assumes
-// array is already sorted going on.  Find element, if it's there in duplicate,
-// remove.  Insert to next position and shift remaining.
-// Given the conditions this is faster than std::sort.
-// Return true if element inserted or false if insert failed (array full).
-bool Broker::addAndSort(Snapshot& s, int64_t id, Participant* p) {
-  // Remove existing
-  for (size_t i = 0; i < s.count; ++i) {
-    if (s.moduleIds[i] == id) {
-      for (size_t j = i; j + 1 < s.count; ++j) {
-        s.moduleIds[j] = s.moduleIds[j + 1];
-        s.participants[j] = s.participants[j + 1];
-      }
-      --s.count;
-      break;
+bool Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
+  uint8_t hardwareId = p->getHardwareId();
+
+  for (size_t i = 0; i < maxCards; ++i) {
+    if (s.slots[i].props.isAllocated == false &&
+        s.slots[i].props.hardwareId == hardwareId) {
+      s.slots[i].participant = p;
+      s.slots[i].props.moduleId = moduleId;
+      s.slots[i].props.isAllocated = true;
+      INFO("found slot %ld for moduleId %lld hardwareId %d",
+           i, moduleId, hardwareId);
+      return true;
     }
   }
 
-  // this is where number of voice cards is enforced
-  if (s.count >= maxCards) {
-    return false;
-  }
-
-  // Insert sorted
-  size_t pos = s.count;
-  while (pos > 0 && s.moduleIds[pos - 1] > id) {
-    s.moduleIds[pos] = s.moduleIds[pos - 1];
-    s.participants[pos] = s.participants[pos - 1];
-    --pos;
-  }
-
-  s.moduleIds[pos] = id;
-  s.participants[pos] = p;
-  ++s.count;
-  return true;
+  return false;
 }
 
 
@@ -134,9 +116,10 @@ void ParticipantLifecycle::tryAttach(Participant *p) {
 
   // else: not attached, but do have a valid orchestrator.  Effect the attachment.
   broker = &inst->getBroker();
-  broker->registerParticipant(p->getModuleId(), p);
-  participant = p;
-  attached = true;
+  if (broker->registerParticipant(p->getModuleId(), p)) {
+    participant = p;
+    attached = true;
+  }
 }
 
 
