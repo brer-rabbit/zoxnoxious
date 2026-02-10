@@ -11,6 +11,11 @@ Broker::Broker() {
 }
 
 
+bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
+  return true;
+}
+
+
 // register the participant Id.  Double buffer the storage, so UI and audio threads
 // can co-mingle.  Mutation is only to happen on UI thread.  Audio thread gets a
 // pointer to a published stable version.

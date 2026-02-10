@@ -29,11 +29,19 @@ struct Broker {
 
   Broker();
 
+  // Broker invariant:
+  // if published == nullptr  -> discovery report not yet latched
+  // if published != nullptr  -> device tree initialized and stable
+  // what that means:
+  // published is initialized to nullptr.
+  // registerDevices may be called once (and only once) to set published non-null.
+  // (un)registerParticipant returns false if published is nullptr.
+  //
   // Broker snapshot ownership & threading model
   // - The Broker maintains TWO Snapshot buffers (stoargeA and storageB)
   // - Exactly ONE Snapshot is "published" at any time via the atomic `published`.
   // - The AUDIO THREAD:
-  //     * May ONLY read from the Snapshot pointed to by `published`.
+  //     * May ONLY read from the Snapshot pointed to by `published` (which is initially null).
   //     * Must never write to any Snapshot.
   //
   // - The UI THREAD:
@@ -55,6 +63,7 @@ struct Broker {
   // Audio-thread to accesses Snapshot via this pointer
   std::atomic<const Snapshot*> published { nullptr };
 
+  bool registerDevices(ParticipantProperty *devices, size_t count);
 
   bool registerParticipant(int64_t moduleId, Participant *p);
   bool unregisterParticipant(int64_t moduleId);
