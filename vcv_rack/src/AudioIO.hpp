@@ -133,6 +133,9 @@ private:
 
 
   uint8_t getHardwareId();
+  int8_t cvChannelOffset;
+  int8_t outputDeviceId;
+  int8_t midiChannel;
 
   bool discoveryReportReceived = false;
   dsp::ClockDivider discoveryRequestClockDivider;
@@ -140,7 +143,7 @@ private:
   dsp::ClockDivider midiPollClockDivider;
 
   int sendMidiProgramChangeMessage(int programNumber);
-  void processMidiMessage(const midi::Message &msg);
+  void processMidiInMessage(const midi::Message &msg);
   void processDiscoveryReport(const midi::Message &msg);
 
   static const std::string audioPortNum;

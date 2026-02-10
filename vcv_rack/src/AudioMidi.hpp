@@ -38,11 +38,11 @@ namespace zox {
   struct ZoxnoxiousAudioPort : audio::Port {
     Module* module;
 
-    dsp::DoubleRingBuffer<dsp::Frame<maxChannels>, 32768> engineInputBuffer;
-    dsp::DoubleRingBuffer<dsp::Frame<maxChannels>, 32768> engineOutputBuffer;
+    dsp::DoubleRingBuffer<dsp::Frame<maxAudioChannels>, 32768> engineInputBuffer;
+    dsp::DoubleRingBuffer<dsp::Frame<maxAudioChannels>, 32768> engineOutputBuffer;
 
-    dsp::SampleRateConverter<maxChannels> inputSrc;
-    dsp::SampleRateConverter<maxChannels> outputSrc;
+    dsp::SampleRateConverter<maxAudioChannels> inputSrc;
+    dsp::SampleRateConverter<maxAudioChannels> outputSrc;
 
     // Port variable caches
     int deviceNumInputs = 0;
@@ -52,8 +52,8 @@ namespace zox {
 
     ZoxnoxiousAudioPort(Module* module) {
       this->module = module;
-      maxOutputs = maxChannels;
-      maxInputs = maxChannels;
+      maxOutputs = maxAudioChannels;
+      maxInputs = maxAudioChannels;
       inputSrc.setQuality(6);
       outputSrc.setQuality(6);
     }
@@ -74,8 +74,8 @@ namespace zox {
     }
 
     void processInput(const float* input, int inputStride, int frames) override {
-      deviceNumInputs = std::min(getNumInputs(), static_cast<int>(maxChannels));
-      deviceNumOutputs = std::min(getNumOutputs(), static_cast<int>(maxChannels));
+      deviceNumInputs = std::min(getNumInputs(), static_cast<int>(maxAudioChannels));
+      deviceNumOutputs = std::min(getNumOutputs(), static_cast<int>(maxAudioChannels));
       deviceSampleRate = getSampleRate();
 
       // DEBUG("%p: new device block ____________________________", this);
@@ -111,7 +111,7 @@ namespace zox {
         outputSrc.setChannels(deviceNumInputs);
         int inputFrames = frames;
         int outputFrames = engineOutputBuffer.capacity();
-        outputSrc.process(input, inputStride, &inputFrames, (float*) engineOutputBuffer.endData(), maxChannels, &outputFrames);
+        outputSrc.process(input, inputStride, &inputFrames, (float*) engineOutputBuffer.endData(), maxAudioChannels, &outputFrames);
         engineOutputBuffer.endIncr(outputFrames);
         // Request exactly as many frames as we have in the engine output buffer.
         requestedEngineFrames = engineOutputBuffer.size();
@@ -142,7 +142,7 @@ namespace zox {
         // Convert engine input -> audio output
         int inputFrames = engineInputBuffer.size();
         int outputFrames = frames;
-        inputSrc.process((const float*) engineInputBuffer.startData(), maxChannels, &inputFrames, output, outputStride, &outputFrames);
+        inputSrc.process((const float*) engineInputBuffer.startData(), maxAudioChannels, &inputFrames, output, outputStride, &outputFrames);
         engineInputBuffer.startIncr(inputFrames);
         // Clamp output samples
         for (int i = 0; i < outputFrames; i++) {

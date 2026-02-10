@@ -3,9 +3,9 @@
 namespace zox {
   
 // maximum number of channels on a USB Audio interface
-static constexpr int8_t maxChannels = 27;
-static constexpr int8_t maxDevices = 2;
-static constexpr size_t maxCards = 6;
+static constexpr int8_t maxAudioChannels = 27;
+static constexpr int8_t maxAudioDevices = 2;
+static constexpr int maxVoiceCards = 6;
 
 static constexpr int8_t invalidSlot = -1;
 static constexpr int8_t invalidOutputDeviceId = -1;

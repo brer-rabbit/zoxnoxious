@@ -33,7 +33,7 @@ AudioIO::AudioIO() : cardAOutput1NameString(invalidCardOutputName),
                      out1LevelClipTimer(0.f),
                      out2LevelClipTimer(0.f) {
 
-  for(int i = 0; i < maxDevices; ++i) {
+  for(int i = 0; i < maxAudioDevices; ++i) {
     audioPorts.push_back(new ZoxnoxiousAudioPort(this));
   }
 
@@ -126,35 +126,38 @@ void AudioIO::onSampleRateChange(const SampleRateChangeEvent& e) {
   }
 
   midiPollClockDivider.setDivision(static_cast<int>(e.sampleRate) / midiPollRateHz);
-  INFO("midi polling set to %d", midiPollClockDivider.getDivision());
+  INFO("midi polling set to %" PRIu32, midiPollClockDivider.getDivision());
   // discoveryRequestClockDivider: no need to change, it's acted on once only
   lightDivider.setDivision(static_cast<int>(e.sampleRate) / lightRateHz);
 }
 
 
 void AudioIO::process(const ProcessArgs& args) {
-  dsp::Frame<maxChannels> sharedFrame;
-  midi::Message midiMessage;
+  dsp::Frame<maxAudioChannels> sharedFrame;
+  midi::Message midiOutMessage;
 
   auto snap = broker.snapshot();
 
-  for (size_t i = 0; i < maxCards; ++i) {
+  // process all participants
+  for (size_t i = 0; i < maxVoiceCards; ++i) {
     const auto entry = snap.slots[i].participant;
     if (entry != nullptr) {
       entry->pullSamples(args, sharedFrame, 0);
 
       if (midiPollClockDivider.process()) {
-          entry->pullMidi(args, 0, midiMessage);
-          //processMidiMessage(midiMeesage);
+          entry->pullMidi(args, 0, midiOutMessage);
       }
     }
   }
 
 
 
-  midi::Message msg;
-  while (midiInput.tryPop(&msg, args.frame)) {
+  // check for incoming midi
+  midi::Message midiInMsg;
+  while (midiInput.tryPop(&midiInMsg, args.frame)) {
+    processMidiInMessage(midiInMsg);
   }
+
 
   if (discoveryReportReceived == false && discoveryRequestClockDivider.process()) {
     INFO("Sending MIDI message discovery request");
@@ -234,7 +237,7 @@ int AudioIO::sendMidiProgramChangeMessage(int programNumber) {
 
 
 
-void AudioIO::processMidiMessage(const midi::Message &msg) {
+void AudioIO::processMidiInMessage(const midi::Message &msg) {
   // the only thing being processed as of now is the Discovery Report
   INFO("processing MIDI message");
   if (msg.getStatus() == 0xf && msg.getSize() > 3 && msg.bytes[1] == midiManufacturerId) {
@@ -284,8 +287,18 @@ void AudioIO::processMidiMessage(const midi::Message &msg) {
  * This report specifies exactly what cards are present in the
  * system and how the host (VCV Rack) is to communicate with each card.
  */
-static const int discoveryReportMessageSize = 28;
+static constexpr int discoveryReportMessageSize = 28;
 void AudioIO::processDiscoveryReport(const midi::Message &msg) {
+  ParticipantProperty deviceTree[maxVoiceCards] = {};
+  const int bytesOffset = 3; // actual data starts at this offset
+  int assignedMidiChannel = 0;
+
+  if (msg.getSize() != discoveryReportMessageSize) {
+    WARN("Discovery report contains %d bytes, expected %d", msg.getSize(), discoveryReportMessageSize);
+  }
+
+  // process maxVoiceCards + 1
+
 
   // note to self that with a report received, we need not keep requesting it.
   // Process the results and pass it along to any expanded modules (flip request).

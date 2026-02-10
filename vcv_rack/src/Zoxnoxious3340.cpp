@@ -281,7 +281,7 @@ enum cvChannel {
       return getId();
     }
 
-    void pullSamples(const rack::engine::Module::ProcessArgs &args, dsp::Frame<maxChannels> &sharedFrame, int offset) override {
+    void pullSamples(const rack::engine::Module::ProcessArgs &args, dsp::Frame<maxAudioChannels> &sharedFrame, int offset) override {
     }
 
     bool pullMidi(const rack::engine::Module::ProcessArgs &args, int midiChannel, midi::Message &midiMessage) override {

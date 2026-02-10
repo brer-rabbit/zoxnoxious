@@ -17,7 +17,7 @@ Broker::Broker() {
 
 bool Broker::registerParticipant(int64_t moduleId, Participant *p) {
   if (p == nullptr) {
-    WARN("Broker received a null pointer for registration: moduleId %lld", moduleId);
+    WARN("Broker received a null pointer for registration: moduleId %" PRId64, moduleId);
     return false;
   }
 
@@ -52,7 +52,7 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
   next = current;
 
   // find then remove moduleId but clearing isAllocated flag
-  for (size_t i = 0; i < maxCards; ++i) {
+  for (size_t i = 0; i < maxVoiceCards; ++i) {
     if (next.slots[i].props.moduleId == moduleId) {
       next.slots[i].props.isAllocated = false;
       removed = true;
@@ -68,13 +68,13 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
 bool Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
   uint8_t hardwareId = p->getHardwareId();
 
-  for (size_t i = 0; i < maxCards; ++i) {
+  for (size_t i = 0; i < maxVoiceCards; ++i) {
     if (s.slots[i].props.isAllocated == false &&
         s.slots[i].props.hardwareId == hardwareId) {
       s.slots[i].participant = p;
       s.slots[i].props.moduleId = moduleId;
       s.slots[i].props.isAllocated = true;
-      INFO("found slot %ld for moduleId %lld hardwareId %d",
+      INFO("found slot %zu for moduleId %" PRId64  " hardwareId %" PRIu8,
            i, moduleId, hardwareId);
       return true;
     }

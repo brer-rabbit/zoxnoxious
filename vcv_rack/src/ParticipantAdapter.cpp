@@ -39,6 +39,7 @@ void ParticipantAdapter::onRemove(const RemoveEvent& e) {
 }
 
 
+// enable setting attached status light
 void ParticipantAdapter::setLightEnum(int lightEnum) {
   myLightEnum = lightEnum;
 }

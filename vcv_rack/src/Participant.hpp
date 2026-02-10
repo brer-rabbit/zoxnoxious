@@ -15,6 +15,7 @@ struct ParticipantProperty {
   uint8_t hardwareId;
   int8_t cvChannelOffset;
   int8_t outputDeviceId;
+  int8_t midiChannel;
   bool isAllocated;
 };
 
@@ -48,7 +49,7 @@ struct Broker {
   // -----------------------------------------------------------------------------
 
   struct Snapshot {
-    Slot slots[maxCards];
+    Slot slots[maxVoiceCards];
   } storageA, storageB;
 
   // Audio-thread to accesses Snapshot via this pointer
@@ -82,7 +83,7 @@ struct Participant {
 
   // pullSamples() is called at the audio rate and replaces process().  Client
   // fills in the sharedFrame with samples starting at the offset.
-  virtual void pullSamples(const rack::engine::Module::ProcessArgs& args, rack::dsp::Frame<maxChannels> &sharedFrame, int offset) = 0;
+  virtual void pullSamples(const rack::engine::Module::ProcessArgs& args, rack::dsp::Frame<maxAudioChannels> &sharedFrame, int offset) = 0;
 
 
   // pullMidi()  Client may set the midi::Message owned by the caller.  Return value of
