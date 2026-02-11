@@ -11,6 +11,7 @@ ParticipantAdapter::ParticipantAdapter() : myLightEnum(invalidLightEnum) {
 }
 
 ParticipantAdapter::~ParticipantAdapter() {
+  // destructors called from UI thread- this is a safe backup if onRemove went wonky
   lifecycle.detach();
 }
 

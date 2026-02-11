@@ -4,7 +4,10 @@
 #include "Participant.hpp"
 #include "AudioMidi.hpp"
 
+
 namespace zox {
+
+struct DiscoveredCard;
 
 struct AudioIO : rack::engine::Module {
   enum ParamId {
@@ -145,6 +148,7 @@ private:
   int sendMidiProgramChangeMessage(int programNumber);
   void processMidiInMessage(const midi::Message &msg);
   void processDiscoveryReport(const midi::Message &msg);
+  void applyDiscoveryReport(DiscoveredCard *cards);
 
   static const std::string audioPortNum;
 };

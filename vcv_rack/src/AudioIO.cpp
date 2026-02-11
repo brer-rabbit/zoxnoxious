@@ -286,27 +286,96 @@ void AudioIO::processMidiInMessage(const midi::Message &msg) {
  * if the card Id isn't 0x00 or 0xFF then process it.
  * This report specifies exactly what cards are present in the
  * system and how the host (VCV Rack) is to communicate with each card.
+ * Yes, the report does specify 8 cards.  One is the backplane (this module),
+ * the hardware guarantees only six are populated (hardware does not have a 7th slot)
+ * but it's there in the report anyway.  Only six are cold-swappable voice cards.
  */
-static constexpr int discoveryReportMessageSize = 28;
-void AudioIO::processDiscoveryReport(const midi::Message &msg) {
-  ParticipantProperty deviceTree[maxVoiceCards] = {};
-  const int bytesOffset = 3; // actual data starts at this offset
-  int assignedMidiChannel = 0;
 
-  if (msg.getSize() != discoveryReportMessageSize) {
-    WARN("Discovery report contains %d bytes, expected %d", msg.getSize(), discoveryReportMessageSize);
+static constexpr int discoveryReportMessageSize = 28;
+static constexpr int numReportsCards = 8;
+
+// to be mapped to ParticipantProperty
+struct DiscoveredCard {
+    uint8_t hardwareId;
+    uint8_t cvChannelOffset;
+    uint8_t outputDeviceId;
+    bool valid;
+};
+
+
+void AudioIO::processDiscoveryReport(const midi::Message &msg) {
+  constexpr int byteOffset = 3; // actual data starts at this offset after sysex header
+  int msgSize = msg.getSize(); // cache
+
+  if (msgSize != discoveryReportMessageSize) {
+    WARN("Discovery report contains %d bytes, expected %d", msgSize, discoveryReportMessageSize);
   }
 
-  // process maxVoiceCards + 1
+  DiscoveredCard cards[numReportsCards] = {};
 
+  // first pass: just parse
+  for (int i = 0; i < numReportsCards; ++i) {
+    int base = byteOffset + (i * 3);
+    uint8_t id = msg.bytes[base];
+    uint8_t cv = msg.bytes[base + 1];
+    uint8_t dev = msg.bytes[base + 2];
 
-  // note to self that with a report received, we need not keep requesting it.
-  // Process the results and pass it along to any expanded modules (flip request).
-  // Since the report is basically static (no hotplugging modules) we shouldn't need
-  // to produce a new one or flip the left message again.
+    // 0x00 and 0xFF are not valid hardware Ids
+    if (id != 0x00 && id != 0xFF) {
+      cards[i] = { id, cv, dev, true };
+    }
+    else {
+      cards[i] = { 0, 0, 0, false };
+    }
+
+  }
+
+  // second pass: apply bizrules
+  applyDiscoveryReport(cards);
   discoveryReportReceived = true;
 }
 
+
+// note the midi channel is assigned here.  By convention with the zoxnoxiousd daemon
+// the first in the report has channel 0, then 1, etc.
+// "Discovered card number maps to MIDI channel number.  Not actual slot number."
+void AudioIO::applyDiscoveryReport(DiscoveredCard *cards) {
+  int assignedMidiChannel = 0;
+  ParticipantProperty deviceTree[maxVoiceCards] = {};
+  size_t participant_count = 0;
+
+  for (int i = 0; i < numReportsCards; ++i) {
+    if (!cards[i].valid) {
+      continue; // ignore it
+    }
+
+    if (cards[i].hardwareId == getHardwareId()) {
+      // Backplane
+      cvChannelOffset = cards[i].cvChannelOffset;
+      outputDeviceId = cards[i].outputDeviceId;
+      midiChannel = assignedMidiChannel++;
+    }
+    else if (i < maxVoiceCards) {
+      // Voice card
+      ParticipantProperty& slot = deviceTree[i];
+      participant_count++;
+      
+      slot.moduleId = -1;
+      slot.hardwareId = cards[i].hardwareId;
+      slot.cvChannelOffset = cards[i].cvChannelOffset;
+      slot.outputDeviceId = cards[i].outputDeviceId;
+      slot.midiChannel = assignedMidiChannel++;
+      slot.isAllocated = false;
+      INFO("registered hardware id %d midi channel %d", slot.hardwareId, slot.midiChannel);
+    }
+    else {
+      WARN("too many voice cards");
+    }
+
+  }
+
+  broker.registerDevices(deviceTree, participant_count);
+}
 
 
 json_t* AudioIO::dataToJson() {
