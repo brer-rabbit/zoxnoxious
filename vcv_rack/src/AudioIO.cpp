@@ -307,6 +307,11 @@ void AudioIO::processDiscoveryReport(const midi::Message &msg) {
   constexpr int byteOffset = 3; // actual data starts at this offset after sysex header
   int msgSize = msg.getSize(); // cache
 
+  if (discoveryReportReceived == true) {
+    INFO("ignoring duplicate Discovery Report");
+    return;
+  }
+
   if (msgSize != discoveryReportMessageSize) {
     WARN("Discovery report contains %d bytes, expected %d", msgSize, discoveryReportMessageSize);
   }
