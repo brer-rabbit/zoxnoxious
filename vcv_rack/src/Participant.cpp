@@ -26,6 +26,9 @@ bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
     storageB.slots[i].props.hardwareId = invalidCardId;
   }
 
+  // set published non-null: allow the participant registrations to proceed
+  published.store(&storageA, std::memory_order_release);
+
   return true;
 }
 
