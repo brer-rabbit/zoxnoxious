@@ -9,7 +9,7 @@ namespace zox {
 
 struct DiscoveredCard;
 
-struct AudioIO : rack::engine::Module {
+struct AudioIO final : rack::engine::Module {
   enum ParamId {
     OUT1_LEVEL_KNOB_PARAM,
     OUT2_LEVEL_KNOB_PARAM,

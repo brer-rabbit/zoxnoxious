@@ -45,7 +45,7 @@ bool Broker::registerParticipant(int64_t moduleId, Participant *p) {
 
   if (published.load(std::memory_order_acquire) == nullptr) {
     WARN("registration denied for moduleId %" PRId64
-         ": try again / waiting for hardware detail", moduleId);
+         ": hardware detail pending", moduleId);
     return false;
   }
 
@@ -54,7 +54,7 @@ bool Broker::registerParticipant(int64_t moduleId, Participant *p) {
   Snapshot &next = (&current == &storageA) ? storageB : storageA;
 
   // 2. Clone current state into the next snapshot
-  next = current; 
+  next = current;
 
   // 3. Perform bizlogic to determine if we can register participant.
   // Any manipulation is allowed on next since it is not used by audio thread.
@@ -63,7 +63,7 @@ bool Broker::registerParticipant(int64_t moduleId, Participant *p) {
   // 4. Atomic Swap: Now the audio thread sees the new participant
   // (and yes, still do this even if the previous step failed)
   published.store(&next, std::memory_order_release);
-        
+
   return retval;
 }
 
@@ -79,7 +79,7 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
   // clone current state into next published state
   next = current;
 
-  // find then remove moduleId but clearing isAllocated flag
+  // find then remove moduleId by clearing isAllocated flag
   for (size_t i = 0; i < maxVoiceCards; ++i) {
     if (next.slots[i].props.moduleId == moduleId) {
       next.slots[i].props.isAllocated = false;
@@ -157,6 +157,7 @@ void ParticipantLifecycle::detach() {
     return;
   }
   if (broker && participant) {
+    INFO("ParticipantLifecycle calling detach on %" PRId64, participant->getModuleId());
     broker->unregisterParticipant(participant->getModuleId());
   }
 

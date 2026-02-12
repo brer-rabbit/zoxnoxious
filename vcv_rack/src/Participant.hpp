@@ -86,10 +86,7 @@ struct Participant {
   // Zoxnoxious hardware Id set in voice card ROM
   virtual uint8_t getHardwareId() const = 0;
 
-
-
   // Participants requiring Rack's ProcessArgs will instead use methods provided here.
-
   // pullSamples() is called at the audio rate and replaces process().  Client
   // fills in the sharedFrame with samples starting at the offset.
   virtual void pullSamples(const rack::engine::Module::ProcessArgs& args, rack::dsp::Frame<maxAudioChannels> &sharedFrame, int offset) = 0;

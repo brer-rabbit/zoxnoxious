@@ -133,19 +133,23 @@ void AudioIO::onSampleRateChange(const SampleRateChangeEvent& e) {
 
 
 void AudioIO::process(const ProcessArgs& args) {
-  dsp::Frame<maxAudioChannels> sharedFrame;
+  dsp::Frame<maxAudioChannels> sharedFrameFIXME;
   midi::Message midiOutMessage;
+  bool isMidiClockTick = midiPollClockDivider.process();
+  const Broker::Snapshot snap = broker.snapshot();
 
-  auto snap = broker.snapshot();
 
   // process all participants
   for (size_t i = 0; i < maxVoiceCards; ++i) {
-    const auto entry = snap.slots[i].participant;
-    if (entry != nullptr) {
-      entry->pullSamples(args, sharedFrame, 0);
+    Participant *entry = snap.slots[i].participant;
+    const ParticipantProperty& props = snap.slots[i].props;
+    if (entry != nullptr && props.isAllocated) {
+      entry->pullSamples(args, sharedFrameFIXME, 0);
 
-      if (midiPollClockDivider.process()) {
-          entry->pullMidi(args, 0, midiOutMessage);
+      if (isMidiClockTick) {
+        INFO("midi process on slot %ld module id %ld",
+             i, entry->getModuleId());
+        entry->pullMidi(args, props.midiChannel, midiOutMessage);
       }
     }
   }
