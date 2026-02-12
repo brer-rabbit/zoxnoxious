@@ -7,11 +7,25 @@ namespace zox {
 
 
 Broker::Broker() {
-  published.store(&storageA, std::memory_order_relaxed);
+  // do not initialize published: nullptr value indicates no ParticipantProperties
+  // registered.
 }
 
 
 bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
+  size_t i = 0;
+  for (; i < count; ++i) {
+    // store to both copies so it won't matter which one is actually used first
+    std::memcpy(&storageA.slots[i].props, &devices[i], sizeof(ParticipantProperty));
+    std::memcpy(&storageB.slots[i].props, &devices[i], sizeof(ParticipantProperty));
+  }
+
+  // flag anything not specified as invalid
+  for (; i < maxVoiceCards; ++i) {
+    storageA.slots[i].props.hardwareId = invalidCardId;
+    storageB.slots[i].props.hardwareId = invalidCardId;
+  }
+
   return true;
 }
 
@@ -23,6 +37,12 @@ bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
 bool Broker::registerParticipant(int64_t moduleId, Participant *p) {
   if (p == nullptr) {
     WARN("Broker received a null pointer for registration: moduleId %" PRId64, moduleId);
+    return false;
+  }
+
+  if (published.load(std::memory_order_acquire) == nullptr) {
+    WARN("registration denied for moduleId %" PRId64
+         ": try again / waiting for hardware detail", moduleId);
     return false;
   }
 
