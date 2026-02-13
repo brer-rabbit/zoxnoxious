@@ -133,23 +133,41 @@ void AudioIO::onSampleRateChange(const SampleRateChangeEvent& e) {
 
 
 void AudioIO::process(const ProcessArgs& args) {
-  dsp::Frame<maxAudioChannels> sharedFrameFIXME;
+  dsp::Frame<maxAudioChannels> sharedFrames[ audioPorts.size() ];
   midi::Message midiOutMessage;
   bool isMidiClockTick = midiPollClockDivider.process();
   const Broker::Snapshot snap = broker.snapshot();
 
+  /*
+  if (isMidiClockTick) {
+    for (size_t i = 0; i < maxVoiceCards; ++i) {
+      const auto& s = snap.slots[i];
+      INFO("slot %ld: p=%p allocated=%d hw=%d",
+           i, (void*)s.participant,
+           s.props.isAllocated,
+           s.props.hardwareId);
+    }
+  }
+  */
+
 
   // process all participants
   for (size_t i = 0; i < maxVoiceCards; ++i) {
-    Participant *entry = snap.slots[i].participant;
-    const ParticipantProperty& props = snap.slots[i].props;
-    if (entry != nullptr && props.isAllocated) {
-      entry->pullSamples(args, sharedFrameFIXME, 0);
+    const Slot *slot = &snap.slots[i];
+
+    if (slot->participant != nullptr && slot->props.isAllocated) {
+      slot->participant->pullSamples(args,
+                                     sharedFrames[slot->props.outputDeviceId],
+                                     slot->props.cvChannelOffset);
 
       if (isMidiClockTick) {
-        INFO("midi process on slot %ld module id %ld",
-             i, entry->getModuleId());
-        entry->pullMidi(args, props.midiChannel, midiOutMessage);
+        INFO("frame %ld: midi process on slot %ld module id %ld",
+             args.frame,
+             i, slot->participant->getModuleId());
+        slot->participant->pullMidi(args,
+                                    midiPollClockDivider.getDivision(),
+                                    slot->props.midiChannel,
+                                    midiOutMessage);
       }
     }
   }

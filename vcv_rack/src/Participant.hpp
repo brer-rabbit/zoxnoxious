@@ -95,9 +95,9 @@ struct Participant {
   // pullMidi()  Client may set the midi::Message owned by the caller.  Return value of
   // true signals midi message is set and to be returned.  Client to return
   // false is no message is set.
-  // Called at 100-200 Hz (TBD).
+  // Called at 100-200 Hz (TBD).  Actual frequency can be inferred from clockDivision.
   // This is also a good place to do any module state changes for UI elements such as lights.
-  virtual bool pullMidi(const rack::engine::Module::ProcessArgs& args, int midiChannel, rack::midi::Message &midiMessage) = 0;
+  virtual bool pullMidi(const rack::engine::Module::ProcessArgs& args, uint32_t clockDivision, int midiChannel, rack::midi::Message &midiMessage) = 0;
 
 };
 

@@ -84,7 +84,6 @@ enum cvChannel {
     };
 
 
-    dsp::ClockDivider lightDivider;
     float syncPhaseClipTimer;
     float freqClipTimer;
     float mix1PulseVcaClipTimer;
@@ -187,75 +186,12 @@ enum cvChannel {
         configLight(LEFT_EXPANDER_LIGHT, "Connection Status");
         configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
 
-        lightDivider.setDivision(512);
     }
 
 
 
 /*
     void process(const ProcessArgs& args) override {
-      // participate
-      lifecycle.tryAttach(this);
-
-
-      if (lightDivider.process()) {
-        bool sync_pos = params[SYNC_POS_BUTTON_PARAM].getValue() > 0.f;
-        lights[SYNC_POS_BUTTON_LIGHT].setBrightness(sync_pos);
-
-        bool mix2_pulse = params[MIX2_PULSE_BUTTON_PARAM].getValue() > 0.f;
-        lights[MIX2_PULSE_BUTTON_LIGHT].setBrightness(mix2_pulse);
-
-        bool ext_mod_pwm = params[EXT_MOD_PWM_BUTTON_PARAM].getValue() > 0.f;
-        lights[EXT_MOD_PWM_BUTTON_LIGHT].setBrightness(ext_mod_pwm);
-
-        bool exp_fm = params[EXP_FM_BUTTON_PARAM].getValue() > 0.f;
-        lights[EXP_FM_BUTTON_LIGHT].setBrightness(exp_fm);
-
-        bool linear_fm = params[LINEAR_FM_BUTTON_PARAM].getValue() > 0.f;
-        lights[LINEAR_FM_BUTTON_LIGHT].setBrightness(linear_fm);
-
-        bool mix2_saw = params[MIX2_SAW_BUTTON_PARAM].getValue() > 0.f;
-        lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
-
-        bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
-        lights[SYNC_NEG_BUTTON_LIGHT].setBrightness(sync_neg);
-
-        bool sync_hard = params[SYNC_HARD_BUTTON_PARAM].getValue() > 0.f;
-        lights[SYNC_HARD_BUTTON_LIGHT].setBrightness(sync_hard);
-
-        bool sync_soft = params[SYNC_SOFT_BUTTON_PARAM].getValue() > 0.f;
-        lights[SYNC_SOFT_BUTTON_LIGHT].setBrightness(sync_soft);
-
-        lights[EXT_MOD_SELECT_SWITCH_UP_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_UP_PARAM].getValue());
-        lights[EXT_MOD_SELECT_SWITCH_DOWN_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_DOWN_PARAM].getValue());
-
-        // clipping light timer
-        const float lightTime = args.sampleTime * lightDivider.getDivision();
-        const float brightnessDeltaTime = 1 / lightTime;
-
-        syncPhaseClipTimer -= lightTime;
-        lights[SYNC_PHASE_CLIP_LIGHT].setBrightnessSmooth(syncPhaseClipTimer > 0.f, brightnessDeltaTime);
-
-        freqClipTimer -= lightTime;
-        lights[FREQ_CLIP_LIGHT].setBrightnessSmooth(freqClipTimer > 0.f, brightnessDeltaTime);
-
-        mix1PulseVcaClipTimer -= lightTime;
-        lights[MIX1_PULSE_CLIP_LIGHT].setBrightnessSmooth(mix1PulseVcaClipTimer > 0.f, brightnessDeltaTime);
-
-        extModAmountClipTimer -= lightTime;
-        lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
-
-        mix1TriangleVcaClipTimer -= lightTime;
-        lights[MIX1_TRIANGLE_CLIP_LIGHT].setBrightnessSmooth(mix1TriangleVcaClipTimer > 0.f, brightnessDeltaTime);
-
-        mix1SawVcaClipTimer -= lightTime;
-        lights[MIX1_SAW_CLIP_LIGHT].setBrightnessSmooth(mix1SawVcaClipTimer > 0.f, brightnessDeltaTime);
-
-        pulseWidthClipTimer -= lightTime;
-        lights[PULSE_WIDTH_CLIP_LIGHT].setBrightnessSmooth(pulseWidthClipTimer > 0.f, brightnessDeltaTime);
-
-        linearClipTimer -= lightTime;
-        lights[LINEAR_CLIP_LIGHT].setBrightnessSmooth(linearClipTimer > 0.f, brightnessDeltaTime);
 
         //setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
         //setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
@@ -284,8 +220,74 @@ enum cvChannel {
     void pullSamples(const rack::engine::Module::ProcessArgs &args, dsp::Frame<maxAudioChannels> &sharedFrame, int offset) override {
     }
 
-    bool pullMidi(const rack::engine::Module::ProcessArgs &args, int midiChannel, midi::Message &midiMessage) override {
-      INFO("zoxnoxious3340 %lld pulling midi", id);
+    bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override {
+      INFO("zoxnoxious3340 %" PRId64 " pulling midi", id);
+
+
+
+      // UI related updates:
+
+      // Lights - we need lights.
+      // First, button lights.
+      bool sync_pos = params[SYNC_POS_BUTTON_PARAM].getValue() > 0.f;
+      lights[SYNC_POS_BUTTON_LIGHT].setBrightness(sync_pos);
+
+      bool mix2_pulse = params[MIX2_PULSE_BUTTON_PARAM].getValue() > 0.f;
+      lights[MIX2_PULSE_BUTTON_LIGHT].setBrightness(mix2_pulse);
+
+      bool ext_mod_pwm = params[EXT_MOD_PWM_BUTTON_PARAM].getValue() > 0.f;
+      lights[EXT_MOD_PWM_BUTTON_LIGHT].setBrightness(ext_mod_pwm);
+
+      bool exp_fm = params[EXP_FM_BUTTON_PARAM].getValue() > 0.f;
+      lights[EXP_FM_BUTTON_LIGHT].setBrightness(exp_fm);
+
+      bool linear_fm = params[LINEAR_FM_BUTTON_PARAM].getValue() > 0.f;
+      lights[LINEAR_FM_BUTTON_LIGHT].setBrightness(linear_fm);
+
+      bool mix2_saw = params[MIX2_SAW_BUTTON_PARAM].getValue() > 0.f;
+      lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
+
+      bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
+      lights[SYNC_NEG_BUTTON_LIGHT].setBrightness(sync_neg);
+
+      bool sync_hard = params[SYNC_HARD_BUTTON_PARAM].getValue() > 0.f;
+      lights[SYNC_HARD_BUTTON_LIGHT].setBrightness(sync_hard);
+
+      bool sync_soft = params[SYNC_SOFT_BUTTON_PARAM].getValue() > 0.f;
+      lights[SYNC_SOFT_BUTTON_LIGHT].setBrightness(sync_soft);
+
+      lights[EXT_MOD_SELECT_SWITCH_UP_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_UP_PARAM].getValue());
+      lights[EXT_MOD_SELECT_SWITCH_DOWN_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_DOWN_PARAM].getValue());
+
+      // Then clipping lights.
+      // clipping light timer
+      const float lightTime = args.sampleTime * clockDivision;
+      const float brightnessDeltaTime = 1 / lightTime;
+
+      syncPhaseClipTimer -= lightTime;
+      lights[SYNC_PHASE_CLIP_LIGHT].setBrightnessSmooth(syncPhaseClipTimer > 0.f, brightnessDeltaTime);
+
+      freqClipTimer -= lightTime;
+      lights[FREQ_CLIP_LIGHT].setBrightnessSmooth(freqClipTimer > 0.f, brightnessDeltaTime);
+
+      mix1PulseVcaClipTimer -= lightTime;
+      lights[MIX1_PULSE_CLIP_LIGHT].setBrightnessSmooth(mix1PulseVcaClipTimer > 0.f, brightnessDeltaTime);
+
+      extModAmountClipTimer -= lightTime;
+      lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
+
+      mix1TriangleVcaClipTimer -= lightTime;
+      lights[MIX1_TRIANGLE_CLIP_LIGHT].setBrightnessSmooth(mix1TriangleVcaClipTimer > 0.f, brightnessDeltaTime);
+
+      mix1SawVcaClipTimer -= lightTime;
+      lights[MIX1_SAW_CLIP_LIGHT].setBrightnessSmooth(mix1SawVcaClipTimer > 0.f, brightnessDeltaTime);
+
+      pulseWidthClipTimer -= lightTime;
+      lights[PULSE_WIDTH_CLIP_LIGHT].setBrightnessSmooth(pulseWidthClipTimer > 0.f, brightnessDeltaTime);
+
+      linearClipTimer -= lightTime;
+      lights[LINEAR_CLIP_LIGHT].setBrightnessSmooth(linearClipTimer > 0.f, brightnessDeltaTime);
+
       return false;
     }
 
