@@ -121,6 +121,19 @@ const Broker::Snapshot& Broker::snapshot() const {
 
 
 
+bool ParticipantLifecycle::heartbeat() {
+  AudioIO* current = AudioIO::instance.load(std::memory_order_acquire);
+
+  if (attached && (!current || &current->getBroker() != broker)) {
+    // Orchestrator vanished or changed
+    attached = false;
+    broker = nullptr;
+    return false;
+  }
+  return true;
+}
+
+
 // tryAttach() may be called from audio thread or GUI thread.  For the common case of
 // the module is attached and a valid AudioIO instance exists return quick.
 void ParticipantLifecycle::tryAttach(Participant *p) {

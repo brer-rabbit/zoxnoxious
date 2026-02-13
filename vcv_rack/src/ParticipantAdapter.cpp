@@ -23,6 +23,7 @@ void ParticipantAdapter::setParticipant(Participant* p) {
 void ParticipantAdapter::process(const ProcessArgs& args) {
   if (tryAttachDivider.process()) {
     lifecycle.tryAttach(participant);
+    //lifecycle.heartbeat();
     if (myLightEnum != invalidLightEnum) {
       setAttachedLightStatus();
     }

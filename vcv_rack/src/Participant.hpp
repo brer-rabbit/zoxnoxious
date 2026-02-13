@@ -111,6 +111,7 @@ struct ParticipantLifecycle {
   // a hardware allocation in the Broker. May lag behind Snapshot.
   bool attached = false;
 
+  bool heartbeat();
   void tryAttach(Participant *p);
   void detach();
 };
