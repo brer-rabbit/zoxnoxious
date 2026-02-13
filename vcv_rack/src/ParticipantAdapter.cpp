@@ -21,6 +21,8 @@ void ParticipantAdapter::setParticipant(Participant* p) {
 }
 
 void ParticipantAdapter::process(const ProcessArgs& args) {
+  // TODO: this is not thread safe when Rack is set to >1 threads
+  // to fix: use a "wantAttach" methodology instead of tryAttach()
   if (tryAttachDivider.process()) {
     lifecycle.tryAttach(participant);
     //lifecycle.heartbeat();

@@ -161,7 +161,7 @@ void AudioIO::process(const ProcessArgs& args) {
                                      slot->props.cvChannelOffset);
 
       if (isMidiClockTick) {
-        INFO("frame %ld: midi process on slot %ld module id %ld",
+        INFO("frame %" PRId64 ": midi process on slot %ld module id %" PRId64,
              args.frame,
              i, slot->participant->getModuleId());
         slot->participant->pullMidi(args,
