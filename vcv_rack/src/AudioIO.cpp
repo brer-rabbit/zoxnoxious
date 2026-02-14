@@ -237,7 +237,6 @@ uint8_t AudioIO::getHardwareId() { // TODO: should this be an interface?
 }
 
 
-static const uint8_t midiProgramChangeStatus = 0xC;
 static const uint8_t midiManufacturerId = 0x7d;
 static const uint8_t midiSysexDiscoveryReport = 0x01;
 
