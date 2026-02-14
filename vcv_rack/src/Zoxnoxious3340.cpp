@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "zcomponentlib.hpp"
 #include "ParticipantAdapter.hpp"
+#include "ButtonMidiController.hpp"
 
 namespace zox {
   
