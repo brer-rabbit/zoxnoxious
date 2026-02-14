@@ -47,7 +47,7 @@ public:
         state.latchedValue = curValue;
 
         uint8_t program = map.midiProogram[curValue];
-        setMidiMessage(midiOut, midiChannel, program);
+        setMidiProgramChangeMessage(midiOut, midiChannel, program);
 
         return true; // only single midi::Message is set per call, so early return here
       }
@@ -68,6 +68,14 @@ private:
     const Mapping* mappings;
     size_t count;
     std::vector<ButtonState> states;
+
+  static void setMidiProgramChangeMessage(midi::Message& midiOutMessage, int8_t midiChannel, int8_t program) {
+    midiOutMessage.setSize(2);
+    midiOutMessage.setChannel(midiChannel);
+    midiOutMessage.setStatus(midiProgramChangeStatus);
+    midiOutMessage.setNote(program);
+  }
+
 };
 
 
