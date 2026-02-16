@@ -1,6 +1,5 @@
 #include "plugin.hpp"
 
-
 Plugin* pluginInstance;
 
 
@@ -52,6 +51,8 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
         (outputNumber == 1 ? "1 " : (outputNumber == 2 ? "2 " : "") ) +
         cardName;
 }
+
+
 
 
 void init(Plugin* p) {

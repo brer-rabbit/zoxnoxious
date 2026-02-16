@@ -102,35 +102,21 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   // Assume int_min is an invalid value.  On start, idea would be
   // to send current state via midi so the board is in sync with
   // the rack plugin.
-  // The program value to send over midi  is indexed based on the
-  // button parameter value.
-  // The order must agree with the z3340 rpi driver
-  struct buttonParamMidiProgram {
-    enum ParamId button;
-    int previousValue;
-    uint8_t midiProgram[13];
-  } buttonParamToMidiProgramList[10] =
-      {
-        { SYNC_HARD_BUTTON_PARAM, INT_MIN, { 0, 1 } },
-        { EXT_MOD_PWM_BUTTON_PARAM, INT_MIN, { 2, 3 } },
-        { SYNC_NEG_BUTTON_PARAM, INT_MIN, { 4, 5 } },
-        { SYNC_SOFT_BUTTON_PARAM, INT_MIN, { 6, 7 } },
-        { SYNC_POS_BUTTON_PARAM, INT_MIN, { 8, 9 } },
-        { LINEAR_FM_BUTTON_PARAM, INT_MIN, { 10, 11 } },
-        { MIX2_SAW_BUTTON_PARAM, INT_MIN, { 12, 13 } },
-        { MIX2_PULSE_BUTTON_PARAM, INT_MIN, { 14, 15 } },
-        { EXP_FM_BUTTON_PARAM, INT_MIN, { 16, 17 } },
-        { EXT_MOD_SELECT_SWITCH_UP_PARAM, INT_MIN, { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 } } // special handling
-      };
+  // The order must agree with the z3340 rpi driver.
 
-  // index of EXT_MOD_SELECT_SWITCH_UP_PARAM
-  const int extModSelectSwitchIndex =
-    sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram) - 1;
+  // index corresponds on both vectors for tracking button pushes and outgoing MIDI msg
+  static const std::vector<ButtonMapping<Zoxnoxious3340> > buttonMappings;
+  std::vector<ButtonState> buttonStates;
+  ButtonMidiController<Zoxnoxious3340> buttonMidiController;
+
+  // the stateful selector is handled a bit differently than toggle buttons.
+  // This is the MIDI program changes it sends and how it is tracked.
+  static constexpr int8_t extModSelectMidiPrograms[13] = { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 };
+  int extModSelectSwitchValue; // current index to above array
+  bool extModSelectChanged;
 
   ParticipantLifecycle lifecycle;
 
-  int extModSelectSwitchValue;
-  bool extModSelectChanged;
 
   Zoxnoxious3340() :
     syncPhaseClipTimer(0.f), freqClipTimer(0.f),
@@ -140,6 +126,8 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     output1NameString(invalidCardOutputName),
     output2NameString(invalidCardOutputName),
     modulationInputNameString(invalidCardOutputName),
+    buttonStates(buttonMappings.size()),
+    buttonMidiController(buttonMappings),
     extModSelectSwitchValue(0),
     extModSelectChanged(false) {
 
@@ -187,27 +175,6 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
 
 
 
-/*
-  void process(const ProcessArgs& args) override {
-
-  //setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
-  //setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
-
-  // TODO: rework this without string copy.
-  // Could do something like:
-  // if (params[EXT_MOD_SELECT_SWITCH_PARAM].getValue() != modulationInputParamPrevValue)...
-  // but then the field isn't populated on connection.  sigh.
-  //
-  // oddly (well, by design) this is how the mux is wired up:
-  // CardA_Out1, CardA_Out2, CardB_Out1, CardC_Out1,
-  // CardD_Out1, CardE_Out1, CardF_Out1, CardG_Out1,
-
-  //modulationInputNameString = cardOutputNames[extModSelectSwitchValue];
-  }
-  }
-*/
-
-
   /* Participant interface */
   int64_t getModuleId() override {
     return getId();
@@ -217,7 +184,77 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   }
 
 
-  bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override;
+  bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override {
+    //INFO("zoxnoxious3340 %" PRId64 " pulling midi", id);
+
+    do {
+/*
+    lights[EXT_MOD_SELECT_SWITCH_UP_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_UP_PARAM].getValue());
+    lights[EXT_MOD_SELECT_SWITCH_DOWN_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_DOWN_PARAM].getValue());
+
+*/
+
+      // the last entry of buttonParamToMidiProgramList is handled here:
+      // add/subtract the up/down buttons
+      if (params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].getValue()) {
+        params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(0);
+        extModSelectSwitchValue =
+          extModSelectSwitchValue > 11 ? 0 : extModSelectSwitchValue + 1;
+        extModSelectChanged = true;
+      }
+      if (params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].getValue()) {
+        params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].setValue(0);
+        extModSelectSwitchValue =
+          extModSelectSwitchValue < 1 ? 12 : extModSelectSwitchValue - 1;
+        extModSelectChanged = true;
+      }
+
+      if (extModSelectChanged) {
+        extModSelectChanged = false;
+        INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d sending: %d",
+             APP->engine->getFrame(), extModSelectSwitchValue,
+             extModSelectMidiPrograms[extModSelectSwitchValue]);
+        //setMidiMessage(midiMessage, extModSelectSwitchValue, extModSelectSwitchIndex);
+      }
+
+    } while (0);
+
+    buttonMidiController.process(this, midiChannel, midiMessage);
+    buttonMidiController.updateLights(this);
+
+
+    // Then clipping lights.
+    // clipping light timer
+    const float lightTime = args.sampleTime * clockDivision;
+    const float brightnessDeltaTime = 1 / lightTime;
+
+    syncPhaseClipTimer -= lightTime;
+    lights[SYNC_PHASE_CLIP_LIGHT].setBrightnessSmooth(syncPhaseClipTimer > 0.f, brightnessDeltaTime);
+
+    freqClipTimer -= lightTime;
+    lights[FREQ_CLIP_LIGHT].setBrightnessSmooth(freqClipTimer > 0.f, brightnessDeltaTime);
+
+    mix1PulseVcaClipTimer -= lightTime;
+    lights[MIX1_PULSE_CLIP_LIGHT].setBrightnessSmooth(mix1PulseVcaClipTimer > 0.f, brightnessDeltaTime);
+
+    extModAmountClipTimer -= lightTime;
+    lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
+
+    mix1TriangleVcaClipTimer -= lightTime;
+    lights[MIX1_TRIANGLE_CLIP_LIGHT].setBrightnessSmooth(mix1TriangleVcaClipTimer > 0.f, brightnessDeltaTime);
+
+    mix1SawVcaClipTimer -= lightTime;
+    lights[MIX1_SAW_CLIP_LIGHT].setBrightnessSmooth(mix1SawVcaClipTimer > 0.f, brightnessDeltaTime);
+
+    pulseWidthClipTimer -= lightTime;
+    lights[PULSE_WIDTH_CLIP_LIGHT].setBrightnessSmooth(pulseWidthClipTimer > 0.f, brightnessDeltaTime);
+
+    linearClipTimer -= lightTime;
+    lights[LINEAR_CLIP_LIGHT].setBrightnessSmooth(linearClipTimer > 0.f, brightnessDeltaTime);
+
+    return false;
+  }
+
 
   /** getCardHardwareId
    * return the hardware Id of the 3340 card
@@ -248,111 +285,6 @@ private:
 };
 
 
-bool Zoxnoxious3340::pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) {
-  INFO("zoxnoxious3340 %" PRId64 " pulling midi", id);
-
-
-  do {
-    // the last entry of buttonParamToMidiProgramList is handled here:
-    // add/subtract the up/down buttons
-    if (params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].getValue()) {
-      params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(0);
-      extModSelectSwitchValue =
-        extModSelectSwitchValue > 13 ? 0 : extModSelectSwitchValue + 1;
-      extModSelectChanged = true;
-    }
-    if (params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].getValue()) {
-      params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].setValue(0);
-      extModSelectSwitchValue =
-        extModSelectSwitchValue == 0 ? 13 : extModSelectSwitchValue - 1;
-      extModSelectChanged = true;
-    }
-
-    if (extModSelectChanged) {
-      extModSelectChanged = false;
-      INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d idx: %d sending: %d",
-           APP->engine->getFrame(), extModSelectSwitchValue,
-           extModSelectSwitchIndex,
-           buttonParamToMidiProgramList[extModSelectSwitchIndex].midiProgram[extModSelectSwitchValue]);
-      //setMidiMessage(midiMessage, extModSelectSwitchValue, extModSelectSwitchIndex);
-    }
-
-    // all other entries in buttonParamToMidiProgramList are handled here (almost as poorly)
-
-    // Any buttons params pushed need to send midi events.  Send directly or queue.
-    // skip EXT_MOD_SELECT_SWITCH_UP_PARAM.
-    for (int i = 0; i < extModSelectSwitchIndex; ++i) {
-      int newValue = (int) (params[ buttonParamToMidiProgramList[i].button ].getValue() + 0.5f);
-      //sendOrQueueMidiMessage(controlMsg, newValue, i);
-    }
-
-  } while (0);
-
-  // UI related updates:
-
-  // Lights - we need lights.
-  // First, button lights.
-  bool sync_pos = params[SYNC_POS_BUTTON_PARAM].getValue() > 0.f;
-  lights[SYNC_POS_BUTTON_LIGHT].setBrightness(sync_pos);
-
-  bool mix2_pulse = params[MIX2_PULSE_BUTTON_PARAM].getValue() > 0.f;
-  lights[MIX2_PULSE_BUTTON_LIGHT].setBrightness(mix2_pulse);
-
-  bool ext_mod_pwm = params[EXT_MOD_PWM_BUTTON_PARAM].getValue() > 0.f;
-  lights[EXT_MOD_PWM_BUTTON_LIGHT].setBrightness(ext_mod_pwm);
-
-  bool exp_fm = params[EXP_FM_BUTTON_PARAM].getValue() > 0.f;
-  lights[EXP_FM_BUTTON_LIGHT].setBrightness(exp_fm);
-
-  bool linear_fm = params[LINEAR_FM_BUTTON_PARAM].getValue() > 0.f;
-  lights[LINEAR_FM_BUTTON_LIGHT].setBrightness(linear_fm);
-
-  bool mix2_saw = params[MIX2_SAW_BUTTON_PARAM].getValue() > 0.f;
-  lights[MIX2_SAW_BUTTON_LIGHT].setBrightness(mix2_saw);
-
-  bool sync_neg = params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f;
-  lights[SYNC_NEG_BUTTON_LIGHT].setBrightness(sync_neg);
-
-  bool sync_hard = params[SYNC_HARD_BUTTON_PARAM].getValue() > 0.f;
-  lights[SYNC_HARD_BUTTON_LIGHT].setBrightness(sync_hard);
-
-  bool sync_soft = params[SYNC_SOFT_BUTTON_PARAM].getValue() > 0.f;
-  lights[SYNC_SOFT_BUTTON_LIGHT].setBrightness(sync_soft);
-
-  lights[EXT_MOD_SELECT_SWITCH_UP_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_UP_PARAM].getValue());
-  lights[EXT_MOD_SELECT_SWITCH_DOWN_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_DOWN_PARAM].getValue());
-
-  // Then clipping lights.
-  // clipping light timer
-  const float lightTime = args.sampleTime * clockDivision;
-  const float brightnessDeltaTime = 1 / lightTime;
-
-  syncPhaseClipTimer -= lightTime;
-  lights[SYNC_PHASE_CLIP_LIGHT].setBrightnessSmooth(syncPhaseClipTimer > 0.f, brightnessDeltaTime);
-
-  freqClipTimer -= lightTime;
-  lights[FREQ_CLIP_LIGHT].setBrightnessSmooth(freqClipTimer > 0.f, brightnessDeltaTime);
-
-  mix1PulseVcaClipTimer -= lightTime;
-  lights[MIX1_PULSE_CLIP_LIGHT].setBrightnessSmooth(mix1PulseVcaClipTimer > 0.f, brightnessDeltaTime);
-
-  extModAmountClipTimer -= lightTime;
-  lights[EXT_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(extModAmountClipTimer > 0.f, brightnessDeltaTime);
-
-  mix1TriangleVcaClipTimer -= lightTime;
-  lights[MIX1_TRIANGLE_CLIP_LIGHT].setBrightnessSmooth(mix1TriangleVcaClipTimer > 0.f, brightnessDeltaTime);
-
-  mix1SawVcaClipTimer -= lightTime;
-  lights[MIX1_SAW_CLIP_LIGHT].setBrightnessSmooth(mix1SawVcaClipTimer > 0.f, brightnessDeltaTime);
-
-  pulseWidthClipTimer -= lightTime;
-  lights[PULSE_WIDTH_CLIP_LIGHT].setBrightnessSmooth(pulseWidthClipTimer > 0.f, brightnessDeltaTime);
-
-  linearClipTimer -= lightTime;
-  lights[LINEAR_CLIP_LIGHT].setBrightnessSmooth(linearClipTimer > 0.f, brightnessDeltaTime);
-
-  return false;
-}
 
 
 
@@ -441,6 +373,18 @@ bool Zoxnoxious3340::pullMidi(const rack::engine::Module::ProcessArgs &args, uin
     CardTextDisplay *mix2OutputTextField;
     CardTextDisplay *modulationInputTextField;
 
+  };
+
+  const std::vector<ButtonMapping<Zoxnoxious3340> > Zoxnoxious3340::buttonMappings = {
+    { SYNC_HARD_BUTTON_PARAM, SYNC_HARD_BUTTON_LIGHT, {0,1} },
+    { EXT_MOD_PWM_BUTTON_PARAM, EXT_MOD_PWM_BUTTON_LIGHT, {2,3} },
+    { SYNC_NEG_BUTTON_PARAM, SYNC_NEG_BUTTON_LIGHT, {4,5} },
+    { SYNC_SOFT_BUTTON_PARAM, SYNC_SOFT_BUTTON_LIGHT, {6,7} },
+    { SYNC_POS_BUTTON_PARAM, SYNC_POS_BUTTON_LIGHT, {8,9} },
+    { LINEAR_FM_BUTTON_PARAM, LINEAR_FM_BUTTON_LIGHT, {10,11} },
+    { MIX2_SAW_BUTTON_PARAM, MIX2_SAW_BUTTON_LIGHT, {12,13} },
+    { MIX2_PULSE_BUTTON_PARAM, MIX2_PULSE_BUTTON_LIGHT, {14,15} },
+    { EXP_FM_BUTTON_PARAM, EXP_FM_BUTTON_LIGHT, {16,17} }
   };
 
 } // namespace zox

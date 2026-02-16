@@ -9,7 +9,7 @@ namespace zox {
 
 std::atomic<AudioIO*> AudioIO::instance { nullptr };
 // TODO: THIS WILL NEED TO BE SET TO 100~200 ONCE DONE HERE
-static constexpr int midiPollRateHz = 1;
+static constexpr int midiPollRateHz = 10;
 static constexpr int lightRateHz = 60;
 
 enum cvChannel {
@@ -161,9 +161,7 @@ void AudioIO::process(const ProcessArgs& args) {
                                      slot->props.cvChannelOffset);
 
       if (isMidiClockTick) {
-        INFO("frame %" PRId64 ": midi process on slot %ld module id %" PRId64,
-             args.frame,
-             i, slot->participant->getModuleId());
+        //INFO("frame %" PRId64 ": midi process on slot %ld module id %" PRId64, args.frame, i, slot->participant->getModuleId());
         slot->participant->pullMidi(args,
                                     midiPollClockDivider.getDivision(),
                                     slot->props.midiChannel,
@@ -180,6 +178,21 @@ void AudioIO::process(const ProcessArgs& args) {
     processMidiInMessage(midiInMsg);
   }
 
+  // DEBUG REMOVE THIS
+  if (APP->engine->getFrame() == 80000) {
+    midi::Message discoReport;
+    discoReport.setSize(28);
+    discoReport.bytes[0] = 0xF0;
+    discoReport.bytes[1] = 0x7D;
+    discoReport.bytes[2] = 0x01;
+    discoReport.bytes[3] = 0x01;
+    discoReport.bytes[4] = 0x01;
+    discoReport.bytes[5] = 0x00;
+    discoReport.bytes[6] = 0x02;
+    discoReport.bytes[7] = 0x03;
+    discoReport.bytes[8] = 0x00;
+    processDiscoveryReport(discoReport);
+  }
 
   if (discoveryReportReceived == false && discoveryRequestClockDivider.process()) {
     INFO("Sending MIDI message discovery request");

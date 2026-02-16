@@ -18,4 +18,6 @@ static const std::string invalidCardOutputName = "----";
 //static std::vector<std::string> cardOutputNames;
 
 static constexpr uint8_t midiProgramChangeStatus = 0xC;
+
+void setMidiProgramChangeMessage(rack::midi::Message& midiOutMessage, int8_t midiChannel, int8_t program);
 }
