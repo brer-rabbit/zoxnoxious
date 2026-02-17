@@ -194,6 +194,10 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
 
 */
 
+      // TODO: set buttons lights (above) for a frame
+      // check if selector gets the midi message.  If not the button controller runs.
+      // actually -- maybe that's backwards.  Try button controller first.
+
       // the last entry of buttonParamToMidiProgramList is handled here:
       // add/subtract the up/down buttons
       if (params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].getValue()) {

@@ -97,17 +97,16 @@ struct AudioIO final : rack::engine::Module {
   midi::InputQueue midiInput;
 
   // Discovery related variables
-  midi::Message MIDI_DISCOVERY_REQUEST_SYSEX; // this should be const static
-  midi::Message MIDI_SHUTDOWN_SYSEX;
-  midi::Message MIDI_RESTART_SYSEX;
-  midi::Message MIDI_TUNE_REQUEST;
+  static const midi::Message MIDI_DISCOVERY_REQUEST_SYSEX;
+  static const midi::Message MIDI_SHUTDOWN_SYSEX;
+  static const midi::Message MIDI_RESTART_SYSEX;
+  static const midi::Message MIDI_TUNE_REQUEST;
 
   bool isPrimary() const;
 
 private:
   Broker broker;
 
-  dsp::ClockDivider lightDivider;
   float out1LevelClipTimer;
   float out2LevelClipTimer;
 
@@ -142,10 +141,8 @@ private:
 
   bool discoveryReportReceived = false;
   dsp::ClockDivider discoveryRequestClockDivider;
-
   dsp::ClockDivider midiPollClockDivider;
 
-  int sendMidiProgramChangeMessage(int programNumber);
   void processMidiInMessage(const midi::Message &msg);
   void processDiscoveryReport(const midi::Message &msg);
   void applyDiscoveryReport(DiscoveredCard *cards);

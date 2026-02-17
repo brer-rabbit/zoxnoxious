@@ -8,9 +8,9 @@
 namespace zox {
 
 std::atomic<AudioIO*> AudioIO::instance { nullptr };
+
 // TODO: THIS WILL NEED TO BE SET TO 100~200 ONCE DONE HERE
 static constexpr int midiPollRateHz = 10;
-static constexpr int lightRateHz = 60;
 
 enum cvChannel {
     OUT2_CHANNEL = 0,
@@ -62,31 +62,10 @@ AudioIO::AudioIO() : cardAOutput1NameString(invalidCardOutputName),
 
   onReset();
 
-  lightDivider.setDivision(APP->engine->getSampleRate() / lightRateHz);
   discoveryRequestClockDivider.setDivision(APP->engine->getSampleRate());  // once per second
   midiPollClockDivider.setDivision(static_cast<int>(APP->engine->getSampleRate()) / midiPollRateHz);
 
-  // see Zoxnoxious MIDI spec for details
-  MIDI_DISCOVERY_REQUEST_SYSEX.setSize(4);
-  MIDI_DISCOVERY_REQUEST_SYSEX.bytes[0] = 0xF0;
-  MIDI_DISCOVERY_REQUEST_SYSEX.bytes[1] = 0x7D;
-  MIDI_DISCOVERY_REQUEST_SYSEX.bytes[2] = 0x02;
-  MIDI_DISCOVERY_REQUEST_SYSEX.bytes[3] = 0xF7;
 
-  MIDI_SHUTDOWN_SYSEX.setSize(4);
-  MIDI_SHUTDOWN_SYSEX.bytes[0] = 0xF0;
-  MIDI_SHUTDOWN_SYSEX.bytes[1] = 0x7D;
-  MIDI_SHUTDOWN_SYSEX.bytes[2] = 0x03;
-  MIDI_SHUTDOWN_SYSEX.bytes[3] = 0xF7;
-
-  MIDI_RESTART_SYSEX.setSize(4);
-  MIDI_RESTART_SYSEX.bytes[0] = 0xF0;
-  MIDI_RESTART_SYSEX.bytes[1] = 0x7D;
-  MIDI_RESTART_SYSEX.bytes[2] = 0x04;
-  MIDI_RESTART_SYSEX.bytes[3] = 0xF7;
-
-  MIDI_TUNE_REQUEST.setSize(1);
-  MIDI_TUNE_REQUEST.bytes[0] = 0xF6;
 }
 
 
@@ -128,7 +107,6 @@ void AudioIO::onSampleRateChange(const SampleRateChangeEvent& e) {
   midiPollClockDivider.setDivision(static_cast<int>(e.sampleRate) / midiPollRateHz);
   INFO("midi polling set to %" PRIu32, midiPollClockDivider.getDivision());
   // discoveryRequestClockDivider: no need to change, it's acted on once only
-  lightDivider.setDivision(static_cast<int>(e.sampleRate) / lightRateHz);
 }
 
 
@@ -161,11 +139,14 @@ void AudioIO::process(const ProcessArgs& args) {
                                      slot->props.cvChannelOffset);
 
       if (isMidiClockTick) {
-        //INFO("frame %" PRId64 ": midi process on slot %ld module id %" PRId64, args.frame, i, slot->participant->getModuleId());
-        slot->participant->pullMidi(args,
-                                    midiPollClockDivider.getDivision(),
-                                    slot->props.midiChannel,
-                                    midiOutMessage);
+        if (slot->participant->pullMidi(args,
+                                        midiPollClockDivider.getDivision(),
+                                        slot->props.midiChannel,
+                                        midiOutMessage)) {
+          INFO("frame %" PRId64 ": midi: slot %ld module id %" PRId64 " send message %02X",
+               args.frame, i, slot->participant->getModuleId(), midiOutMessage.getNote());
+          midiOutput.sendMidiMessage(midiOutMessage);
+        }
       }
     }
   }
@@ -200,9 +181,9 @@ void AudioIO::process(const ProcessArgs& args) {
   }
 
 
-  if (lightDivider.process()) {
+  if (isMidiClockTick) {
     // purely UI related state changes
-    const float lightTime = args.sampleTime * lightDivider.getDivision();
+    const float lightTime = args.sampleTime * midiPollClockDivider.getDivision();
     const float brightnessDeltaTime = 1 / lightTime;
 
     out1LevelClipTimer -= lightTime;
@@ -230,7 +211,10 @@ void AudioIO::process(const ProcessArgs& args) {
           int buttonParamValue = (params[buttonParam].getValue() > 0.f);
           lights[lightParam].setBrightness(buttonParamValue);
           int midiProgram = buttonParamToMidiProgramList[i].midiProgram[buttonParamValue];
-          sendMidiProgramChangeMessage(midiProgram);
+          midi::Message midiOutMessage;
+          setMidiProgramChangeMessage(midiOutMessage, midiChannel, midiProgram);
+          midiOutput.sendMidiMessage(midiOutMessage);
+          
         }
       }
     }
@@ -252,23 +236,6 @@ uint8_t AudioIO::getHardwareId() { // TODO: should this be an interface?
 
 static const uint8_t midiManufacturerId = 0x7d;
 static const uint8_t midiSysexDiscoveryReport = 0x01;
-
-/** sendMidiProgramChangeMessage
- *
- * send a program change message
- */
-int AudioIO::sendMidiProgramChangeMessage(int programNumber) {
-  midi::Message midiProgramMessage;
-  midiProgramMessage.setSize(2);
-  midiProgramMessage.setChannel(1);
-  midiProgramMessage.setStatus(midiProgramChangeStatus);
-  midiProgramMessage.setNote(programNumber);
-  midiOutput.sendMidiMessage(midiProgramMessage);
-  INFO("sending midi message for program %d channel %d",
-       programNumber, 1);
-  return 0;
-}
-
 
 
 void AudioIO::processMidiInMessage(const midi::Message &msg) {
@@ -656,6 +623,35 @@ struct AudioIOWidget : ModuleWidget {
 
 
 const std::string AudioIO::audioPortNum = "audioPort";
+
+// see Zoxnoxious MIDI spec for details
+
+const midi::Message AudioIO::MIDI_DISCOVERY_REQUEST_SYSEX = []{
+  midi::Message m;
+  m.bytes = { 0xF0, 0x7D, 0x02, 0xF7 };
+  return m;
+}();
+
+const midi::Message AudioIO::MIDI_SHUTDOWN_SYSEX = []{
+  midi::Message m;
+  m.bytes = { 0xF0, 0x7D, 0x03, 0xF7 };
+  return m;
+}();
+
+const midi::Message AudioIO::MIDI_RESTART_SYSEX = []{
+  midi::Message m;
+  m.bytes = { 0xF0, 0x7D, 0x04, 0xF7 };
+  return m;
+}();
+
+const midi::Message AudioIO::MIDI_TUNE_REQUEST = []{
+  midi::Message m;
+  m.bytes = { 0xF6 };
+  return m;
+}();
+
+
+
 
 } // namespace zox
 

@@ -18,7 +18,7 @@ namespace zox {
       setChannel(-1); // allow messages out on any channel
     }
 
-    void sendMidiMessage(midi::Message &midiMessage) {
+    void sendMidiMessage(const midi::Message &midiMessage) {
       Output::sendMessage(midiMessage);
     }
 
