@@ -217,7 +217,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
       INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d sending: %d",
            APP->engine->getFrame(), extModSelectSwitchValue,
            extModSelectMidiPrograms[extModSelectSwitchValue]);
-      //setMidiMessage(midiMessage, extModSelectSwitchValue, extModSelectSwitchIndex);
+      setMidiProgramChangeMessage(midiMessage, midiChannel, extModSelectMidiPrograms[extModSelectSwitchValue]);
       midiMsgSet = true;
     }
 
