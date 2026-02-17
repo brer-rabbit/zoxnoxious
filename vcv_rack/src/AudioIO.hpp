@@ -3,6 +3,7 @@
 #include <atomic>
 #include "Participant.hpp"
 #include "AudioMidi.hpp"
+#include "ButtonMidiController.hpp"
 
 
 namespace zox {
@@ -58,14 +59,16 @@ struct AudioIO final : rack::engine::Module {
   };
 
 
+  AudioIO();
+  ~AudioIO();
+
   // Global access point: no writes allowed from the audio thread
   static std::atomic<AudioIO*> instance;
 
   // Broker access
   Broker& getBroker() { return broker; }
 
-  AudioIO();
-  ~AudioIO();
+
 
   // Module methods
   void onAdd(const AddEvent &e) override;
@@ -132,6 +135,10 @@ private:
     { CARD_E_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 20, 21 } },
     { CARD_F_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 22, 23 } }
   };
+
+  static const std::vector<ButtonMapping<AudioIO> > buttonMappings;
+  std::vector<ButtonState> buttonStates;
+  ButtonMidiController<AudioIO> buttonMidiController;
 
 
   uint8_t getHardwareId();

@@ -31,7 +31,9 @@ AudioIO::AudioIO() : cardAOutput1NameString(invalidCardOutputName),
                      cardFOutput1NameString(invalidCardOutputName),
                      cardFOutput2NameString(invalidCardOutputName),
                      out1LevelClipTimer(0.f),
-                     out2LevelClipTimer(0.f) {
+                     out2LevelClipTimer(0.f),
+                     buttonStates(buttonMappings.size()),
+                     buttonMidiController(buttonMappings) {
 
   for(int i = 0; i < maxAudioDevices; ++i) {
     audioPorts.push_back(new ZoxnoxiousAudioPort(this));
@@ -112,7 +114,6 @@ void AudioIO::onSampleRateChange(const SampleRateChangeEvent& e) {
 
 void AudioIO::process(const ProcessArgs& args) {
   dsp::Frame<maxAudioChannels> sharedFrames[ audioPorts.size() ];
-  midi::Message midiOutMessage;
   bool isMidiClockTick = midiPollClockDivider.process();
   const Broker::Snapshot snap = broker.snapshot();
 
@@ -127,30 +128,6 @@ void AudioIO::process(const ProcessArgs& args) {
     }
   }
   */
-
-
-  // process all participants
-  for (size_t i = 0; i < maxVoiceCards; ++i) {
-    const Slot *slot = &snap.slots[i];
-
-    if (slot->participant != nullptr && slot->props.isAllocated) {
-      slot->participant->pullSamples(args,
-                                     sharedFrames[slot->props.outputDeviceId],
-                                     slot->props.cvChannelOffset);
-
-      if (isMidiClockTick) {
-        if (slot->participant->pullMidi(args,
-                                        midiPollClockDivider.getDivision(),
-                                        slot->props.midiChannel,
-                                        midiOutMessage)) {
-          INFO("frame %" PRId64 ": midi: slot %ld module id %" PRId64 " send message %02X",
-               args.frame, i, slot->participant->getModuleId(), midiOutMessage.getNote());
-          midiOutput.sendMidiMessage(midiOutMessage);
-        }
-      }
-    }
-  }
-
 
 
   // check for incoming midi
@@ -179,6 +156,32 @@ void AudioIO::process(const ProcessArgs& args) {
     INFO("Sending MIDI message discovery request");
     midiOutput.sendMidiMessage(MIDI_DISCOVERY_REQUEST_SYSEX);
   }
+  else if (discoveryReportReceived == false) {
+    return;
+  }
+
+  // process all participants
+  for (size_t i = 0; i < maxVoiceCards; ++i) {
+    const Slot *slot = &snap.slots[i];
+
+    if (slot->participant != nullptr && slot->props.isAllocated) {
+      slot->participant->pullSamples(args,
+                                     sharedFrames[slot->props.outputDeviceId],
+                                     slot->props.cvChannelOffset);
+
+      if (isMidiClockTick) {
+        midi::Message midiOutMessage;
+        if (slot->participant->pullMidi(args,
+                                        midiPollClockDivider.getDivision(),
+                                        slot->props.midiChannel,
+                                        midiOutMessage)) {
+          INFO("frame %" PRId64 ": midi: slot %ld module id %" PRId64 " send message %02X",
+               args.frame, i, slot->participant->getModuleId(), midiOutMessage.getNote());
+          midiOutput.sendMidiMessage(midiOutMessage);
+        }
+      }
+    }
+  }
 
 
   if (isMidiClockTick) {
@@ -193,29 +196,32 @@ void AudioIO::process(const ProcessArgs& args) {
     lights[OUT2_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out2LevelClipTimer > 0.f, brightnessDeltaTime);
 
 
-    // only do midi stuff if we have an assigned channel
-    if (false) { 
+    midi::Message midiOutMessage;
+    
+    if (buttonMidiController.process(this, midiChannel, midiOutMessage)) {
+      midiOutput.sendMidiMessage(midiOutMessage);
+    }
+    buttonMidiController.updateLights(this);
+
       // MIX1 and MIX2 buttons to midi programs
       //
       // check for any MIX1 buttons changing state and send midi
       // messages for them.  Toggle light if so.  Do this by
       // indexing the enums -- just don't re-order the enums
 
-      for (int i = 0; i < 12; ++i) {
-        int buttonParam = CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i;
-        int lightParam = CARD_A_MIX1_OUTPUT_BUTTON_LIGHT + i;
+    for (int i = 0; i < 12; ++i) {
+      int buttonParam = CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i;
+      int lightParam = CARD_A_MIX1_OUTPUT_BUTTON_LIGHT + i;
 
-        if (params[buttonParam].getValue() != buttonParamToMidiProgramList[i].previousValue) {
-          buttonParamToMidiProgramList[i].previousValue = params[buttonParam].getValue();
+      if (params[buttonParam].getValue() != buttonParamToMidiProgramList[i].previousValue) {
+        buttonParamToMidiProgramList[i].previousValue = params[buttonParam].getValue();
 
-          int buttonParamValue = (params[buttonParam].getValue() > 0.f);
-          lights[lightParam].setBrightness(buttonParamValue);
-          int midiProgram = buttonParamToMidiProgramList[i].midiProgram[buttonParamValue];
-          midi::Message midiOutMessage;
-          setMidiProgramChangeMessage(midiOutMessage, midiChannel, midiProgram);
-          midiOutput.sendMidiMessage(midiOutMessage);
+        int buttonParamValue = (params[buttonParam].getValue() > 0.f);
+        lights[lightParam].setBrightness(buttonParamValue);
+        int midiProgram = buttonParamToMidiProgramList[i].midiProgram[buttonParamValue];
+        setMidiProgramChangeMessage(midiOutMessage, midiChannel, midiProgram);
+        midiOutput.sendMidiMessage(midiOutMessage);
           
-        }
       }
     }
   }
@@ -651,6 +657,20 @@ const midi::Message AudioIO::MIDI_TUNE_REQUEST = []{
 }();
 
 
+const std::vector<ButtonMapping<AudioIO> > AudioIO::buttonMappings = {
+    { CARD_A_MIX1_OUTPUT_BUTTON_PARAM, CARD_A_MIX1_OUTPUT_BUTTON_LIGHT, { 0, 1} },
+    { CARD_B_MIX1_OUTPUT_BUTTON_PARAM, CARD_B_MIX1_OUTPUT_BUTTON_LIGHT, { 2, 3} },
+    { CARD_C_MIX1_OUTPUT_BUTTON_PARAM, CARD_C_MIX1_OUTPUT_BUTTON_LIGHT, { 4, 5} },
+    { CARD_D_MIX1_OUTPUT_BUTTON_PARAM, CARD_D_MIX1_OUTPUT_BUTTON_LIGHT, { 6, 7} },
+    { CARD_E_MIX1_OUTPUT_BUTTON_PARAM, CARD_E_MIX1_OUTPUT_BUTTON_LIGHT, { 8, 9} },
+    { CARD_F_MIX1_OUTPUT_BUTTON_PARAM, CARD_F_MIX1_OUTPUT_BUTTON_LIGHT, { 10, 11} },
+    { CARD_A_MIX2_OUTPUT_BUTTON_PARAM, CARD_A_MIX2_OUTPUT_BUTTON_LIGHT, { 12, 13} },
+    { CARD_B_MIX2_OUTPUT_BUTTON_PARAM, CARD_B_MIX2_OUTPUT_BUTTON_LIGHT, { 14, 15} },
+    { CARD_C_MIX2_OUTPUT_BUTTON_PARAM, CARD_C_MIX2_OUTPUT_BUTTON_LIGHT, { 16, 17} },
+    { CARD_D_MIX2_OUTPUT_BUTTON_PARAM, CARD_D_MIX2_OUTPUT_BUTTON_LIGHT, { 18, 19} },
+    { CARD_E_MIX2_OUTPUT_BUTTON_PARAM, CARD_E_MIX2_OUTPUT_BUTTON_LIGHT, { 20, 21} },
+    { CARD_F_MIX2_OUTPUT_BUTTON_PARAM, CARD_F_MIX2_OUTPUT_BUTTON_LIGHT, { 22, 23} }
+};
 
 
 } // namespace zox
