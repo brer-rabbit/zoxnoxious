@@ -182,25 +182,27 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     bool midiMsgSet = false;
     //INFO("zoxnoxious3340 %" PRId64 " pulling midi", id);
 
-/* TODO:
-    lights[EXT_MOD_SELECT_SWITCH_UP_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_UP_PARAM].getValue());
-    lights[EXT_MOD_SELECT_SWITCH_DOWN_LIGHT].setBrightness(params[EXT_MOD_SELECT_SWITCH_DOWN_PARAM].getValue());
-
-*/
 
     // check if selector gets the midi message.  If not the button controller runs.
     // actually -- maybe that's backwards.  Try button controller first.
 
     // the last entry of buttonParamToMidiProgramList is handled here:
     // add/subtract the up/down buttons
-    if (params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].getValue()) {
-      params[ EXT_MOD_SELECT_SWITCH_UP_PARAM ].setValue(0);
+    int up_param = params[EXT_MOD_SELECT_SWITCH_UP_PARAM].getValue();
+    int down_param = params[EXT_MOD_SELECT_SWITCH_DOWN_PARAM].getValue();
+    // lights will get lit for one frame-- once they're set they
+    // are immediately unset on the next pullMidi()
+    lights[EXT_MOD_SELECT_SWITCH_UP_LIGHT].setBrightness(up_param);
+    lights[EXT_MOD_SELECT_SWITCH_DOWN_LIGHT].setBrightness(down_param);
+
+    if (up_param) {
+      params[EXT_MOD_SELECT_SWITCH_UP_PARAM].setValue(0);
       extModSelectSwitchValue =
         extModSelectSwitchValue > 11 ? 0 : extModSelectSwitchValue + 1;
       extModSelectChanged = true;
     }
-    if (params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].getValue()) {
-      params[ EXT_MOD_SELECT_SWITCH_DOWN_PARAM ].setValue(0);
+    if (down_param) {
+      params[EXT_MOD_SELECT_SWITCH_DOWN_PARAM].setValue(0);
       extModSelectSwitchValue =
         extModSelectSwitchValue < 1 ? 12 : extModSelectSwitchValue - 1;
       extModSelectChanged = true;
@@ -216,6 +218,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     }
 
 
+    // all buttons outside of the above selector are handled here
     if (!midiMsgSet) {
       midiMsgSet = buttonMidiController.process(this, midiChannel, midiMessage);
     }
