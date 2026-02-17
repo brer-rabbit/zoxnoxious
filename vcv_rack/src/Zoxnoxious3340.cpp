@@ -85,14 +85,14 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   };
 
 
-  float syncPhaseClipTimer;
-  float freqClipTimer;
-  float mix1PulseVcaClipTimer;
-  float extModAmountClipTimer;
-  float mix1TriangleVcaClipTimer;
-  float mix1SawVcaClipTimer;
-  float pulseWidthClipTimer;
-  float linearClipTimer;
+  float syncPhaseClipTimer = 0.f;
+  float freqClipTimer = 0.f;
+  float mix1PulseVcaClipTimer = 0.f;
+  float extModAmountClipTimer = 0.f;
+  float mix1TriangleVcaClipTimer = 0.f;
+  float mix1SawVcaClipTimer = 0.f;
+  float pulseWidthClipTimer = 0.f;
+  float linearClipTimer = 0.f;
 
   std::string output1NameString;
   std::string output2NameString;
@@ -112,24 +112,18 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   // the stateful selector is handled a bit differently than toggle buttons.
   // This is the MIDI program changes it sends and how it is tracked.
   static constexpr int8_t extModSelectMidiPrograms[] = { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 };
-  int extModSelectSwitchValue; // current index to above array
-  bool extModSelectChanged;
+  int extModSelectSwitchValue = 0; // current index to above array
+  bool extModSelectChanged = false;
 
   ParticipantLifecycle lifecycle;
 
 
   Zoxnoxious3340() :
-    syncPhaseClipTimer(0.f), freqClipTimer(0.f),
-    mix1PulseVcaClipTimer(0.f), extModAmountClipTimer(0.f),
-    mix1TriangleVcaClipTimer(0.f), mix1SawVcaClipTimer(0.f),
-    pulseWidthClipTimer(0.f), linearClipTimer(0.f),
     output1NameString(invalidCardOutputName),
     output2NameString(invalidCardOutputName),
     modulationInputNameString(invalidCardOutputName),
     buttonStates(buttonMappings.size()),
-    buttonMidiController(buttonMappings),
-    extModSelectSwitchValue(0),
-    extModSelectChanged(false) {
+    buttonMidiController(buttonMappings) {
 
     setParticipant(this);
     setLightEnum(RIGHT_EXPANDER_LIGHT);
