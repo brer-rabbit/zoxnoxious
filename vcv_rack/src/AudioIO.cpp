@@ -185,45 +185,23 @@ void AudioIO::process(const ProcessArgs& args) {
 
 
   if (isMidiClockTick) {
-    // purely UI related state changes
+    setStatusLight();
+
     const float lightTime = args.sampleTime * midiPollClockDivider.getDivision();
     const float brightnessDeltaTime = 1 / lightTime;
 
     out1LevelClipTimer -= lightTime;
     lights[OUT1_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out1LevelClipTimer > 0.f, brightnessDeltaTime);
-
     out2LevelClipTimer -= lightTime;
     lights[OUT2_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out2LevelClipTimer > 0.f, brightnessDeltaTime);
 
 
     midi::Message midiOutMessage;
-    
     if (buttonMidiController.process(this, midiChannel, midiOutMessage)) {
       midiOutput.sendMidiMessage(midiOutMessage);
     }
     buttonMidiController.updateLights(this);
 
-      // MIX1 and MIX2 buttons to midi programs
-      //
-      // check for any MIX1 buttons changing state and send midi
-      // messages for them.  Toggle light if so.  Do this by
-      // indexing the enums -- just don't re-order the enums
-
-    for (int i = 0; i < 12; ++i) {
-      int buttonParam = CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i;
-      int lightParam = CARD_A_MIX1_OUTPUT_BUTTON_LIGHT + i;
-
-      if (params[buttonParam].getValue() != buttonParamToMidiProgramList[i].previousValue) {
-        buttonParamToMidiProgramList[i].previousValue = params[buttonParam].getValue();
-
-        int buttonParamValue = (params[buttonParam].getValue() > 0.f);
-        lights[lightParam].setBrightness(buttonParamValue);
-        int midiProgram = buttonParamToMidiProgramList[i].midiProgram[buttonParamValue];
-        setMidiProgramChangeMessage(midiOutMessage, midiChannel, midiProgram);
-        midiOutput.sendMidiMessage(midiOutMessage);
-          
-      }
-    }
   }
 }
     
@@ -239,6 +217,27 @@ uint8_t AudioIO::getHardwareId() { // TODO: should this be an interface?
   return hardwareId;
 }
 
+
+void AudioIO::setStatusLight() {
+  if (discoveryReportReceived) {
+    lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(0.f);
+    lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
+    lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+  }
+  /* yellow case
+     else if (validRightExpander) {
+     lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
+     lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
+     lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+     }
+  */
+  else {
+    lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
+    lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(0.f);
+    lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+  }
+
+}
 
 static const uint8_t midiManufacturerId = 0x7d;
 static const uint8_t midiSysexDiscoveryReport = 0x01;

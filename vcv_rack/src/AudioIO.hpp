@@ -113,35 +113,12 @@ private:
   float out1LevelClipTimer;
   float out2LevelClipTimer;
 
-
-  struct buttonParamMidiProgram {
-    enum ParamId button;
-    int previousValue;
-    uint8_t midiProgram[2];
-  } buttonParamToMidiProgramList[12] =
-  {
-    // the ordering here is important- taking a dependency on
-    // ordering when producing midi messages
-    { CARD_A_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 0, 1 } },
-    { CARD_B_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 2, 3 } },
-    { CARD_C_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 4, 5 } },
-    { CARD_D_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 6, 7 } },
-    { CARD_E_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 8, 9 } },
-    { CARD_F_MIX1_OUTPUT_BUTTON_PARAM, INT_MIN, { 10, 11 } },
-    { CARD_A_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 12, 13 } },
-    { CARD_B_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 14, 15 } },
-    { CARD_C_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 16, 17 } },
-    { CARD_D_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 18, 19 } },
-    { CARD_E_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 20, 21 } },
-    { CARD_F_MIX2_OUTPUT_BUTTON_PARAM, INT_MIN, { 22, 23 } }
-  };
-
   static const std::vector<ButtonMapping<AudioIO> > buttonMappings;
   std::vector<ButtonState> buttonStates;
   ButtonMidiController<AudioIO> buttonMidiController;
 
-
   uint8_t getHardwareId();
+  void setStatusLight();
   int8_t cvChannelOffset;
   int8_t outputDeviceId;
   int8_t midiChannel;
@@ -153,6 +130,7 @@ private:
   void processMidiInMessage(const midi::Message &msg);
   void processDiscoveryReport(const midi::Message &msg);
   void applyDiscoveryReport(DiscoveredCard *cards);
+
 
   static const std::string audioPortNum;
 };
