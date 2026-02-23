@@ -1,9 +1,11 @@
 #pragma once
 
+#include <array>
 #include <atomic>
 #include "Participant.hpp"
 #include "AudioMidi.hpp"
 #include "ButtonMidiController.hpp"
+#include "CvCalcAndClipHelper.hpp"
 
 
 namespace zox {
@@ -131,6 +133,10 @@ private:
   void processDiscoveryReport(const midi::Message &msg);
   void applyDiscoveryReport(DiscoveredCard *cards);
 
+  void processSelfSamples(rack::dsp::Frame<maxAudioChannels> &sharedFrame);
+  void sendFramesToDevices(rack::dsp::Frame<maxAudioChannels> *sharedFrame, int numFrames);
+
+  std::array<CvRoute,2> routes;
 
   static const std::string audioPortNum;
 };

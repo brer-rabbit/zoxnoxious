@@ -4,7 +4,6 @@
 #include "common.hpp"
 #include "zcomponentlib.hpp"
 
-
 namespace zox {
 
 std::atomic<AudioIO*> AudioIO::instance { nullptr };
@@ -33,7 +32,12 @@ AudioIO::AudioIO() : cardAOutput1NameString(invalidCardOutputName),
                      out1LevelClipTimer(0.f),
                      out2LevelClipTimer(0.f),
                      buttonStates(buttonMappings.size()),
-                     buttonMidiController(buttonMappings) {
+                     buttonMidiController(buttonMappings),
+                     routes{{
+                         {OUT1_LEVEL_KNOB_PARAM, OUT1_LEVEL_INPUT, OUT1_CHANNEL, &out1LevelClipTimer, nullptr},
+                         {OUT2_LEVEL_KNOB_PARAM, OUT2_LEVEL_INPUT, OUT2_CHANNEL, &out2LevelClipTimer, nullptr}
+  }}
+{
 
   for(int i = 0; i < maxAudioDevices; ++i) {
     audioPorts.push_back(new ZoxnoxiousAudioPort(this));
@@ -117,19 +121,6 @@ void AudioIO::process(const ProcessArgs& args) {
   bool isMidiClockTick = midiPollClockDivider.process();
   const Broker::Snapshot snap = broker.snapshot();
 
-  /*
-  if (isMidiClockTick) {
-    for (size_t i = 0; i < maxVoiceCards; ++i) {
-      const auto& s = snap.slots[i];
-      INFO("slot %ld: p=%p allocated=%d hw=%d",
-           i, (void*)s.participant,
-           s.props.isAllocated,
-           s.props.hardwareId);
-    }
-  }
-  */
-
-
   // check for incoming midi
   midi::Message midiInMsg;
   while (midiInput.tryPop(&midiInMsg, args.frame)) {
@@ -152,25 +143,36 @@ void AudioIO::process(const ProcessArgs& args) {
     processDiscoveryReport(discoReport);
   }
 
-  if (discoveryReportReceived == false && discoveryRequestClockDivider.process()) {
-    INFO("Sending MIDI message discovery request");
-    midiOutput.sendMidiMessage(MIDI_DISCOVERY_REQUEST_SYSEX);
-  }
-  else if (discoveryReportReceived == false) {
+  if (discoveryReportReceived == false) {
+    if (discoveryRequestClockDivider.process()) {
+      INFO("Sending MIDI message discovery request");
+      midiOutput.sendMidiMessage(MIDI_DISCOVERY_REQUEST_SYSEX);
+    }
     return;
   }
 
-  // process all participants
+  // process all participants for samples
   for (size_t i = 0; i < maxVoiceCards; ++i) {
     const Slot *slot = &snap.slots[i];
-
     if (slot->participant != nullptr && slot->props.isAllocated) {
       slot->participant->pullSamples(args,
                                      sharedFrames[slot->props.outputDeviceId],
                                      slot->props.cvChannelOffset);
+    }
+  }
 
-      if (isMidiClockTick) {
-        midi::Message midiOutMessage;
+
+  processSelfSamples(sharedFrames[outputDeviceId]);
+  sendFramesToDevices(sharedFrames, audioPorts.size());
+
+  if (isMidiClockTick) {
+    setStatusLight();
+
+    // process all participants for MIDI
+    midi::Message midiOutMessage;
+    for (size_t i = 0; i < maxVoiceCards; ++i) {
+      const Slot *slot = &snap.slots[i];
+      if (slot->participant != nullptr && slot->props.isAllocated) {
         if (slot->participant->pullMidi(args,
                                         midiPollClockDivider.getDivision(),
                                         slot->props.midiChannel,
@@ -181,11 +183,11 @@ void AudioIO::process(const ProcessArgs& args) {
         }
       }
     }
-  }
 
-
-  if (isMidiClockTick) {
-    setStatusLight();
+    if (buttonMidiController.process(this, midiChannel, midiOutMessage)) {
+      midiOutput.sendMidiMessage(midiOutMessage);
+    }
+    buttonMidiController.updateLights(this);
 
     const float lightTime = args.sampleTime * midiPollClockDivider.getDivision();
     const float brightnessDeltaTime = 1 / lightTime;
@@ -194,14 +196,6 @@ void AudioIO::process(const ProcessArgs& args) {
     lights[OUT1_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out1LevelClipTimer > 0.f, brightnessDeltaTime);
     out2LevelClipTimer -= lightTime;
     lights[OUT2_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out2LevelClipTimer > 0.f, brightnessDeltaTime);
-
-
-    midi::Message midiOutMessage;
-    if (buttonMidiController.process(this, midiChannel, midiOutMessage)) {
-      midiOutput.sendMidiMessage(midiOutMessage);
-    }
-    buttonMidiController.updateLights(this);
-
   }
 }
     
@@ -387,6 +381,54 @@ void AudioIO::applyDiscoveryReport(DiscoveredCard *cards) {
 
   broker.registerDevices(deviceTree, participant_count);
 }
+
+
+// add our own samples to the DSP frame
+void AudioIO::processSelfSamples(rack::dsp::Frame<maxAudioChannels> &sharedFrame) {
+  float v;
+  bool clipped;
+  static constexpr float clipTime = 0.25f;
+  // out1 level
+  v = params[OUT1_LEVEL_KNOB_PARAM].getValue() + inputs[OUT1_LEVEL_INPUT].getVoltageSum() / 10.f;
+  clipped = (v < 0.f) || (v > 1.f);
+  sharedFrame.samples[cvChannelOffset + OUT1_CHANNEL] = clamp(v, 0.f, 1.f);
+  if (clipped) {
+    out1LevelClipTimer = clipTime;
+  }
+
+  // out2 level
+  v = params[OUT2_LEVEL_KNOB_PARAM].getValue() + inputs[OUT2_LEVEL_INPUT].getVoltageSum() / 10.f;
+  clipped = (v < 0.f) || (v > 1.f);
+  sharedFrame.samples[cvChannelOffset + OUT2_CHANNEL] = clamp(v, 0.f, 1.f);
+  if (clipped) {
+    out2LevelClipTimer = clipTime;
+  }
+
+  // TODO: validate the below and remove the above
+  /*
+  processCvRoutes(routes.data(),
+                  routes.size(),
+                  clipTime,
+                  cvChannelOffset,
+                  sharedFrame.samples,
+                  params.data(),
+                  inputs.data());
+  */
+
+}
+
+
+// send all audio frames to the audio ports
+void AudioIO::sendFramesToDevices(rack::dsp::Frame<maxAudioChannels> *sharedFrame, int numFrames) {
+  for (int deviceNum = 0; deviceNum < numFrames; ++deviceNum) {
+    if (!audioPorts[deviceNum]->engineInputBuffer.full()) {
+      audioPorts[deviceNum]->engineInputBuffer.push(sharedFrame[deviceNum]);
+    }
+  }
+}
+
+
+
 
 
 json_t* AudioIO::dataToJson() {
