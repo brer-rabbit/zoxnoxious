@@ -357,11 +357,16 @@ static const struct midi_program_to_gpio midi_program_to_gpio[] = {
   { 1, port1_addr, 0b01000000, 0b11111111 },  // prog 23 - rez stage 2 enable
 
   // program shortcuts for the usable resonance compensation modes
+  //                  2 3 1I      2 3 1I
   { 1, port1_addr, 0b00000010, 0b00000010 }, // prog 24 - no compensation
   { 1, port1_addr, 0b01010000, 0b01010000 }, // prog 25 - 4P bandpass
   { 1, port1_addr, 0b00000110, 0b00000110 }, // prog 26 - 2P alt bandpass
   { 1, port1_addr, 0b01000110, 0b01000110 }, // prog 27 - alt compensation
 
+  { 1, port1_addr, 0b00000100, 0b00000100 }, // prog 28 - small formant
+  { 1, port1_addr, 0b00010100, 0b00010100 }, // prog 29 - larger formant
+  { 1, port1_addr, 0b00010000, 0b00010000 }, // prog 30 - broad bandwidth
+  { 1, port1_addr, 0b01010110, 0b01010110 }  // prog 31 - nasal
 };
 
 

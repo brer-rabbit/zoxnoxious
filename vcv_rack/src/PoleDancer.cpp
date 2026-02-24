@@ -41,7 +41,7 @@ enum cvChannel {
   Q_VCA,
 };
 
-static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Mode 1", "Alt Mode 2" };
+static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Mode 1", "Alt Mode 2", "Small Formant", "Large Formant", "Broad", "Nasal" };
 
 
 static const float mixerGain = 8.f;
@@ -133,7 +133,7 @@ struct PoleDancer : ZoxnoxiousModule {
     {
       { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 0, 1, 2, 3, 4, 5, 6, 7 } },
       { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 8, 9, 10, 11, 12, 13, 14, 15 } },
-      { REZ_COMP_VALUE_HIDDEN_PARAM, INT_MIN, { 24, 25, 26, 27 } },
+      { REZ_COMP_VALUE_HIDDEN_PARAM, INT_MIN, { 24, 25, 26, 27, 28, 29, 30, 31 } },
       { REZ_COMP_INV_SWITCH_PARAM, INT_MIN, { 16, 17 } },
       { REZ_COMP_P1_SWITCH_PARAM, INT_MIN, { 18, 19 } },
       { REZ_COMP_P3_SWITCH_PARAM, INT_MIN, { 20, 21 } },
@@ -278,14 +278,14 @@ struct PoleDancer : ZoxnoxiousModule {
       if (params[ REZ_COMP_UP_BUTTON_PARAM ].getValue()) {
         params[ REZ_COMP_UP_BUTTON_PARAM ].setValue(0);
         int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
-        rezCompModeInt = rezCompModeInt == 3 ? 0 : rezCompModeInt + 1;
+        rezCompModeInt = rezCompModeInt == 7 ? 0 : rezCompModeInt + 1;
         params[ REZ_COMP_VALUE_HIDDEN_PARAM ].setValue(rezCompModeInt);
         rezCompModeNameString = rezCompModes[ rezCompModeInt ];
       }
       if (params[ REZ_COMP_DOWN_BUTTON_PARAM ].getValue()) {
         params[ REZ_COMP_DOWN_BUTTON_PARAM ].setValue(0);
         int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
-        rezCompModeInt = rezCompModeInt == 0 ? 3 : rezCompModeInt - 1;
+        rezCompModeInt = rezCompModeInt == 0 ? 7 : rezCompModeInt - 1;
         params[ REZ_COMP_VALUE_HIDDEN_PARAM ].setValue(rezCompModeInt);
         rezCompModeNameString = rezCompModes[ rezCompModeInt ];
       }
