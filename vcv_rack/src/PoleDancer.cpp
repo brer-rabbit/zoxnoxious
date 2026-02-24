@@ -64,6 +64,10 @@ struct PoleDancer : ZoxnoxiousModule {
     REZ_COMP_VALUE_HIDDEN_PARAM,
     REZ_COMP_DOWN_BUTTON_PARAM,
     REZ_COMP_UP_BUTTON_PARAM,
+    REZ_COMP_INV_SWITCH_PARAM,
+    REZ_COMP_P1_SWITCH_PARAM,
+    REZ_COMP_P2_SWITCH_PARAM,
+    REZ_COMP_P3_SWITCH_PARAM,
     PARAMS_LEN
   };
   enum InputId {
@@ -94,6 +98,10 @@ struct PoleDancer : ZoxnoxiousModule {
     SOURCE_TWO_UP_BUTTON_LIGHT,
     REZ_COMP_DOWN_BUTTON_LIGHT,
     REZ_COMP_UP_BUTTON_LIGHT,
+    REZ_COMP_P1_SWITCH_LIGHT,
+    REZ_COMP_P2_SWITCH_LIGHT,
+    REZ_COMP_P3_SWITCH_LIGHT,
+    REZ_COMP_INV_SWITCH_LIGHT,
     ENUMS(LEFT_EXPANDER_LIGHT, 3),
     ENUMS(RIGHT_EXPANDER_LIGHT, 3),
     LIGHTS_LEN
@@ -121,11 +129,15 @@ struct PoleDancer : ZoxnoxiousModule {
       enum ParamId button;
       int previousValue;
       uint8_t midiProgram[8];
-  } buttonParamToMidiProgramList[3] =
+  } buttonParamToMidiProgramList[7] =
     {
       { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 0, 1, 2, 3, 4, 5, 6, 7 } },
       { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 8, 9, 10, 11, 12, 13, 14, 15 } },
-      { REZ_COMP_VALUE_HIDDEN_PARAM, INT_MIN, { 24, 25, 26, 27 } }
+      { REZ_COMP_VALUE_HIDDEN_PARAM, INT_MIN, { 24, 25, 26, 27 } },
+      { REZ_COMP_INV_SWITCH_PARAM, INT_MIN, { 16, 17 } },
+      { REZ_COMP_P1_SWITCH_PARAM, INT_MIN, { 18, 19 } },
+      { REZ_COMP_P3_SWITCH_PARAM, INT_MIN, { 20, 21 } },
+      { REZ_COMP_P2_SWITCH_PARAM, INT_MIN, { 22, 23 } }
     };
 
 
@@ -149,6 +161,11 @@ struct PoleDancer : ZoxnoxiousModule {
 
     configButton(REZ_COMP_DOWN_BUTTON_PARAM, "Previous");
     configButton(REZ_COMP_UP_BUTTON_PARAM, "Next");
+
+    configSwitch(REZ_COMP_P1_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 1 Rez Comp", {"Off", "On"});
+    configSwitch(REZ_COMP_P2_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 2 Rez Comp", {"Off", "On"});
+    configSwitch(REZ_COMP_P3_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pole 3 Rez Comp", {"Off", "On"});
+    configSwitch(REZ_COMP_INV_SWITCH_PARAM, 0.f, 1.f, 0.f, "Invert Rez Comp", {"Off", "On"});
 
     configParam(SOURCE_ONE_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Source One Level", "%", 0.f, 100.f);
     configParam(SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Source One Mod", "%", 0.f, 100.f);
@@ -188,6 +205,11 @@ struct PoleDancer : ZoxnoxiousModule {
       lights[SOURCE_TWO_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_UP_BUTTON_PARAM].getValue());
       lights[REZ_COMP_DOWN_BUTTON_LIGHT].setBrightness(params[REZ_COMP_DOWN_BUTTON_PARAM].getValue());
       lights[REZ_COMP_UP_BUTTON_LIGHT].setBrightness(params[REZ_COMP_UP_BUTTON_PARAM].getValue());
+
+      lights[REZ_COMP_P1_SWITCH_LIGHT].setBrightness( params[REZ_COMP_P1_SWITCH_PARAM].getValue() > 0.f );
+      lights[REZ_COMP_P2_SWITCH_LIGHT].setBrightness( params[REZ_COMP_P2_SWITCH_PARAM].getValue() > 0.f );
+      lights[REZ_COMP_P3_SWITCH_LIGHT].setBrightness( params[REZ_COMP_P3_SWITCH_PARAM].getValue() > 0.f );
+      lights[REZ_COMP_INV_SWITCH_LIGHT].setBrightness( params[REZ_COMP_INV_SWITCH_PARAM].getValue() > 0.f );
 
       // clipping
       const float lightTime = args.sampleTime * lightDivider.getDivision();
@@ -492,12 +514,12 @@ struct PoleDancerWidget : ModuleWidget {
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(68.474, 77.415)), module, PoleDancer::FILTER_VCA_KNOB_PARAM));
 
 
-    /*
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.666, 76.946)), module, PoleDancer::REZ_COMP_P1_SWITCH_PARAM, PoleDancer::REZ_COMP_P1_SWITCH_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(52.616, 76.946)), module, PoleDancer::REZ_COMP_P2_SWITCH_PARAM, PoleDancer::REZ_COMP_P2_SWITCH_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.666, 91.072)), module, PoleDancer::REZ_COMP_P3_SWITCH_PARAM, PoleDancer::REZ_COMP_P3_SWITCH_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(52.616, 91.072)), module, PoleDancer::REZ_COMP_INV_SWITCH_PARAM, PoleDancer::REZ_COMP_INV_SWITCH_LIGHT));
 
+    /*
     addParam(createParamCentered<Trimpot>(mm2px(Vec(23.754, 109.044)), module, PoleDancer::DRY_MIX_KNOB_PARAM));
     addParam(createParamCentered<Trimpot>(mm2px(Vec(35.331, 109.044)), module, PoleDancer::POLE1_MIX_KNOB_PARAM));
     addParam(createParamCentered<Trimpot>(mm2px(Vec(46.907, 109.044)), module, PoleDancer::POLE2_MIX_KNOB_PARAM));
