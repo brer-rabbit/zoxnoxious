@@ -265,13 +265,13 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     if (up_param) {
       params[EXT_MOD_SELECT_SWITCH_UP_PARAM].setValue(0);
       extModSelectSwitchValue =
-        extModSelectSwitchValue > 11 ? 0 : extModSelectSwitchValue + 1;
+        extModSelectSwitchValue >= 12 ? 0 : extModSelectSwitchValue + 1;
       extModSelectChanged = true;
     }
     if (down_param) {
       params[EXT_MOD_SELECT_SWITCH_DOWN_PARAM].setValue(0);
       extModSelectSwitchValue =
-        extModSelectSwitchValue < 1 ? 12 : extModSelectSwitchValue - 1;
+        extModSelectSwitchValue <= 0 ? 12 : extModSelectSwitchValue - 1;
       extModSelectChanged = true;
     }
 
@@ -289,6 +289,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     if (!midiMsgSet) {
       midiMsgSet = buttonMidiController.process(this, midiChannel, midiMessage);
     }
+    // lights may lead midi messages if above buttons are skipped on this clock
     buttonMidiController.updateLights(this);
 
 

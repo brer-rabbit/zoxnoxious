@@ -16,6 +16,7 @@ struct ParticipantProperty {
   int8_t cvChannelOffset;
   int8_t outputDeviceId;
   int8_t midiChannel;
+  int8_t slotNum;
   bool isAllocated;
 };
 

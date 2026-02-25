@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+#include "plugin.hpp"
 
 namespace zox {
   
@@ -21,3 +23,4 @@ static constexpr uint8_t midiProgramChangeStatus = 0xC;
 
 void setMidiProgramChangeMessage(rack::midi::Message& midiOutMessage, int8_t midiChannel, int8_t program);
 }
+

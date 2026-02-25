@@ -213,7 +213,7 @@ uint8_t AudioIO::getHardwareId() { // TODO: should this be an interface?
 
 
 void AudioIO::setStatusLight() {
-  if (discoveryReportReceived) {
+  if (discoveryReportReceived) {  // green
     lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(0.f);
     lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
     lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
@@ -225,7 +225,7 @@ void AudioIO::setStatusLight() {
      lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
      }
   */
-  else {
+  else {  // red
     lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
     lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(0.f);
     lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
@@ -296,10 +296,11 @@ static constexpr int numReportsCards = 8;
 
 // to be mapped to ParticipantProperty
 struct DiscoveredCard {
-    uint8_t hardwareId;
-    uint8_t cvChannelOffset;
-    uint8_t outputDeviceId;
-    bool valid;
+  uint8_t hardwareId;
+  int8_t cvChannelOffset;
+  int8_t outputDeviceId;
+  int8_t slotNum;
+  bool valid;
 };
 
 
@@ -318,19 +319,19 @@ void AudioIO::processDiscoveryReport(const midi::Message &msg) {
 
   DiscoveredCard cards[numReportsCards] = {};
 
-  // first pass: just parse
-  for (int i = 0; i < numReportsCards; ++i) {
+  // first pass: just parse.  These are in slot order, so i == slot
+  for (int8_t i = 0; i < numReportsCards; ++i) {
     int base = byteOffset + (i * 3);
     uint8_t id = msg.bytes[base];
-    uint8_t cv = msg.bytes[base + 1];
-    uint8_t dev = msg.bytes[base + 2];
+    int8_t cv = msg.bytes[base + 1];
+    int8_t dev = msg.bytes[base + 2];
 
     // 0x00 and 0xFF are not valid hardware Ids
     if (id != 0x00 && id != 0xFF) {
-      cards[i] = { id, cv, dev, true };
+      cards[i] = { id, cv, dev, i, true };
     }
     else {
-      cards[i] = { 0, 0, 0, false };
+      cards[i] = { 0, 0, 0, i, false };
     }
 
   }
@@ -359,6 +360,7 @@ void AudioIO::applyDiscoveryReport(DiscoveredCard *cards) {
       cvChannelOffset = cards[i].cvChannelOffset;
       outputDeviceId = cards[i].outputDeviceId;
       midiChannel = assignedMidiChannel++;
+      slotNum = cards[i].slotNum;
     }
     else if (i < maxVoiceCards) {
       // Voice card
@@ -370,6 +372,7 @@ void AudioIO::applyDiscoveryReport(DiscoveredCard *cards) {
       slot.cvChannelOffset = cards[i].cvChannelOffset;
       slot.outputDeviceId = cards[i].outputDeviceId;
       slot.midiChannel = assignedMidiChannel++;
+      slot.slotNum = cards[i].slotNum;
       slot.isAllocated = false;
       INFO("registered hardware id %d midi channel %d", slot.hardwareId, slot.midiChannel);
     }
