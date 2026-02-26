@@ -3,6 +3,7 @@
 #include <vector>
 #include <rack.hpp>
 #include "common.hpp"
+#include "HardwareNameService.hpp"
 
 
 namespace zox {
@@ -72,8 +73,12 @@ struct Broker {
   // client on audio thread: use snapshot() to get view of data
   const Snapshot& snapshot() const;
 
+  // attached participants use HNS to discover names
+  std::shared_ptr<const HardwareNameService> getHardwareNameService() const;
+
 private:
   bool findSlot(Snapshot& s, int64_t moduleId, Participant* p);
+  std::shared_ptr<HardwareNameService> nameService;
 };
 
 

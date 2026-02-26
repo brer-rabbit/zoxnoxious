@@ -13,11 +13,23 @@ Broker::Broker() {
 
 
 bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
+  struct OutputNameTable table;
   size_t i = 0;
+
   for (; i < count; ++i) {
     // store to both copies so it won't matter which one is actually used first
     std::memcpy(&storageA.slots[i].props, &devices[i], sizeof(ParticipantProperty));
     std::memcpy(&storageB.slots[i].props, &devices[i], sizeof(ParticipantProperty));
+    // output table need to be indexed by slot number
+    if (devices[i].slotNum >= 0 && devices[i].slotNum < kMaxModules) {
+      table.names[ devices[i].slotNum * 2 ] = getCardOutputName(devices[i].hardwareId, 1, devices[i].slotNum);
+      table.names[ devices[i].slotNum * 2 + 1] = getCardOutputName(devices[i].hardwareId, 2, devices[i].slotNum);
+      INFO("register index %zu slot %d: %s :: %s", i, devices[i].slotNum,
+           table.names[ devices[i].slotNum * 2 ].c_str(), table.names[ devices[i].slotNum * 2 +1 ].c_str());
+    }
+    else {
+      WARN("unexpected slot number: %d", devices[i].slotNum);
+    }
   }
 
   // flag anything not specified as invalid

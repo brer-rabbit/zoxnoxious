@@ -349,6 +349,7 @@ void AudioIO::applyDiscoveryReport(DiscoveredCard *cards) {
   int assignedMidiChannel = 0;
   ParticipantProperty deviceTree[maxVoiceCards] = {};
   size_t participant_count = 0;
+  auto table = std::make_shared<OutputNameTable>();
 
   for (int i = 0; i < numReportsCards; ++i) {
     if (!cards[i].valid) {
