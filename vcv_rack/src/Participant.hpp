@@ -74,7 +74,7 @@ struct Broker {
   const Snapshot& snapshot() const;
 
   // attached participants use HNS to discover names
-  std::shared_ptr<const HardwareNameService> getHardwareNameService() const;
+  const std::shared_ptr<HardwareNameService> getHardwareNameService() const;
 
 private:
   bool findSlot(Snapshot& s, int64_t moduleId, Participant* p);

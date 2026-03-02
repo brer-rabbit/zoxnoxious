@@ -9,24 +9,22 @@ namespace zox {
 constexpr int kMaxModules = 7;
 constexpr int kOutputsPerModule = 2;
 
-struct OutputNameTable {
-  std::array<std::string, kMaxModules * kOutputsPerModule> names;
-  OutputNameTable() {
-    names.fill(invalidCardOutputName);
-  }
-};
-
 
 class HardwareNameService {
 public:
-  HardwareNameService(OutputNameTable tableInput)
-    : table(std::move(tableInput)) {}
+  std::array<std::string, kMaxModules * kOutputsPerModule> names;
 
-  const std::string& getOutputNameBySlot(int slotIndex, int outputIndex);
-  const std::string& getOutputNameByOutputNum(int outputIndex);
+  HardwareNameService() {
+    names.fill(invalidCardOutputName);
+  }
 
-private:
-  OutputNameTable table;
+  std::string* getNamePtr(int index) {
+    return &names[index];
+  }
+
+  void setName(int index, const std::string& value) {
+      names[index] = value;
+  }
 };
 
 

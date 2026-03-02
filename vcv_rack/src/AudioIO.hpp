@@ -71,7 +71,6 @@ struct AudioIO final : rack::engine::Module {
   Broker& getBroker() { return broker; }
 
 
-
   // Module methods
   void onAdd(const AddEvent &e) override;
   void onRemove(const RemoveEvent &e) override;
@@ -81,21 +80,6 @@ struct AudioIO final : rack::engine::Module {
 
   json_t* dataToJson() override;
   void dataFromJson(json_t* rootJ) override;
-
-
-  std::string cardAOutput1NameString;
-  std::string cardAOutput2NameString;
-  std::string cardBOutput1NameString;
-  std::string cardBOutput2NameString;
-  std::string cardCOutput1NameString;
-  std::string cardCOutput2NameString;
-  std::string cardDOutput1NameString;
-  std::string cardDOutput2NameString;
-  std::string cardEOutput1NameString;
-  std::string cardEOutput2NameString;
-  std::string cardFOutput1NameString;
-  std::string cardFOutput2NameString;
-
 
   std::vector<ZoxnoxiousAudioPort*> audioPorts;
   ZoxnoxiousMidiOutput midiOutput;
