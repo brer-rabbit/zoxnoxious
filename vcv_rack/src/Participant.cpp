@@ -48,17 +48,19 @@ bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
 // register the participant Id.  Double buffer the storage, so UI and audio threads
 // can co-mingle.  Mutation is only to happen on UI thread.  Audio thread gets a
 // pointer to a published stable version.
+// On successful register returns the slot
 
-bool Broker::registerParticipant(int64_t moduleId, Participant *p) {
+SlotAndNameService Broker::registerParticipant(int64_t moduleId, Participant *p) {
+  SlotAndNameService slotAndName = { invalidSlot, nameService };
   if (p == nullptr) {
     WARN("Broker received a null pointer for registration: moduleId %" PRId64, moduleId);
-    return false;
+    return slotAndName;
   }
 
   if (published.load(std::memory_order_acquire) == nullptr) {
     WARN("registration denied for moduleId %" PRId64
          ": hardware detail pending", moduleId);
-    return false;
+    return slotAndName;
   }
 
   // 1. Grab the "other" snapshot (the one the audio thread isn't using)
@@ -70,13 +72,13 @@ bool Broker::registerParticipant(int64_t moduleId, Participant *p) {
 
   // 3. Perform bizlogic to determine if we can register participant.
   // Any manipulation is allowed on next since it is not used by audio thread.
-  bool retval = findSlot(next, moduleId, p);
+  slotAndName.slotNum = findSlot(next, moduleId, p);
 
   // 4. Atomic Swap: Now the audio thread sees the new participant
   // (and yes, still do this even if the previous step failed)
   published.store(&next, std::memory_order_release);
 
-  return retval;
+  return slotAndName;
 }
 
 
@@ -105,22 +107,20 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
 }
 
 
-bool Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
+int8_t Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
   uint8_t hardwareId = p->getHardwareId();
 
-  for (size_t i = 0; i < maxVoiceCards; ++i) {
+  for (int i = 0; i < maxVoiceCards; ++i) {
     if (s.slots[i].props.isAllocated == false &&
         s.slots[i].props.hardwareId == hardwareId) {
       s.slots[i].participant = p;
       s.slots[i].props.moduleId = moduleId;
       s.slots[i].props.isAllocated = true;
-      INFO("found slot %zu for moduleId %" PRId64  " hardwareId %" PRIu8,
-           i, moduleId, hardwareId);
-      return true;
+      return i;
     }
   }
 
-  return false;
+  return invalidSlot;
 }
 
 
@@ -153,11 +153,12 @@ bool ParticipantLifecycle::heartbeat() {
 
 // tryAttach() may be called from audio thread or GUI thread.  For the common case of
 // the module is attached and a valid AudioIO instance exists return quick.
-void ParticipantLifecycle::tryAttach(Participant *p) {
+// Return true on state change to attached.
+bool ParticipantLifecycle::tryAttach(Participant *p) {
   auto* inst = AudioIO::instance.load(std::memory_order_relaxed);
 
   if (attached && inst) {
-    return;
+    return false;
   }
 
   if (attached && !inst) {
@@ -169,15 +170,21 @@ void ParticipantLifecycle::tryAttach(Participant *p) {
 
   if (!inst) {
     // no orchestrator to attach to
-    return;
+    return false;
   }
 
   // else: not attached, but do have a valid orchestrator.  Effect the attachment.
   broker = &inst->getBroker();
-  if (broker->registerParticipant(p->getModuleId(), p)) {
+  SlotAndNameService slotAndName = broker->registerParticipant(p->getModuleId(), p);
+  if (slotAndName.slotNum != invalidSlot) {
     participant = p;
     attached = true;
+    slotNum = slotAndName.slotNum;
+    nameService = slotAndName.nameService;
+    INFO("returning attached in slot %d", slotNum);
+    return true;
   }
+  return false;
 }
 
 

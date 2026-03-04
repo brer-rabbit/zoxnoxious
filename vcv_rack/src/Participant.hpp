@@ -27,6 +27,11 @@ struct Slot {
 };
 
 
+struct SlotAndNameService {
+  int8_t slotNum;
+  std::shared_ptr<HardwareNameService> nameService;
+};
+
 struct Broker {
 
   Broker();
@@ -67,7 +72,7 @@ struct Broker {
 
   bool registerDevices(ParticipantProperty *devices, size_t count);
 
-  bool registerParticipant(int64_t moduleId, Participant *p);
+  SlotAndNameService registerParticipant(int64_t moduleId, Participant *p);
   bool unregisterParticipant(int64_t moduleId);
 
   // client on audio thread: use snapshot() to get view of data
@@ -77,7 +82,7 @@ struct Broker {
   const std::shared_ptr<HardwareNameService> getHardwareNameService() const;
 
 private:
-  bool findSlot(Snapshot& s, int64_t moduleId, Participant* p);
+  int8_t findSlot(Snapshot& s, int64_t moduleId, Participant* p);
   std::shared_ptr<HardwareNameService> nameService;
 };
 
@@ -116,9 +121,11 @@ struct ParticipantLifecycle {
   // Module-local cache of whether this Participant currently owns
   // a hardware allocation in the Broker. May lag behind Snapshot.
   bool attached = false;
+  int8_t slotNum = invalidSlot;
+  std::shared_ptr<HardwareNameService> nameService = nullptr;
 
   bool heartbeat();
-  void tryAttach(Participant *p);
+  bool tryAttach(Participant *p);
   void detach();
 };
 

@@ -17,7 +17,6 @@ static constexpr uint8_t invalidCardId = 0;
 static constexpr int invalidPrimaryDepth = -1;
 
 static const std::string invalidCardOutputName = "----";
-//static std::vector<std::string> cardOutputNames;
 
 static constexpr uint8_t midiProgramChangeStatus = 0xC;
 

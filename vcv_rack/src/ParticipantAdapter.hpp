@@ -20,8 +20,8 @@ public:
   void onRemove(const RemoveEvent& e) override;
 
 protected:
-    ParticipantLifecycle lifecycle;
-    Participant* participant = nullptr;
+  ParticipantLifecycle lifecycle;
+  Participant* participant;
 
   // shortcut function that takes the expander light enum to set it based on attached state.
   // May be overridden if you don't want to go with the flow.
@@ -29,6 +29,9 @@ protected:
   // setAttachedLightStatus gets called during process()
   virtual void setLightEnum(int lightEnum);
   virtual void setAttachedLightStatus();
+
+  // override function available for callback on attaching to broker
+  virtual void onAttach();
 
 private:
   rack::dsp::ClockDivider tryAttachDivider;

@@ -5,7 +5,8 @@ namespace zox {
 
 static constexpr int invalidLightEnum = -1;
 
-ParticipantAdapter::ParticipantAdapter() : myLightEnum(invalidLightEnum) {
+ParticipantAdapter::ParticipantAdapter() :
+  participant(nullptr), myLightEnum(invalidLightEnum) {
   // TODO: 10000 ?
   tryAttachDivider.setDivision(10000);
 }
@@ -24,7 +25,10 @@ void ParticipantAdapter::process(const ProcessArgs& args) {
   // TODO: this is not thread safe when Rack is set to >1 threads
   // to fix: use a "wantAttach" methodology instead of tryAttach()
   if (tryAttachDivider.process()) {
-    lifecycle.tryAttach(participant);
+    if (lifecycle.tryAttach(participant)) {
+      onAttach();
+    }
+
     //lifecycle.heartbeat();
     if (myLightEnum != invalidLightEnum) {
       setAttachedLightStatus();
@@ -34,13 +38,20 @@ void ParticipantAdapter::process(const ProcessArgs& args) {
 
 void ParticipantAdapter::onAdd(const AddEvent& e) {
   Module::onAdd(e);
-  lifecycle.tryAttach(participant);
+  if (lifecycle.tryAttach(participant)) {
+    onAttach();
+  }
 }
 
 void ParticipantAdapter::onRemove(const RemoveEvent& e) {
   lifecycle.detach();
   Module::onRemove(e);
 }
+
+
+void ParticipantAdapter::onAttach() {
+}
+
 
 
 // enable setting attached status light
