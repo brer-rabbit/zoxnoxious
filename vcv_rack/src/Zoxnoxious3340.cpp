@@ -94,9 +94,9 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   float pulseWidthClipTimer = 0.f;
   float linearClipTimer = 0.f;
 
-  std::string *output1NameString;
-  std::string *output2NameString;
-  std::string *modulationInputNameString;
+  std::string output1NameString;
+  std::string output2NameString;
+  std::string modulationInputNameString;
 
   // detect state changes so we can send a MIDI event.
   // Assume int_min is an invalid value.  On start, idea would be
@@ -117,9 +117,6 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
 
 
   Zoxnoxious3340() :
-    output1NameString(nullptr),
-    output2NameString(nullptr),
-    modulationInputNameString(nullptr),
     buttonStates(buttonMappings.size()),
     buttonMidiController(buttonMappings) {
 
@@ -163,6 +160,12 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     configLight(LEFT_EXPANDER_LIGHT, "Connection Status");
     configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
 
+    output1NameString.reserve(16);
+    output1NameString = invalidCardOutputName;
+    output2NameString.reserve(16);
+    output2NameString = invalidCardOutputName;
+    modulationInputNameString.reserve(16);
+    modulationInputNameString = invalidCardOutputName;
   }
 
 
@@ -280,6 +283,9 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
            extModSelectMidiPrograms[extModSelectSwitchValue]);
       setMidiProgramChangeMessage(midiMessage, midiChannel, extModSelectMidiPrograms[extModSelectSwitchValue]);
       midiMsgSet = true;
+      if (lifecycle.nameService != nullptr) {
+        modulationInputNameString = *lifecycle.nameService->getNamePtr(extModSelectSwitchValue);
+      }
     }
 
 
@@ -335,20 +341,15 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
 
 
   void onAttach() override {
-    INFO("attached in slot %d", lifecycle.slotNum);
-    if (lifecycle.nameService != nullptr) {
-      std::string *s = lifecycle.nameService->getNamePtr(lifecycle.slotNum * 2);
-      if (s != nullptr) {
-        INFO("my name is %s", s->c_str());
-      }
-      else {
-        INFO("my name is nullptr");
-      }
+    if (lifecycle.nameService == nullptr) {
+      return;
     }
-    else {
-      INFO("name service is nullptr");
-    }
-
+    auto *ptr1 = lifecycle.nameService->getNamePtr(lifecycle.slotNum * 2);
+    auto *ptr2 = lifecycle.nameService->getNamePtr(lifecycle.slotNum * 2 + 1);
+    auto *ptrMod = lifecycle.nameService->getNamePtr(extModSelectSwitchValue);
+    output1NameString = ptr1 ? *ptr1 : invalidCardOutputName;
+    output2NameString = ptr2 ? *ptr2 : invalidCardOutputName;
+    modulationInputNameString = ptrMod ? *ptrMod : invalidCardOutputName;
   }
 
 
@@ -442,17 +443,17 @@ private:
 
       mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(53.378, 12.989)));
       mix1OutputTextField->box.size = (mm2px(Vec(18.5, 3.636)));
-      mix1OutputTextField->setText(module ? module->output1NameString : NULL);
+      mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
       addChild(mix1OutputTextField);
 
       mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(53.250, 102.833)));
       mix2OutputTextField->box.size = (mm2px(Vec(18.5, 3.636)));
-      mix2OutputTextField->setText(module ? module->output2NameString : NULL);
+      mix2OutputTextField->setText(module ? &module->output2NameString : NULL);
       addChild(mix2OutputTextField);
 
       modulationInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(6.0, 56.119)));
       modulationInputTextField->box.size = (mm2px(Vec(20.0, 3.636)));
-      modulationInputTextField->setText(module ? module->modulationInputNameString  : NULL);
+      modulationInputTextField->setText(module ? &module->modulationInputNameString  : NULL);
       addChild(modulationInputTextField);
     }
 
