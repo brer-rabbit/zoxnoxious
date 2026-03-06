@@ -49,8 +49,7 @@ void ParticipantAdapter::onRemove(const RemoveEvent& e) {
 }
 
 
-void ParticipantAdapter::onAttach() {
-}
+void ParticipantAdapter::onAttach() {}
 
 
 

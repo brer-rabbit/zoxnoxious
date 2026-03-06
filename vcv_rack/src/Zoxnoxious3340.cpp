@@ -98,11 +98,6 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   std::string output2NameString;
   std::string modulationInputNameString;
 
-  // detect state changes so we can send a MIDI event.
-  // Assume int_min is an invalid value.  On start, idea would be
-  // to send current state via midi so the board is in sync with
-  // the rack plugin.
-  // The order must agree with the z3340 rpi driver.
 
   // index corresponds on both vectors for tracking button pushes and outgoing MIDI msg
   static const std::vector<ButtonMapping<Zoxnoxious3340> > buttonMappings;
@@ -248,8 +243,6 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
 
   bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override {
     bool midiMsgSet = false;
-    //INFO("zoxnoxious3340 %" PRId64 " pulling midi", id);
-
 
     // check if selector gets the midi message.  If not the button controller runs.
     // actually -- maybe that's backwards.  Try button controller first.
@@ -278,9 +271,6 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
 
     if (extModSelectChanged) {
       extModSelectChanged = false;
-      INFO("zoxnoxious3340: clock %" PRId64 " : changed extModSelectSwitchValue: %d sending: %d",
-           APP->engine->getFrame(), extModSelectSwitchValue,
-           extModSelectMidiPrograms[extModSelectSwitchValue]);
       setMidiProgramChangeMessage(midiMessage, midiChannel, extModSelectMidiPrograms[extModSelectSwitchValue]);
       midiMsgSet = true;
       if (lifecycle.nameService != nullptr) {
@@ -293,7 +283,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     if (!midiMsgSet) {
       midiMsgSet = buttonMidiController.process(this, midiChannel, midiMessage);
     }
-    // lights may lead midi messages if above buttons are skipped on this clock
+    // lights may lead midi messages if above buttons are skipped on this clock.  oh well.
     buttonMidiController.updateLights(this);
 
 
