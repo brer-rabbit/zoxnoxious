@@ -117,16 +117,24 @@ struct Participant {
 struct ParticipantLifecycle {
   Participant *participant = nullptr;
   Broker* broker = nullptr;
-  // ParticipantLifecycle::attached:
-  // Module-local cache of whether this Participant currently owns
-  // a hardware allocation in the Broker. May lag behind Snapshot.
-  bool attached = false;
+
+  enum class AttachState : uint8_t {
+    Detached,
+    AttachRequested,
+    Attached,
+    DetachRequested
+  };
+
+  std::atomic<AttachState> state { AttachState::AttachRequested };
+
   int8_t slotNum = invalidSlot;
   std::shared_ptr<HardwareNameService> nameService = nullptr;
 
+  bool wantAttach() const;
+  bool isAttached() const;
   bool heartbeat();
-  bool tryAttach(Participant *p);
-  void detach();
+  bool completeAttach(Broker *b, Participant *p);
+  void completeDetach();
 };
 
 } // namespace zox

@@ -3,6 +3,7 @@
 #include <array>
 #include <atomic>
 #include "Participant.hpp"
+#include "ParticipantAdapter.hpp"
 #include "AudioMidi.hpp"
 #include "ButtonMidiController.hpp"
 #include "CvCalcAndClipHelper.hpp"
@@ -111,7 +112,7 @@ private:
   int8_t slotNum;
 
   bool discoveryReportReceived = false;
-  dsp::ClockDivider discoveryRequestClockDivider;
+  dsp::ClockDivider orchestrationClockDivider;
   dsp::ClockDivider midiPollClockDivider;
 
   void processMidiInMessage(const midi::Message &msg);
@@ -120,6 +121,8 @@ private:
 
   void processSelfSamples(rack::dsp::Frame<maxAudioChannels> &sharedFrame);
   void sendFramesToDevices(rack::dsp::Frame<maxAudioChannels> *sharedFrame, int numFrames);
+
+  void scanParticipants();
 
   std::array<CvRoute,2> routes;
 

@@ -110,6 +110,7 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
 int8_t Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
   uint8_t hardwareId = p->getHardwareId();
 
+  // TODO: may want to safeguard against incoming s.slots[i].props.moduleId == moduleId
   for (int i = 0; i < maxVoiceCards; ++i) {
     if (s.slots[i].props.isAllocated == false &&
         s.slots[i].props.hardwareId == hardwareId) {
@@ -138,12 +139,20 @@ const std::shared_ptr<HardwareNameService> Broker::getHardwareNameService() cons
 }
 
 
+bool ParticipantLifecycle::wantAttach() const {
+  return state.load(std::memory_order_acquire) == AttachState::AttachRequested;
+}
+
+bool ParticipantLifecycle::isAttached() const {
+  return state.load(std::memory_order_acquire) == AttachState::Attached;
+}
+
 bool ParticipantLifecycle::heartbeat() {
   AudioIO* current = AudioIO::instance.load(std::memory_order_acquire);
 
-  if (attached && (!current || &current->getBroker() != broker)) {
+  if (isAttached() && (!current || &current->getBroker() != broker)) {
     // Orchestrator vanished or changed
-    attached = false;
+    //attachState = ATTACH_REQUESTED;
     broker = nullptr;
     return false;
   }
@@ -151,46 +160,38 @@ bool ParticipantLifecycle::heartbeat() {
 }
 
 
-// tryAttach() may be called from audio thread or GUI thread.  For the common case of
-// the module is attached and a valid AudioIO instance exists return quick.
+// completeAttach() is called from the AudioIO manager on scanning modules for those that
+// have an ATTACH_REQUESTED state.  This avoids the Participant modules calling attach themselves.
 // Return true on state change to attached.
-bool ParticipantLifecycle::tryAttach(Participant *p) {
-  auto* inst = AudioIO::instance.load(std::memory_order_relaxed);
-
-  if (attached && inst) {
+bool ParticipantLifecycle::completeAttach(Broker *b, Participant *p) {
+  if (b == nullptr || p == nullptr) {
+    WARN("completeAtttach received nullptr");
     return false;
   }
 
-  if (attached && !inst) {
-    // orchestrator vanished: detach
-    participant = nullptr;
-    broker = nullptr;
-    attached = false;
-  }
-
-  if (!inst) {
-    // no orchestrator to attach to
+  if (isAttached()) {
     return false;
   }
 
-  // else: not attached, but do have a valid orchestrator.  Effect the attachment.
-  broker = &inst->getBroker();
-  SlotAndNameService slotAndName = broker->registerParticipant(p->getModuleId(), p);
+  SlotAndNameService slotAndName = b->registerParticipant(p->getModuleId(), p);
+
   if (slotAndName.slotNum != invalidSlot) {
+    broker = b;
     participant = p;
-    attached = true;
     slotNum = slotAndName.slotNum;
     nameService = slotAndName.nameService;
-    INFO("returning attached in slot %d", slotNum);
+    state.store(AttachState::Attached, std::memory_order_release);
+
     return true;
   }
+
   return false;
 }
 
 
-// detach () this must remain idempotent
-void ParticipantLifecycle::detach() {
-  if (!attached) {
+// detach() this must remain idempotent
+void ParticipantLifecycle::completeDetach() {
+  if (!isAttached()) {
     return;
   }
   if (broker && participant) {
@@ -200,7 +201,7 @@ void ParticipantLifecycle::detach() {
 
   participant = nullptr;
   broker = nullptr;
-  attached = false;
+  state.store(AttachState::Detached, std::memory_order_release);
 }
 
 

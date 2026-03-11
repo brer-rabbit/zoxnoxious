@@ -14,10 +14,16 @@ public:
   virtual ~ParticipantAdapter();
 
   void setParticipant(Participant* p);
+  Participant* getParticipant();
   void process(const ProcessArgs& args) final;
 
   void onAdd(const AddEvent& e) override;
   void onRemove(const RemoveEvent& e) override;
+
+  ParticipantLifecycle& getLifecycle();
+
+  // override function available for callback on attaching to broker
+  virtual void onAttach();
 
 protected:
   ParticipantLifecycle lifecycle;
@@ -29,9 +35,6 @@ protected:
   // setAttachedLightStatus gets called during process()
   virtual void setLightEnum(int lightEnum);
   virtual void setAttachedLightStatus();
-
-  // override function available for callback on attaching to broker
-  virtual void onAttach();
 
 private:
   rack::dsp::ClockDivider tryAttachDivider;

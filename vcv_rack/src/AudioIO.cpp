@@ -56,7 +56,7 @@ AudioIO::AudioIO() : out1LevelClipTimer(0.f),
 
   onReset();
 
-  discoveryRequestClockDivider.setDivision(APP->engine->getSampleRate());  // once per second
+  orchestrationClockDivider.setDivision(APP->engine->getSampleRate());  // once per second
   midiPollClockDivider.setDivision(static_cast<int>(APP->engine->getSampleRate()) / midiPollRateHz);
 
 
@@ -99,14 +99,15 @@ void AudioIO::onSampleRateChange(const SampleRateChangeEvent& e) {
   }
 
   midiPollClockDivider.setDivision(static_cast<int>(e.sampleRate) / midiPollRateHz);
-  INFO("midi polling set to %" PRIu32, midiPollClockDivider.getDivision());
-  // discoveryRequestClockDivider: no need to change, it's acted on once only
+  orchestrationClockDivider.setDivision(static_cast<int>(e.sampleRate));
 }
 
 
 void AudioIO::process(const ProcessArgs& args) {
   dsp::Frame<maxAudioChannels> sharedFrames[ audioPorts.size() ];
   bool isMidiClockTick = midiPollClockDivider.process();
+  bool isOrchestrationClockTick = orchestrationClockDivider.process();
+
   const Broker::Snapshot snap = broker.snapshot();
 
   // check for incoming midi
@@ -136,11 +137,17 @@ void AudioIO::process(const ProcessArgs& args) {
   }
 
   if (discoveryReportReceived == false) {
-    if (discoveryRequestClockDivider.process()) {
+    if (isOrchestrationClockTick) {
       INFO("Sending MIDI message discovery request");
       midiOutput.sendMidiMessage(MIDI_DISCOVERY_REQUEST_SYSEX);
     }
     return;
+  }
+
+  // walk the modules to see if anything should be attached
+  if (isOrchestrationClockTick) {
+    scanParticipants();
+
   }
 
   // process all participants for samples
@@ -462,6 +469,28 @@ void AudioIO::dataFromJson(json_t* rootJ) {
 bool AudioIO::isPrimary() const {
     return AudioIO::instance.load(std::memory_order_relaxed) == this;
 }
+
+
+void AudioIO::scanParticipants() {
+
+  for (int64_t moduleId : APP->engine->getModuleIds()) {
+    Module *m = APP->engine->getModule(moduleId);
+    auto* p = dynamic_cast<ParticipantAdapter*>(m);
+    if (!p) {
+      continue;
+    }
+
+    auto& lifecycle = p->getLifecycle();
+
+    if (lifecycle.wantAttach()) {
+      INFO("completing attach for module %" PRId64, moduleId);
+      if (lifecycle.completeAttach(&broker, p->getParticipant())) {
+        p->onAttach();
+      }
+    }
+  }
+}
+
 
 
 
