@@ -363,9 +363,7 @@ void AudioIO::applyDiscoveryReport(DiscoveredCard *cards) {
     }
     else if (i < maxVoiceCards) {
       // Voice card
-      ParticipantProperty& slot = deviceTree[i];
-      participant_count++;
-      
+      ParticipantProperty& slot = deviceTree[participant_count++];      
       slot.moduleId = -1;
       slot.hardwareId = cards[i].hardwareId;
       slot.cvChannelOffset = cards[i].cvChannelOffset;
