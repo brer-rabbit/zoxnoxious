@@ -1,4 +1,5 @@
 #include "plugin.hpp"
+#include "common.hpp"
 #include "zcomponentlib.hpp"
 #include "ParticipantAdapter.hpp"
 
@@ -299,9 +300,61 @@ struct PoleDancer final : ParticipantAdapter, Participant {
   }
 
 
+  inline int wrapIncrement(int value, int delta, int max) {
+    value += delta;
+    if (value > max) {
+      value = 0;
+    }
+    else if (value < 0) {
+      value = max;
+    }
+    return value;
+  }
+
+  template <typename NameLookup> inline bool handleUpDownSelector(
+    Param& upButton,
+    Param& downButton,
+    Param& valueParam,
+    int maxIndex,
+    NameLookup nameLookup,
+    std::string& nameString,
+    const int8_t* midiPrograms,
+    rack::midi::Message& midiMessage,
+    int8_t midiChannel) {
+
+    int delta = 0;
+
+    if (upButton.getValue()) {
+      upButton.setValue(0.f);
+      delta += 1;
+    }
+
+    if (downButton.getValue()) {
+      downButton.setValue(0.f);
+      delta -= 1;
+    }
+
+    if (delta == 0) {
+      return false;
+    }
+
+    int value = (int)valueParam.getValue();
+    int newValue = wrapIncrement(value, delta, maxIndex);
+
+    if (newValue == value) {
+      return false;
+    }
+
+    valueParam.setValue(newValue);
+
+    nameString = nameLookup(newValue);
+
+    setMidiProgramChangeMessage(midiMessage, midiChannel, midiPrograms[newValue]);
+    return true;
+  }
+
 
   bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override {
-    bool midiMsgSet = false;
 
     // light up any buttons
     lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
@@ -342,51 +395,46 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     // add/subtract the up/down buttons and set a string that
     // the UI can use.  There ought to be some todos here to
     // make/fix this.
-    if (params[ SOURCE_ONE_UP_BUTTON_PARAM ].getValue()) {
-      params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0.f);
-      int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-      sourceOneInt = sourceOneInt == 7 ? 0 : sourceOneInt + 1;
-      params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
-      source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
-    }
-    if (params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].getValue()) {
-      params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].setValue(0);
-      int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-      sourceOneInt = sourceOneInt == 0 ? 7 : sourceOneInt - 1;
-      params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
-      source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
+    if (handleUpDownSelector(
+          params[SOURCE_ONE_UP_BUTTON_PARAM],
+          params[SOURCE_ONE_DOWN_BUTTON_PARAM],
+          params[SOURCE_ONE_VALUE_HIDDEN_PARAM],
+          7,
+          [&](int i){ return *lifecycle.nameService->getNamePtr(source1Sources[i]); },
+          source1NameString,
+          sourceOneSelectMidiPrograms,
+          midiMessage,
+          midiChannel)) {
+      return true;
     }
 
-    if (params[ SOURCE_TWO_UP_BUTTON_PARAM ].getValue()) {
-      params[ SOURCE_TWO_UP_BUTTON_PARAM ].setValue(0);
-      int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-      sourceTwoInt = sourceTwoInt == 7 ? 0 : sourceTwoInt + 1;
-      params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
-      source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
-    }
-    if (params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].getValue()) {
-      params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].setValue(0);
-      int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-      sourceTwoInt = sourceTwoInt == 0 ? 7 : sourceTwoInt - 1;
-      params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
-      source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
+    if (handleUpDownSelector(
+          params[SOURCE_TWO_UP_BUTTON_PARAM],
+          params[SOURCE_TWO_DOWN_BUTTON_PARAM],
+          params[SOURCE_TWO_VALUE_HIDDEN_PARAM],
+          7,
+          [&](int i){ return *lifecycle.nameService->getNamePtr(source2Sources[i]); },
+          source2NameString,
+          sourceTwoSelectMidiPrograms,
+          midiMessage,
+          midiChannel)) {
+      return true;
     }
 
-    // rez compensation mode selection buttons
-    if (params[ REZ_COMP_UP_BUTTON_PARAM ].getValue()) {
-      params[ REZ_COMP_UP_BUTTON_PARAM ].setValue(0);
-      int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
-      rezCompModeInt = rezCompModeInt == 3 ? 0 : rezCompModeInt + 1;
-      params[ REZ_COMP_VALUE_HIDDEN_PARAM ].setValue(rezCompModeInt);
-      rezCompModeNameString = rezCompModes[ rezCompModeInt ];
+    if (handleUpDownSelector(
+          params[REZ_COMP_UP_BUTTON_PARAM],
+          params[REZ_COMP_DOWN_BUTTON_PARAM],
+          params[REZ_COMP_VALUE_HIDDEN_PARAM],
+          3,
+          [&](int i){ return rezCompModes[i]; },
+          rezCompModeNameString,
+          rezModeSelectMidiPrograms,
+          midiMessage,
+          midiChannel)) {
+      return true;
     }
-    if (params[ REZ_COMP_DOWN_BUTTON_PARAM ].getValue()) {
-      params[ REZ_COMP_DOWN_BUTTON_PARAM ].setValue(0);
-      int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
-      rezCompModeInt = rezCompModeInt == 0 ? 3 : rezCompModeInt - 1;
-      params[ REZ_COMP_VALUE_HIDDEN_PARAM ].setValue(rezCompModeInt);
-      rezCompModeNameString = rezCompModes[ rezCompModeInt ];
-    }
+
+    return false;
   }
 
 
@@ -525,6 +573,11 @@ struct PoleDancerWidget : ModuleWidget {
 };
 
 
-}
+constexpr int8_t zox::PoleDancer::sourceOneSelectMidiPrograms[];
+constexpr int8_t zox::PoleDancer::sourceTwoSelectMidiPrograms[];
+constexpr int8_t zox::PoleDancer::rezModeSelectMidiPrograms[];
 
-Model* modelPoleDancer = createModel<PoleDancer, PoleDancerWidget>("PoleDancer");
+
+} // namespace zox
+
+Model* modelPoleDancer = createModel<zox::PoleDancer, zox::PoleDancerWidget>("PoleDancer");

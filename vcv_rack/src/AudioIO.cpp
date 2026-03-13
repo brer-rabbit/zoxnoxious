@@ -129,9 +129,12 @@ void AudioIO::process(const ProcessArgs& args) {
     discoReport.bytes[6] = 0x02;
     discoReport.bytes[7] = 0x00;
     discoReport.bytes[8] = 0x00;
-    discoReport.bytes[9] = 0x07;
+    discoReport.bytes[9] = 0x06;
     discoReport.bytes[10] = 0x00;
     discoReport.bytes[11] = 0x00;
+    discoReport.bytes[12] = 0x07;
+    discoReport.bytes[13] = 0x00;
+    discoReport.bytes[14] = 0x00;
 
     processDiscoveryReport(discoReport);
   }

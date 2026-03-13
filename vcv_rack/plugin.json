@@ -29,6 +29,21 @@
         "VCO",
         "Hardware"
       ]
+    },
+    {
+      "slug": "PoleDancer",
+      "name": "PoleDancer",
+      "description": "morphing multimode analog filter",
+      "tags": [
+        "VCF",
+        "Hardware"
+      ]
+    },
+    {
+      "slug": "PoleDancerPersonality",
+      "name": "PoleDancerPersonality",
+      "description": "Personality module for Pole Dancer",
+      "tags": []
     }
   ]
 }
