@@ -122,7 +122,7 @@ private:
   void processSelfSamples(rack::dsp::Frame<maxAudioChannels> &sharedFrame);
   void sendFramesToDevices(rack::dsp::Frame<maxAudioChannels> *sharedFrame, int numFrames);
 
-  void scanParticipants();
+  void serviceParticipantAttachments();
 
   std::array<CvRoute,2> routes;
 

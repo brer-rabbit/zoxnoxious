@@ -146,7 +146,7 @@ void AudioIO::process(const ProcessArgs& args) {
 
   // walk the modules to see if anything should be attached
   if (isOrchestrationClockTick) {
-    scanParticipants();
+    serviceParticipantAttachments();
 
   }
 
@@ -471,7 +471,7 @@ bool AudioIO::isPrimary() const {
 }
 
 
-void AudioIO::scanParticipants() {
+void AudioIO::serviceParticipantAttachments() {
 
   for (int64_t moduleId : APP->engine->getModuleIds()) {
     Module *m = APP->engine->getModule(moduleId);
@@ -482,6 +482,10 @@ void AudioIO::scanParticipants() {
 
     auto& lifecycle = p->getLifecycle();
 
+    if (!p->getParticipant()) {
+      WARN("ParticipantAdapter points to null participant");
+      continue;
+    }
     if (lifecycle.wantAttach()) {
       INFO("completing attach for module %" PRId64, moduleId);
       if (lifecycle.completeAttach(&broker, p->getParticipant())) {

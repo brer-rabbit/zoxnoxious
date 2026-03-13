@@ -152,7 +152,9 @@ bool ParticipantLifecycle::heartbeat() {
 
   if (isAttached() && (!current || &current->getBroker() != broker)) {
     // Orchestrator vanished or changed
-    //attachState = ATTACH_REQUESTED;
+    INFO("heartbeat failed, detaching");
+    state.store(AttachState::AttachRequested);
+    participant = nullptr;
     broker = nullptr;
     return false;
   }
@@ -163,29 +165,29 @@ bool ParticipantLifecycle::heartbeat() {
 // completeAttach() is called from the AudioIO manager on scanning modules for those that
 // have an ATTACH_REQUESTED state.  This avoids the Participant modules calling attach themselves.
 // Return true on state change to attached.
-bool ParticipantLifecycle::completeAttach(Broker *b, Participant *p) {
-  if (b == nullptr || p == nullptr) {
+bool ParticipantLifecycle::completeAttach(Broker* b, Participant* p) {
+  if (!b || !p) {
     WARN("completeAtttach received nullptr");
     return false;
   }
 
-  if (isAttached()) {
+  if (state.load(std::memory_order_acquire) != AttachState::AttachRequested) {
     return false;
   }
 
   SlotAndNameService slotAndName = b->registerParticipant(p->getModuleId(), p);
 
-  if (slotAndName.slotNum != invalidSlot) {
-    broker = b;
-    participant = p;
-    slotNum = slotAndName.slotNum;
-    nameService = slotAndName.nameService;
-    state.store(AttachState::Attached, std::memory_order_release);
-
-    return true;
+  if (slotAndName.slotNum == invalidSlot) {
+    return false;
   }
 
-  return false;
+  broker = b;
+  participant = p;
+  slotNum = slotAndName.slotNum;
+  nameService = slotAndName.nameService;
+
+  state.store(AttachState::Attached, std::memory_order_release);
+  return true;
 }
 
 

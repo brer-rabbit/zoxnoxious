@@ -7,8 +7,7 @@ static constexpr int invalidLightEnum = -1;
 
 ParticipantAdapter::ParticipantAdapter() :
   participant(nullptr), myLightEnum(invalidLightEnum) {
-  // TODO: 10000 ?
-  tryAttachDivider.setDivision(10000);
+  lightDivider.setDivision(APP->engine->getSampleRate() / 120);
 }
 
 ParticipantAdapter::~ParticipantAdapter() {
@@ -27,16 +26,9 @@ Participant* ParticipantAdapter::getParticipant() {
 
 
 void ParticipantAdapter::process(const ProcessArgs& args) {
-  // TODO: this is not thread safe when Rack is set to >1 threads
-  // to fix: use a "wantAttach" methodology instead of tryAttach()
-  if (tryAttachDivider.process()) {
-    /*
-    if (lifecycle.tryAttach(participant)) {
-      onAttach();
-    }
-    */
+  lifecycle.heartbeat();
 
-    //lifecycle.heartbeat();
+  if (lightDivider.process()) {
     if (myLightEnum != invalidLightEnum) {
       setAttachedLightStatus();
     }

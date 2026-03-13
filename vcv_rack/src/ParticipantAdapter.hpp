@@ -37,7 +37,7 @@ protected:
   virtual void setAttachedLightStatus();
 
 private:
-  rack::dsp::ClockDivider tryAttachDivider;
+  rack::dsp::ClockDivider lightDivider;
   int myLightEnum;
 };
 
