@@ -8,7 +8,6 @@
 #include "ButtonMidiController.hpp"
 #include "CvCalcAndClipHelper.hpp"
 
-
 namespace zox {
 
 struct DiscoveredCard;
@@ -119,7 +118,6 @@ private:
   void processDiscoveryReport(const midi::Message &msg);
   void applyDiscoveryReport(DiscoveredCard *cards);
 
-  void processSelfSamples(rack::dsp::Frame<maxAudioChannels> &sharedFrame);
   void sendFramesToDevices(rack::dsp::Frame<maxAudioChannels> *sharedFrame, int numFrames);
 
   void serviceParticipantAttachments();

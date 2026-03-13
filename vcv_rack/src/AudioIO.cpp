@@ -164,7 +164,15 @@ void AudioIO::process(const ProcessArgs& args) {
   }
 
 
-  processSelfSamples(sharedFrames[outputDeviceId]);
+  static constexpr float clipTime = 0.25f;
+  processCvRoutes(routes.data(),
+                  routes.size(),
+                  clipTime,
+                  cvChannelOffset,
+                  sharedFrames[outputDeviceId].samples,
+                  params.data(),
+                  inputs.data());
+
   sendFramesToDevices(sharedFrames, audioPorts.size());
 
   if (isMidiClockTick) {
@@ -385,40 +393,6 @@ void AudioIO::applyDiscoveryReport(DiscoveredCard *cards) {
   broker.registerDevices(deviceTree, participant_count);
 }
 
-
-// add our own samples to the DSP frame
-void AudioIO::processSelfSamples(rack::dsp::Frame<maxAudioChannels> &sharedFrame) {
-  float v;
-  bool clipped;
-  static constexpr float clipTime = 0.25f;
-  // out1 level
-  v = params[OUT1_LEVEL_KNOB_PARAM].getValue() + inputs[OUT1_LEVEL_INPUT].getVoltageSum() / 10.f;
-  clipped = (v < 0.f) || (v > 1.f);
-  sharedFrame.samples[cvChannelOffset + OUT1_CHANNEL] = clamp(v, 0.f, 1.f);
-  if (clipped) {
-    out1LevelClipTimer = clipTime;
-  }
-
-  // out2 level
-  v = params[OUT2_LEVEL_KNOB_PARAM].getValue() + inputs[OUT2_LEVEL_INPUT].getVoltageSum() / 10.f;
-  clipped = (v < 0.f) || (v > 1.f);
-  sharedFrame.samples[cvChannelOffset + OUT2_CHANNEL] = clamp(v, 0.f, 1.f);
-  if (clipped) {
-    out2LevelClipTimer = clipTime;
-  }
-
-  // TODO: validate the below and remove the above
-  /*
-  processCvRoutes(routes.data(),
-                  routes.size(),
-                  clipTime,
-                  cvChannelOffset,
-                  sharedFrame.samples,
-                  params.data(),
-                  inputs.data());
-  */
-
-}
 
 
 // send all audio frames to the audio ports

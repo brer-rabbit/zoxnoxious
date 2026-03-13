@@ -1,5 +1,6 @@
 #include "plugin.hpp"
 #include "common.hpp"
+#include "CvCalcAndClipHelper.hpp"
 #include "zcomponentlib.hpp"
 #include "ParticipantAdapter.hpp"
 #include "ButtonMidiController.hpp"
@@ -109,11 +110,23 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   static constexpr int8_t extModSelectMidiPrograms[] = { 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 };
   int extModSelectSwitchValue = 0; // current index to above array
   bool extModSelectChanged = false;
+  std::array<CvRoute,8> routes;
 
 
   Zoxnoxious3340() :
     buttonStates(buttonMappings.size()),
-    buttonMidiController(buttonMappings) {
+    buttonMidiController(buttonMappings),
+    routes{{
+          {LINEAR_KNOB_PARAM, LINEAR_INPUT, LINEAR_CHANNEL, &linearClipTimer, nullptr},
+          {PULSE_WIDTH_KNOB_PARAM, PULSE_WIDTH_INPUT, PULSE_WIDTH_CHANNEL, &pulseWidthClipTimer, nullptr},
+          {MIX1_SAW_KNOB_PARAM, MIX1_SAW_VCA_INPUT, MIX1_SAW_VCA_CHANNEL, &mix1SawVcaClipTimer, nullptr},
+          {MIX1_TRIANGLE_KNOB_PARAM, MIX1_TRIANGLE_VCA_INPUT, MIX1_TRIANGLE_VCA_CHANNEL, &mix1TriangleVcaClipTimer, nullptr},
+          {EXT_MOD_AMOUNT_KNOB_PARAM, EXT_MOD_AMOUNT_INPUT, EXT_MOD_AMOUNT_CHANNEL, &extModAmountClipTimer, nullptr},
+          {MIX1_PULSE_KNOB_PARAM, MIX1_PULSE_VCA_INPUT, MIX1_PULSE_VCA_CHANNEL, &mix1PulseVcaClipTimer, nullptr},
+          {SYNC_PHASE_KNOB_PARAM, SYNC_PHASE_INPUT, SYNC_PHASE_CHANNEL, &syncPhaseClipTimer, nullptr},
+          {FREQ_KNOB_PARAM, FREQ_INPUT, FREQ_CHANNEL, &freqClipTimer, nullptr}
+      }}
+        {
 
     setParticipant(this);
     setLightEnum(RIGHT_EXPANDER_LIGHT);
@@ -171,73 +184,15 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   }
 
   void pullSamples(const rack::engine::Module::ProcessArgs &args, dsp::Frame<maxAudioChannels> &sharedFrame, int offset) override {
-    float v;
-    bool clipped;
     static constexpr float clipTime = 0.25f;
 
-    // linear
-    v = params[LINEAR_KNOB_PARAM].getValue() + inputs[LINEAR_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + LINEAR_CHANNEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      linearClipTimer = clipTime;
-    }
-
-    // pulse width
-    v = params[PULSE_WIDTH_KNOB_PARAM].getValue() + inputs[PULSE_WIDTH_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + PULSE_WIDTH_CHANNEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      pulseWidthClipTimer = clipTime;
-    }
-
-    // mix1 saw
-    v = params[MIX1_SAW_KNOB_PARAM].getValue() + inputs[MIX1_SAW_VCA_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + MIX1_SAW_VCA_CHANNEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      mix1SawVcaClipTimer = clipTime;
-    }
-
-    // mix1 triangle
-    v = params[MIX1_TRIANGLE_KNOB_PARAM].getValue() + inputs[MIX1_TRIANGLE_VCA_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + MIX1_TRIANGLE_VCA_CHANNEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      mix1TriangleVcaClipTimer = clipTime;
-    }
-
-    // external mod amount
-    v = params[EXT_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[EXT_MOD_AMOUNT_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + EXT_MOD_AMOUNT_CHANNEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      extModAmountClipTimer = clipTime;
-    }
-
-    // mix1 pulse
-    v = params[MIX1_PULSE_KNOB_PARAM].getValue() + inputs[MIX1_PULSE_VCA_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + MIX1_PULSE_VCA_CHANNEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      mix1PulseVcaClipTimer = clipTime;
-    }
-
-    // sync phase
-    v = params[SYNC_PHASE_KNOB_PARAM].getValue() + inputs[SYNC_PHASE_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + SYNC_PHASE_CHANNEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      syncPhaseClipTimer = clipTime;
-    }
-
-    // frequency
-    v = params[FREQ_KNOB_PARAM].getValue() + inputs[FREQ_INPUT].getVoltage() / 8.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + FREQ_CHANNEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      freqClipTimer = clipTime;
-    }
+    processCvRoutes(routes.data(),
+                    routes.size(),
+                    clipTime,
+                    offset,
+                    sharedFrame.samples,
+                    params.data(),
+                    inputs.data());
   }
 
 
