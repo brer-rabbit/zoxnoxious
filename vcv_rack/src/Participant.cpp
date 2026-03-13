@@ -152,10 +152,11 @@ bool ParticipantLifecycle::heartbeat() {
 
   if (isAttached() && (!current || &current->getBroker() != broker)) {
     // Orchestrator vanished or changed
+    // clear fields then publish state
     INFO("heartbeat failed, detaching");
-    state.store(AttachState::AttachRequested);
     participant = nullptr;
     broker = nullptr;
+    state.store(AttachState::AttachRequested);
     return false;
   }
   return true;

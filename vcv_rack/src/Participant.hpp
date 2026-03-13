@@ -125,6 +125,8 @@ struct ParticipantLifecycle {
     DetachRequested
   };
 
+  // ALL reads of broker / participant / slotNum / nameService
+  // must occur only after reading state with acquire.
   std::atomic<AttachState> state { AttachState::AttachRequested };
 
   int8_t slotNum = invalidSlot;
