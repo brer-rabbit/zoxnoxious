@@ -5,8 +5,6 @@
 #include "Participant.hpp"
 #include "ParticipantAdapter.hpp"
 #include "AudioMidi.hpp"
-#include "ButtonMidiController.hpp"
-#include "CvCalcAndClipHelper.hpp"
 
 namespace zox {
 

@@ -1,9 +1,7 @@
 #include "plugin.hpp"
 #include "common.hpp"
-#include "CvCalcAndClipHelper.hpp"
 #include "zcomponentlib.hpp"
 #include "ParticipantAdapter.hpp"
-#include "ButtonMidiController.hpp"
 
 namespace zox {
   
@@ -125,8 +123,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
           {MIX1_PULSE_KNOB_PARAM, MIX1_PULSE_VCA_INPUT, MIX1_PULSE_VCA_CHANNEL, &mix1PulseVcaClipTimer, nullptr},
           {SYNC_PHASE_KNOB_PARAM, SYNC_PHASE_INPUT, SYNC_PHASE_CHANNEL, &syncPhaseClipTimer, nullptr},
           {FREQ_KNOB_PARAM, FREQ_INPUT, FREQ_CHANNEL, &freqClipTimer, nullptr}
-      }}
-        {
+      }} {
 
     setParticipant(this);
     setLightEnum(RIGHT_EXPANDER_LIGHT);

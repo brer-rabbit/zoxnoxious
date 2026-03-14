@@ -126,8 +126,17 @@ struct PoleDancer final : ParticipantAdapter, Participant {
   int rezModeSelectSwitchValue = 0; // current index to rezModeSelectMidiPrograms
   bool rezModeSelectChanged = false;
 
+  std::array<CvRoute,5> routes;
 
-  PoleDancer() {
+  PoleDancer() :
+    routes{{
+          {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, VCF_CUTOFF, &cutoffClipTimer, nullptr},
+          {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, &sourceOneLevelClipTimer, nullptr},
+          {SOURCE_TWO_LEVEL_KNOB_PARAM, SOURCE_TWO_LEVEL_INPUT, SOURCE_TWO_LEVEL, &sourceTwoLevelClipTimer, nullptr},
+          {SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, SOURCE_ONE_MOD_AMOUNT_INPUT, SOURCE_ONE_MOD_AMOUNT, &sourceOneModAmountClipTimer, nullptr},
+          {SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM, SOURCE_TWO_MOD_AMOUNT_INPUT, SOURCE_TWO_MOD_AMOUNT, &sourceTwoModAmountClipTimer, nullptr}
+      }} {
+
     setParticipant(this);
     setLightEnum(RIGHT_EXPANDER_LIGHT);
 
@@ -185,53 +194,19 @@ struct PoleDancer final : ParticipantAdapter, Participant {
   }
 
 
-
   void pullSamples(const rack::engine::Module::ProcessArgs &args, dsp::Frame<maxAudioChannels> &sharedFrame, int offset) override {
 
     float v;
     bool clipped;
     static constexpr float clipTime = 0.25f;
 
-    // vcf cutoff
-    v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + VCF_CUTOFF] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      cutoffClipTimer = clipTime;
-    }
-
-    // source one audio
-    v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + SOURCE_ONE_LEVEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      sourceOneLevelClipTimer = clipTime;
-    }
-
-    // source two audio
-    v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + SOURCE_TWO_LEVEL] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      sourceTwoLevelClipTimer = clipTime;
-    }
-
-    // source one modulation
-    v = params[SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_MOD_AMOUNT_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + SOURCE_ONE_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      sourceOneModAmountClipTimer = clipTime;
-    }
-
-    // source two modulation
-    v = params[SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_MOD_AMOUNT_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
-    sharedFrame.samples[offset + SOURCE_TWO_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
-    if (clipped) {
-      sourceTwoModAmountClipTimer = clipTime;
-    }
-
+    processCvRoutes(routes.data(),
+                    routes.size(),
+                    clipTime,
+                    offset,
+                    sharedFrame.samples,
+                    params.data(),
+                    inputs.data());
 
     // qvca
     v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltage() / 10.f;
@@ -272,7 +247,6 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     if (clipped) {
       filterVcaClipTimer = clipTime;
     }
-
 
     if (inputs[POLE_MIX_INPUT].isConnected()) {
       sharedFrame.samples[offset + DRY_LEVEL] =
