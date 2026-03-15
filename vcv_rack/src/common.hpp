@@ -148,11 +148,12 @@ private:
 using CvTransform = float (*)(float);
 
 struct CvRoute {
-    int knobParam;
-    int inputId;
-    int channel;
-    float* timer;
-    CvTransform transform; // may be nullptr for identity transform
+  int knobParam;
+  int inputId;
+  int channel;
+  float divisor;
+  float* timer;
+  CvTransform transform; // may be nullptr for identity transform
 };
 
 inline void processCvRoutes(
@@ -168,7 +169,7 @@ inline void processCvRoutes(
         const auto& r = routes[i];
 
         float v = params[r.knobParam].getValue()
-          + inputs[r.inputId].getVoltage() / 10.f;
+          + inputs[r.inputId].getVoltage() / r.divisor;
 
         if (r.transform) {
             v = r.transform(v);

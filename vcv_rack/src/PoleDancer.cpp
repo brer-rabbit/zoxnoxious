@@ -130,12 +130,12 @@ struct PoleDancer final : ParticipantAdapter, Participant {
 
   PoleDancer() :
     routes{{
-          {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, VCF_CUTOFF, &cutoffClipTimer, nullptr},
-          {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, &sourceOneLevelClipTimer, nullptr},
-          {SOURCE_TWO_LEVEL_KNOB_PARAM, SOURCE_TWO_LEVEL_INPUT, SOURCE_TWO_LEVEL, &sourceTwoLevelClipTimer, nullptr},
-          {SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, SOURCE_ONE_MOD_AMOUNT_INPUT, SOURCE_ONE_MOD_AMOUNT, &sourceOneModAmountClipTimer, nullptr},
-          {SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM, SOURCE_TWO_MOD_AMOUNT_INPUT, SOURCE_TWO_MOD_AMOUNT, &sourceTwoModAmountClipTimer, nullptr}
-      }} {
+      {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, VCF_CUTOFF, 10.f, &cutoffClipTimer, nullptr},
+      {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, 10.f, &sourceOneLevelClipTimer, nullptr},
+      {SOURCE_TWO_LEVEL_KNOB_PARAM, SOURCE_TWO_LEVEL_INPUT, SOURCE_TWO_LEVEL, 10.f, &sourceTwoLevelClipTimer, nullptr},
+      {SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, SOURCE_ONE_MOD_AMOUNT_INPUT, SOURCE_ONE_MOD_AMOUNT, 10.f, &sourceOneModAmountClipTimer, nullptr},
+      {SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM, SOURCE_TWO_MOD_AMOUNT_INPUT, SOURCE_TWO_MOD_AMOUNT, 10.f, &sourceTwoModAmountClipTimer, nullptr}
+    }} {
 
     setParticipant(this);
     setLightEnum(RIGHT_EXPANDER_LIGHT);
@@ -312,7 +312,7 @@ struct PoleDancer final : ParticipantAdapter, Participant {
       return false;
     }
 
-    int value = (int)valueParam.getValue();
+    int value = static_cast<int>(valueParam.getValue());
     int newValue = wrapIncrement(value, delta, maxIndex);
 
     if (newValue == value) {

@@ -115,15 +115,15 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     buttonStates(buttonMappings.size()),
     buttonMidiController(buttonMappings),
     routes{{
-          {LINEAR_KNOB_PARAM, LINEAR_INPUT, LINEAR_CHANNEL, &linearClipTimer, nullptr},
-          {PULSE_WIDTH_KNOB_PARAM, PULSE_WIDTH_INPUT, PULSE_WIDTH_CHANNEL, &pulseWidthClipTimer, nullptr},
-          {MIX1_SAW_KNOB_PARAM, MIX1_SAW_VCA_INPUT, MIX1_SAW_VCA_CHANNEL, &mix1SawVcaClipTimer, nullptr},
-          {MIX1_TRIANGLE_KNOB_PARAM, MIX1_TRIANGLE_VCA_INPUT, MIX1_TRIANGLE_VCA_CHANNEL, &mix1TriangleVcaClipTimer, nullptr},
-          {EXT_MOD_AMOUNT_KNOB_PARAM, EXT_MOD_AMOUNT_INPUT, EXT_MOD_AMOUNT_CHANNEL, &extModAmountClipTimer, nullptr},
-          {MIX1_PULSE_KNOB_PARAM, MIX1_PULSE_VCA_INPUT, MIX1_PULSE_VCA_CHANNEL, &mix1PulseVcaClipTimer, nullptr},
-          {SYNC_PHASE_KNOB_PARAM, SYNC_PHASE_INPUT, SYNC_PHASE_CHANNEL, &syncPhaseClipTimer, nullptr},
-          {FREQ_KNOB_PARAM, FREQ_INPUT, FREQ_CHANNEL, &freqClipTimer, nullptr}
-      }} {
+      {LINEAR_KNOB_PARAM, LINEAR_INPUT, LINEAR_CHANNEL, 10.f, &linearClipTimer, nullptr},
+      {PULSE_WIDTH_KNOB_PARAM, PULSE_WIDTH_INPUT, PULSE_WIDTH_CHANNEL, 10.f, &pulseWidthClipTimer, nullptr},
+      {MIX1_SAW_KNOB_PARAM, MIX1_SAW_VCA_INPUT, MIX1_SAW_VCA_CHANNEL, 10.f, &mix1SawVcaClipTimer, nullptr},
+      {MIX1_TRIANGLE_KNOB_PARAM, MIX1_TRIANGLE_VCA_INPUT, MIX1_TRIANGLE_VCA_CHANNEL, 10.f, &mix1TriangleVcaClipTimer, nullptr},
+      {EXT_MOD_AMOUNT_KNOB_PARAM, EXT_MOD_AMOUNT_INPUT, EXT_MOD_AMOUNT_CHANNEL, 10.f, &extModAmountClipTimer, nullptr},
+      {MIX1_PULSE_KNOB_PARAM, MIX1_PULSE_VCA_INPUT, MIX1_PULSE_VCA_CHANNEL, 10.f, &mix1PulseVcaClipTimer, nullptr},
+      {SYNC_PHASE_KNOB_PARAM, SYNC_PHASE_INPUT, SYNC_PHASE_CHANNEL, 10.f, &syncPhaseClipTimer, nullptr},
+      {FREQ_KNOB_PARAM, FREQ_INPUT, FREQ_CHANNEL, 8.f, &freqClipTimer, nullptr}
+    }} {
 
     setParticipant(this);
     setLightEnum(RIGHT_EXPANDER_LIGHT);

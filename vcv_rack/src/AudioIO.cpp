@@ -21,9 +21,10 @@ AudioIO::AudioIO() : out1LevelClipTimer(0.f),
                      out2LevelClipTimer(0.f),
                      buttonStates(buttonMappings.size()),
                      buttonMidiController(buttonMappings),
-                     routes{{
-                         {OUT1_LEVEL_KNOB_PARAM, OUT1_LEVEL_INPUT, OUT1_CHANNEL, &out1LevelClipTimer, nullptr},
-                         {OUT2_LEVEL_KNOB_PARAM, OUT2_LEVEL_INPUT, OUT2_CHANNEL, &out2LevelClipTimer, nullptr}
+                     routes{
+  {
+    {OUT1_LEVEL_KNOB_PARAM, OUT1_LEVEL_INPUT, OUT1_CHANNEL, 10.f, &out1LevelClipTimer, nullptr},
+    {OUT2_LEVEL_KNOB_PARAM, OUT2_LEVEL_INPUT, OUT2_CHANNEL, 10.f, &out2LevelClipTimer, nullptr}
   }}
 {
 
@@ -129,7 +130,7 @@ void AudioIO::process(const ProcessArgs& args) {
     discoReport.bytes[6] = 0x02;
     discoReport.bytes[7] = 0x00;
     discoReport.bytes[8] = 0x00;
-    discoReport.bytes[9] = 0x06;
+    discoReport.bytes[9] = 0x04;
     discoReport.bytes[10] = 0x00;
     discoReport.bytes[11] = 0x00;
     discoReport.bytes[12] = 0x07;

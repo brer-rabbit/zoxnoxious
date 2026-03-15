@@ -35,14 +35,9 @@ void ParticipantAdapter::process(const ProcessArgs& args) {
   }
 }
 
+
 void ParticipantAdapter::onAdd(const AddEvent& e) {
   Module::onAdd(e);
-
-  /*
-  if (lifecycle.tryAttach(participant)) {
-    onAttach();
-  }
-  */
 }
 
 void ParticipantAdapter::onRemove(const RemoveEvent& e) {
