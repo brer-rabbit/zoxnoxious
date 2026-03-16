@@ -265,7 +265,7 @@ struct Zoxnoxious5524 final : ParticipantAdapter, Participant {
     vcoTwoPulseEnabled = static_cast<bool>(params[VCO_TWO_WAVE_PULSE_BUTTON_PARAM].getValue());
     if (vcoTwoPulseEnabled) {
       if (pwLimit) {
-        sharedFrame.samples[offset + VCO_TWO_PW] = sharedFrame.samples[offset + VCO_TWO_PW] * 0.88f + 0.06f;
+        sharedFrame.samples[offset + VCO_TWO_PW] = sharedFrame.samples[offset + VCO_TWO_PW] * 0.88f;
       }
     }
     else {
