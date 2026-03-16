@@ -118,7 +118,7 @@ void AudioIO::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
-  if (APP->engine->getFrame() == 80000) {
+  if (0) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
@@ -333,13 +333,13 @@ void AudioIO::processDiscoveryReport(const midi::Message &msg) {
   // first pass: just parse.  These are in slot order, so i == slot
   for (int8_t i = 0; i < numReportsCards; ++i) {
     int base = byteOffset + (i * 3);
-    uint8_t id = msg.bytes[base];
-    int8_t cv = msg.bytes[base + 1];
-    int8_t dev = msg.bytes[base + 2];
+    uint8_t hwId = msg.bytes[base];
+    int8_t cvOffset = msg.bytes[base + 1];
+    int8_t outputDev = msg.bytes[base + 2];
 
     // 0x00 and 0xFF are not valid hardware Ids
-    if (id != 0x00 && id != 0xFF) {
-      cards[i] = { id, cv, dev, i, true };
+    if (hwId != 0x00 && hwId != 0xFF) {
+      cards[i] = { hwId, cvOffset, outputDev, i, true };
     }
     else {
       cards[i] = { 0, 0, 0, i, false };

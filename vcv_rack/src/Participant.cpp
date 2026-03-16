@@ -107,6 +107,7 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
 }
 
 
+// find a slot that is available for this hardwareId.  If none found return an invalid slot number.
 int8_t Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
   uint8_t hardwareId = p->getHardwareId();
 
@@ -117,7 +118,7 @@ int8_t Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
       s.slots[i].participant = p;
       s.slots[i].props.moduleId = moduleId;
       s.slots[i].props.isAllocated = true;
-      return i;
+      return s.slots[i].props.slotNum;
     }
   }
 
