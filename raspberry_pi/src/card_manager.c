@@ -46,6 +46,8 @@ static const char *config_lookup_eeprom_base_i2c_address = CARD_MANAGER_KEY_NAME
 #define TUNEREQ_RESTORE_STATE "tunereq_restore_state"
 
 
+// uninitialized memory on the EEPROM comes back with this value
+static const int uninitialized_i2c_rom_read = 0xff;
 
 /* init_card_manager
  *
@@ -133,6 +135,10 @@ int discover_cards(struct card_manager *card_mgr) {
         i2c_read = 0;
       }
       else if (i2c_read == PI_I2C_READ_FAILED) {
+        INFO("no card present slot %d", slot_num);
+        i2c_read = 0;
+      }
+      else if (i2c_read == uninitialized_i2c_rom_read) {
         INFO("no card present slot %d", slot_num);
         i2c_read = 0;
       }

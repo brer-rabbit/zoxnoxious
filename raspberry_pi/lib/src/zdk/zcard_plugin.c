@@ -26,7 +26,7 @@
 #define MUXOUT_0 20
 #define MUXOUT_1 26
 #define MUXOUT_2 21
-
+#define MUX_MASK ((1u << MUXOUT_0) | (1u << MUXOUT_1) | (1u << MUXOUT_2))
 
 #define NUM_SPI_CHIP_SELECTS 2
 
@@ -46,22 +46,31 @@ struct zhost {
 };
 
 
-struct gpio_pin_value_tuple {
-    unsigned int gpio;
-    unsigned int level;
+struct gpio_bitmask {
+    uint32_t set_mask;
+    uint32_t clear_mask;
 };
 
-// mind bit ordering here vs usage...MSB is a thing
-static const struct gpio_pin_value_tuple pin_value_tuple[8][3] = {
-  { { MUXOUT_2, 0 }, { MUXOUT_1, 0 }, { MUXOUT_0, 0 } },
-  { { MUXOUT_2, 0 }, { MUXOUT_1, 0 }, { MUXOUT_0, 1 } },
-  { { MUXOUT_2, 0 }, { MUXOUT_1, 1 }, { MUXOUT_0, 0 } },
-  { { MUXOUT_2, 0 }, { MUXOUT_1, 1 }, { MUXOUT_0, 1 } },
-  { { MUXOUT_2, 1 }, { MUXOUT_1, 0 }, { MUXOUT_0, 0 } },
-  { { MUXOUT_2, 1 }, { MUXOUT_1, 0 }, { MUXOUT_0, 1 } },
-  { { MUXOUT_2, 1 }, { MUXOUT_1, 1 }, { MUXOUT_0, 0 } },
-  { { MUXOUT_2, 1 }, { MUXOUT_1, 1 }, { MUXOUT_0, 1 } }
+#define SET_MASK_FOR_SLOT(slot) \
+    ( ((slot) & 0x1 ? (1u << MUXOUT_0) : 0) | \
+      ((slot) & 0x2 ? (1u << MUXOUT_1) : 0) | \
+      ((slot) & 0x4 ? (1u << MUXOUT_2) : 0) )
+
+#define CLEAR_MASK_FOR_SLOT(slot) \
+    ( MUX_MASK & ~SET_MASK_FOR_SLOT(slot) )
+
+static const struct gpio_bitmask mux_masks[8] = {
+    { SET_MASK_FOR_SLOT(0), CLEAR_MASK_FOR_SLOT(0) },
+    { SET_MASK_FOR_SLOT(1), CLEAR_MASK_FOR_SLOT(1) },
+    { SET_MASK_FOR_SLOT(2), CLEAR_MASK_FOR_SLOT(2) },
+    { SET_MASK_FOR_SLOT(3), CLEAR_MASK_FOR_SLOT(3) },
+    { SET_MASK_FOR_SLOT(4), CLEAR_MASK_FOR_SLOT(4) },
+    { SET_MASK_FOR_SLOT(5), CLEAR_MASK_FOR_SLOT(5) },
+    { SET_MASK_FOR_SLOT(6), CLEAR_MASK_FOR_SLOT(6) },
+    { SET_MASK_FOR_SLOT(7), CLEAR_MASK_FOR_SLOT(7) },
 };
+
+
 
 
 struct zhost* zhost_create() {
@@ -74,26 +83,18 @@ struct zhost* zhost_create() {
   if (gpioSetMode(MUXOUT_0, PI_OUTPUT) ||
       gpioSetMode(MUXOUT_1, PI_OUTPUT) ||
       gpioSetMode(MUXOUT_2, PI_OUTPUT)) {
-    ERROR("failed to open SPI");
-    free(zhost);
-    return NULL;
-  }
-
-  if (gpioSetMode(pin_value_tuple[INITIAL_SLOT][0].gpio, PI_OUTPUT) ||
-      gpioSetMode(pin_value_tuple[INITIAL_SLOT][1].gpio, PI_OUTPUT) ||
-      gpioSetMode(pin_value_tuple[INITIAL_SLOT][2].gpio, PI_OUTPUT)) {
     ERROR("gpio setMode failed");
     free(zhost);
     return NULL;
   }
 
-  if (gpioWrite(pin_value_tuple[INITIAL_SLOT][0].gpio, pin_value_tuple[INITIAL_SLOT][0].level) ||
-      gpioWrite(pin_value_tuple[INITIAL_SLOT][1].gpio, pin_value_tuple[INITIAL_SLOT][1].level) ||
-      gpioWrite(pin_value_tuple[INITIAL_SLOT][2].gpio, pin_value_tuple[INITIAL_SLOT][2].level)) {
+  if (gpioWrite_Bits_0_31_Clear(mux_masks[INITIAL_SLOT].clear_mask) ||
+      gpioWrite_Bits_0_31_Set(mux_masks[INITIAL_SLOT].set_mask)) {
     ERROR("gpio write failed");
     free(zhost);
     return NULL;
   }
+
 
   zhost->active_slot = INITIAL_SLOT;
   for (int i = 0; i < NUM_SPI_CHIP_SELECTS; ++i) {
@@ -111,16 +112,17 @@ struct zhost* zhost_create() {
 
 
 int set_spi_interface(struct zhost *zhost, unsigned int spi_channel, unsigned int spi_flags, int slot) {
-
+    int retval;
     assert(spi_channel < NUM_SPI_CHIP_SELECTS);
 
     if (zhost->active_slot != slot) {
         // change GPIOs to the slot
-        if (gpioWrite(pin_value_tuple[slot][0].gpio, pin_value_tuple[slot][0].level) ||
-            gpioWrite(pin_value_tuple[slot][1].gpio, pin_value_tuple[slot][1].level) ||
-            gpioWrite(pin_value_tuple[slot][2].gpio, pin_value_tuple[slot][2].level)) {
+        retval = gpioWrite_Bits_0_31_Clear(mux_masks[slot].clear_mask);
+        retval += gpioWrite_Bits_0_31_Set(mux_masks[slot].set_mask);
+
+        if (retval) {
             ERROR("gpio write failed");
-            return -1;  // valid spi handle is >= 0
+            return -1;
         }
         zhost->active_slot = slot;
     }
