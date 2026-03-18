@@ -8,8 +8,7 @@ namespace zox {
 
 std::atomic<AudioIO*> AudioIO::instance { nullptr };
 
-// TODO: THIS WILL NEED TO BE SET TO 100~200 ONCE DONE HERE
-static constexpr int midiPollRateHz = 10;
+static constexpr int midiPollRateHz = 100;
 
 enum cvChannel {
     OUT2_CHANNEL = 0,
@@ -119,6 +118,7 @@ void AudioIO::process(const ProcessArgs& args) {
 
   // DEBUG REMOVE THIS
   if (0) {
+//  if (APP->engine->getFrame() == 80000) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
@@ -133,10 +133,15 @@ void AudioIO::process(const ProcessArgs& args) {
     discoReport.bytes[9] = 0x04;
     discoReport.bytes[10] = 0x00;
     discoReport.bytes[11] = 0x00;
-    discoReport.bytes[12] = 0x07;
+    discoReport.bytes[12] = 0x06;
     discoReport.bytes[13] = 0x00;
     discoReport.bytes[14] = 0x00;
-
+    discoReport.bytes[15] = 0x03;
+    discoReport.bytes[16] = 0x00;
+    discoReport.bytes[17] = 0x00;
+    discoReport.bytes[18] = 0x07;
+    discoReport.bytes[19] = 0x00;
+    discoReport.bytes[20] = 0x00;
     processDiscoveryReport(discoReport);
   }
 

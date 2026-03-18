@@ -1,8 +1,9 @@
 #include "plugin.hpp"
 #include "zcomponentlib.hpp"
-#include "ZoxnoxiousExpander.hpp"
+#include "common.hpp"
+#include "ParticipantAdapter.hpp"
 
-static const int midiMessageQueueMaxSize = 16;
+namespace zox {
 
 // relative cv channel for the control voltage being sent over the wire
 enum cvChannel {
@@ -28,7 +29,7 @@ enum cvChannel {
 // card2 out2
 // card1 out2
 // card1 out1
-static const int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
+static constexpr int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 
 // card6 out1
 // card5 out2
@@ -38,371 +39,255 @@ static const int source1Sources[] = { 0, 1, 3, 4, 7, 8, 11, 12 };
 // card2 out1
 // card1 out2
 // card1 out1
-static const int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
+static constexpr int source2Sources[] = { 0, 1, 2, 3, 5, 6, 9, 10 };
 
 
-struct Zoxnoxious3372 : ZoxnoxiousModule {
-    enum ParamId {
-        CUTOFF_KNOB_PARAM,
-        OUTPUT_PAN_KNOB_PARAM,
-        MOD_AMOUNT_KNOB_PARAM,
-        SOURCE_ONE_LEVEL_KNOB_PARAM,
-        SOURCE_TWO_LEVEL_KNOB_PARAM,
-        RESONANCE_KNOB_PARAM,
-        FILTER_VCA_KNOB_PARAM,
-        VCA_MOD_SWITCH_PARAM,
-        PAN_MOD_SWITCH_PARAM,
-        NOISE_KNOB_PARAM,
-        FILTER_MOD_SWITCH_PARAM,
-        SOURCE_ONE_VALUE_HIDDEN_PARAM,
-        SOURCE_ONE_DOWN_BUTTON_PARAM,
-        SOURCE_ONE_UP_BUTTON_PARAM,
-        SOURCE_TWO_VALUE_HIDDEN_PARAM,
-        SOURCE_TWO_DOWN_BUTTON_PARAM,
-        SOURCE_TWO_UP_BUTTON_PARAM,
-        REZ_MOD_SWITCH_PARAM,
-        PARAMS_LEN
-    };
-    enum InputId {
-        CUTOFF_INPUT,
-        OUTPUT_PAN_INPUT,
-        NOISE_LEVEL_INPUT,
-        MOD_AMOUNT_INPUT,
-        SOURCE_ONE_LEVEL_INPUT,
-        SOURCE_TWO_LEVEL_INPUT,
-        RESONANCE_INPUT,
-        FILTER_VCA_INPUT,
-        INPUTS_LEN
-    };
-    enum OutputId {
-        OUTPUTS_LEN
-    };
-    enum LightId {
-        MOD_AMOUNT_CLIP_LIGHT,
-        SOURCE_ONE_LEVEL_CLIP_LIGHT,
-        SOURCE_TWO_LEVEL_CLIP_LIGHT,
-        OUTPUT_PAN_CLIP_LIGHT,
-        CUTOFF_CLIP_LIGHT,
-        RESONANCE_CLIP_LIGHT,
-        FILTER_VCA_CLIP_LIGHT,
-        OUTPUT_VCA_CLIP_LIGHT,
-        VCA_MOD_ENABLE_LIGHT,
-        FILTER_MOD_ENABLE_LIGHT,
-        REZ_MOD_ENABLE_LIGHT,
-        PAN_MOD_ENABLE_LIGHT,
-        SOURCE_ONE_DOWN_BUTTON_LIGHT,
-        SOURCE_ONE_UP_BUTTON_LIGHT,
-        SOURCE_TWO_DOWN_BUTTON_LIGHT,
-        SOURCE_TWO_UP_BUTTON_LIGHT,
-        ENUMS(LEFT_EXPANDER_LIGHT, 3),
-        ENUMS(RIGHT_EXPANDER_LIGHT, 3),
-        LIGHTS_LEN
-    };
+struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
+  enum ParamId {
+    CUTOFF_KNOB_PARAM,
+    OUTPUT_PAN_KNOB_PARAM,
+    MOD_AMOUNT_KNOB_PARAM,
+    SOURCE_ONE_LEVEL_KNOB_PARAM,
+    SOURCE_TWO_LEVEL_KNOB_PARAM,
+    RESONANCE_KNOB_PARAM,
+    FILTER_VCA_KNOB_PARAM,
+    VCA_MOD_SWITCH_PARAM,
+    PAN_MOD_SWITCH_PARAM,
+    NOISE_KNOB_PARAM,
+    FILTER_MOD_SWITCH_PARAM,
+    SOURCE_ONE_VALUE_HIDDEN_PARAM,
+    SOURCE_ONE_DOWN_BUTTON_PARAM,
+    SOURCE_ONE_UP_BUTTON_PARAM,
+    SOURCE_TWO_VALUE_HIDDEN_PARAM,
+    SOURCE_TWO_DOWN_BUTTON_PARAM,
+    SOURCE_TWO_UP_BUTTON_PARAM,
+    REZ_MOD_SWITCH_PARAM,
+    PARAMS_LEN
+  };
+  enum InputId {
+    CUTOFF_INPUT,
+    OUTPUT_PAN_INPUT,
+    NOISE_LEVEL_INPUT,
+    MOD_AMOUNT_INPUT,
+    SOURCE_ONE_LEVEL_INPUT,
+    SOURCE_TWO_LEVEL_INPUT,
+    RESONANCE_INPUT,
+    FILTER_VCA_INPUT,
+    INPUTS_LEN
+  };
+  enum OutputId {
+    OUTPUTS_LEN
+  };
+  enum LightId {
+    MOD_AMOUNT_CLIP_LIGHT,
+    SOURCE_ONE_LEVEL_CLIP_LIGHT,
+    SOURCE_TWO_LEVEL_CLIP_LIGHT,
+    OUTPUT_PAN_CLIP_LIGHT,
+    CUTOFF_CLIP_LIGHT,
+    RESONANCE_CLIP_LIGHT,
+    FILTER_VCA_CLIP_LIGHT,
+    OUTPUT_VCA_CLIP_LIGHT,
+    VCA_MOD_ENABLE_LIGHT,
+    FILTER_MOD_ENABLE_LIGHT,
+    REZ_MOD_ENABLE_LIGHT,
+    PAN_MOD_ENABLE_LIGHT,
+    SOURCE_ONE_DOWN_BUTTON_LIGHT,
+    SOURCE_ONE_UP_BUTTON_LIGHT,
+    SOURCE_TWO_DOWN_BUTTON_LIGHT,
+    SOURCE_TWO_UP_BUTTON_LIGHT,
+    ENUMS(LEFT_EXPANDER_LIGHT, 3),
+    ENUMS(RIGHT_EXPANDER_LIGHT, 3),
+    LIGHTS_LEN
+  };
 
 
-    dsp::ClockDivider lightDivider;
-    float modAmountClipTimer;
-    float sourceOneLevelClipTimer;
-    float sourceTwoLevelClipTimer;
-    float outputPanClipTimer;
-    float cutoffClipTimer;
-    float resonanceClipTimer;
-    float outputVcaClipTimer;
+  float noiseClipTimer = 0.f;
+  float modAmountClipTimer = 0.f;
+  float sourceOneLevelClipTimer = 0.f;
+  float sourceTwoLevelClipTimer = 0.f;
+  float outputPanClipTimer = 0.f;
+  float cutoffClipTimer = 0.f;
+  float resonanceClipTimer = 0.f;
+  float outputVcaClipTimer = 0.f;
 
-    std::deque<midi::Message> midiMessageQueue;
+  std::string source1NameString;
+  std::string source2NameString;
+  std::string output1NameString;
+  std::string output2NameString;
 
-    std::string source1NameString;
-    std::string source2NameString;
-    std::string output1NameString;
-    std::string output2NameString;
+  static constexpr int8_t sourceOneSelectMidiPrograms[] = { 4, 5, 6, 7, 8, 9, 10, 11 };
+  static constexpr int8_t sourceTwoSelectMidiPrograms[] = { 12, 13, 14, 15, 16, 17, 18, 19 };
 
-    // detect state changes so we can send a MIDI event.
-    struct buttonParamMidiProgram {
-        enum ParamId button;
-        int previousValue;
-        uint8_t midiProgram[8];
-    } buttonParamToMidiProgramList[6] =
-      {
-          { FILTER_MOD_SWITCH_PARAM, INT_MIN, { 0, 1 } },
-          { VCA_MOD_SWITCH_PARAM, INT_MIN, { 2, 3 } },
-          { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 4, 5, 6, 7, 8, 9, 10, 11 } },
-          { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 12, 13, 14, 15, 16, 17, 18, 19 } },
-          { REZ_MOD_SWITCH_PARAM, INT_MIN, { 20, 21 } },
-          { PAN_MOD_SWITCH_PARAM, INT_MIN, { 22, 23 } }
-      };
+  // index corresponds on both vectors for tracking button pushes and outgoing MIDI msg
+  static const std::vector<ButtonMapping<Zoxnoxious3372> > buttonMappings;
+  std::vector<ButtonState> buttonStates;
+  ButtonMidiController<Zoxnoxious3372> buttonMidiController;
+
+  std::array<CvRoute,8> routes;
+
+  Zoxnoxious3372() :
+    source1NameString(invalidCardOutputName), source2NameString(invalidCardOutputName),
+    output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName),
+    buttonStates(buttonMappings.size()),
+    buttonMidiController(buttonMappings),
+    routes{{
+      {NOISE_KNOB_PARAM, NOISE_LEVEL_INPUT, NOISE_LEVEL, 10.f, &noiseClipTimer, nullptr},
+      {OUTPUT_PAN_KNOB_PARAM, OUTPUT_PAN_INPUT, OUTPUT_PAN, 10.f, &outputPanClipTimer, nullptr},
+      {RESONANCE_KNOB_PARAM, RESONANCE_INPUT, RESONANCE, 10.f, &resonanceClipTimer, dualLinearSwitch0_8},
+      {FILTER_VCA_KNOB_PARAM, FILTER_VCA_INPUT, FILTER_VCA, 10.f, &outputVcaClipTimer, nullptr},
+      {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, CUTOFF, 10.f, &cutoffClipTimer, nullptr},
+      {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, 10.f, &sourceOneLevelClipTimer, nullptr},
+      {SOURCE_TWO_LEVEL_KNOB_PARAM, SOURCE_TWO_LEVEL_INPUT, SOURCE_TWO_LEVEL, 10.f, &sourceTwoLevelClipTimer, nullptr},
+      {MOD_AMOUNT_KNOB_PARAM, MOD_AMOUNT_INPUT, MOD_AMOUNT, 10.f, &modAmountClipTimer, nullptr} }} {
+
+    setParticipant(this);
+    setLightEnum(RIGHT_EXPANDER_LIGHT);
 
 
-    Zoxnoxious3372() :
-        modAmountClipTimer(0.f), sourceOneLevelClipTimer(0.f), sourceTwoLevelClipTimer(0.f),
-        outputPanClipTimer(0.f), cutoffClipTimer(0.f), resonanceClipTimer(0.f), outputVcaClipTimer(0.f),
-        source1NameString(invalidCardOutputName), source2NameString(invalidCardOutputName),
-        output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName) {
+    config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+    configButton(SOURCE_ONE_DOWN_BUTTON_PARAM, "Previous");
+    configButton(SOURCE_ONE_UP_BUTTON_PARAM, "Next");
+    configButton(SOURCE_TWO_DOWN_BUTTON_PARAM, "Previous");
+    configButton(SOURCE_TWO_UP_BUTTON_PARAM, "Next");
 
-        config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-        configButton(SOURCE_ONE_DOWN_BUTTON_PARAM, "Previous");
-        configButton(SOURCE_ONE_UP_BUTTON_PARAM, "Next");
-        configButton(SOURCE_TWO_DOWN_BUTTON_PARAM, "Previous");
-        configButton(SOURCE_TWO_UP_BUTTON_PARAM, "Next");
+    configParam(MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Modulation Amount", "%", 0.f, 100.f);
+    configParam(NOISE_KNOB_PARAM, 0.f, 1.f, 0.f, "White Noise", "%", 0.f, 100.f);
+    configParam(SOURCE_ONE_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Level", "%", 0.f, 100.f);
+    configParam(SOURCE_TWO_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Level", "%", 0.f, 100.f);
+    configParam(OUTPUT_PAN_KNOB_PARAM, 0.f, 1.f, 0.5f, "Pan", "%", 0.f, 200.f, -100.f);
+    configParam(CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff", " V", 0.f, 10.f, -1.f);
+    configParam(RESONANCE_KNOB_PARAM, 0.f, 1.f, 0.f, "Resonance", "%", 0.f, 100.f);
+    configParam(FILTER_VCA_KNOB_PARAM, 0.f, 1.f, 0.f, "Level", "%", 0.f, 100.f);
 
-        configParam(MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Modulation Amount", "%", 0.f, 100.f);
-        configParam(NOISE_KNOB_PARAM, 0.f, 1.f, 0.f, "White Noise", "%", 0.f, 100.f);
-        configParam(SOURCE_ONE_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Level", "%", 0.f, 100.f);
-        configParam(SOURCE_TWO_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Level", "%", 0.f, 100.f);
-        configParam(OUTPUT_PAN_KNOB_PARAM, 0.f, 1.f, 0.5f, "Pan", "%", 0.f, 200.f, -100.f);
-        configParam(CUTOFF_KNOB_PARAM, 0.f, 1.f, 1.f, "Cutoff", " V", 0.f, 10.f, -1.f);
-        configParam(RESONANCE_KNOB_PARAM, 0.f, 1.f, 0.f, "Resonance", "%", 0.f, 100.f);
-        configParam(FILTER_VCA_KNOB_PARAM, 0.f, 1.f, 0.f, "Level", "%", 0.f, 100.f);
+    configSwitch(FILTER_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Filter Mod", {"Off", "On"});
+    configSwitch(VCA_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "VCA Mod", {"Off", "On"});
+    configSwitch(REZ_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Rez Mod", {"Off", "On"});
+    configSwitch(PAN_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pan Mod", {"Off", "On"});
 
-        configSwitch(FILTER_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Filter Mod", {"Off", "On"});
-        configSwitch(VCA_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "VCA Mod", {"Off", "On"});
-        configSwitch(REZ_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Rez Mod", {"Off", "On"});
-        configSwitch(PAN_MOD_SWITCH_PARAM, 0.f, 1.f, 0.f, "Pan Mod", {"Off", "On"});
+    configInput(MOD_AMOUNT_INPUT, "Modulation Amount");
+    configInput(NOISE_LEVEL_INPUT, "Noise Level");
+    configInput(SOURCE_ONE_LEVEL_INPUT, "Source One Level");
+    configInput(SOURCE_TWO_LEVEL_INPUT, "Source Two Level");
+    configInput(OUTPUT_PAN_INPUT, "Pan");
+    configInput(CUTOFF_INPUT, "Cutoff");
+    configInput(RESONANCE_INPUT, "Resonance");
+    configInput(FILTER_VCA_INPUT, "Output Level");
 
-        configInput(MOD_AMOUNT_INPUT, "Modulation Amount");
-        configInput(NOISE_LEVEL_INPUT, "Noise Level");
-        configInput(SOURCE_ONE_LEVEL_INPUT, "Source One Level");
-        configInput(SOURCE_TWO_LEVEL_INPUT, "Source Two Level");
-        configInput(OUTPUT_PAN_INPUT, "Pan");
-        configInput(CUTOFF_INPUT, "Cutoff");
-        configInput(RESONANCE_INPUT, "Resonance");
-        configInput(FILTER_VCA_INPUT, "Output Level");
+    // no UI elements for these
+    configSwitch(SOURCE_ONE_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source One", {"0", "1", "2", "3", "4", "5", "6", "7"} );
+    configSwitch(SOURCE_TWO_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source Two", {"0", "1", "2", "3", "4", "5", "6", "7"} );
 
-        // no UI elements for these
-        configSwitch(SOURCE_ONE_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source One", {"0", "1", "2", "3", "4", "5", "6", "7"} );
-        configSwitch(SOURCE_TWO_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source Two", {"0", "1", "2", "3", "4", "5", "6", "7"} );
+  }
 
-        lightDivider.setDivision(512);
+  void pullSamples(const rack::engine::Module::ProcessArgs &args, dsp::Frame<maxAudioChannels> &sharedFrame, int offset) override {
+    // clipping
+    static constexpr float clipTime = 0.25f;
+
+    processCvRoutes(routes.data(),
+                    routes.size(),
+                    clipTime,
+                    offset,
+                    sharedFrame.samples,
+                    params.data(),
+                    inputs.data());
+
+  }
+
+  bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override {
+    const float lightTime = args.sampleTime * clockDivision;
+    const float brightnessDeltaTime = 1 / lightTime;
+
+    // lights first then MIDI messages
+    modAmountClipTimer -= lightTime;
+    lights[MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(modAmountClipTimer > 0.f, brightnessDeltaTime);
+
+    sourceOneLevelClipTimer -= lightTime;
+    lights[SOURCE_ONE_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceOneLevelClipTimer > 0.f, brightnessDeltaTime);
+
+    sourceTwoLevelClipTimer -= lightTime;
+    lights[SOURCE_TWO_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceTwoLevelClipTimer > 0.f, brightnessDeltaTime);
+
+    outputPanClipTimer -= lightTime;
+    lights[OUTPUT_PAN_CLIP_LIGHT].setBrightnessSmooth(outputPanClipTimer > 0.f, brightnessDeltaTime);
+
+    cutoffClipTimer -= lightTime;
+    lights[CUTOFF_CLIP_LIGHT].setBrightnessSmooth(cutoffClipTimer > 0.f, brightnessDeltaTime);
+
+    resonanceClipTimer -= lightTime;
+    lights[RESONANCE_CLIP_LIGHT].setBrightnessSmooth(resonanceClipTimer > 0.f, brightnessDeltaTime);
+
+    outputVcaClipTimer -= lightTime;
+    lights[OUTPUT_VCA_CLIP_LIGHT].setBrightnessSmooth(outputVcaClipTimer > 0.f, brightnessDeltaTime);
+
+    lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
+    lights[SOURCE_ONE_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_UP_BUTTON_PARAM].getValue());
+    lights[SOURCE_TWO_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_DOWN_BUTTON_PARAM].getValue());
+    lights[SOURCE_TWO_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_UP_BUTTON_PARAM].getValue());
+
+    buttonMidiController.updateLights(this);
+    if (buttonMidiController.process(this, midiChannel, midiMessage)) {
+      return true;
     }
 
-    void process(const ProcessArgs& args) override {
-        processExpander(args);
-
-
-        if (lightDivider.process()) {
-            // buttons
-            lights[VCA_MOD_ENABLE_LIGHT].setBrightness( params[VCA_MOD_SWITCH_PARAM].getValue() > 0.f );
-            lights[FILTER_MOD_ENABLE_LIGHT].setBrightness( params[FILTER_MOD_SWITCH_PARAM].getValue() > 0.f );
-            lights[REZ_MOD_ENABLE_LIGHT].setBrightness( params[REZ_MOD_SWITCH_PARAM].getValue() > 0.f );
-            lights[PAN_MOD_ENABLE_LIGHT].setBrightness( params[PAN_MOD_SWITCH_PARAM].getValue() > 0.f );
-
-
-            lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
-            lights[SOURCE_ONE_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_UP_BUTTON_PARAM].getValue());
-            lights[SOURCE_TWO_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_DOWN_BUTTON_PARAM].getValue());
-            lights[SOURCE_TWO_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_UP_BUTTON_PARAM].getValue());
-
-            // clipping
-            const float lightTime = args.sampleTime * lightDivider.getDivision();
-            const float brightnessDeltaTime = 1 / lightTime;
-
-            modAmountClipTimer -= lightTime;
-            lights[MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(modAmountClipTimer > 0.f, brightnessDeltaTime);
-
-            sourceOneLevelClipTimer -= lightTime;
-            lights[SOURCE_ONE_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceOneLevelClipTimer > 0.f, brightnessDeltaTime);
-
-            sourceTwoLevelClipTimer -= lightTime;
-            lights[SOURCE_TWO_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceTwoLevelClipTimer > 0.f, brightnessDeltaTime);
-
-            outputPanClipTimer -= lightTime;
-            lights[OUTPUT_PAN_CLIP_LIGHT].setBrightnessSmooth(outputPanClipTimer > 0.f, brightnessDeltaTime);
-
-            cutoffClipTimer -= lightTime;
-            lights[CUTOFF_CLIP_LIGHT].setBrightnessSmooth(cutoffClipTimer > 0.f, brightnessDeltaTime);
-
-            resonanceClipTimer -= lightTime;
-            lights[RESONANCE_CLIP_LIGHT].setBrightnessSmooth(resonanceClipTimer > 0.f, brightnessDeltaTime);
-
-            outputVcaClipTimer -= lightTime;
-            lights[OUTPUT_VCA_CLIP_LIGHT].setBrightnessSmooth(outputVcaClipTimer > 0.f, brightnessDeltaTime);
-
-            setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
-            setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
-
-
-            // add/subtract the up/down buttons and set a string that
-            // the UI can use.  There ought to be some todos here to
-            // make/fix this.
-            if (params[ SOURCE_ONE_UP_BUTTON_PARAM ].getValue()) {
-                params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0.f);
-                int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-                sourceOneInt = sourceOneInt == 7 ? 0 : sourceOneInt + 1;
-                params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
-                source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
-            }
-            if (params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].getValue()) {
-                params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].setValue(0);
-                int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-                sourceOneInt = sourceOneInt == 0 ? 7 : sourceOneInt - 1;
-                params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
-                source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
-            }
-
-
-            if (params[ SOURCE_TWO_UP_BUTTON_PARAM ].getValue()) {
-                params[ SOURCE_TWO_UP_BUTTON_PARAM ].setValue(0);
-                int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-                sourceTwoInt = sourceTwoInt == 7 ? 0 : sourceTwoInt + 1;
-                params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
-                source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
-            }
-            if (params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].getValue()) {
-                params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].setValue(0);
-                int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-                sourceTwoInt = sourceTwoInt == 0 ? 7 : sourceTwoInt - 1;
-                params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
-                source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
-            }
-        }
-
+    if (handleUpDownSelector(
+          params[SOURCE_ONE_UP_BUTTON_PARAM],
+          params[SOURCE_ONE_DOWN_BUTTON_PARAM],
+          params[SOURCE_ONE_VALUE_HIDDEN_PARAM],
+          7,
+          [&](int i){ return *lifecycle.nameService->getNamePtr(source1Sources[i]); },
+          source1NameString,
+          sourceOneSelectMidiPrograms,
+          midiMessage,
+          midiChannel)) {
+      return true;
     }
 
-
-
-    /** processZoxnoxiousControl
-     *
-     * add our control voltage values to the control message.  Add or queue any MIDI message.
-     *
-     */
-    void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
-
-        if (!hasChannelAssignment) {
-            return;
-        }
-
-
-        float v;
-        const float clipTime = 0.25f;
-
-        // noise
-        v = params[NOISE_KNOB_PARAM].getValue() + inputs[NOISE_LEVEL_INPUT].getVoltage() / 10.f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + NOISE_LEVEL] = clamp(v, 0.f, 1.f);
-        // no clip LED for noise level
-
-        // panning
-        v = params[OUTPUT_PAN_KNOB_PARAM].getValue() + inputs[OUTPUT_PAN_INPUT].getVoltage() / 10.f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + OUTPUT_PAN] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + OUTPUT_PAN] != v) {
-            outputPanClipTimer = clipTime;
-        }
-
-        // resonance
-        // dual-linear slope.  Slope changes at 0.8.
-        v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltage() / 10.f;
-        v = v < 0.8f ? v * 0.6f : 2.6f * v - 1.6f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + RESONANCE] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + RESONANCE] != v) {
-            resonanceClipTimer = clipTime;
-        }
-
-        // output VCA
-        v = params[FILTER_VCA_KNOB_PARAM].getValue() + inputs[FILTER_VCA_INPUT].getVoltage() / 10.f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + FILTER_VCA] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + FILTER_VCA] != v) {
-            outputVcaClipTimer = clipTime;
-        }
-
-        // cutoff
-        v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltage() / 10.f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + CUTOFF] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + CUTOFF] != v) {
-            cutoffClipTimer = clipTime;
-        }
-
-        // sig1 vca
-        v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltage() / 10.f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_LEVEL] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_LEVEL] != v) {
-            sourceOneLevelClipTimer = clipTime;
-        }
-
-        // sig2 vca
-        v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltage() / 10.f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_LEVEL] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_LEVEL] != v) {
-            sourceTwoLevelClipTimer = clipTime;
-        }
-
-        // modulation vca
-        v = params[MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[MOD_AMOUNT_INPUT].getVoltage() / 10.f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + MOD_AMOUNT] = clamp(v, 0.f, 1.f);
-        if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + MOD_AMOUNT] != v) {
-            modAmountClipTimer = clipTime;
-        }
-
-
-
-        // if we have any queued midi messages, send them if possible
-        if (controlMsg->midiMessageSet == false) {
-            if (midiMessageQueue.size() > 0) {
-                //INFO("z3372: clock %" PRId64 " : bus is open, popping MIDI message from queue", APP->engine->getFrame());
-                controlMsg->midiMessageSet = true;
-                controlMsg->midiMessage = midiMessageQueue.front();
-                midiMessageQueue.pop_front();
-            }
-        }
-
-
-        for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
-            int newValue = static_cast<int>(std::round(params[ buttonParamToMidiProgramList[i].button ].getValue()));
-
-            if (buttonParamToMidiProgramList[i].previousValue != newValue) {
-                buttonParamToMidiProgramList[i].previousValue = newValue;
-                if (controlMsg->midiMessageSet == false) {
-                    // send direct
-                    controlMsg->midiMessage.setSize(2);
-                    controlMsg->midiMessage.setChannel(midiChannel);
-                    controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
-                    controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
-                    controlMsg->midiMessageSet = true;
-                    INFO("zoxnoxious3372: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
-                }
-                else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
-                    midi::Message queuedMessage;
-                    queuedMessage.setSize(2);
-                    queuedMessage.setChannel(midiChannel);
-                    queuedMessage.setStatus(midiProgramChangeStatus);
-                    queuedMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
-                    midiMessageQueue.push_back(queuedMessage);
-                }
-                else {
-                    INFO("zoxnoxious3372: dropping MIDI message, bus full and queue full");
-                }
-            }
-        }
-
+    if (handleUpDownSelector(
+          params[SOURCE_TWO_UP_BUTTON_PARAM],
+          params[SOURCE_TWO_DOWN_BUTTON_PARAM],
+          params[SOURCE_TWO_VALUE_HIDDEN_PARAM],
+          7,
+          [&](int i){ return *lifecycle.nameService->getNamePtr(source2Sources[i]); },
+          source2NameString,
+          sourceTwoSelectMidiPrograms,
+          midiMessage,
+          midiChannel)) {
+      return true;
     }
 
+    return false;
+  }
 
-    /** getCardHardwareId
-     * return the hardware Id of the 3340 card
-     */
-    static const uint8_t hardwareId = 0x03;
-    uint8_t getHardwareId() override {
-        return hardwareId;
+
+  /** getCardHardwareId
+   * return the hardware Id of the 3340 card
+   */
+  static constexpr uint8_t hardwareId = 0x03;
+  uint8_t getHardwareId() const override {
+    return hardwareId;
+  }
+
+  /* Participant interface */
+  int64_t getModuleId() override {
+    return getId();
+  }
+
+  void onAttach() override {
+    if (lifecycle.nameService == nullptr) {
+      return;
     }
+    auto *ptr1 = lifecycle.nameService->getNamePtr(lifecycle.slotNum * 2);
+    auto *ptr2 = lifecycle.nameService->getNamePtr(lifecycle.slotNum * 2 + 1);
+    output1NameString = ptr1 ? *ptr1 : invalidCardOutputName;
+    output2NameString = ptr2 ? *ptr2 : invalidCardOutputName;
 
-
-    void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) override {
-        ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
-        output1NameString = getCardOutputName(hardwareId, 1, slot);
-        output2NameString = getCardOutputName(hardwareId, 2, slot);
-        int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-        source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
-        int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-        source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
-    }
-
-    void onChannelAssignmentLost() override {
-        ZoxnoxiousModule::onChannelAssignmentLost();
-        output1NameString = invalidCardOutputName;
-        output2NameString = invalidCardOutputName;
-        // should do something better with source{1,2}NameString here since
-        // user can still click on the buttons to change them
-        source1NameString = invalidCardOutputName;
-        source2NameString = invalidCardOutputName;
-    }
-
+    int sourceOneIndex = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
+    int sourceTwoIndex = static_cast<int>(params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue());
+    auto *ptrSource1 = lifecycle.nameService->getNamePtr( source1Sources[sourceOneIndex] );
+    auto *ptrSource2 = lifecycle.nameService->getNamePtr( source2Sources[sourceTwoIndex] );
+    source1NameString = ptrSource1 ? *ptrSource1 : invalidCardOutputName;
+    source2NameString = ptrSource2 ? *ptrSource2 : invalidCardOutputName;
+  }
 
 };
 
@@ -487,5 +372,17 @@ struct Zoxnoxious3372Widget : ModuleWidget {
 
 };
 
+const std::vector<ButtonMapping<Zoxnoxious3372> > Zoxnoxious3372::buttonMappings = {
+  { FILTER_MOD_SWITCH_PARAM, FILTER_MOD_ENABLE_LIGHT, {0,1} },
+  { VCA_MOD_SWITCH_PARAM, VCA_MOD_ENABLE_LIGHT, {2,3} },
+  { REZ_MOD_SWITCH_PARAM, REZ_MOD_ENABLE_LIGHT, {20, 21} },
+  { PAN_MOD_SWITCH_PARAM, PAN_MOD_ENABLE_LIGHT, {22, 23} }
+};
 
-Model* modelZoxnoxious3372 = createModel<Zoxnoxious3372, Zoxnoxious3372Widget>("Zoxnoxious3372");
+constexpr int8_t zox::Zoxnoxious3372::sourceOneSelectMidiPrograms[];
+constexpr int8_t zox::Zoxnoxious3372::sourceTwoSelectMidiPrograms[];
+
+
+} // namespace zox
+
+Model* modelZoxnoxious3372 = createModel<zox::Zoxnoxious3372, zox::Zoxnoxious3372Widget>("Zoxnoxious3372");

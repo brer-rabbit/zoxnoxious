@@ -119,16 +119,14 @@ struct PoleDancer final : ParticipantAdapter, Participant {
   static constexpr int8_t sourceOneSelectMidiPrograms[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
   static constexpr int8_t sourceTwoSelectMidiPrograms[] = { 8, 9, 10, 11, 12, 13, 14, 15 };
   static constexpr int8_t rezModeSelectMidiPrograms[] = { 24, 25, 26, 27 };
-  int sourceOneSelectSwitchValue = 0; // current index to sourceOneSelectSwitchValue
-  bool sourceOneSelectChanged = false;
-  int sourceTwoSelectSwitchValue = 0; // current index to sourceTwoSelectMidiPrograms
-  bool sourceTwoSelectChanged = false;
-  int rezModeSelectSwitchValue = 0; // current index to rezModeSelectMidiPrograms
-  bool rezModeSelectChanged = false;
 
   std::array<CvRoute,5> routes;
 
   PoleDancer() :
+    source1NameString(invalidCardOutputName),
+    source2NameString(invalidCardOutputName),
+    output1NameString(invalidCardOutputName),
+    output2NameString(invalidCardOutputName),
     routes{{
       {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, VCF_CUTOFF, 10.f, &cutoffClipTimer, nullptr},
       {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, 10.f, &sourceOneLevelClipTimer, nullptr},
@@ -175,18 +173,12 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     configSwitch(SOURCE_TWO_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source Two", {"0", "1", "2", "3", "4", "5", "6", "7"} );
     configSwitch(REZ_COMP_VALUE_HIDDEN_PARAM, 0.f, 3.f, 0.f, "Rez Compensation", {"0", "1", "2", "3"} );
     source1NameString.reserve(16);
-    source1NameString = invalidCardOutputName;
     source2NameString.reserve(16);
-    source2NameString = invalidCardOutputName;
     output1NameString.reserve(16);
-    output1NameString = invalidCardOutputName;
     output2NameString.reserve(16);
-    output2NameString = invalidCardOutputName;
     rezCompModeNameString.reserve(16);
-    rezCompModeNameString = rezCompModes[rezModeSelectSwitchValue];
-
-
-    }
+    rezCompModeNameString = rezCompModes[0];
+  }
 
   /* Participant interface: return Module identifier */
   int64_t getModuleId() override {
@@ -274,74 +266,11 @@ struct PoleDancer final : ParticipantAdapter, Participant {
   }
 
 
-  inline int wrapIncrement(int value, int delta, int max) {
-    value += delta;
-    if (value > max) {
-      value = 0;
-    }
-    else if (value < 0) {
-      value = max;
-    }
-    return value;
-  }
-
-  template <typename NameLookup> inline bool handleUpDownSelector(
-    Param& upButton,
-    Param& downButton,
-    Param& valueParam,
-    int maxIndex,
-    NameLookup nameLookup,
-    std::string& nameString,
-    const int8_t* midiPrograms,
-    rack::midi::Message& midiMessage,
-    int8_t midiChannel) {
-
-    int delta = 0;
-
-    if (upButton.getValue()) {
-      upButton.setValue(0.f);
-      delta += 1;
-    }
-
-    if (downButton.getValue()) {
-      downButton.setValue(0.f);
-      delta -= 1;
-    }
-
-    if (delta == 0) {
-      return false;
-    }
-
-    int value = static_cast<int>(valueParam.getValue());
-    int newValue = wrapIncrement(value, delta, maxIndex);
-
-    if (newValue == value) {
-      return false;
-    }
-
-    valueParam.setValue(newValue);
-
-    nameString = nameLookup(newValue);
-
-    setMidiProgramChangeMessage(midiMessage, midiChannel, midiPrograms[newValue]);
-    return true;
-  }
-
-
   bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override {
-
-    // light up any buttons
-    lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
-    lights[SOURCE_ONE_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_UP_BUTTON_PARAM].getValue());
-    lights[SOURCE_TWO_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_DOWN_BUTTON_PARAM].getValue());
-    lights[SOURCE_TWO_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_UP_BUTTON_PARAM].getValue());
-    lights[REZ_COMP_DOWN_BUTTON_LIGHT].setBrightness(params[REZ_COMP_DOWN_BUTTON_PARAM].getValue());
-    lights[REZ_COMP_UP_BUTTON_LIGHT].setBrightness(params[REZ_COMP_UP_BUTTON_PARAM].getValue());
 
     // clipping
     const float lightTime = args.sampleTime * clockDivision;
     const float brightnessDeltaTime = 1 / lightTime;
-
 
     // for clipping lights just keep subtracting every cycle
     sourceOneLevelClipTimer -= lightTime;
@@ -364,6 +293,15 @@ struct PoleDancer final : ParticipantAdapter, Participant {
 
     filterVcaClipTimer -= lightTime;
     lights[FILTER_VCA_CLIP_LIGHT].setBrightnessSmooth(filterVcaClipTimer > 0.f, brightnessDeltaTime);
+
+
+    // light up any buttons-- processing of these is done immediately below
+    lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
+    lights[SOURCE_ONE_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_UP_BUTTON_PARAM].getValue());
+    lights[SOURCE_TWO_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_DOWN_BUTTON_PARAM].getValue());
+    lights[SOURCE_TWO_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_UP_BUTTON_PARAM].getValue());
+    lights[REZ_COMP_DOWN_BUTTON_LIGHT].setBrightness(params[REZ_COMP_DOWN_BUTTON_PARAM].getValue());
+    lights[REZ_COMP_UP_BUTTON_LIGHT].setBrightness(params[REZ_COMP_UP_BUTTON_PARAM].getValue());
 
 
     // add/subtract the up/down buttons and set a string that
@@ -416,7 +354,7 @@ struct PoleDancer final : ParticipantAdapter, Participant {
   /** getCardHardwareId
    * return the hardware Id of the poledancer card
    */
-  static const uint8_t hardwareId = 0x06;
+  static constexpr uint8_t hardwareId = 0x06;
   uint8_t getHardwareId() const override {
     return hardwareId;
   }
@@ -431,8 +369,10 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     output1NameString = ptr1 ? *ptr1 : invalidCardOutputName;
     output2NameString = ptr2 ? *ptr2 : invalidCardOutputName;
 
-    auto *ptrSource1 = lifecycle.nameService->getNamePtr( source1Sources[sourceOneSelectSwitchValue] );
-    auto *ptrSource2 = lifecycle.nameService->getNamePtr( source2Sources[sourceTwoSelectSwitchValue] );
+    int sourceOneIndex = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
+    int sourceTwoIndex = static_cast<int>(params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue());
+    auto *ptrSource1 = lifecycle.nameService->getNamePtr( source1Sources[sourceOneIndex] );
+    auto *ptrSource2 = lifecycle.nameService->getNamePtr( source2Sources[sourceTwoIndex] );
     source1NameString = ptrSource1 ? *ptrSource1 : invalidCardOutputName;
     source2NameString = ptrSource2 ? *ptrSource2 : invalidCardOutputName;
   }

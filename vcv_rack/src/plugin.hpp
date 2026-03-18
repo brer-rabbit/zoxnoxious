@@ -20,7 +20,6 @@ extern Plugin* pluginInstance;
 extern Model* modelPoleDancer;
 extern Model* modelPoleDancerPersonality;
 extern Model* modelZoxnoxious3340;
-// extern Model* modelZoxnoxious3372;
+extern Model* modelZoxnoxious3372;
 extern Model* modelZoxnoxious5524;
-// extern Model* modelPatchingMatrix;
 extern Model* modelAudioIO;

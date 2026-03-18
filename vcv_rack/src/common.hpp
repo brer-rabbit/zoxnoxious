@@ -191,5 +191,67 @@ inline float dualLinearSwitch0_8(float v) {
 
 
 
+
+//----------------------------------------------------------------------------
+// Helper functions for up/down param selector switching.
+// used where an up button/down button combo sets a +1/-1 to a state.
+// A string is set based on the new value, and the passed on midi
+// message populated with a payload.  Unlike other helpers this does
+// not take the light arg; any button lights to be lit by the caller
+//
+
+inline int wrapIncrement(int value, int delta, int max) {
+  value += delta;
+  if (value > max) {
+    value = 0;
+  }
+  else if (value < 0) {
+    value = max;
+  }
+  return value;
 }
 
+template <typename NameLookup> inline bool handleUpDownSelector(
+  Param& upButton,
+  Param& downButton,
+  Param& valueParam,
+  int maxIndex,
+  NameLookup nameLookup,
+  std::string& nameString,
+  const int8_t* midiPrograms,
+  rack::midi::Message& midiMessage,
+  int8_t midiChannel) {
+
+  int delta = 0;
+
+  if (upButton.getValue()) {
+    upButton.setValue(0.f);
+    delta += 1;
+  }
+
+  if (downButton.getValue()) {
+    downButton.setValue(0.f);
+    delta -= 1;
+  }
+
+  if (delta == 0) {
+    return false;
+  }
+
+  int value = static_cast<int>(valueParam.getValue());
+  int newValue = wrapIncrement(value, delta, maxIndex);
+
+  if (newValue == value) {
+    return false;
+  }
+
+  valueParam.setValue(newValue);
+
+  nameString = nameLookup(newValue);
+
+  setMidiProgramChangeMessage(midiMessage, midiChannel, midiPrograms[newValue]);
+  return true;
+}
+
+
+} // namespace zox

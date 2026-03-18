@@ -276,7 +276,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
    * return the hardware Id of the 3340 card
    * This MUST match the ROM Id on the card
    */
-  static const uint8_t hardwareId = 0x02;
+  static constexpr uint8_t hardwareId = 0x02;
   uint8_t getHardwareId() const override {
     return hardwareId;
   }
