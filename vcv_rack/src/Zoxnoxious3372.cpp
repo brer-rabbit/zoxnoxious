@@ -120,7 +120,6 @@ struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
 
   // index corresponds on both vectors for tracking button pushes and outgoing MIDI msg
   static const std::vector<ButtonMapping<Zoxnoxious3372> > buttonMappings;
-  std::vector<ButtonState> buttonStates;
   ButtonMidiController<Zoxnoxious3372> buttonMidiController;
 
   std::array<CvRoute,8> routes;
@@ -128,7 +127,6 @@ struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
   Zoxnoxious3372() :
     source1NameString(invalidCardOutputName), source2NameString(invalidCardOutputName),
     output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName),
-    buttonStates(buttonMappings.size()),
     buttonMidiController(buttonMappings),
     routes{{
       {NOISE_KNOB_PARAM, NOISE_LEVEL_INPUT, NOISE_LEVEL, 10.f, &noiseClipTimer, nullptr},
@@ -287,6 +285,15 @@ struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
     auto *ptrSource2 = lifecycle.nameService->getNamePtr( source2Sources[sourceTwoIndex] );
     source1NameString = ptrSource1 ? *ptrSource1 : invalidCardOutputName;
     source2NameString = ptrSource2 ? *ptrSource2 : invalidCardOutputName;
+
+    // fake out the handleUpDownSelector() to force a MIDI message to be sent
+    params[SOURCE_ONE_VALUE_HIDDEN_PARAM].setValue(
+      params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue() - 1.f);
+    params[SOURCE_ONE_UP_BUTTON_PARAM].setValue(1.f);
+
+    params[SOURCE_TWO_VALUE_HIDDEN_PARAM].setValue(
+      params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue() - 1.f);
+    params[SOURCE_TWO_UP_BUTTON_PARAM].setValue(1.f);
   }
 
 };

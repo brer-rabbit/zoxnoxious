@@ -100,7 +100,6 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
 
   // index corresponds on both vectors for tracking button pushes and outgoing MIDI msg
   static const std::vector<ButtonMapping<Zoxnoxious3340> > buttonMappings;
-  std::vector<ButtonState> buttonStates;
   ButtonMidiController<Zoxnoxious3340> buttonMidiController;
 
   // the stateful selector is handled a bit differently than toggle buttons.
@@ -112,7 +111,6 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
 
 
   Zoxnoxious3340() :
-    buttonStates(buttonMappings.size()),
     buttonMidiController(buttonMappings),
     routes{{
       {LINEAR_KNOB_PARAM, LINEAR_INPUT, LINEAR_CHANNEL, 10.f, &linearClipTimer, nullptr},

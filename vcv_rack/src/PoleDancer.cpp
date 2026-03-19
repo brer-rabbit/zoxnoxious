@@ -375,6 +375,20 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     auto *ptrSource2 = lifecycle.nameService->getNamePtr( source2Sources[sourceTwoIndex] );
     source1NameString = ptrSource1 ? *ptrSource1 : invalidCardOutputName;
     source2NameString = ptrSource2 ? *ptrSource2 : invalidCardOutputName;
+
+    // fake out the handleUpDownSelector() to force a MIDI message to be sent
+    params[SOURCE_ONE_VALUE_HIDDEN_PARAM].setValue(
+      params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue() - 1.f);
+    params[SOURCE_ONE_UP_BUTTON_PARAM].setValue(1.f);
+
+    params[SOURCE_TWO_VALUE_HIDDEN_PARAM].setValue(
+      params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue() - 1.f);
+    params[SOURCE_TWO_UP_BUTTON_PARAM].setValue(1.f);
+
+    params[REZ_COMP_VALUE_HIDDEN_PARAM].setValue(
+      params[REZ_COMP_VALUE_HIDDEN_PARAM].getValue() - 1.f);
+    params[REZ_COMP_UP_BUTTON_PARAM].setValue(1.f);
+
   }
 
 
@@ -384,7 +398,7 @@ struct PoleDancer final : ParticipantAdapter, Participant {
   }
 
   void dataFromJson(json_t* rootJ) override {
-    int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
+    int rezCompModeInt = static_cast<int>(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue());
     rezCompModeNameString = rezCompModes[ rezCompModeInt ];
     INFO("poledancer: setting comp mode to %s", rezCompModeNameString.c_str());
   }

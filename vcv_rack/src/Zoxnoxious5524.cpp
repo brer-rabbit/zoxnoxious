@@ -152,9 +152,7 @@ struct Zoxnoxious5524 final : ParticipantAdapter, Participant {
 
   // index corresponds on both vectors for tracking button pushes and outgoing MIDI msg
   static const std::vector<ButtonMapping<Zoxnoxious5524> > buttonMappings;
-  std::vector<ButtonState> buttonStates;
   ButtonMidiController<Zoxnoxious5524> buttonMidiController;
-
 
   // VCO Two pulse is enabled/disabled by setting the pulse width to
   // minimum value.  Track that outside of buttonParamToMidiProgramList.
@@ -169,7 +167,6 @@ struct Zoxnoxious5524 final : ParticipantAdapter, Participant {
 
   Zoxnoxious5524() : output1NameString(invalidCardOutputName),
     output2NameString(invalidCardOutputName),
-    buttonStates(buttonMappings.size()),
     buttonMidiController(buttonMappings),
     routes{{
       {VCO_ONE_SAW_KNOB_PARAM, VCO_ONE_SAW_INPUT, VCO_ONE_SAW, 10.f, &vcoOneSawClipTimer, nullptr},

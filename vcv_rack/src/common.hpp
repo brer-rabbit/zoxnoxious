@@ -88,10 +88,7 @@ public:
         if (curValue >= 0 && curValue < static_cast<int>(map.midiPrograms.size())) {
           int8_t program = map.midiPrograms[curValue];
           setMidiProgramChangeMessage(midiOut, midiChannel, program);
-          INFO("new: button param %zu latched value %d MIDI program %d",
-               i,
-               curValue,
-               program);
+          //INFO("new: button param %zu latched value %d MIDI program %d", i, curValue, program);
           return true; // only single midi::Message is set per call, so early return here
         }
         else {
