@@ -1,8 +1,10 @@
 #include "plugin.hpp"
+#include "common.hpp"
 #include "zcomponentlib.hpp"
-#include "ZoxnoxiousExpander.hpp"
+#include "ParticipantAdapter.hpp"
 
-static const int midiMessageQueueMaxSize = 16;
+namespace zox {
+
 // map wired mux inputs to signal from cardOutputNames array
 // (card(N-1) * 2 + (out(N-1))
 // card7 out1
@@ -44,9 +46,10 @@ enum cvChannel {
 static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Mode 1", "Alt Mode 2" };
 
 
-static const float mixerGain = 8.f;
+static constexpr float mixerGain = 8.f;
 
-struct PoleDancer : ZoxnoxiousModule {
+struct PoleDancer final : ParticipantAdapter, Participant {
+
   enum ParamId {
     SOURCE_ONE_LEVEL_KNOB_PARAM,
     SOURCE_TWO_LEVEL_KNOB_PARAM,
@@ -99,17 +102,13 @@ struct PoleDancer : ZoxnoxiousModule {
     LIGHTS_LEN
   };
 
-
-  dsp::ClockDivider lightDivider;
-  float sourceOneLevelClipTimer;
-  float sourceOneModAmountClipTimer;
-  float sourceTwoLevelClipTimer;
-  float sourceTwoModAmountClipTimer;
-  float cutoffClipTimer;
-  float resonanceClipTimer;
-  float filterVcaClipTimer;
-
-  std::deque<midi::Message> midiMessageQueue;
+  float sourceOneLevelClipTimer = 0.f;
+  float sourceOneModAmountClipTimer = 0.f;
+  float sourceTwoLevelClipTimer = 0.f;
+  float sourceTwoModAmountClipTimer = 0.f;
+  float cutoffClipTimer = 0.f;
+  float resonanceClipTimer = 0.f;
+  float filterVcaClipTimer = 0.f;
 
   std::string source1NameString;
   std::string source2NameString;
@@ -117,27 +116,27 @@ struct PoleDancer : ZoxnoxiousModule {
   std::string output2NameString;
   std::string rezCompModeNameString;
 
-  struct buttonParamMidiProgram {
-      enum ParamId button;
-      int previousValue;
-      uint8_t midiProgram[8];
-  } buttonParamToMidiProgramList[3] =
-    {
-      { SOURCE_ONE_VALUE_HIDDEN_PARAM, INT_MIN, { 0, 1, 2, 3, 4, 5, 6, 7 } },
-      { SOURCE_TWO_VALUE_HIDDEN_PARAM, INT_MIN, { 8, 9, 10, 11, 12, 13, 14, 15 } },
-      { REZ_COMP_VALUE_HIDDEN_PARAM, INT_MIN, { 24, 25, 26, 27 } }
-    };
+  static constexpr int8_t sourceOneSelectMidiPrograms[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+  static constexpr int8_t sourceTwoSelectMidiPrograms[] = { 8, 9, 10, 11, 12, 13, 14, 15 };
+  static constexpr int8_t rezModeSelectMidiPrograms[] = { 24, 25, 26, 27 };
 
+  std::array<CvRoute,5> routes;
 
   PoleDancer() :
-    sourceOneLevelClipTimer(0.f), sourceOneModAmountClipTimer(0.f),
-    sourceTwoLevelClipTimer(0.f), sourceTwoModAmountClipTimer(0.f),
-    cutoffClipTimer(0.f), resonanceClipTimer(0.f),
-    filterVcaClipTimer(0.f),
-    source1NameString(invalidCardOutputName), source2NameString(invalidCardOutputName),
-    output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName),
-    rezCompModeNameString(rezCompModes[0])
-    {
+    source1NameString(invalidCardOutputName),
+    source2NameString(invalidCardOutputName),
+    output1NameString(invalidCardOutputName),
+    output2NameString(invalidCardOutputName),
+    routes{{
+      {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, VCF_CUTOFF, 10.f, &cutoffClipTimer, nullptr},
+      {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, 10.f, &sourceOneLevelClipTimer, nullptr},
+      {SOURCE_TWO_LEVEL_KNOB_PARAM, SOURCE_TWO_LEVEL_INPUT, SOURCE_TWO_LEVEL, 10.f, &sourceTwoLevelClipTimer, nullptr},
+      {SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, SOURCE_ONE_MOD_AMOUNT_INPUT, SOURCE_ONE_MOD_AMOUNT, 10.f, &sourceOneModAmountClipTimer, nullptr},
+      {SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM, SOURCE_TWO_MOD_AMOUNT_INPUT, SOURCE_TWO_MOD_AMOUNT, 10.f, &sourceTwoModAmountClipTimer, nullptr}
+    }} {
+
+    setParticipant(this);
+    setLightEnum(RIGHT_EXPANDER_LIGHT);
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -173,152 +172,40 @@ struct PoleDancer : ZoxnoxiousModule {
     configSwitch(SOURCE_ONE_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source One", {"0", "1", "2", "3", "4", "5", "6", "7"} );
     configSwitch(SOURCE_TWO_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source Two", {"0", "1", "2", "3", "4", "5", "6", "7"} );
     configSwitch(REZ_COMP_VALUE_HIDDEN_PARAM, 0.f, 3.f, 0.f, "Rez Compensation", {"0", "1", "2", "3"} );
-    lightDivider.setDivision(512);
-
+    source1NameString.reserve(16);
+    source2NameString.reserve(16);
+    output1NameString.reserve(16);
+    output2NameString.reserve(16);
+    rezCompModeNameString.reserve(16);
+    rezCompModeNameString = rezCompModes[0];
   }
 
-  void process(const ProcessArgs& args) override {
-    processExpander(args);
-
-    if (lightDivider.process()) {
-      // light up any buttons
-      lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
-      lights[SOURCE_ONE_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_UP_BUTTON_PARAM].getValue());
-      lights[SOURCE_TWO_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_DOWN_BUTTON_PARAM].getValue());
-      lights[SOURCE_TWO_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_UP_BUTTON_PARAM].getValue());
-      lights[REZ_COMP_DOWN_BUTTON_LIGHT].setBrightness(params[REZ_COMP_DOWN_BUTTON_PARAM].getValue());
-      lights[REZ_COMP_UP_BUTTON_LIGHT].setBrightness(params[REZ_COMP_UP_BUTTON_PARAM].getValue());
-
-      // clipping
-      const float lightTime = args.sampleTime * lightDivider.getDivision();
-      const float brightnessDeltaTime = 1 / lightTime;
-
-
-      // for clipping lights just keep subtracting every cycle.  Timer gets set if needed in processZoxnoxiousControl
-      sourceOneLevelClipTimer -= lightTime;
-      lights[SOURCE_ONE_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceOneLevelClipTimer > 0.f, brightnessDeltaTime);
-
-      sourceOneModAmountClipTimer -= lightTime;
-      lights[SOURCE_ONE_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(sourceOneModAmountClipTimer > 0.f, brightnessDeltaTime);
-
-      sourceTwoLevelClipTimer -= lightTime;
-      lights[SOURCE_TWO_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceTwoLevelClipTimer > 0.f, brightnessDeltaTime);
-
-      sourceTwoModAmountClipTimer -= lightTime;
-      lights[SOURCE_TWO_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(sourceTwoModAmountClipTimer > 0.f, brightnessDeltaTime);
-
-      cutoffClipTimer -= lightTime;
-      lights[CUTOFF_CLIP_LIGHT].setBrightnessSmooth(cutoffClipTimer > 0.f, brightnessDeltaTime);
-
-      resonanceClipTimer -= lightTime;
-      lights[RESONANCE_CLIP_LIGHT].setBrightnessSmooth(resonanceClipTimer > 0.f, brightnessDeltaTime);
-
-      filterVcaClipTimer -= lightTime;
-      lights[FILTER_VCA_CLIP_LIGHT].setBrightnessSmooth(filterVcaClipTimer > 0.f, brightnessDeltaTime);
-
-      setLeftExpanderLight(LEFT_EXPANDER_LIGHT);
-      setRightExpanderLight(RIGHT_EXPANDER_LIGHT);
-
-      // add/subtract the up/down buttons and set a string that
-      // the UI can use.  There ought to be some todos here to
-      // make/fix this.
-      if (params[ SOURCE_ONE_UP_BUTTON_PARAM ].getValue()) {
-        params[ SOURCE_ONE_UP_BUTTON_PARAM ].setValue(0.f);
-        int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-        sourceOneInt = sourceOneInt == 7 ? 0 : sourceOneInt + 1;
-        params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
-        source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
-      }
-      if (params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].getValue()) {
-        params[ SOURCE_ONE_DOWN_BUTTON_PARAM ].setValue(0);
-        int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-        sourceOneInt = sourceOneInt == 0 ? 7 : sourceOneInt - 1;
-        params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].setValue(sourceOneInt);
-        source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
-      }
-
-      if (params[ SOURCE_TWO_UP_BUTTON_PARAM ].getValue()) {
-        params[ SOURCE_TWO_UP_BUTTON_PARAM ].setValue(0);
-        int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-        sourceTwoInt = sourceTwoInt == 7 ? 0 : sourceTwoInt + 1;
-        params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
-        source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
-      }
-      if (params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].getValue()) {
-        params[ SOURCE_TWO_DOWN_BUTTON_PARAM ].setValue(0);
-        int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-        sourceTwoInt = sourceTwoInt == 0 ? 7 : sourceTwoInt - 1;
-        params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].setValue(sourceTwoInt);
-        source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
-      }
-
-      // rez compensation mode selection buttons
-      if (params[ REZ_COMP_UP_BUTTON_PARAM ].getValue()) {
-        params[ REZ_COMP_UP_BUTTON_PARAM ].setValue(0);
-        int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
-        rezCompModeInt = rezCompModeInt == 3 ? 0 : rezCompModeInt + 1;
-        params[ REZ_COMP_VALUE_HIDDEN_PARAM ].setValue(rezCompModeInt);
-        rezCompModeNameString = rezCompModes[ rezCompModeInt ];
-      }
-      if (params[ REZ_COMP_DOWN_BUTTON_PARAM ].getValue()) {
-        params[ REZ_COMP_DOWN_BUTTON_PARAM ].setValue(0);
-        int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
-        rezCompModeInt = rezCompModeInt == 0 ? 3 : rezCompModeInt - 1;
-        params[ REZ_COMP_VALUE_HIDDEN_PARAM ].setValue(rezCompModeInt);
-        rezCompModeNameString = rezCompModes[ rezCompModeInt ];
-      }
-
-    }
-
+  /* Participant interface: return Module identifier */
+  int64_t getModuleId() override {
+    return getId();
   }
 
 
-  void processZoxnoxiousControl(ZoxnoxiousControlMsg *controlMsg) override {
-
-    if (!hasChannelAssignment) {
-      return;
-    }
+  void pullSamples(const rack::engine::Module::ProcessArgs &args, dsp::Frame<maxAudioChannels> &sharedFrame, int offset) override {
 
     float v;
-    const float clipTime = 0.25f;
+    bool clipped;
+    static constexpr float clipTime = 0.25f;
 
-    // vcf cutoff
-    v = params[CUTOFF_KNOB_PARAM].getValue() + inputs[CUTOFF_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCF_CUTOFF] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + VCF_CUTOFF] != v) {
-      cutoffClipTimer = clipTime;
-    }
-
-    // source one audio
-    v = params[SOURCE_ONE_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_LEVEL_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_LEVEL] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_LEVEL] != v) {
-      sourceOneLevelClipTimer = clipTime;
-    }
-
-    // source two audio
-    v = params[SOURCE_TWO_LEVEL_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_LEVEL_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_LEVEL] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_LEVEL] != v) {
-      sourceTwoLevelClipTimer = clipTime;
-    }
-
-    // source one modulation
-    v = params[SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[SOURCE_ONE_MOD_AMOUNT_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_ONE_MOD_AMOUNT] != v) {
-      sourceOneModAmountClipTimer = clipTime;
-    }
-
-    // source two modulation
-    v = params[SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[SOURCE_TWO_MOD_AMOUNT_INPUT].getVoltage() / 10.f;
-    controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] = clamp(v, 0.f, 1.f);
-    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + SOURCE_TWO_MOD_AMOUNT] != v) {
-      sourceTwoModAmountClipTimer = clipTime;
-    }
+    processCvRoutes(routes.data(),
+                    routes.size(),
+                    clipTime,
+                    offset,
+                    sharedFrame.samples,
+                    params.data(),
+                    inputs.data());
 
     // qvca
     v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltage() / 10.f;
+    clipped = (v < 0.f) || (v > 1.f);
+    if (clipped) {
+        resonanceClipTimer = clipTime;
+    }
     // Resonance slope & max will vary depending on Resonance Compensation mode
     // for consistency between modes, try to get oscillation to start around 80%.
     // From 80% then ramp up to the max allowable value.
@@ -327,128 +214,181 @@ struct PoleDancer : ZoxnoxiousModule {
         // oscillation starts at 16%, max rez is at 33%
         // map 80% --> 16% and 100% --> 33%
         v = v < 0.80f ? 0.20f * v : 0.85f * v - 0.52f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 0.34f);
+        sharedFrame.samples[offset + Q_VCA] = clamp(v, 0.f, 0.34f);
         break;
     case 3: // oddball comp
         // oscillation starts at 26%, max rez is at 50%
         // map 80% --> 26% and 100% --> 50%
         v = v < 0.80f ? 0.325f * v : 1.2f * v - 0.7f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 0.51f);
+        sharedFrame.samples[offset + Q_VCA] = clamp(v, 0.f, 0.51f);
         break;
     default: // uncomp and 4P-bandpass
         // map 80% --> 70% and 100% --> 100%
         v = v < 0.80f ? 0.875f * v : 1.5f * v - 0.5f;
-        controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] = clamp(v, 0.f, 1.f);
+        sharedFrame.samples[offset + Q_VCA] = clamp(v, 0.f, 1.f);
         break;
     }
 
-    if (controlMsg->frame[outputDeviceId].samples[cvChannelOffset + Q_VCA] != v) {
-        resonanceClipTimer = clipTime;
-    }
 
 
     // pole levels:
     // these are scaled by the Filter VCA, so get that first
     v = params[FILTER_VCA_KNOB_PARAM].getValue() + inputs[FILTER_VCA_INPUT].getVoltage() / 10.f;
+    clipped = (v < 0.f) || (v > 1.f);
     float filterVcaGain = clamp(v, 0.f, 1.f);
-    if (filterVcaGain != v) {
+    if (clipped) {
       filterVcaClipTimer = clipTime;
     }
 
-
     if (inputs[POLE_MIX_INPUT].isConnected()) {
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + DRY_LEVEL] =
+      sharedFrame.samples[offset + DRY_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(0) / 10.f) * filterVcaGain;
 
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE1_LEVEL] =
+      sharedFrame.samples[offset + POLE1_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(1) / 10.f) * filterVcaGain;
 
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE2_LEVEL] =
+      sharedFrame.samples[offset + POLE2_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(2) / 10.f) * filterVcaGain;
 
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE3_LEVEL] =
+      sharedFrame.samples[offset + POLE3_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(3) / 10.f) * filterVcaGain;
 
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE4_LEVEL] =
+      sharedFrame.samples[offset + POLE4_LEVEL] =
         (inputs[POLE_MIX_INPUT].getVoltage(4) / 10.f) * filterVcaGain;
     } else {
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + DRY_LEVEL] = 0.f;
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE1_LEVEL] = 0.f;
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE2_LEVEL] = 0.f;
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE3_LEVEL] = 0.f;
-      controlMsg->frame[outputDeviceId].samples[cvChannelOffset + POLE4_LEVEL] = filterVcaGain / mixerGain;
-    }
-
-
-
-    // if we have any queued midi messages, send them
-    if (controlMsg->midiMessageSet == false) {
-      if (midiMessageQueue.size() > 0) {
-        controlMsg->midiMessageSet = true;
-        controlMsg->midiMessage = midiMessageQueue.front();
-        midiMessageQueue.pop_front();
-      }
-    }
-
-
-    for (int i = 0; i < (int) (sizeof(buttonParamToMidiProgramList) / sizeof(struct buttonParamMidiProgram)); ++i) {
-      int newValue = static_cast<int>(std::round(params[ buttonParamToMidiProgramList[i].button ].getValue()));
-
-      if (buttonParamToMidiProgramList[i].previousValue != newValue) {
-        buttonParamToMidiProgramList[i].previousValue = newValue;
-        if (controlMsg->midiMessageSet == false) {
-          // send direct
-          controlMsg->midiMessage.setSize(2);
-          controlMsg->midiMessage.setChannel(midiChannel);
-          controlMsg->midiMessage.setStatus(midiProgramChangeStatus);
-          controlMsg->midiMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
-          controlMsg->midiMessageSet = true;
-          INFO("poledancer: clock %" PRId64 " :  MIDI message direct midi channel %d", APP->engine->getFrame(), midiChannel);
-        }
-        else if (midiMessageQueue.size() < midiMessageQueueMaxSize) {
-          midi::Message queuedMessage;
-          queuedMessage.setSize(2);
-          queuedMessage.setChannel(midiChannel);
-          queuedMessage.setStatus(midiProgramChangeStatus);
-          queuedMessage.setNote(buttonParamToMidiProgramList[i].midiProgram[newValue]);
-          midiMessageQueue.push_back(queuedMessage);
-        }
-        else {
-          INFO("poledancer: dropping MIDI message, bus full and queue full");
-        }
-      }
+      sharedFrame.samples[offset + DRY_LEVEL] = 0.f;
+      sharedFrame.samples[offset + POLE1_LEVEL] = 0.f;
+      sharedFrame.samples[offset + POLE2_LEVEL] = 0.f;
+      sharedFrame.samples[offset + POLE3_LEVEL] = 0.f;
+      sharedFrame.samples[offset + POLE4_LEVEL] = filterVcaGain / mixerGain;
     }
 
   }
+
+
+  bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override {
+
+    // clipping
+    const float lightTime = args.sampleTime * clockDivision;
+    const float brightnessDeltaTime = 1 / lightTime;
+
+    // for clipping lights just keep subtracting every cycle
+    sourceOneLevelClipTimer -= lightTime;
+    lights[SOURCE_ONE_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceOneLevelClipTimer > 0.f, brightnessDeltaTime);
+
+    sourceOneModAmountClipTimer -= lightTime;
+    lights[SOURCE_ONE_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(sourceOneModAmountClipTimer > 0.f, brightnessDeltaTime);
+
+    sourceTwoLevelClipTimer -= lightTime;
+    lights[SOURCE_TWO_LEVEL_CLIP_LIGHT].setBrightnessSmooth(sourceTwoLevelClipTimer > 0.f, brightnessDeltaTime);
+
+    sourceTwoModAmountClipTimer -= lightTime;
+    lights[SOURCE_TWO_MOD_AMOUNT_CLIP_LIGHT].setBrightnessSmooth(sourceTwoModAmountClipTimer > 0.f, brightnessDeltaTime);
+
+    cutoffClipTimer -= lightTime;
+    lights[CUTOFF_CLIP_LIGHT].setBrightnessSmooth(cutoffClipTimer > 0.f, brightnessDeltaTime);
+
+    resonanceClipTimer -= lightTime;
+    lights[RESONANCE_CLIP_LIGHT].setBrightnessSmooth(resonanceClipTimer > 0.f, brightnessDeltaTime);
+
+    filterVcaClipTimer -= lightTime;
+    lights[FILTER_VCA_CLIP_LIGHT].setBrightnessSmooth(filterVcaClipTimer > 0.f, brightnessDeltaTime);
+
+
+    // light up any buttons-- processing of these is done immediately below
+    lights[SOURCE_ONE_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_DOWN_BUTTON_PARAM].getValue());
+    lights[SOURCE_ONE_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_ONE_UP_BUTTON_PARAM].getValue());
+    lights[SOURCE_TWO_DOWN_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_DOWN_BUTTON_PARAM].getValue());
+    lights[SOURCE_TWO_UP_BUTTON_LIGHT].setBrightness(params[SOURCE_TWO_UP_BUTTON_PARAM].getValue());
+    lights[REZ_COMP_DOWN_BUTTON_LIGHT].setBrightness(params[REZ_COMP_DOWN_BUTTON_PARAM].getValue());
+    lights[REZ_COMP_UP_BUTTON_LIGHT].setBrightness(params[REZ_COMP_UP_BUTTON_PARAM].getValue());
+
+
+    // add/subtract the up/down buttons and set a string that
+    // the UI can use.  There ought to be some todos here to
+    // make/fix this.
+    if (handleUpDownSelector(
+          params[SOURCE_ONE_UP_BUTTON_PARAM],
+          params[SOURCE_ONE_DOWN_BUTTON_PARAM],
+          params[SOURCE_ONE_VALUE_HIDDEN_PARAM],
+          7,
+          [&](int i){ return *lifecycle.nameService->getNamePtr(source1Sources[i]); },
+          source1NameString,
+          sourceOneSelectMidiPrograms,
+          midiMessage,
+          midiChannel)) {
+      return true;
+    }
+
+    if (handleUpDownSelector(
+          params[SOURCE_TWO_UP_BUTTON_PARAM],
+          params[SOURCE_TWO_DOWN_BUTTON_PARAM],
+          params[SOURCE_TWO_VALUE_HIDDEN_PARAM],
+          7,
+          [&](int i){ return *lifecycle.nameService->getNamePtr(source2Sources[i]); },
+          source2NameString,
+          sourceTwoSelectMidiPrograms,
+          midiMessage,
+          midiChannel)) {
+      return true;
+    }
+
+    if (handleUpDownSelector(
+          params[REZ_COMP_UP_BUTTON_PARAM],
+          params[REZ_COMP_DOWN_BUTTON_PARAM],
+          params[REZ_COMP_VALUE_HIDDEN_PARAM],
+          3,
+          [&](int i){ return rezCompModes[i]; },
+          rezCompModeNameString,
+          rezModeSelectMidiPrograms,
+          midiMessage,
+          midiChannel)) {
+      return true;
+    }
+
+    return false;
+  }
+
 
 
   /** getCardHardwareId
    * return the hardware Id of the poledancer card
    */
-  static const uint8_t hardwareId = 0x06;
-  uint8_t getHardwareId() override {
+  static constexpr uint8_t hardwareId = 0x06;
+  uint8_t getHardwareId() const override {
     return hardwareId;
   }
 
 
-  void onChannelAssignmentEstablished(ZoxnoxiousCommandMsg *zCommand) override {
-    ZoxnoxiousModule::onChannelAssignmentEstablished(zCommand);
-    output1NameString = getCardOutputName(hardwareId, 1, slot);
-    output2NameString = getCardOutputName(hardwareId, 2, slot);
-    int sourceOneInt = static_cast<int>(std::round(params[ SOURCE_ONE_VALUE_HIDDEN_PARAM ].getValue()));
-    source1NameString = cardOutputNames[ source1Sources[sourceOneInt] ];
-    int sourceTwoInt = static_cast<int>(std::round(params[ SOURCE_TWO_VALUE_HIDDEN_PARAM ].getValue()));
-    source2NameString = cardOutputNames[ source2Sources[sourceTwoInt] ];
-  }
+  void onAttach() override {
+    if (lifecycle.nameService == nullptr) {
+      return;
+    }
+    auto *ptr1 = lifecycle.nameService->getNamePtr(lifecycle.slotNum * 2);
+    auto *ptr2 = lifecycle.nameService->getNamePtr(lifecycle.slotNum * 2 + 1);
+    output1NameString = ptr1 ? *ptr1 : invalidCardOutputName;
+    output2NameString = ptr2 ? *ptr2 : invalidCardOutputName;
 
-  void onChannelAssignmentLost() override {
-    ZoxnoxiousModule::onChannelAssignmentLost();
-    output1NameString = invalidCardOutputName;
-    output2NameString = invalidCardOutputName;
-    // should do something better with source{1,2}NameString here since
-    // user can still click on the buttons to change them
-    source1NameString = invalidCardOutputName;
-    source2NameString = invalidCardOutputName;
+    int sourceOneIndex = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
+    int sourceTwoIndex = static_cast<int>(params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue());
+    auto *ptrSource1 = lifecycle.nameService->getNamePtr( source1Sources[sourceOneIndex] );
+    auto *ptrSource2 = lifecycle.nameService->getNamePtr( source2Sources[sourceTwoIndex] );
+    source1NameString = ptrSource1 ? *ptrSource1 : invalidCardOutputName;
+    source2NameString = ptrSource2 ? *ptrSource2 : invalidCardOutputName;
+
+    // fake out the handleUpDownSelector() to force a MIDI message to be sent
+    params[SOURCE_ONE_VALUE_HIDDEN_PARAM].setValue(
+      params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue() - 1.f);
+    params[SOURCE_ONE_UP_BUTTON_PARAM].setValue(1.f);
+
+    params[SOURCE_TWO_VALUE_HIDDEN_PARAM].setValue(
+      params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue() - 1.f);
+    params[SOURCE_TWO_UP_BUTTON_PARAM].setValue(1.f);
+
+    params[REZ_COMP_VALUE_HIDDEN_PARAM].setValue(
+      params[REZ_COMP_VALUE_HIDDEN_PARAM].getValue() - 1.f);
+    params[REZ_COMP_UP_BUTTON_PARAM].setValue(1.f);
+
   }
 
 
@@ -458,7 +398,7 @@ struct PoleDancer : ZoxnoxiousModule {
   }
 
   void dataFromJson(json_t* rootJ) override {
-    int rezCompModeInt = static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()));
+    int rezCompModeInt = static_cast<int>(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue());
     rezCompModeNameString = rezCompModes[ rezCompModeInt ];
     INFO("poledancer: setting comp mode to %s", rezCompModeNameString.c_str());
   }
@@ -558,8 +498,14 @@ struct PoleDancerWidget : ModuleWidget {
   CardTextDisplay *output1NameTextField;
   CardTextDisplay *output2NameTextField;
   CardTextDisplay *rezCompTextField;
-
 };
 
 
-Model* modelPoleDancer = createModel<PoleDancer, PoleDancerWidget>("PoleDancer");
+constexpr int8_t zox::PoleDancer::sourceOneSelectMidiPrograms[];
+constexpr int8_t zox::PoleDancer::sourceTwoSelectMidiPrograms[];
+constexpr int8_t zox::PoleDancer::rezModeSelectMidiPrograms[];
+
+
+} // namespace zox
+
+Model* modelPoleDancer = createModel<zox::PoleDancer, zox::PoleDancerWidget>("PoleDancer");

@@ -1,0 +1,129 @@
+#pragma once
+
+#include <array>
+#include <atomic>
+#include "Participant.hpp"
+#include "ParticipantAdapter.hpp"
+#include "AudioMidi.hpp"
+
+namespace zox {
+
+struct DiscoveredCard;
+
+struct AudioIO final : rack::engine::Module {
+  enum ParamId {
+    OUT1_LEVEL_KNOB_PARAM,
+    OUT2_LEVEL_KNOB_PARAM,
+    // the MIX1 and MIX2 enums need to be sequential
+    CARD_A_MIX1_OUTPUT_BUTTON_PARAM,
+    CARD_B_MIX1_OUTPUT_BUTTON_PARAM,
+    CARD_C_MIX1_OUTPUT_BUTTON_PARAM,
+    CARD_D_MIX1_OUTPUT_BUTTON_PARAM,
+    CARD_E_MIX1_OUTPUT_BUTTON_PARAM,
+    CARD_F_MIX1_OUTPUT_BUTTON_PARAM,
+    CARD_A_MIX2_OUTPUT_BUTTON_PARAM,
+    CARD_B_MIX2_OUTPUT_BUTTON_PARAM,
+    CARD_C_MIX2_OUTPUT_BUTTON_PARAM,
+    CARD_D_MIX2_OUTPUT_BUTTON_PARAM,
+    CARD_E_MIX2_OUTPUT_BUTTON_PARAM,
+    CARD_F_MIX2_OUTPUT_BUTTON_PARAM,
+    PARAMS_LEN
+  };
+  enum InputId {
+    OUT1_LEVEL_INPUT,
+    OUT2_LEVEL_INPUT,
+    INPUTS_LEN
+  };
+  enum OutputId {
+    OUTPUTS_LEN
+  };
+  enum LightId {
+    OUT1_LEVEL_CLIP_LIGHT,
+    OUT2_LEVEL_CLIP_LIGHT,
+    // the MIX1 and MIX2 enums need to be sequential
+    CARD_A_MIX1_OUTPUT_BUTTON_LIGHT,
+    CARD_B_MIX1_OUTPUT_BUTTON_LIGHT,
+    CARD_C_MIX1_OUTPUT_BUTTON_LIGHT,
+    CARD_D_MIX1_OUTPUT_BUTTON_LIGHT,
+    CARD_E_MIX1_OUTPUT_BUTTON_LIGHT,
+    CARD_F_MIX1_OUTPUT_BUTTON_LIGHT,
+    CARD_A_MIX2_OUTPUT_BUTTON_LIGHT,
+    CARD_B_MIX2_OUTPUT_BUTTON_LIGHT,
+    CARD_C_MIX2_OUTPUT_BUTTON_LIGHT,
+    CARD_D_MIX2_OUTPUT_BUTTON_LIGHT,
+    CARD_E_MIX2_OUTPUT_BUTTON_LIGHT,
+    CARD_F_MIX2_OUTPUT_BUTTON_LIGHT,
+    ENUMS(LEFT_EXPANDER_LIGHT, 3),
+    ENUMS(RIGHT_EXPANDER_LIGHT, 3),
+    LIGHTS_LEN
+  };
+
+
+  AudioIO();
+  ~AudioIO();
+
+  // Global access point: no writes allowed from the audio thread
+  static std::atomic<AudioIO*> instance;
+
+  // Broker access
+  Broker& getBroker() { return broker; }
+
+
+  // Module methods
+  void onAdd(const AddEvent &e) override;
+  void onRemove(const RemoveEvent &e) override;
+  void onReset() override;
+  void onSampleRateChange(const SampleRateChangeEvent& e) override;
+  void process(const ProcessArgs& args) override;
+
+  json_t* dataToJson() override;
+  void dataFromJson(json_t* rootJ) override;
+
+  std::vector<ZoxnoxiousAudioPort*> audioPorts;
+  ZoxnoxiousMidiOutput midiOutput;
+  midi::InputQueue midiInput;
+
+  // Discovery related variables
+  static const midi::Message MIDI_DISCOVERY_REQUEST_SYSEX;
+  static const midi::Message MIDI_SHUTDOWN_SYSEX;
+  static const midi::Message MIDI_RESTART_SYSEX;
+  static const midi::Message MIDI_TUNE_REQUEST;
+
+  bool isPrimary() const;
+
+private:
+  Broker broker;
+
+  float out1LevelClipTimer;
+  float out2LevelClipTimer;
+
+  static const std::vector<ButtonMapping<AudioIO> > buttonMappings;
+  std::vector<ButtonState> buttonStates;
+  ButtonMidiController<AudioIO> buttonMidiController;
+
+  uint8_t getHardwareId();
+  void setStatusLight();
+  int8_t cvChannelOffset;
+  int8_t outputDeviceId;
+  int8_t midiChannel;
+  int8_t slotNum;
+
+  bool discoveryReportReceived = false;
+  dsp::ClockDivider orchestrationClockDivider;
+  dsp::ClockDivider midiPollClockDivider;
+
+  void processMidiInMessage(const midi::Message &msg);
+  void processDiscoveryReport(const midi::Message &msg);
+  void applyDiscoveryReport(DiscoveredCard *cards);
+
+  void sendFramesToDevices(rack::dsp::Frame<maxAudioChannels> *sharedFrame, int numFrames);
+
+  void serviceParticipantAttachments();
+
+  std::array<CvRoute,2> routes;
+
+  static const std::string audioPortNum;
+};
+
+
+} // namespace zox

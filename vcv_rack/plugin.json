@@ -14,14 +14,6 @@
   "changelogUrl": "",
   "modules": [
     {
-      "slug": "PatchingMatrix",
-      "name": "Patching Matrix",
-      "description": "Audio Out for Zonoxious components",
-      "tags": [
-        "Hardware"
-      ]
-    },
-    {
       "slug": "AudioIO",
       "name": "AudioIO",
       "description": "Audio In/Out",
@@ -39,34 +31,30 @@
       ]
     },
     {
-      "slug": "Zoxnoxious3340Legacy",
-      "name": "Zoxnoxious3340Legacy",
-      "description": "Hardware 3340 VCO",
-      "tags": [
-        "VCO",
-        "Hardware"
-      ]
-    },
-    {
       "slug": "Zoxnoxious3372",
       "name": "Zoxnoxious3372",
       "description": "Hardware 3372 VCF",
       "tags": [
-        "Hardware",
-        "VCF"
+        "VCF",
+        "Hardware"
       ]
     },
     {
       "slug": "Zoxnoxious5524",
       "name": "Zoxnoxious5524",
-      "description": "",
-      "tags": []
+      "description": "dual VCO voice",
+      "tags": [
+        "Hardware"
+      ]
     },
     {
       "slug": "PoleDancer",
       "name": "PoleDancer",
       "description": "morphing multimode analog filter",
-      "tags": []
+      "tags": [
+        "VCF",
+        "Hardware"
+      ]
     },
     {
       "slug": "PoleDancerPersonality",

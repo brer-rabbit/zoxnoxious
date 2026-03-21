@@ -1,6 +1,5 @@
 #include "plugin.hpp"
 
-
 Plugin* pluginInstance;
 
 
@@ -38,9 +37,6 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
     else if (cardId == 0x04) {
       cardName = outputNumber == 1 ? "5524 VCF" : "5524 VCO1";
     }
-    else if (cardId == 0x05) {
-        cardName = "3340Legacy";
-    }
     else if (cardId == 0x06) {
         cardName = "Pole Dancer";
     }
@@ -57,17 +53,17 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
 }
 
 
+
+
 void init(Plugin* p) {
 	pluginInstance = p;
 
 	// Add modules here
         p->addModel(modelPoleDancer);
         p->addModel(modelPoleDancerPersonality);
-        p->addModel(modelZoxnoxious3340);
         p->addModel(modelZoxnoxious3372);
         p->addModel(modelZoxnoxious5524);
-        p->addModel(modelPatchingMatrix);
-        p->addModel(modelZoxnoxious3340Legacy);
+        p->addModel(modelZoxnoxious3340);
         p->addModel(modelAudioIO);
 
 	// Any other plugin initialization may go here.
