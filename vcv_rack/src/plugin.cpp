@@ -29,13 +29,13 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
         cardName = "Audio Out";
     }
     else if (cardId == 0x02) {
-        cardName = "3340 VCO";
+        cardName = "3340!VCO";
     }
     else if (cardId == 0x03) {
-        cardName = "3372 VCF";
+        cardName = "3372!VCF";
     }
     else if (cardId == 0x04) {
-      cardName = outputNumber == 1 ? "5524 VCF" : "5524 VCO1";
+      cardName = outputNumber == 1 ? "5524!VCF" : "5524!VCO1";
     }
     else if (cardId == 0x06) {
         cardName = "Pole Dancer";
@@ -48,7 +48,7 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
     }
 
     return (slot == -1 ? "" : slotNameString ) +
-        (outputNumber == 1 ? "1 " : (outputNumber == 2 ? "2 " : "") ) +
+        (outputNumber == 1 ? "1!" : (outputNumber == 2 ? "2!" : "") ) +
         cardName;
 }
 

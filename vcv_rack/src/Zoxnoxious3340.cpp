@@ -328,71 +328,66 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(9.7834, 24.553)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(43.275, 24.553)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(27.020, 24.553)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.0, 18.245)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.0, 88.958)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(16.0, 55.847)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
 
-//        addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(62.243, 27.700)), module, Zoxnoxious3340::MIX1_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX1_PULSE_BUTTON_LIGHT));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(89.844, 18.245)), module, Zoxnoxious3340::MIX1_PULSE_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(89.844, 55.885)), module, Zoxnoxious3340::MIX1_TRIANGLE_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(89.844, 37.065)), module, Zoxnoxious3340::MIX1_SAW_KNOB_PARAM));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(62.243, 24.584)), module, Zoxnoxious3340::MIX1_PULSE_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(62.314, 51.003)), module, Zoxnoxious3340::MIX1_TRIANGLE_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(62.300, 78.103)), module, Zoxnoxious3340::MIX1_SAW_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(67.508, 55.885)), module, Zoxnoxious3340::SYNC_PHASE_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(40.5, 55.885)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(39.480, 87.501)), module, Zoxnoxious3340::SYNC_PHASE_KNOB_PARAM));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(61.848, 94.939)), module, Zoxnoxious3340::SYNC_HARD_BUTTON_PARAM, Zoxnoxious3340::SYNC_HARD_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(61.848, 106.839)), module, Zoxnoxious3340::SYNC_SOFT_BUTTON_PARAM, Zoxnoxious3340::SYNC_SOFT_BUTTON_LIGHT));
 
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(33.559, 62.255)), module, Zoxnoxious3340::SYNC_HARD_BUTTON_PARAM, Zoxnoxious3340::SYNC_HARD_BUTTON_LIGHT));
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(45.19, 62.255)), module, Zoxnoxious3340::SYNC_SOFT_BUTTON_PARAM, Zoxnoxious3340::SYNC_SOFT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(33.559, 72.994)), module, Zoxnoxious3340::SYNC_POS_BUTTON_PARAM, Zoxnoxious3340::SYNC_POS_BUTTON_LIGHT));
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(45.19, 72.995)), module, Zoxnoxious3340::SYNC_NEG_BUTTON_PARAM, Zoxnoxious3340::SYNC_NEG_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(73.168, 94.939)), module, Zoxnoxious3340::SYNC_POS_BUTTON_PARAM, Zoxnoxious3340::SYNC_POS_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(73.168, 106.839)), module, Zoxnoxious3340::SYNC_NEG_BUTTON_PARAM, Zoxnoxious3340::SYNC_NEG_BUTTON_LIGHT));
 
 
-//        addParam(createParamCentered<RoundBlackSnapKnob>(mm2px(Vec(62.487, 69.011)), module, Zoxnoxious3340::MIX1_SAW_LEVEL_SELECTOR_PARAM));
+    addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(53.21, 32.409)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_LIGHT));
+    addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(39.89, 32.409)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_LIGHT));
 
-    addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(21.625, 64.0)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_LIGHT));
-    addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(9.994, 64.0)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(89.844, 94.939)), module, Zoxnoxious3340::MIX2_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX2_PULSE_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(40.5, 110.758)), module, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_PARAM, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(40.5, 88.459)), module, Zoxnoxious3340::EXP_FM_BUTTON_PARAM, Zoxnoxious3340::EXP_FM_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(40.5, 99.921)), module, Zoxnoxious3340::LINEAR_FM_BUTTON_PARAM, Zoxnoxious3340::LINEAR_FM_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(102.532, 94.939)), module, Zoxnoxious3340::MIX2_SAW_BUTTON_PARAM, Zoxnoxious3340::MIX2_SAW_BUTTON_LIGHT));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.184, 87.501)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(57.112, 118.52)), module, Zoxnoxious3340::MIX2_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX2_PULSE_BUTTON_LIGHT));
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(10.626, 118.52)), module, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_PARAM, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_LIGHT));
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(26.663, 118.52)), module, Zoxnoxious3340::EXP_FM_BUTTON_PARAM, Zoxnoxious3340::EXP_FM_BUTTON_LIGHT));
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.275, 118.52)), module, Zoxnoxious3340::LINEAR_FM_BUTTON_PARAM, Zoxnoxious3340::LINEAR_FM_BUTTON_LIGHT));
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(68.019, 118.52)), module, Zoxnoxious3340::MIX2_SAW_BUTTON_PARAM, Zoxnoxious3340::MIX2_SAW_BUTTON_LIGHT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.0, 32.245)), module, Zoxnoxious3340::FREQ_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.0, 103.958)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.0, 70.438)), module, Zoxnoxious3340::LINEAR_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(102.532, 18.245)), module, Zoxnoxious3340::MIX1_PULSE_VCA_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(102.532, 55.885)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(102.532, 37.065)), module, Zoxnoxious3340::MIX1_SAW_VCA_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(67.508, 70.475)), module, Zoxnoxious3340::SYNC_PHASE_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(40.5, 70.475)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_INPUT));
 
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.7834, 37.915)), module, Zoxnoxious3340::FREQ_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.275, 37.915)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(27.020, 37.915)), module, Zoxnoxious3340::LINEAR_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(62.314, 36.719)), module, Zoxnoxious3340::MIX1_PULSE_VCA_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(62.314, 63.048)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(62.314, 91.137)), module, Zoxnoxious3340::MIX1_SAW_VCA_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.480, 101.925)), module, Zoxnoxious3340::SYNC_PHASE_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.184, 101.924)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_INPUT));
+    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(22.038, 25.516)), module, Zoxnoxious3340::FREQ_CLIP_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(22.038, 97.229)), module, Zoxnoxious3340::PULSE_WIDTH_CLIP_LIGHT));
+    //addChild(createLightCentered<SmallLight<RedLight>>(mm2px(ABCD), module, Zoxnoxious3340::LINEAR_CLIP_LIGHT));
+    //addChild(createLightCentered<SmallLight<RedLight>>(mm2px(ABCD), module, Zoxnoxious3340::MIX1_PULSE_CLIP_LIGHT));
+    //addChild(createLightCentered<SmallLight<RedLight>>(mm2px(ABCD), module, Zoxnoxious3340::MIX1_TRIANGLE_CLIP_LIGHT));
+    //addChild(createLightCentered<SmallLight<RedLight>>(mm2px(ABCD), module, Zoxnoxious3340::MIX1_SAW_CLIP_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(73.546, 64.175)), module, Zoxnoxious3340::SYNC_PHASE_CLIP_LIGHT));
+    //addChild(createLightCentered<SmallLight<RedLight>>(mm2px(ABCD), module, Zoxnoxious3340::EXT_MOD_AMOUNT_CLIP_LIGHT));
 
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(13.783, 30.553)), module, Zoxnoxious3340::FREQ_CLIP_LIGHT));
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(47.793, 30.553)), module, Zoxnoxious3340::PULSE_WIDTH_CLIP_LIGHT));
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(31.020, 30.553)), module, Zoxnoxious3340::LINEAR_CLIP_LIGHT));
+    //addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(ABCD), module, Zoxnoxious3340::LEFT_EXPANDER_LIGHT));
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(5.532, 119.307)), module, Zoxnoxious3340::RIGHT_EXPANDER_LIGHT));
 
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(66.313, 31.761)), module, Zoxnoxious3340::MIX1_PULSE_CLIP_LIGHT));
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(66.313, 57.003)), module, Zoxnoxious3340::MIX1_TRIANGLE_CLIP_LIGHT));
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(66.313, 85.095)), module, Zoxnoxious3340::MIX1_SAW_CLIP_LIGHT));
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(43.480, 93.501)), module, Zoxnoxious3340::SYNC_PHASE_CLIP_LIGHT));
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(18.184, 93.501)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_CLIP_LIGHT));
-
-    addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.020, 8.2185)), module, Zoxnoxious3340::LEFT_EXPANDER_LIGHT));
-    addChild(createLightCentered<TriangleRightLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(74.427, 8.219)), module, Zoxnoxious3340::RIGHT_EXPANDER_LIGHT));
-
-    mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(53.378, 12.989)));
-    mix1OutputTextField->box.size = (mm2px(Vec(18.5, 3.636)));
+    mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(86.336, 64.53)));
+    mix1OutputTextField->box.size = (mm2px(Vec(19.0, 3.136)));
     mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
     addChild(mix1OutputTextField);
 
-    mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(53.250, 102.833)));
-    mix2OutputTextField->box.size = (mm2px(Vec(18.5, 3.636)));
+    mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(86.336, 100.942)));
+    mix2OutputTextField->box.size = (mm2px(Vec(19.0, 3.136)));
     mix2OutputTextField->setText(module ? &module->output2NameString : NULL);
     addChild(mix2OutputTextField);
 
-    modulationInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(6.0, 56.119)));
-    modulationInputTextField->box.size = (mm2px(Vec(20.0, 3.636)));
+    modulationInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(37.267, 19.53)));
+    modulationInputTextField->box.size = (mm2px(Vec(19.0, 3.136)));
     modulationInputTextField->setText(module ? &module->modulationInputNameString  : NULL);
     addChild(modulationInputTextField);
   }

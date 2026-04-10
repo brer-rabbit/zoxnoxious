@@ -156,14 +156,16 @@ struct TriangleRightLight : TBase {
 // Text Display box
 //
 
-static const int cardTextFontSize = 9;
+static const int cardTextFontSize = 6;
 static const int cardTextLetterSpacing = 0;
 static const int cardTextLeftMargin = 2;
 
 struct CardTextDisplay : TransparentWidget {
     std::string *displayString;
+    std::shared_ptr<Font> font;
 
     CardTextDisplay() : displayString(NULL) {
+      font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG14Modern-Regular.ttf"));
     }
 
     void draw(const DrawArgs& args) override {
@@ -175,22 +177,29 @@ struct CardTextDisplay : TransparentWidget {
         // Draw dark background
         nvgBeginPath(vg);
         nvgRect(vg, 0, 0, box.size.x, box.size.y);
-        nvgFillColor(vg, nvgRGBA(20, 20, 20, 255));
+        //nvgFillColor(vg, nvgRGBA(20, 20, 20, 255));
+        nvgFillColor(vg, nvgRGBA(0x3A, 0x1A, 0x00, 0xFF));
         nvgFill(vg);
 
         // If the track name is not empty, then display it
         if (displayString)  {
+          bndSetFont(font->handle);
+          nvgFontFaceId(vg, font->handle);
+          nvgTextLetterSpacing(vg, 0);
+
             // Set up font parameters
             nvgFontSize(vg, cardTextFontSize);
             nvgTextLetterSpacing(vg, cardTextLetterSpacing);
 
-            nvgFillColor(vg, nvgRGBA(255, 215, 20, 0xff));
-            nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+            //nvgFillColor(vg, nvgRGBA(255, 215, 20, 0xff));
+            nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0xff));
+            nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
 
             float bounds[4];
             nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, displayString->c_str(), NULL, bounds);
             float textHeight = bounds[3];
             nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, displayString->c_str(), NULL);
+            bndSetFont(APP->window->uiFont->handle);
         }
 
         nvgRestore(vg);
