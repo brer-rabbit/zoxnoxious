@@ -332,12 +332,12 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.5, 92.978)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
     addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(14.5, 58.11)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
 
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(90.454, 23.8)), module, Zoxnoxious3340::MIX1_PULSE_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(90.454, 64.869)), module, Zoxnoxious3340::MIX1_TRIANGLE_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(90.454, 44.149)), module, Zoxnoxious3340::MIX1_SAW_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(90.0, 23.3)), module, Zoxnoxious3340::MIX1_PULSE_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(90.0, 64.369)), module, Zoxnoxious3340::MIX1_TRIANGLE_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(90.0, 43.649)), module, Zoxnoxious3340::MIX1_SAW_KNOB_PARAM));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(66.5, 58.0)), module, Zoxnoxious3340::SYNC_PHASE_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(40.5, 58.0)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(66.5, 58.11)), module, Zoxnoxious3340::SYNC_PHASE_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(40.5, 58.11)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
 
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(60.84, 99.296)), module, Zoxnoxious3340::SYNC_HARD_BUTTON_PARAM, Zoxnoxious3340::SYNC_HARD_BUTTON_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(60.84, 110.696)), module, Zoxnoxious3340::SYNC_SOFT_BUTTON_PARAM, Zoxnoxious3340::SYNC_SOFT_BUTTON_LIGHT));
@@ -358,9 +358,9 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 40.112)), module, Zoxnoxious3340::FREQ_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 106.978)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 72.11)), module, Zoxnoxious3340::LINEAR_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(102.392, 23.8)), module, Zoxnoxious3340::MIX1_PULSE_VCA_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(102.392, 64.869)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(102.392, 44.149)), module, Zoxnoxious3340::MIX1_SAW_VCA_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(103.0, 23.3)), module, Zoxnoxious3340::MIX1_PULSE_VCA_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(103.0, 64.369)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(103.0, 43.649)), module, Zoxnoxious3340::MIX1_SAW_VCA_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(66.5, 72.11)), module, Zoxnoxious3340::SYNC_PHASE_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(40.5, 72.11)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_INPUT));
 
