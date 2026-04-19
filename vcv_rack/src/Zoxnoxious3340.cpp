@@ -355,14 +355,14 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(40.5, 102.92)), module, Zoxnoxious3340::LINEAR_FM_BUTTON_PARAM, Zoxnoxious3340::LINEAR_FM_BUTTON_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(101.892, 98.997)), module, Zoxnoxious3340::MIX2_SAW_BUTTON_PARAM, Zoxnoxious3340::MIX2_SAW_BUTTON_LIGHT));
 
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 40.112)), module, Zoxnoxious3340::FREQ_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 106.978)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 72.11)), module, Zoxnoxious3340::LINEAR_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(103.0, 23.3)), module, Zoxnoxious3340::MIX1_PULSE_VCA_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(103.0, 64.369)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(103.0, 43.649)), module, Zoxnoxious3340::MIX1_SAW_VCA_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(66.5, 72.11)), module, Zoxnoxious3340::SYNC_PHASE_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(40.5, 72.11)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(14.5, 40.112)), module, Zoxnoxious3340::FREQ_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(14.5, 106.978)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(14.5, 72.11)), module, Zoxnoxious3340::LINEAR_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(103.0, 23.3)), module, Zoxnoxious3340::MIX1_PULSE_VCA_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(103.0, 64.369)), module, Zoxnoxious3340::MIX1_TRIANGLE_VCA_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(103.0, 43.649)), module, Zoxnoxious3340::MIX1_SAW_VCA_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(66.5, 72.11)), module, Zoxnoxious3340::SYNC_PHASE_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(40.5, 72.11)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_INPUT));
 
     addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(22.645, 35.112)), module, Zoxnoxious3340::FREQ_CLIP_LIGHT));
     addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(22.645, 102.123)), module, Zoxnoxious3340::PULSE_WIDTH_CLIP_LIGHT));
