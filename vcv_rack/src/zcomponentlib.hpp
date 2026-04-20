@@ -172,7 +172,7 @@ struct CardTextDisplay : TransparentWidget {
   std::shared_ptr<Font> font;
 
   CardTextDisplay() : displayString(NULL) {
-    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG14Modern-Regular.ttf"));
+    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG14Classic-BoldItalic.ttf"));
   }
 
   void draw(const DrawArgs& args) override {
