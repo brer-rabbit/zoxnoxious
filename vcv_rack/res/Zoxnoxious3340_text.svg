@@ -25,16 +25,16 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.1161012"
-     inkscape:cx="140.22026"
-     inkscape:cy="231.60982"
+     inkscape:zoom="4.56022"
+     inkscape:cx="40.677862"
+     inkscape:cy="131.02438"
      inkscape:window-width="1480"
      inkscape:window-height="966"
-     inkscape:window-x="200"
-     inkscape:window-y="28"
+     inkscape:window-x="117"
+     inkscape:window-y="56"
      inkscape:window-maximized="0"
      showguides="false"
-     inkscape:current-layer="g1">
+     inkscape:current-layer="layer2">
     <inkscape:grid
        id="grid1"
        units="mm"
@@ -1059,7 +1059,7 @@
      inkscape:label="components"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:none">
+     style="display:inline">
     <rect
        id="rect219"
        data-name="Screen"
@@ -1725,7 +1725,7 @@
          y="105.29788">clip</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.13229167px;text-anchor:middle;display:inline;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="14.450611"
        y="49.866398"
        id="text179"><tspan
@@ -1753,6 +1753,26 @@
          id="tspan24"
          x="10.670752"
          y="17.76527">(octave)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.0661458px;text-anchor:middle;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
+       x="45.393169"
+       y="49.833969"
+       id="text10"><tspan
+         sodipodi:role="line"
+         id="tspan10"
+         x="45.360096"
+         y="49.833969">%</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.0661458px;text-anchor:middle;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
+       x="24.356617"
+       y="83.949379"
+       id="text13"><tspan
+         sodipodi:role="line"
+         id="tspan13"
+         x="24.323544"
+         y="83.949379">%</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
