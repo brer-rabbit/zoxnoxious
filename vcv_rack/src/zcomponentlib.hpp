@@ -1,12 +1,19 @@
 #include "componentlibrary.hpp"
 
 
+
 struct BNCPort : app::SvgPort {
   BNCPort() {
     setSvg(Svg::load(asset::plugin(pluginInstance, "res/BNCFemale.svg")));
   }
 };
 
+
+struct ScrewSlottedKnurled : app::SvgScrew {
+  ScrewSlottedKnurled() {
+    setSvg(Svg::load(asset::plugin(pluginInstance, "res/ScrewSlottedKnurled.svg")));
+  }
+};
 
 //
 // Button - VCV Rack button at about 2/3 the size

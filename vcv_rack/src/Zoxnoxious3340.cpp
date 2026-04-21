@@ -1,6 +1,7 @@
 #include "plugin.hpp"
 #include "common.hpp"
 #include "zcomponentlib.hpp"
+#include "TurnsCountingKnob.hpp"
 #include "ParticipantAdapter.hpp"
 
 namespace zox {
@@ -323,12 +324,19 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/Zoxnoxious3340.svg")));
 
-    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-    addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-    addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.5, 26.112)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
+    //addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.5, 26.112)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
+    auto* knob = createParamCentered<TurnsCountingKnob>(
+      mm2px(Vec(14.5, 26.112)),   // centre position on panel (mm)
+      module,
+      Zoxnoxious3340::FREQ_KNOB_PARAM);
+    knob->setTurns(8);
+    addParam(knob);
+
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.5, 92.978)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
     addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(14.5, 58.11)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
 
