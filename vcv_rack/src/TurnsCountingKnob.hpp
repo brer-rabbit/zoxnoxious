@@ -42,13 +42,14 @@ using namespace rack;
 
 struct TurnsCountingKnob : app::SvgKnob {
   widget::SvgWidget *bg;
+  widget::SvgWidget *fg;
 
   // ---- tuneable constants ------------------------------------------------
   float windowRelX = 0.0f;   // fraction of knob radius, +right
   float windowRelY = -0.30f; // fraction of knob radius, +down
-  float windowW = 15.0f;  // pixels
-  float windowH = 8.0f;  // pixels
-  float fontSize = 5.0f;   // nvgFontSize pixels
+  float windowW = 7.5f;  // window width
+  float windowH = 8.0f;  // window height
+  float fontSize = 6.0f;   // nvgFontSize pixels
   float sweepCompensation = 1.0f; // sweep range by numTurns speed times this
   // -----------------------------------------------------------------------
 

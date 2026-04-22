@@ -25,13 +25,13 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="4.56022"
-     inkscape:cx="40.677862"
-     inkscape:cy="131.02438"
+     inkscape:zoom="1.5432951"
+     inkscape:cx="187.26165"
+     inkscape:cy="216.74402"
      inkscape:window-width="1480"
      inkscape:window-height="966"
      inkscape:window-x="117"
-     inkscape:window-y="56"
+     inkscape:window-y="28"
      inkscape:window-maximized="0"
      showguides="false"
      inkscape:current-layer="layer2">
@@ -1414,14 +1414,14 @@
    id="tspan9">DEP</tspan>TH %</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82223871px;line-height:1;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.13229167px;text-anchor:start;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-opacity:1;stroke-dasharray:none"
-       x="59.824051"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
+       x="57.45578"
        y="49.758221"
        id="text209"><tspan
          sodipodi:role="line"
          id="tspan4"
-         x="59.824051"
-         y="49.758221">WINDOW</tspan></text>
+         x="57.45578"
+         y="49.758221">EDGE DETECT</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11666995px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-opacity:1;stroke-dasharray:none"

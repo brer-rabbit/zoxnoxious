@@ -30,22 +30,27 @@
 // ---------------------------------------------------------------------------
 
 TurnsCountingKnob::TurnsCountingKnob() {
-  bg = new widget::SvgWidget;
   // Load (or reuse) the standard round-knob SVG that ships with VCV Rack.
   // Swap the path for your own artwork if desired.
   setSvg(Svg::load(asset::plugin(pluginInstance, "res/TurnsCountingDial.svg")));
-  //bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundLargeBlackKnob_bg.svg")));
+
+  bg = new widget::SvgWidget;
+  bg->setSvg(Svg::load(asset::plugin(pluginInstance, "res/TurnsCountingDial_bg.svg")));
   fb->addChildBelow(bg, tw);
+
+  fg = new widget::SvgWidget;
+  fg->setSvg(Svg::load(asset::plugin(pluginInstance, "res/TurnsCountingDial_fg.svg")));
+  fb->addChildAbove(fg, tw);
 
   // Set the rotation sweep so one full normalised range = numTurns * 360
   // SvgKnob interprets these as radians.
   setTurns(numTurns);
 
-  // Allow smooth wrapping (Rack 2 supports this via the snap / smooth flags).
+  // Allow smooth wrapping
   snap = false;
 
   counterFont = APP->window->loadFont(asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf"));
-  shadow->opacity = 0.00f;
+  //shadow->opacity = 0.00f;
 }
 
 void TurnsCountingKnob::setTurns(int turns) {
@@ -112,8 +117,8 @@ void TurnsCountingKnob::drawCounterWindow(const DrawArgs& args,
   // Window should sit slightly above the knob.
   //float cx = windowRelX * knobRadius;
   //float cy = windowRelY * knobRadius - knobRadius;
-  float windowOffsetX = -0.01;
-  float windowOffsetY = -1.3f; // knob radii, negative = upward
+  float windowOffsetX = -0.0f;
+  float windowOffsetY = -0.0f; // knob radii, negative = upward
   float cx = windowOffsetX * knobRadius;
   float cy = windowOffsetY * knobRadius;
 
@@ -124,19 +129,19 @@ void TurnsCountingKnob::drawCounterWindow(const DrawArgs& args,
   nvgBeginPath(vg);
   nvgRoundedRect(vg, cx - hw, cy - hh, windowW, windowH, 0.1f);
   //nvgFillColor(vg, nvgRGBAf(0.08f, 0.08f, 0.08f, 0.92f));
-  nvgFillColor(vg, nvgRGBA(0x08, 0x05, 0x05, 0xFF));
+  nvgFillColor(vg, nvgRGBA(0x20, 0x1A, 0x00, 0xFF));
   nvgFill(vg);
 
   // ---- border ------------------------------------------------------------
-  nvgStrokeColor(vg, nvgRGBAf(0.8f, 0.8f, 0.8f, 0.55f));
-  nvgStrokeWidth(vg, 0.6f);
-  nvgStroke(vg);
+  //nvgStrokeColor(vg, nvgRGBAf(0.8f, 0.8f, 0.8f, 0.55f));
+  //nvgStrokeWidth(vg, 0.6f);
+  //nvgStroke(vg);
 
   // ---- digit -------------------------------------------------------------
   nvgFontSize(vg, fontSize);
   nvgFontFaceId(vg, counterFont->handle);
   nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-  nvgFillColor(vg, nvgRGBA(0x66, 0xFF, 0x66, 0xFF));
+  nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0xff));
 
   char buf[2] = { static_cast<char>('0' + turn), '\0' };
   nvgText(vg, cx, cy, buf, nullptr);
