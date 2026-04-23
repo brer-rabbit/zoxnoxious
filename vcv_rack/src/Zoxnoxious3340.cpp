@@ -385,16 +385,19 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(4.468, 121.583)), module, Zoxnoxious3340::RIGHT_EXPANDER_LIGHT));
 
     mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(86.173, 75.5)));
+    mix1OutputTextField->setNumChars(11);
     mix1OutputTextField->box.size = (mm2px(Vec(19.0, 3.136)));
     mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
     addChild(mix1OutputTextField);
 
     mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(86.173, 105.0)));
+    mix2OutputTextField->setNumChars(11);
     mix2OutputTextField->box.size = (mm2px(Vec(19.0, 3.136)));
     mix2OutputTextField->setText(module ? &module->output2NameString : NULL);
     addChild(mix2OutputTextField);
 
     modulationInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(40.181, 20.412)));
+    modulationInputTextField->setNumChars(14);
     modulationInputTextField->box.size = (mm2px(Vec(24.0, 3.136)));
     modulationInputTextField->setText(module ? &module->modulationInputNameString  : NULL);
     addChild(modulationInputTextField);

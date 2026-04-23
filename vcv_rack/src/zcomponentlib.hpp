@@ -173,13 +173,19 @@ struct TriangleRightLight : TBase {
 static const int cardTextFontSize = 6;
 static const int cardTextLetterSpacing = 0;
 static const int cardTextLeftMargin = 2;
+static const int cardDefaultNumChars = 8;
 
 struct CardTextDisplay : TransparentWidget {
   std::string *displayString;
   std::shared_ptr<Font> font;
+  std::string allSegments;
 
-  CardTextDisplay() : displayString(NULL) {
+  CardTextDisplay() : displayString(NULL), allSegments(cardDefaultNumChars, '~') {
     font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG14Classic-BoldItalic.ttf"));
+  }
+
+  void setNumChars(size_t count) {
+    allSegments.resize(count, '~');
   }
 
   void draw(const DrawArgs& args) override {
@@ -213,6 +219,11 @@ struct CardTextDisplay : TransparentWidget {
       nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, displayString->c_str(), NULL, bounds);
       float textHeight = bounds[3];
       nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, displayString->c_str(), NULL);
+
+      // light all segments of 14-segment LED with a transparency
+      nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0x20));
+      nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, allSegments.c_str(), NULL);
+
       bndSetFont(APP->window->uiFont->handle);
     }
 

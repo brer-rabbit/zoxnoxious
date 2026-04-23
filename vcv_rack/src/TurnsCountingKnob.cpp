@@ -145,6 +145,12 @@ void TurnsCountingKnob::drawCounterWindow(const DrawArgs& args,
 
   char buf[2] = { static_cast<char>('0' + turn), '\0' };
   nvgText(vg, cx, cy, buf, nullptr);
+
+  // then display all segment with a low alpha for realism
+  nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0x30));
+  buf[0] = '8';
+  nvgText(vg, cx, cy, buf, nullptr);
+
 }
 
 
