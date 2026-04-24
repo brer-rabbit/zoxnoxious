@@ -24,17 +24,29 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="7.9724156"
-     inkscape:cx="22.891431"
-     inkscape:cy="26.027243"
+     inkscape:zoom="8.7369559"
+     inkscape:cx="26.611099"
+     inkscape:cy="27.297837"
      inkscape:window-width="1440"
      inkscape:window-height="840"
-     inkscape:window-x="219"
-     inkscape:window-y="86"
+     inkscape:window-x="220"
+     inkscape:window-y="29"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg1" />
   <defs
      id="defs1">
+    <linearGradient
+       id="linearGradient1"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#484847;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#2b2b2b;stop-opacity:1;"
+         offset="1"
+         id="stop2" />
+    </linearGradient>
     <linearGradient
        id="linearGradient6"
        inkscape:collect="always">
@@ -46,30 +58,6 @@
          style="stop-color:#555554;stop-opacity:1;"
          offset="1"
          id="stop6" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient3"
-       inkscape:collect="always">
-      <stop
-         style="stop-color:#8b8d8e;stop-opacity:1;"
-         offset="0"
-         id="stop3" />
-      <stop
-         style="stop-color:#acaca9;stop-opacity:1;"
-         offset="1"
-         id="stop4" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient1"
-       inkscape:collect="always">
-      <stop
-         style="stop-color:#a6a5a6;stop-opacity:1;"
-         offset="0"
-         id="stop1" />
-      <stop
-         style="stop-color:#e2e3e3;stop-opacity:1;"
-         offset="1"
-         id="stop2" />
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
@@ -104,23 +92,35 @@
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3"
-       id="linearGradient4"
-       x1="4.3840189"
-       y1="12.685864"
-       x2="10.615982"
-       y2="2.3141363"
+       xlink:href="#linearGradient1"
+       id="linearGradient5"
+       x1="7.5999985"
+       y1="0.24999999"
+       x2="8.3128338"
+       y2="14.905525"
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient1"
-       id="linearGradient5"
+       xlink:href="#linearGradient3"
+       id="linearGradient7"
        gradientUnits="userSpaceOnUse"
-       x1="7.1074815"
-       y1="14.989726"
-       x2="7.8925214"
-       y2="0.010279528"
-       gradientTransform="matrix(0.99333333,0,0,0.99333333,0.05000019,0.05000019)" />
+       x1="4.6596956"
+       y1="12.841837"
+       x2="10.340303"
+       y2="2.1581676"
+       gradientTransform="matrix(0.97520658,0,0,0.97520658,0.18595054,0.18595047)" />
+    <linearGradient
+       id="linearGradient3"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#8b8d8e;stop-opacity:1;"
+         offset="0"
+         id="stop3" />
+      <stop
+         style="stop-color:#acaca9;stop-opacity:1;"
+         offset="1"
+         id="stop4" />
+    </linearGradient>
   </defs>
   <circle
      style="fill:url(#linearGradient2);fill-opacity:1;stroke-width:0.600001;stroke-linejoin:round"
@@ -166,14 +166,20 @@
      cy="7.5"
      r="7.4499998" />
   <circle
-     style="fill:url(#linearGradient4);fill-opacity:1;stroke-width:0.3;stroke-linejoin:round;-inkscape-stroke:none"
+     style="fill:#2b2b2b;fill-opacity:1;stroke-width:0.3;stroke-linejoin:round;-inkscape-stroke:none;opacity:0.5"
      id="path2"
      cx="7.5"
      cy="7.5"
      r="6.0500002" />
+  <circle
+     style="fill:url(#linearGradient7);fill-opacity:1;stroke-width:0.3;stroke-linejoin:round;-inkscape-stroke:none"
+     id="circle5"
+     cx="7.5"
+     cy="7.5"
+     r="5.9000001" />
   <path
-     style="fill:none;stroke:#000000;stroke-width:0.199999"
+     style="fill:none;stroke:#e2e4e1;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
      inkscape:label="none"
-     d="M 7.5,0.25 V 1"
+     d="M 7.4999996,0.05000019 V 1.4499998"
      id="path2-8" />
 </svg>

@@ -197,7 +197,6 @@ struct CardTextDisplay : TransparentWidget {
     // Draw dark background
     nvgBeginPath(vg);
     nvgRect(vg, 0, 0, box.size.x, box.size.y);
-    //nvgFillColor(vg, nvgRGBA(20, 20, 20, 255));
     nvgFillColor(vg, nvgRGBA(0x3A, 0x1A, 0x00, 0xFF));
     nvgFill(vg);
 
@@ -211,8 +210,8 @@ struct CardTextDisplay : TransparentWidget {
       nvgFontSize(vg, cardTextFontSize);
       nvgTextLetterSpacing(vg, cardTextLetterSpacing);
 
-      //nvgFillColor(vg, nvgRGBA(255, 215, 20, 0xff));
-      nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0xff));
+      //nvgFillColor(vg, nvgRGBA(0xff, 0x90, 0x10, 0xff));
+      nvgFillColor(vg, nvgRGBA(0xff, 0xB0, 0x10, 0xff));
       nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
 
       float bounds[4];
