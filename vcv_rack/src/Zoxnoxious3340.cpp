@@ -344,7 +344,7 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(90.0, 64.369)), module, Zoxnoxious3340::MIX1_TRIANGLE_KNOB_PARAM));
     addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(90.0, 43.649)), module, Zoxnoxious3340::MIX1_SAW_KNOB_PARAM));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(66.5, 58.11)), module, Zoxnoxious3340::SYNC_PHASE_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(66.5, 58.21)), module, Zoxnoxious3340::SYNC_PHASE_KNOB_PARAM));
     addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(40.5, 58.11)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
 
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(60.84, 99.296)), module, Zoxnoxious3340::SYNC_HARD_BUTTON_PARAM, Zoxnoxious3340::SYNC_HARD_BUTTON_LIGHT));
