@@ -25,16 +25,16 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.1471774"
-     inkscape:cx="205.28647"
-     inkscape:cy="284.6116"
+     inkscape:zoom="1.5248671"
+     inkscape:cx="312.48625"
+     inkscape:cy="272.48276"
      inkscape:window-width="1480"
      inkscape:window-height="966"
      inkscape:window-x="191"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     showguides="false"
-     inkscape:current-layer="layer2">
+     showguides="true"
+     inkscape:current-layer="layer1">
     <inkscape:grid
        id="grid1"
        units="mm"
@@ -203,7 +203,7 @@
        inkscape:label="jack"
        inkscape:color="rgb(0,134,229)" />
     <sodipodi:guide
-       position="90.000002,128.5"
+       position="88.750002,128.5"
        orientation="-1,0"
        id="guide23"
        inkscape:locked="false"
@@ -658,14 +658,14 @@
      inkscape:label="components"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:none">
+     style="display:inline">
     <rect
        id="rect219"
        data-name="Screen"
        y="74"
        width="18"
        height="3.636193"
-       x="86.673073"
+       x="85.523071"
        style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713581"
        inkscape:label="OUT1_TEXT" />
     <ellipse
@@ -763,7 +763,7 @@
     <ellipse
        id="ellipse280"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="89.453964"
+       cx="88.834137"
        cy="99.296516"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
        inkscape:label="MIX2_PULSE_BUTTON"
@@ -782,7 +782,7 @@
     <ellipse
        id="ellipse173"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="90"
+       cx="88.836105"
        cy="23.299557"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
        inkscape:label="MIX1_PULSE_KNOB"
@@ -801,7 +801,7 @@
     <ellipse
        id="ellipse195"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="90"
+       cx="88.836105"
        cy="43.649166"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
        inkscape:label="MIX1_SAW_KNOB"
@@ -820,7 +820,7 @@
     <ellipse
        id="ellipse201"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="90"
+       cx="88.836105"
        cy="64.369415"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
        inkscape:label="MIX1_TRIANGLE_KNOB"
@@ -850,7 +850,7 @@
        y="104.30002"
        width="18"
        height="3.6367228"
-       x="86.673073"
+       x="85.523071"
        style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713632"
        inkscape:label="OUT2_TEXT" />
     <ellipse
@@ -977,7 +977,7 @@
        y="73.999741"
        width="18"
        height="3.6367228"
-       x="86.673073"
+       x="85.523071"
        style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713632"
        inkscape:label="OUT1_TEXT" />
     <path
@@ -992,7 +992,7 @@
        sodipodi:nodetypes="ccc" />
     <path
        style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       d="m 36.480074,19.87313 -7.380074,0 v 17.458016"
+       d="M 36.480074,19.87313 H 29.1 v 17.458016"
        id="path119"
        sodipodi:nodetypes="ccc" />
     <path
@@ -1093,12 +1093,12 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       x="89.435974"
+       x="88.816147"
        y="95.061417"
        id="text280"><tspan
          sodipodi:role="line"
          id="tspan286"
-         x="89.369827"
+         x="88.75"
          y="95.061417">PULSE</tspan></text>
     <text
        xml:space="preserve"
@@ -1537,119 +1537,119 @@
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 89.9995,23.286871 -2.5,4.330127"
+       d="m 88.835603,23.286871 -2.5,4.330127"
        id="path23" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 90.0005,23.286871 2.5,4.330127"
+       d="m 88.836603,23.286871 2.5,4.330127"
        id="path24" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="M 89.999034,23.285746 85.169405,21.991651"
+       d="M 88.835137,23.285746 84.005508,21.991651"
        id="path25" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 90,23.285005 v -5"
+       d="m 88.836103,23.285005 v -5"
        id="path26" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 90.000966,23.285746 4.829629,-1.294095"
+       d="m 88.837069,23.285746 4.829629,-1.294095"
        id="path27" />
     <text
-       x="85.999275"
+       x="84.835381"
        y="29.982647"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.65;fill:#f0e8d8;fill-opacity:1"
        id="text28">0</text>
     <text
-       x="94.000351"
+       x="92.836456"
        y="29.982647"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.65;fill:#f0e8d8;fill-opacity:1"
        id="text29"><tspan
          sodipodi:role="line"
          id="tspan69"
-         x="94.000351"
+         x="92.836456"
          y="29.982647">1</tspan></text>
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 89.9995,43.641661 -2.5,4.330127"
+       d="m 88.835603,43.641661 -2.5,4.330127"
        id="path43" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 90.0005,43.641661 2.5,4.330127"
+       d="m 88.836603,43.641661 2.5,4.330127"
        id="path44" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="M 89.999034,43.640536 85.169405,42.346441"
+       d="M 88.835137,43.640536 84.005508,42.346441"
        id="path45" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 90,43.639795 v -5"
+       d="m 88.836103,43.639795 v -5"
        id="path46" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 90.000966,43.640536 4.829629,-1.294095"
+       d="m 88.837069,43.640536 4.829629,-1.294095"
        id="path47" />
     <text
-       x="85.999275"
+       x="84.835381"
        y="50.337437"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.65;fill:#f0e8d8;fill-opacity:1"
        id="text47">0</text>
     <text
-       x="94.000351"
+       x="92.836456"
        y="50.337437"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.65;fill:#f0e8d8;fill-opacity:1"
        id="text48"><tspan
          sodipodi:role="line"
          id="tspan70"
-         x="94.000351"
+         x="92.836456"
          y="50.337437">1</tspan></text>
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 89.9995,64.238071 -2.5,4.330127"
+       d="m 88.835603,64.238071 -2.5,4.330127"
        id="path48" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 90.0005,64.238071 2.5,4.330127"
+       d="m 88.836603,64.238071 2.5,4.330127"
        id="path49" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="M 89.999034,64.236946 85.169405,62.942851"
+       d="M 88.835137,64.236946 84.005508,62.942851"
        id="path50" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 90,64.236205 v -5"
+       d="m 88.836103,64.236205 v -5"
        id="path51" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 90.000966,64.236946 4.829629,-1.294095"
+       d="m 88.837069,64.236946 4.829629,-1.294095"
        id="path52" />
     <text
-       x="85.999275"
+       x="84.835381"
        y="70.933846"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.65;fill:#f0e8d8;fill-opacity:1"
        id="text52">0</text>
     <text
-       x="94.000351"
+       x="92.836456"
        y="70.933846"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.65;fill:#f0e8d8;fill-opacity:1"
        id="text53"><tspan
          sodipodi:role="line"
          id="tspan71"
-         x="94.000351"
+         x="92.836456"
          y="70.933846">1</tspan></text>
     <text
        x="40.400002"
@@ -1792,12 +1792,12 @@
     </g>
     <path
        style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       d="M 82.243354,83.03524 H 81.1 V 11.90853"
+       d="M 82.243354,83.03524 H 81.1 V 14"
        id="path123"
        sodipodi:nodetypes="ccc" />
     <path
        style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       d="M 104.39378,83.03524 H 108.66 V 15.134109"
+       d="M 104.39378,83.03524 H 108.66 V 14"
        id="path125"
        sodipodi:nodetypes="ccc" />
     <path
@@ -1848,7 +1848,7 @@
        id="path19" />
     <g
        id="g2"
-       transform="translate(-15.19233,8.5270859)">
+       transform="translate(-16.34233,8.5270859)">
       <rect
          id="rect243"
          data-name="Screen"
@@ -1999,7 +1999,7 @@
     </g>
     <g
        id="g13"
-       transform="translate(-15.19233,38.927086)">
+       transform="translate(-16.34233,38.927086)">
       <rect
          id="rect2"
          data-name="Screen"
