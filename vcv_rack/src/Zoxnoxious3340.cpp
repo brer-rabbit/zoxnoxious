@@ -354,14 +354,14 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(72.16, 110.696)), module, Zoxnoxious3340::SYNC_NEG_BUTTON_PARAM, Zoxnoxious3340::SYNC_NEG_BUTTON_LIGHT));
 
 
-    addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(56.374, 32.791)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_LIGHT));
-    addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.304, 32.791)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_LIGHT));
+    addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(56.374, 35.791)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_UP_LIGHT));
+    addParam(createLightParamCentered<VCVLightButton<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(43.304, 35.791)), module, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_PARAM, Zoxnoxious3340::EXT_MOD_SELECT_SWITCH_DOWN_LIGHT));
 
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(89.454, 98.997)), module, Zoxnoxious3340::MIX2_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX2_PULSE_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(89.454, 99.297)), module, Zoxnoxious3340::MIX2_PULSE_BUTTON_PARAM, Zoxnoxious3340::MIX2_PULSE_BUTTON_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(40.5, 113.757)), module, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_PARAM, Zoxnoxious3340::EXT_MOD_PWM_BUTTON_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(40.5, 91.458)), module, Zoxnoxious3340::EXP_FM_BUTTON_PARAM, Zoxnoxious3340::EXP_FM_BUTTON_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(40.5, 102.92)), module, Zoxnoxious3340::LINEAR_FM_BUTTON_PARAM, Zoxnoxious3340::LINEAR_FM_BUTTON_LIGHT));
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(101.892, 98.997)), module, Zoxnoxious3340::MIX2_SAW_BUTTON_PARAM, Zoxnoxious3340::MIX2_SAW_BUTTON_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(101.892, 99.297)), module, Zoxnoxious3340::MIX2_SAW_BUTTON_PARAM, Zoxnoxious3340::MIX2_SAW_BUTTON_LIGHT));
 
     addInput(createInputCentered<BNCPort>(mm2px(Vec(14.5, 40.112)), module, Zoxnoxious3340::FREQ_INPUT));
     addInput(createInputCentered<BNCPort>(mm2px(Vec(14.5, 106.978)), module, Zoxnoxious3340::PULSE_WIDTH_INPUT));
@@ -384,19 +384,19 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     //addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(ABCD), module, Zoxnoxious3340::LEFT_EXPANDER_LIGHT));
     addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(4.468, 121.583)), module, Zoxnoxious3340::RIGHT_EXPANDER_LIGHT));
 
-    mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(86.173, 75.5)));
+    mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(86.173, 74.2)));
     mix1OutputTextField->setNumChars(11);
     mix1OutputTextField->box.size = (mm2px(Vec(19.0, 3.136)));
     mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
     addChild(mix1OutputTextField);
 
-    mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(86.173, 105.0)));
+    mix2OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(86.173, 104.6)));
     mix2OutputTextField->setNumChars(11);
     mix2OutputTextField->box.size = (mm2px(Vec(19.0, 3.136)));
     mix2OutputTextField->setText(module ? &module->output2NameString : NULL);
     addChild(mix2OutputTextField);
 
-    modulationInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(40.181, 20.412)));
+    modulationInputTextField = createWidget<CardTextDisplay>(mm2px(Vec(40.181, 25.012)));
     modulationInputTextField->setNumChars(14);
     modulationInputTextField->box.size = (mm2px(Vec(24.0, 3.136)));
     modulationInputTextField->setText(module ? &module->modulationInputNameString  : NULL);
