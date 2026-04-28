@@ -25,16 +25,16 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.5248671"
-     inkscape:cx="312.48625"
-     inkscape:cy="272.48276"
+     inkscape:zoom="1.356629"
+     inkscape:cx="175.8034"
+     inkscape:cy="212.65946"
      inkscape:window-width="1480"
      inkscape:window-height="966"
-     inkscape:window-x="191"
-     inkscape:window-y="25"
+     inkscape:window-x="200"
+     inkscape:window-y="32"
      inkscape:window-maximized="0"
-     showguides="true"
-     inkscape:current-layer="layer1">
+     showguides="false"
+     inkscape:current-layer="layer2">
     <inkscape:grid
        id="grid1"
        units="mm"
@@ -658,7 +658,7 @@
      inkscape:label="components"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:inline">
+     style="display:none">
     <rect
        id="rect219"
        data-name="Screen"
@@ -1123,23 +1123,23 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.15875px;text-anchor:start;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
-       x="30.669476"
-       y="44.712734"
+       x="29.948"
+       y="45.262737"
        id="text116"><tspan
          sodipodi:role="line"
          id="tspan3"
-         x="30.669476"
-         y="44.712734">MODULATION</tspan></text>
+         x="29.948"
+         y="45.262737">MODULATION</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
-       x="56.951172"
-       y="44.712234"
+       x="57.551735"
+       y="45.262238"
        id="text117"><tspan
          sodipodi:role="line"
          id="tspan117"
-         x="56.951172"
-         y="44.712234">SYNC</tspan></text>
+         x="57.551735"
+         y="45.262238">SYNC</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
@@ -1253,10 +1253,12 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;display:inline;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="37.983475"
-       y="21.037235"
+       y="23.037458"
        id="text107"><tspan
          sodipodi:role="line"
-         id="tspan12">MOD / SYNC SOURCE</tspan></text>
+         id="tspan21"
+         x="37.983475"
+         y="23.037458">MOD/SYNC SOURCE</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
@@ -1290,12 +1292,12 @@
     <text
        xml:space="preserve"
        style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Medium Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.6;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-opacity:1"
-       x="22.749264"
+       x="21.749041"
        y="44.699951"
        id="text7"><tspan
          sodipodi:role="line"
          id="tspan231"
-         x="22.749264"
+         x="21.749041"
          y="44.699951">1 v/oct</tspan></text>
     <text
        xml:space="preserve"
