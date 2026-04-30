@@ -169,22 +169,22 @@ struct Zoxnoxious5524 final : ParticipantAdapter, Participant {
     output2NameString(invalidCardOutputName),
     buttonMidiController(buttonMappings),
     routes{{
-      {VCO_ONE_SAW_KNOB_PARAM, VCO_ONE_SAW_INPUT, VCO_ONE_SAW, 10.f, &vcoOneSawClipTimer, nullptr},
-      {VCO_ONE_PULSE_KNOB_PARAM, VCO_ONE_PULSE_INPUT, VCO_ONE_PULSE, 10.f, &vcoOnePulseClipTimer, nullptr},
-      {VCO_TWO_MOD_AMOUNT_KNOB_PARAM, VCO_TWO_MOD_AMOUNT_INPUT, VCO_TWO_MOD_AMOUNT, 10.f, &vcoTwoModAmountClipTimer, nullptr},
-      {VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM, VCO_TWO_WAVESHAPE_TZFM_INPUT, VCO_TWO_WAVESHAPE_TZFM, 10.f, &vcoTwoWaveshapeTzfmClipTimer, nullptr},
-      {VCO_ONE_PW_KNOB_PARAM,VCO_ONE_PW_INPUT, VCO_ONE_PW, 10.f, &vcoOnePwClipTimer, nullptr},
-      {VCO_ONE_VOCT_KNOB_PARAM, VCO_ONE_VOCT_INPUT, VCO_ONE_VOCT, 8.f, &vcoOneVoctClipTimer, nullptr},
-      {VCO_ONE_LINEAR_KNOB_PARAM, VCO_ONE_LINEAR_INPUT, VCO_ONE_LINEAR, 10.f, &vcoOneLinearClipTimer, nullptr},
-      {VCO_ONE_TRIANGLE_KNOB_PARAM, VCO_ONE_TRIANGLE_INPUT, VCO_ONE_TRIANGLE, 10.f, &vcoOneTriangleClipTimer, nullptr},
-      {VCF_CUTOFF_KNOB_PARAM,VCF_CUTOFF_INPUT, VCF_CUTOFF, 10.f, &vcfCutoffClipTimer, nullptr},
-      {VCO_TWO_VOCT_KNOB_PARAM, VCO_TWO_VOCT_INPUT, VCO_TWO_VOCT, 6.f, &vcoTwoVoctClipTimer, nullptr},
-      {VCO_ONE_MOD_AMOUNT_KNOB_PARAM, VCO_ONE_MOD_AMOUNT_INPUT, VCO_ONE_MOD_AMOUNT, 10.f, &vcoOneModAmountClipTimer, nullptr},
-      {VCF_RESONANCE_KNOB_PARAM, VCF_RESONANCE_INPUT, VCF_RESONANCE, 10.f, &vcfResonanceClipTimer, dualLinearSwitch0_8},
-      {VCO_TWO_TRI_VCF_KNOB_PARAM, VCO_TWO_TRI_VCF_INPUT, VCO_TWO_TRI_VCF, 10.f, &vcoTwoTriVcfClipTimer, nullptr},
-      {FINAL_GAIN_KNOB_PARAM, FINAL_GAIN_INPUT, FINAL_GAIN, 10.f, &finalGainClipTimer, nullptr},
-      {VCO_TWO_PW_KNOB_PARAM,VCO_TWO_PW_INPUT, VCO_TWO_PW, 10.f, &vcoTwoPwClipTimer, nullptr},
-      {VCO_MIX_KNOB_PARAM, VCO_MIX_INPUT, VCO_MIX, 10.f, &vcoMixClipTimer, nullptr} }} {
+      {VCO_ONE_SAW_KNOB_PARAM, VCO_ONE_SAW_INPUT, VCO_ONE_SAW, 10.f, &vcoOneSawClipTimer, nullptr, CvOperation::Add},
+      {VCO_ONE_PULSE_KNOB_PARAM, VCO_ONE_PULSE_INPUT, VCO_ONE_PULSE, 10.f, &vcoOnePulseClipTimer, nullptr, CvOperation::Add},
+      {VCO_TWO_MOD_AMOUNT_KNOB_PARAM, VCO_TWO_MOD_AMOUNT_INPUT, VCO_TWO_MOD_AMOUNT, 10.f, &vcoTwoModAmountClipTimer, nullptr, CvOperation::Add},
+      {VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM, VCO_TWO_WAVESHAPE_TZFM_INPUT, VCO_TWO_WAVESHAPE_TZFM, 10.f, &vcoTwoWaveshapeTzfmClipTimer, nullptr, CvOperation::Add},
+      {VCO_ONE_PW_KNOB_PARAM,VCO_ONE_PW_INPUT, VCO_ONE_PW, 10.f, &vcoOnePwClipTimer, nullptr, CvOperation::Add},
+      {VCO_ONE_VOCT_KNOB_PARAM, VCO_ONE_VOCT_INPUT, VCO_ONE_VOCT, 8.f, &vcoOneVoctClipTimer, nullptr, CvOperation::Add},
+      {VCO_ONE_LINEAR_KNOB_PARAM, VCO_ONE_LINEAR_INPUT, VCO_ONE_LINEAR, 10.f, &vcoOneLinearClipTimer, nullptr, CvOperation::Add},
+      {VCO_ONE_TRIANGLE_KNOB_PARAM, VCO_ONE_TRIANGLE_INPUT, VCO_ONE_TRIANGLE, 10.f, &vcoOneTriangleClipTimer, nullptr, CvOperation::Add},
+      {VCF_CUTOFF_KNOB_PARAM,VCF_CUTOFF_INPUT, VCF_CUTOFF, 10.f, &vcfCutoffClipTimer, nullptr, CvOperation::Add},
+      {VCO_TWO_VOCT_KNOB_PARAM, VCO_TWO_VOCT_INPUT, VCO_TWO_VOCT, 6.f, &vcoTwoVoctClipTimer, nullptr, CvOperation::Add},
+      {VCO_ONE_MOD_AMOUNT_KNOB_PARAM, VCO_ONE_MOD_AMOUNT_INPUT, VCO_ONE_MOD_AMOUNT, 10.f, &vcoOneModAmountClipTimer, nullptr, CvOperation::Add},
+      {VCF_RESONANCE_KNOB_PARAM, VCF_RESONANCE_INPUT, VCF_RESONANCE, 10.f, &vcfResonanceClipTimer, dualLinearSwitch0_8, CvOperation::Add},
+      {VCO_TWO_TRI_VCF_KNOB_PARAM, VCO_TWO_TRI_VCF_INPUT, VCO_TWO_TRI_VCF, 10.f, &vcoTwoTriVcfClipTimer, nullptr, CvOperation::Add},
+      {FINAL_GAIN_KNOB_PARAM, FINAL_GAIN_INPUT, FINAL_GAIN, 10.f, &finalGainClipTimer, nullptr, CvOperation::Add},
+      {VCO_TWO_PW_KNOB_PARAM,VCO_TWO_PW_INPUT, VCO_TWO_PW, 10.f, &vcoTwoPwClipTimer, nullptr, CvOperation::Add},
+      {VCO_MIX_KNOB_PARAM, VCO_MIX_INPUT, VCO_MIX, 10.f, &vcoMixClipTimer, nullptr, CvOperation::Add} }} {
 
     setParticipant(this);
     setLightEnum(RIGHT_EXPANDER_LIGHT);

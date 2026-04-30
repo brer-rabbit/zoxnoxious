@@ -22,8 +22,8 @@ AudioIO::AudioIO() : out1LevelClipTimer(0.f),
                      buttonMidiController(buttonMappings),
                      routes{
   {
-    {OUT1_LEVEL_KNOB_PARAM, OUT1_LEVEL_INPUT, OUT1_CHANNEL, 10.f, &out1LevelClipTimer, nullptr},
-    {OUT2_LEVEL_KNOB_PARAM, OUT2_LEVEL_INPUT, OUT2_CHANNEL, 10.f, &out2LevelClipTimer, nullptr}
+    {OUT1_LEVEL_KNOB_PARAM, OUT1_LEVEL_INPUT, OUT1_CHANNEL, 10.f, &out1LevelClipTimer, nullptr, CvOperation::Add},
+    {OUT2_LEVEL_KNOB_PARAM, OUT2_LEVEL_INPUT, OUT2_CHANNEL, 10.f, &out2LevelClipTimer, nullptr, CvOperation::Add}
   }}
 {
 
