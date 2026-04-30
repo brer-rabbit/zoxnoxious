@@ -146,7 +146,7 @@ using CvTransform = float (*)(float);
 
 enum class CvOperation {
   Add,
-  Multiply
+  MultiplyNormalled // VCA behavior, unipolar [0,1]
 };
 
 struct CvRoute {
@@ -170,19 +170,18 @@ inline void processCvRoutes(
 {
   for (int i = 0; i < count; ++i) {
     const auto& r = routes[i];
-
+    float knob = params[r.knobParam].getValue();
+    float in = inputs[r.inputId].getVoltage() / r.divisor;
     float v;
     switch (r.op) {
       case CvOperation::Add:
-        v = params[r.knobParam].getValue()
-          + inputs[r.inputId].getVoltage() / r.divisor;
+        v = knob + in;
         break;
-      case CvOperation::Multiply:
-        v = params[r.knobParam].getValue()
-          * inputs[r.inputId].getVoltage() / r.divisor;
+      case CvOperation::MultiplyNormalled:
+        v = inputs[r.inputId].isConnected() ? knob * in : knob;
         break;
     default:
-        v = 0;
+        v = 0.f;
     }
 
     if (r.transform) {

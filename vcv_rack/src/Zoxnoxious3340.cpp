@@ -114,12 +114,12 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   Zoxnoxious3340() :
     buttonMidiController(buttonMappings),
     routes{{
-      {LINEAR_KNOB_PARAM, LINEAR_INPUT, LINEAR_CHANNEL, 10.f, &linearClipTimer, nullptr, CvOperation::Multiply},
+      {LINEAR_KNOB_PARAM, LINEAR_INPUT, LINEAR_CHANNEL, 10.f, &linearClipTimer, nullptr, CvOperation::Add},
       {PULSE_WIDTH_KNOB_PARAM, PULSE_WIDTH_INPUT, PULSE_WIDTH_CHANNEL, 10.f, &pulseWidthClipTimer, nullptr, CvOperation::Add},
-      {MIX1_SAW_KNOB_PARAM, MIX1_SAW_VCA_INPUT, MIX1_SAW_VCA_CHANNEL, 10.f, &mix1SawVcaClipTimer, nullptr, CvOperation::Multiply},
-      {MIX1_TRIANGLE_KNOB_PARAM, MIX1_TRIANGLE_VCA_INPUT, MIX1_TRIANGLE_VCA_CHANNEL, 10.f, &mix1TriangleVcaClipTimer, nullptr, CvOperation::Multiply},
-      {EXT_MOD_AMOUNT_KNOB_PARAM, EXT_MOD_AMOUNT_INPUT, EXT_MOD_AMOUNT_CHANNEL, 10.f, &extModAmountClipTimer, nullptr, CvOperation::Multiply},
-      {MIX1_PULSE_KNOB_PARAM, MIX1_PULSE_VCA_INPUT, MIX1_PULSE_VCA_CHANNEL, 10.f, &mix1PulseVcaClipTimer, nullptr, CvOperation::Multiply},
+      {MIX1_SAW_KNOB_PARAM, MIX1_SAW_VCA_INPUT, MIX1_SAW_VCA_CHANNEL, 10.f, &mix1SawVcaClipTimer, nullptr, CvOperation::MultiplyNormalled},
+      {MIX1_TRIANGLE_KNOB_PARAM, MIX1_TRIANGLE_VCA_INPUT, MIX1_TRIANGLE_VCA_CHANNEL, 10.f, &mix1TriangleVcaClipTimer, nullptr, CvOperation::MultiplyNormalled},
+      {EXT_MOD_AMOUNT_KNOB_PARAM, EXT_MOD_AMOUNT_INPUT, EXT_MOD_AMOUNT_CHANNEL, 10.f, &extModAmountClipTimer, nullptr, CvOperation::MultiplyNormalled},
+      {MIX1_PULSE_KNOB_PARAM, MIX1_PULSE_VCA_INPUT, MIX1_PULSE_VCA_CHANNEL, 10.f, &mix1PulseVcaClipTimer, nullptr, CvOperation::MultiplyNormalled},
       {SYNC_PHASE_KNOB_PARAM, SYNC_PHASE_INPUT, SYNC_PHASE_CHANNEL, 10.f, &syncPhaseClipTimer, nullptr, CvOperation::Add},
       {FREQ_KNOB_PARAM, FREQ_INPUT, FREQ_CHANNEL, 8.f, &freqClipTimer, nullptr, CvOperation::Add}
     }} {

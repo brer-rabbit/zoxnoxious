@@ -25,13 +25,13 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.356629"
-     inkscape:cx="175.8034"
-     inkscape:cy="212.65946"
+     inkscape:zoom="3.0596452"
+     inkscape:cx="80.564897"
+     inkscape:cy="427.9908"
      inkscape:window-width="1480"
      inkscape:window-height="966"
      inkscape:window-x="200"
-     inkscape:window-y="32"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
      showguides="false"
      inkscape:current-layer="layer2">
@@ -1040,16 +1040,14 @@
          y="49.758221">EDGE DETECT</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       x="13.002002"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
+       x="6.3974648"
        y="122.40388"
        id="text230"
        inkscape:transform-center-x="-0.29430972"
        inkscape:transform-center-y="-5.9842977"><tspan
          sodipodi:role="line"
-         id="tspan238"
-         x="12.935856"
-         y="122.40388">COM STATUS</tspan></text>
+         id="tspan12">MODULE LINK</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
