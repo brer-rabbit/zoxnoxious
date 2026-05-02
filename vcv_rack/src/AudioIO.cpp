@@ -494,18 +494,18 @@ struct AudioIOWidget : ModuleWidget {
       Broker& b = module->getBroker();
       const std::shared_ptr<HardwareNameService> hns = b.getHardwareNameService();
       if (hns) {
-        outputA1Text = hns->getNamePtr(0);
-        outputA2Text = hns->getNamePtr(1);
-        outputB1Text = hns->getNamePtr(2);
-        outputB2Text = hns->getNamePtr(3);
-        outputC1Text = hns->getNamePtr(4);
-        outputC2Text = hns->getNamePtr(5);
-        outputD1Text = hns->getNamePtr(6);
-        outputD2Text = hns->getNamePtr(7);
-        outputE1Text = hns->getNamePtr(8);
-        outputE2Text = hns->getNamePtr(9);
-        outputF1Text = hns->getNamePtr(10);
-        outputF2Text = hns->getNamePtr(11);
+        outputA1Text = hns->getShortNamePtr(0);
+        outputA2Text = hns->getShortNamePtr(1);
+        outputB1Text = hns->getShortNamePtr(2);
+        outputB2Text = hns->getShortNamePtr(3);
+        outputC1Text = hns->getShortNamePtr(4);
+        outputC2Text = hns->getShortNamePtr(5);
+        outputD1Text = hns->getShortNamePtr(6);
+        outputD2Text = hns->getShortNamePtr(7);
+        outputE1Text = hns->getShortNamePtr(8);
+        outputE2Text = hns->getShortNamePtr(9);
+        outputF1Text = hns->getShortNamePtr(10);
+        outputF2Text = hns->getShortNamePtr(11);
       }
     }
 
@@ -545,7 +545,6 @@ struct AudioIOWidget : ModuleWidget {
     cardAOutput1TextField->setNumChars(10);
     cardAOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardAOutput1TextField->setText(outputA1Text);
-    cardAOutput1TextField->setTextOffset(3);
     addChild(cardAOutput1TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -553,7 +552,6 @@ struct AudioIOWidget : ModuleWidget {
     cardAOutput2TextField->setNumChars(10);
     cardAOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardAOutput2TextField->setText(outputA2Text);
-    cardAOutput2TextField->setTextOffset(3);
     addChild(cardAOutput2TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -561,7 +559,6 @@ struct AudioIOWidget : ModuleWidget {
     cardBOutput1TextField->setNumChars(10);
     cardBOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardBOutput1TextField->setText(outputB1Text);
-    cardBOutput1TextField->setTextOffset(3);
     addChild(cardBOutput1TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -569,7 +566,6 @@ struct AudioIOWidget : ModuleWidget {
     cardBOutput2TextField->setNumChars(10);
     cardBOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardBOutput2TextField->setText(outputB2Text);
-    cardBOutput2TextField->setTextOffset(3);
     addChild(cardBOutput2TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -577,7 +573,6 @@ struct AudioIOWidget : ModuleWidget {
     cardCOutput1TextField->setNumChars(10);
     cardCOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardCOutput1TextField->setText(outputC1Text);
-    cardCOutput1TextField->setTextOffset(3);
     addChild(cardCOutput1TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -585,7 +580,6 @@ struct AudioIOWidget : ModuleWidget {
     cardCOutput2TextField->setNumChars(10);
     cardCOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardCOutput2TextField->setText(outputC2Text);
-    cardCOutput2TextField->setTextOffset(3);
     addChild(cardCOutput2TextField);
 
 
@@ -594,7 +588,6 @@ struct AudioIOWidget : ModuleWidget {
     cardDOutput1TextField->setNumChars(10);
     cardDOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardDOutput1TextField->setText(outputD1Text);
-    cardDOutput1TextField->setTextOffset(3);
     addChild(cardDOutput1TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -602,7 +595,6 @@ struct AudioIOWidget : ModuleWidget {
     cardDOutput2TextField->setNumChars(10);
     cardDOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardDOutput2TextField->setText(outputD2Text);
-    cardDOutput2TextField->setTextOffset(3);
     addChild(cardDOutput2TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -610,7 +602,6 @@ struct AudioIOWidget : ModuleWidget {
     cardEOutput1TextField->setNumChars(10);
     cardEOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardEOutput1TextField->setText(outputE1Text);
-    cardEOutput1TextField->setTextOffset(3);
     addChild(cardEOutput1TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -618,7 +609,6 @@ struct AudioIOWidget : ModuleWidget {
     cardEOutput2TextField->setNumChars(10);
     cardEOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardEOutput2TextField->setText(outputE2Text);
-    cardEOutput2TextField->setTextOffset(3);
     addChild(cardEOutput2TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -626,7 +616,6 @@ struct AudioIOWidget : ModuleWidget {
     cardFOutput1TextField->setNumChars(10);
     cardFOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardFOutput1TextField->setText(outputF1Text);
-    cardFOutput1TextField->setTextOffset(3);
     addChild(cardFOutput1TextField);
 
     // mm2px(Vec(18.0, 3.636))
@@ -634,7 +623,6 @@ struct AudioIOWidget : ModuleWidget {
     cardFOutput2TextField->setNumChars(10);
     cardFOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardFOutput2TextField->setText(outputF2Text);
-    cardFOutput2TextField->setTextOffset(3);
     addChild(cardFOutput2TextField);
 
   }
@@ -684,33 +672,33 @@ struct AudioIOWidget : ModuleWidget {
 
   CardTextDisplay *cardAOutput1TextField;
   CardTextDisplay *cardAOutput2TextField;
-  std::string *outputA1Text;
-  std::string *outputA2Text;
+  const std::string *outputA1Text;
+  const std::string *outputA2Text;
 
   CardTextDisplay *cardBOutput1TextField;
   CardTextDisplay *cardBOutput2TextField;
-  std::string *outputB1Text;
-  std::string *outputB2Text;
+  const std::string *outputB1Text;
+  const std::string *outputB2Text;
 
   CardTextDisplay *cardCOutput1TextField;
   CardTextDisplay *cardCOutput2TextField;
-  std::string *outputC1Text;
-  std::string *outputC2Text;
+  const std::string *outputC1Text;
+  const std::string *outputC2Text;
 
   CardTextDisplay *cardDOutput1TextField;
   CardTextDisplay *cardDOutput2TextField;
-  std::string *outputD1Text;
-  std::string *outputD2Text;
+  const std::string *outputD1Text;
+  const std::string *outputD2Text;
 
   CardTextDisplay *cardEOutput1TextField;
   CardTextDisplay *cardEOutput2TextField;
-  std::string *outputE1Text;
-  std::string *outputE2Text;
+  const std::string *outputE1Text;
+  const std::string *outputE2Text;
 
   CardTextDisplay *cardFOutput1TextField;
   CardTextDisplay *cardFOutput2TextField;
-  std::string *outputF1Text;
-  std::string *outputF2Text;
+  const std::string *outputF1Text;
+  const std::string *outputF2Text;
 };
 
 

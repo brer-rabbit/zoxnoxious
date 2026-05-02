@@ -176,10 +176,9 @@ static const int cardTextLeftMargin = 2;
 static const int cardDefaultNumChars = 8;
 
 struct CardTextDisplay : TransparentWidget {
-  std::string *displayString = nullptr;
+  const std::string *displayString = nullptr;
   std::shared_ptr<Font> font;
   std::string allSegments;
-  size_t offset = 0;
 
   CardTextDisplay() : allSegments(cardDefaultNumChars, '~') {
     font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG14Classic-BoldItalic.ttf"));
@@ -189,14 +188,8 @@ struct CardTextDisplay : TransparentWidget {
     allSegments.resize(count, '~');
   }
 
-  void setText(std::string *theString) {
+  void setText(const std::string *theString) {
     displayString = theString;
-  }
-
-  // this is a complete hack and should not live at this layer
-  // doing this to index the "A1 3340 VCO" string to drop first few chars to "3340 VCO"
-  void setTextOffset(size_t num) {
-    offset = num;
   }
 
 
@@ -214,8 +207,7 @@ struct CardTextDisplay : TransparentWidget {
 
     // If the track name is not empty, then display it
     if (displayString)  {
-      const char *text = displayString->length() >= offset ?
-        displayString->c_str() + offset : displayString->c_str();
+      const char *text = displayString->c_str();
 
       bndSetFont(font->handle);
       nvgFontFaceId(vg, font->handle);

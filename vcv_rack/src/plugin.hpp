@@ -9,8 +9,14 @@ using namespace rack;
  * cardId : numeric id for card
  * outputNumber : cards have two outputs, 1 or 2.  Any other value suppresses outputNumber
  * slot : card slot (which is also midi channel).  use -1 to suppress slot in the string.
+ * Example: "A1 3340 VCO"
+ *
+ * getCardName returns the card signal for the output number without the slot or output number in the string.
+ * Example: "3340 VCO"
+ *
  */
 std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot);
+std::string getCardName(uint8_t cardId, int outputNumber);
 
 
 // Declare the Plugin, defined in plugin.cpp

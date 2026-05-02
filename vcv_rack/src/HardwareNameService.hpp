@@ -13,18 +13,29 @@ constexpr int kOutputsPerModule = 2;
 class HardwareNameService {
 public:
   std::array<std::string, kMaxModules * kOutputsPerModule> names;
+  std::array<std::string, kMaxModules * kOutputsPerModule> shortNames;
 
   HardwareNameService() {
     names.fill(invalidCardOutputName);
+    shortNames.fill(invalidCardOutputName);
   }
 
-  std::string* getNamePtr(int index) {
+  const std::string* getNamePtr(int index) {
     return &names[index];
   }
 
-  void setName(int index, const std::string& value) {
-      names[index] = value;
+  const std::string* getShortNamePtr(int index) const {
+    return &shortNames[index];
   }
+
+  void setName(int index, const std::string& value) {
+    names[index] = value;
+  }
+
+  void setShortName(int index, const std::string& value) {
+    shortNames[index] = value;
+  }
+
 };
 
 
