@@ -1,12 +1,46 @@
 #pragma once
 
+#include <array>
+#include <memory>
 #include <vector>
 #include <rack.hpp>
-#include "common.hpp"
-#include "HardwareNameService.hpp"
+#include "constants.hpp"
 
 
 namespace zox {
+
+
+constexpr int hnsMaxModules = 7;
+constexpr int hnsOutputsPerModule = 2;
+
+// HardwareNameService is string storage for orchestration layer
+class HardwareNameService {
+public:
+  std::array<std::string, hnsMaxModules * hnsOutputsPerModule> names;
+  std::array<std::string, hnsMaxModules * hnsOutputsPerModule> shortNames;
+
+  HardwareNameService() {
+    names.fill(invalidCardOutputName);
+    shortNames.fill(invalidCardOutputName);
+  }
+
+  const std::string* getNamePtr(int index) {
+    return &names[index];
+  }
+
+  const std::string* getShortNamePtr(int index) const {
+    return &shortNames[index];
+  }
+
+  void setName(int index, const std::string& value) {
+    names[index] = value;
+  }
+
+  void setShortName(int index, const std::string& value) {
+    shortNames[index] = value;
+  }
+
+};
 
 
 struct Participant;

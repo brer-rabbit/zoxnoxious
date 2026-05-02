@@ -5,6 +5,7 @@
 #include "Participant.hpp"
 #include "ParticipantAdapter.hpp"
 #include "AudioMidi.hpp"
+#include "modulehelpers.hpp"
 
 namespace zox {
 

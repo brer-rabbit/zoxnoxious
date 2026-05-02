@@ -1,5 +1,6 @@
 #include "plugin.hpp"
-#include "common.hpp"
+#include "constants.hpp"
+#include "modulehelpers.hpp"
 #include "zcomponentlib.hpp"
 #include "TurnsCountingKnob.hpp"
 #include "ParticipantAdapter.hpp"

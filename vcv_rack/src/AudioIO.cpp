@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 
 #include "AudioIO.hpp"
-#include "common.hpp"
+#include "constants.hpp"
 #include "zcomponentlib.hpp"
 
 namespace zox {

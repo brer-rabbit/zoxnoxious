@@ -1,6 +1,7 @@
 #include "plugin.hpp"
 #include "zcomponentlib.hpp"
-#include "common.hpp"
+#include "constants.hpp"
+#include "modulehelpers.hpp"
 #include "ParticipantAdapter.hpp"
 
 namespace zox {
