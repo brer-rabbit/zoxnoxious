@@ -515,18 +515,18 @@ struct AudioIOWidget : ModuleWidget {
     addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(28.665, 39.243)), module, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.674, 39.421)), module, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(28.665, 44.56)), module, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.674, 44.702)), module, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(28.665, 49.876)), module, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.674, 49.983)), module, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(28.665, 55.193)), module, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.674, 55.264)), module, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(28.665, 60.51)), module, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.674, 60.545)), module, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(28.665, 65.826)), module, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(61.674, 65.826)), module, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 39.243)), module, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 39.421)), module, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 44.56)), module, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 44.702)), module, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.66, 49.876)), module, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 49.983)), module, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 55.193)), module, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 55.264)), module, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 60.51)), module, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 60.545)), module, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 65.826)), module, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 65.826)), module, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
 
 
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.78, 93.244)), module, AudioIO::OUT1_LEVEL_KNOB_PARAM));
@@ -541,88 +541,100 @@ struct AudioIOWidget : ModuleWidget {
     //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 114.233)), module, AudioIO::OUT2_LEVEL_CLIP_LIGHT));
 
     // mm2px(Vec(22.0, 3.636))
-    cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.145, 37.603)));
-    cardAOutput1TextField->setNumChars(11);
-    cardAOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 37.603)));
+    cardAOutput1TextField->setNumChars(10);
+    cardAOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardAOutput1TextField->setText(outputA1Text);
+    cardAOutput1TextField->setTextOffset(3);
     addChild(cardAOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardAOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(41.205, 37.603)));
-    cardAOutput2TextField->setNumChars(11);
-    cardAOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardAOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 37.603)));
+    cardAOutput2TextField->setNumChars(10);
+    cardAOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardAOutput2TextField->setText(outputA2Text);
+    cardAOutput2TextField->setTextOffset(3);
     addChild(cardAOutput2TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardBOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.145, 42.884)));
-    cardBOutput1TextField->setNumChars(11);
-    cardBOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardBOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 42.884)));
+    cardBOutput1TextField->setNumChars(10);
+    cardBOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardBOutput1TextField->setText(outputB1Text);
+    cardBOutput1TextField->setTextOffset(3);
     addChild(cardBOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardBOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(41.205, 42.884)));
-    cardBOutput2TextField->setNumChars(11);
-    cardBOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardBOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 42.884)));
+    cardBOutput2TextField->setNumChars(10);
+    cardBOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardBOutput2TextField->setText(outputB2Text);
+    cardBOutput2TextField->setTextOffset(3);
     addChild(cardBOutput2TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardCOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.145, 48.165)));
-    cardCOutput1TextField->setNumChars(11);
-    cardCOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardCOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 48.165)));
+    cardCOutput1TextField->setNumChars(10);
+    cardCOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardCOutput1TextField->setText(outputC1Text);
+    cardCOutput1TextField->setTextOffset(3);
     addChild(cardCOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardCOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(41.205, 48.165)));
-    cardCOutput2TextField->setNumChars(11);
-    cardCOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardCOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 48.165)));
+    cardCOutput2TextField->setNumChars(10);
+    cardCOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardCOutput2TextField->setText(outputC2Text);
+    cardCOutput2TextField->setTextOffset(3);
     addChild(cardCOutput2TextField);
 
 
-    // mm2px(Vec(22.0, 3.636))
-    cardDOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.145, 53.446)));
-    cardDOutput1TextField->setNumChars(11);
-    cardDOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardDOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 53.446)));
+    cardDOutput1TextField->setNumChars(10);
+    cardDOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardDOutput1TextField->setText(outputD1Text);
+    cardDOutput1TextField->setTextOffset(3);
     addChild(cardDOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardDOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(41.205, 53.446)));
-    cardDOutput2TextField->setNumChars(11);
-    cardDOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardDOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 53.446)));
+    cardDOutput2TextField->setNumChars(10);
+    cardDOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardDOutput2TextField->setText(outputD2Text);
+    cardDOutput2TextField->setTextOffset(3);
     addChild(cardDOutput2TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardEOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.145, 58.727)));
-    cardEOutput1TextField->setNumChars(11);
-    cardEOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardEOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 58.727)));
+    cardEOutput1TextField->setNumChars(10);
+    cardEOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardEOutput1TextField->setText(outputE1Text);
+    cardEOutput1TextField->setTextOffset(3);
     addChild(cardEOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardEOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(41.205, 58.727)));
-    cardEOutput2TextField->setNumChars(11);
-    cardEOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardEOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 58.727)));
+    cardEOutput2TextField->setNumChars(10);
+    cardEOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardEOutput2TextField->setText(outputE2Text);
+    cardEOutput2TextField->setTextOffset(3);
     addChild(cardEOutput2TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardFOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.145, 64.008)));
-    cardFOutput1TextField->setNumChars(11);
-    cardFOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardFOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 64.008)));
+    cardFOutput1TextField->setNumChars(10);
+    cardFOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardFOutput1TextField->setText(outputF1Text);
+    cardFOutput1TextField->setTextOffset(3);
     addChild(cardFOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardFOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(41.205, 64.008)));
-    cardFOutput2TextField->setNumChars(11);
-    cardFOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardFOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 64.008)));
+    cardFOutput2TextField->setNumChars(10);
+    cardFOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardFOutput2TextField->setText(outputF2Text);
+    cardFOutput2TextField->setTextOffset(3);
     addChild(cardFOutput2TextField);
 
   }

@@ -176,17 +176,29 @@ static const int cardTextLeftMargin = 2;
 static const int cardDefaultNumChars = 8;
 
 struct CardTextDisplay : TransparentWidget {
-  std::string *displayString;
+  std::string *displayString = nullptr;
   std::shared_ptr<Font> font;
   std::string allSegments;
+  size_t offset = 0;
 
-  CardTextDisplay() : displayString(NULL), allSegments(cardDefaultNumChars, '~') {
+  CardTextDisplay() : allSegments(cardDefaultNumChars, '~') {
     font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG14Classic-BoldItalic.ttf"));
   }
 
   void setNumChars(size_t count) {
     allSegments.resize(count, '~');
   }
+
+  void setText(std::string *theString) {
+    displayString = theString;
+  }
+
+  // this is a complete hack and should not live at this layer
+  // doing this to index the "A1 3340 VCO" string to drop first few chars to "3340 VCO"
+  void setTextOffset(size_t num) {
+    offset = num;
+  }
+
 
   void draw(const DrawArgs& args) override {
     const auto vg = args.vg;
@@ -202,6 +214,9 @@ struct CardTextDisplay : TransparentWidget {
 
     // If the track name is not empty, then display it
     if (displayString)  {
+      const char *text = displayString->length() >= offset ?
+        displayString->c_str() + offset : displayString->c_str();
+
       bndSetFont(font->handle);
       nvgFontFaceId(vg, font->handle);
       nvgTextLetterSpacing(vg, 0);
@@ -215,9 +230,9 @@ struct CardTextDisplay : TransparentWidget {
       nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
 
       float bounds[4];
-      nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, displayString->c_str(), NULL, bounds);
+      nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, text, NULL, bounds);
       float textHeight = bounds[3];
-      nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, displayString->c_str(), NULL);
+      nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, text, NULL);
 
       // light all segments of 14-segment LED with a transparency
       nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0x20));
@@ -227,11 +242,6 @@ struct CardTextDisplay : TransparentWidget {
     }
 
     nvgRestore(vg);
-  }
-
-
-  void setText(std::string *theString) {
-    displayString = theString;
   }
 
 };
