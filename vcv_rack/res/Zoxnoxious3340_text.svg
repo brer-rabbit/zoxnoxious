@@ -25,16 +25,16 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.0901893"
-     inkscape:cx="226.10753"
-     inkscape:cy="277.47476"
+     inkscape:zoom="3.2164768"
+     inkscape:cx="358.3113"
+     inkscape:cy="393.13201"
      inkscape:window-width="1480"
      inkscape:window-height="966"
      inkscape:window-x="200"
-     inkscape:window-y="58"
+     inkscape:window-y="30"
      inkscape:window-maximized="0"
-     showguides="false"
-     inkscape:current-layer="layer1">
+     showguides="true"
+     inkscape:current-layer="g1">
     <inkscape:grid
        id="grid1"
        units="mm"
@@ -1022,12 +1022,12 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="55.906872"
-       y="122.68224"
+       y="122.5"
        id="text204"><tspan
          sodipodi:role="line"
          id="tspan1"
          x="55.840725"
-         y="122.68224">Z3340 CONTROL SURFACE</tspan></text>
+         y="122.5">Z3340 CONTROL SURFACE</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
@@ -1757,7 +1757,7 @@
        transform="matrix(0.12799763,-0.00628017,0.00640893,0.1588655,68.031386,93.444237)" />
     <path
        style="display:inline;opacity:0.85;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.111565px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 81.410434,122.63905 1.91043,-2.61292 0.925248,-0.0176 -0.02913,2.7518 2.092705,-0.0149 -0.05323,-2.72317 0.929888,-0.0307 1.779465,2.66434 1.033481,-0.0157 0.01498,-2.53008 1.860597,2.42526 -0.0083,-2.48493 1.032253,-0.0219 0.0083,2.60426 2.073109,0.0448 -0.03908,-2.65606 0.973584,-0.008 1.840998,2.70202 1.04723,-0.0153 0.0287,-2.70285 1.05554,-0.0518 0.0969,2.79316 2.083578,-6.9e-4 -0.10565,-2.7476 1.11589,-0.008 0.0445,2.75792 1.757,-0.024 0.0449,-2.7476 1.17943,0.008 1.60766,2.79818"
+       d="m 81.410434,122.39362 1.91043,-2.61292 0.925248,-0.0176 -0.02913,2.7518 2.092705,-0.0149 -0.05323,-2.72317 0.929888,-0.0307 1.779465,2.66434 1.033481,-0.0157 0.01498,-2.53008 1.860597,2.42526 -0.0083,-2.48493 1.032253,-0.0219 0.0083,2.60426 2.073109,0.0448 -0.03908,-2.65606 0.973584,-0.008 1.840998,2.70202 1.04723,-0.0153 0.0287,-2.70285 1.05554,-0.0518 0.0969,2.79316 2.083578,-6.9e-4 -0.10565,-2.7476 1.11589,-0.008 0.0445,2.75792 1.757,-0.024 0.0449,-2.7476 1.17943,0.008 1.60766,2.79818"
        id="path22502-2"
        sodipodi:nodetypes="cccccccccccccccccccccccccccccc"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"

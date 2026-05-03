@@ -80,8 +80,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     PULSE_WIDTH_CLIP_LIGHT,
     LINEAR_CLIP_LIGHT,
 
-    ENUMS(LEFT_EXPANDER_LIGHT, 3),
-    ENUMS(RIGHT_EXPANDER_LIGHT, 3),
+    ENUMS(LINK_STATUS_LIGHT, 3),
     LIGHTS_LEN
   };
 
@@ -126,7 +125,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     }} {
 
     setParticipant(this);
-    setLightEnum(RIGHT_EXPANDER_LIGHT);
+    setLightEnum(LINK_STATUS_LIGHT);
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     configParam(FREQ_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 8.f);
@@ -162,8 +161,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     configInput(PULSE_WIDTH_INPUT, "Pulse Width Modulation");
     configInput(LINEAR_INPUT, "Linear FM");
 
-    configLight(LEFT_EXPANDER_LIGHT, "Connection Status");
-    configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
+    configLight(LINK_STATUS_LIGHT, "Connection Status");
 
     output1NameString.reserve(16);
     output1NameString = invalidCardOutputName;
@@ -382,8 +380,7 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(73.538, 66.175)), module, Zoxnoxious3340::SYNC_PHASE_CLIP_LIGHT));
     //addChild(createLightCentered<SmallLight<RedLight>>(mm2px(ABCD), module, Zoxnoxious3340::EXT_MOD_AMOUNT_CLIP_LIGHT));
 
-    //addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(ABCD), module, Zoxnoxious3340::LEFT_EXPANDER_LIGHT));
-    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(4.468, 121.583)), module, Zoxnoxious3340::RIGHT_EXPANDER_LIGHT));
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(4.468, 121.583)), module, Zoxnoxious3340::LINK_STATUS_LIGHT));
 
     mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(85.023, 74.2)));
     mix1OutputTextField->setNumChars(11);

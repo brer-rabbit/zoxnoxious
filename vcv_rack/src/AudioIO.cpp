@@ -51,8 +51,7 @@ AudioIO::AudioIO() : out1LevelClipTimer(0.f),
   configInput(OUT1_LEVEL_INPUT, "Out1 VCA Level");
   configInput(OUT2_LEVEL_INPUT, "Out2 VCA Level");
 
-  configLight(LEFT_EXPANDER_LIGHT, "Connection Status");
-  configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
+  configLight(HARDWARE_LINK_LIGHT, "Connection Status");
 
   onReset();
 
@@ -184,19 +183,35 @@ void AudioIO::process(const ProcessArgs& args) {
   if (isMidiClockTick) {
     setStatusLight();
 
+    const float lightTime = args.sampleTime * midiPollClockDivider.getDivision();
+    const float brightnessDeltaTime = 1 / lightTime;
+
     // process all participants for MIDI
     midi::Message midiOutMessage;
     for (size_t i = 0; i < maxVoiceCards; ++i) {
       const Slot *slot = &snap.slots[i];
       if (slot->participant != nullptr && slot->props.isAllocated) {
-        if (slot->participant->pullMidi(args,
-                                        midiPollClockDivider.getDivision(),
-                                        slot->props.midiChannel,
-                                        midiOutMessage)) {
-          INFO("frame %" PRId64 ": midi: slot %ld module id %" PRId64 " send message %02X",
-               args.frame, i, slot->participant->getModuleId(), midiOutMessage.getNote());
-          midiOutput.sendMidiMessage(midiOutMessage);
-        }
+          lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 0 ].setBrightness(0.85f);
+          lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 1 ].setBrightness(0.38f);
+          lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 2 ].setBrightness(0.02f);
+          if (slot->participant->pullMidi(args,
+                                          midiPollClockDivider.getDivision(),
+                                          slot->props.midiChannel,
+                                          midiOutMessage)) {
+            INFO("frame %" PRId64 ": midi: slot %ld module id %" PRId64 " send message %02X",
+                 args.frame, i, slot->participant->getModuleId(), midiOutMessage.getNote());
+            midiOutput.sendMidiMessage(midiOutMessage);
+          }
+      }
+      else if (slot->props.hardwareId) {
+        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 0 ].setBrightness(0.25f);
+        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 1 ].setBrightness(0.12f);
+        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 2 ].setBrightness(0.01f);
+      }
+      else {
+        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 0 ].setBrightness(0.f);
+        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 1 ].setBrightness(0.f);
+        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 2 ].setBrightness(0.f);
       }
     }
 
@@ -204,9 +219,6 @@ void AudioIO::process(const ProcessArgs& args) {
       midiOutput.sendMidiMessage(midiOutMessage);
     }
     buttonMidiController.updateLights(this);
-
-    const float lightTime = args.sampleTime * midiPollClockDivider.getDivision();
-    const float brightnessDeltaTime = 1 / lightTime;
 
     out1LevelClipTimer -= lightTime;
     lights[OUT1_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out1LevelClipTimer > 0.f, brightnessDeltaTime);
@@ -230,21 +242,21 @@ uint8_t AudioIO::getHardwareId() { // TODO: should this be an interface?
 
 void AudioIO::setStatusLight() {
   if (discoveryReportReceived) {  // green
-    lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(0.f);
-    lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-    lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+    lights[HARDWARE_LINK_LIGHT + 0].setBrightness(0.f);
+    lights[HARDWARE_LINK_LIGHT + 1].setBrightness(0.5f);
+    lights[HARDWARE_LINK_LIGHT + 2].setBrightness(0.f);
   }
   /* yellow case
      else if (validRightExpander) {
-     lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
-     lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-     lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+     lights[HARDWARE_LINK_LIGHT + 0].setBrightness(1.f);
+     lights[HARDWARE_LINK_LIGHT + 1].setBrightness(1.f);
+     lights[HARDWARE_LINK_LIGHT + 2].setBrightness(0.f);
      }
   */
   else {  // red
-    lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
-    lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(0.f);
-    lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+    lights[HARDWARE_LINK_LIGHT + 0].setBrightness(1.f);
+    lights[HARDWARE_LINK_LIGHT + 1].setBrightness(0.f);
+    lights[HARDWARE_LINK_LIGHT + 2].setBrightness(0.f);
   }
 
 }
@@ -478,7 +490,6 @@ void AudioIO::serviceParticipantAttachments() {
 
 
 
-
 struct AudioIOWidget : ModuleWidget {
   AudioIOWidget(AudioIO* module) :
     outputA1Text(nullptr), outputA2Text(nullptr),
@@ -514,6 +525,13 @@ struct AudioIOWidget : ModuleWidget {
     addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
     addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(53.022, 14.198)), module, AudioIO::HARDWARE_LINK_LIGHT));
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(10.475, 21.639)), module, AudioIO::CARD_A_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(17.034, 21.639)), module, AudioIO::CARD_B_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(23.594, 21.639)), module, AudioIO::CARD_C_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(30.153, 21.639)), module, AudioIO::CARD_D_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(36.712, 21.639)), module, AudioIO::CARD_E_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(43.272, 21.639)), module, AudioIO::CARD_F_PATCH_USAGE_LIGHT));
 
     addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 39.243)), module, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
     addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 39.421)), module, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
@@ -529,12 +547,12 @@ struct AudioIOWidget : ModuleWidget {
     addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 65.826)), module, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
 
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.78, 93.244)), module, AudioIO::OUT1_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(52.11, 93.244)), module, AudioIO::OUT2_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<VCVSlider>(mm2px(Vec(16.78, 88.244)), module, AudioIO::OUT1_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<VCVSlider>(mm2px(Vec(52.11, 88.244)), module, AudioIO::OUT2_LEVEL_KNOB_PARAM));
 
 
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(16.803, 101.104)), module, AudioIO::OUT1_LEVEL_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.11, 101.104)), module, AudioIO::OUT2_LEVEL_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(16.803, 106.104)), module, AudioIO::OUT1_LEVEL_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.11, 106.104)), module, AudioIO::OUT2_LEVEL_INPUT));
 
 
     //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 101.184)), module, AudioIO::OUT1_LEVEL_CLIP_LIGHT));
