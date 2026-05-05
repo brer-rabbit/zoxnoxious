@@ -1,6 +1,7 @@
 #include "componentlibrary.hpp"
 
 
+// plain simple UI skinning for ports and screws
 
 struct BNCPort : app::SvgPort {
   BNCPort() {
@@ -15,50 +16,104 @@ struct ScrewSlottedKnurled : app::SvgScrew {
   }
 };
 
-//
-// Button - VCV Rack button at about 2/3 the size
-//
 
-struct ZButton : app::SvgSwitch {
-  ZButton() {
+// colors for lights within the style
+
+struct ZoxAmberLight : GrayModuleLightWidget {
+  ZoxAmberLight() {
+    addBaseColor(nvgRGB(0xff, 0x9a, 0x35));
+  }
+};
+
+
+
+// ZPushButtonSmall
+
+struct ZPushButtonSmall : app::SvgSwitch {
+  ZPushButtonSmall() {
     momentary = true;
-    addFrame(Svg::load(asset::plugin(pluginInstance, "res/ZButtonSmall_0.svg")));
-    addFrame(Svg::load(asset::plugin(pluginInstance, "res/ZButtonSmall_1.svg")));
+    addFrame(Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_unlatched.svg")));
+    addFrame(Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_latched.svg")));
   }
 };
 
-
-struct ZLatch : ZButton {
-  ZLatch() {
-    momentary = false;
-    latch = true;
-  }
-};
+template <typename TLight = WhiteLight>
+using ZLightPushButtonSmall = LightButton<ZPushButtonSmall, TLight>;
 
 template <typename TLight>
-struct ZLightButton : ZButton {
-  app::ModuleLightWidget* light;
-
-  ZLightButton() {
-    light = new TLight;
-    // Move center of light to center of box
-    light->box.pos = box.size.div(2).minus(light->box.size.div(2));
-    addChild(light);
-  }
-
-  app::ModuleLightWidget* getLight() {
-    return light;
-  }
+struct ZPushButtonSmallLightLatch : ZLightPushButtonSmall<TLight> {
+	ZPushButtonSmallLightLatch() {
+		this->momentary = false;
+		this->latch = true;
+	}
 };
 
+template <typename TLight = MediumSimpleLight<WhiteLight>>
+  struct ZPushButtonSmallStatefulLightLatch : app::SvgSwitch {
+    app::ModuleLightWidget* light;
 
-template <typename TLight>
-struct ZLightLatch : ZLightButton<TLight> {
-  ZLightLatch() {
-    this->momentary = false;
-    this->latch = true;
-  }
-};
+    std::shared_ptr<Svg> offSvg;
+    std::shared_ptr<Svg> onSvg;
+
+    ZPushButtonSmallStatefulLightLatch() {
+      momentary = false;
+      latch = true;
+
+      offSvg = Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_unlatched.svg"));
+      onSvg  = Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_latched.svg"));
+
+      addFrame(offSvg);
+      addFrame(onSvg);
+
+      light = new TLight;
+      light->box.pos = box.size.div(2).minus(light->box.size.div(2));
+      addChild(light);
+    }
+
+    void step() override {
+      app::SvgSwitch::step();
+      engine::ParamQuantity* pq = this->getParamQuantity();
+
+      if (pq) {
+        bool on = pq->getValue() > 0.5f;
+        this->sw->setSvg(on ? onSvg : offSvg);
+      }
+    }
+
+    app::ModuleLightWidget* getLight() {
+      return light;
+    }
+  };
+
+
+  struct ZPushButtonSmallStatefulLatch : app::SvgSwitch {
+
+    std::shared_ptr<Svg> offSvg;
+    std::shared_ptr<Svg> onSvg;
+
+    ZPushButtonSmallStatefulLatch() {
+      momentary = false;
+      latch = true;
+
+      offSvg = Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_unlatched.svg"));
+      onSvg  = Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_latched.svg"));
+
+      addFrame(offSvg);
+      addFrame(onSvg);
+
+    }
+
+    void step() override {
+      app::SvgSwitch::step();
+      engine::ParamQuantity* pq = this->getParamQuantity();
+
+      if (pq) {
+        bool on = pq->getValue() > 0.5f;
+        this->sw->setSvg(on ? onSvg : offSvg);
+      }
+    }
+
+  };
 
 
 

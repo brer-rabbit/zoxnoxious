@@ -191,9 +191,7 @@ void AudioIO::process(const ProcessArgs& args) {
     for (size_t i = 0; i < maxVoiceCards; ++i) {
       const Slot *slot = &snap.slots[i];
       if (slot->participant != nullptr && slot->props.isAllocated) {
-          lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 0 ].setBrightness(0.85f);
-          lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 1 ].setBrightness(0.38f);
-          lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 2 ].setBrightness(0.02f);
+          lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.85f);
           if (slot->participant->pullMidi(args,
                                           midiPollClockDivider.getDivision(),
                                           slot->props.midiChannel,
@@ -204,14 +202,10 @@ void AudioIO::process(const ProcessArgs& args) {
           }
       }
       else if (slot->props.hardwareId) {
-        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 0 ].setBrightness(0.25f);
-        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 1 ].setBrightness(0.12f);
-        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 2 ].setBrightness(0.01f);
+        lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.25f);
       }
       else {
-        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 0 ].setBrightness(0.f);
-        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 1 ].setBrightness(0.f);
-        lights[CARD_A_PATCH_USAGE_LIGHT + 3 * i + 2 ].setBrightness(0.f);
+        lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.f);
       }
     }
 
@@ -526,25 +520,27 @@ struct AudioIOWidget : ModuleWidget {
     addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(53.022, 14.198)), module, AudioIO::HARDWARE_LINK_LIGHT));
-    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(10.475, 21.639)), module, AudioIO::CARD_A_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(17.034, 21.639)), module, AudioIO::CARD_B_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(23.594, 21.639)), module, AudioIO::CARD_C_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(30.153, 21.639)), module, AudioIO::CARD_D_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(36.712, 21.639)), module, AudioIO::CARD_E_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(43.272, 21.639)), module, AudioIO::CARD_F_PATCH_USAGE_LIGHT));
 
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 39.243)), module, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 39.421)), module, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 44.56)), module, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 44.702)), module, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.66, 49.876)), module, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 49.983)), module, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 55.193)), module, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 55.264)), module, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 60.51)), module, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 60.545)), module, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(29.665, 65.826)), module, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(64.674, 65.826)), module, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(10.475, 21.639)), module, AudioIO::CARD_A_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(17.034, 21.639)), module, AudioIO::CARD_B_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(23.594, 21.639)), module, AudioIO::CARD_C_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(30.153, 21.639)), module, AudioIO::CARD_D_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(36.712, 21.639)), module, AudioIO::CARD_E_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(43.272, 21.639)), module, AudioIO::CARD_F_PATCH_USAGE_LIGHT));
+
+
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 39.243)), module, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 39.421)), module, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 44.56)), module, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 44.702)), module, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.66, 49.876)), module, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 49.983)), module, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 55.193)), module, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 55.264)), module, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 60.51)), module, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 60.545)), module, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 65.826)), module, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 65.826)), module, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
 
 
     addParam(createParamCentered<VCVSlider>(mm2px(Vec(16.78, 88.244)), module, AudioIO::OUT1_LEVEL_KNOB_PARAM));
