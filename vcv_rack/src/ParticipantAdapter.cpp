@@ -63,7 +63,7 @@ void ParticipantAdapter::setAttachedLightStatus() {
   if (lifecycle.isAttached()) {
     /* green */
     lights[myLightEnum + 0].setBrightness(0.f);
-    lights[myLightEnum + 1].setBrightness(1.f);
+    lights[myLightEnum + 1].setBrightness(0.5f);
     lights[myLightEnum + 2].setBrightness(0.f);
   }
   else if (lifecycle.wantAttach()) {

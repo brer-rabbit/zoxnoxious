@@ -27,40 +27,85 @@ struct ZoxAmberLight : GrayModuleLightWidget {
 
 
 
-// ZPushButtonSmall
+//
+// ZPushButtons -- Medium and Small
+//
 
-struct ZPushButtonSmall : app::SvgSwitch {
-  ZPushButtonSmall() {
+struct ZPushButtonSmallSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonSmall_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonSmall_latched.svg";
+};
+
+struct ZPushButtonMediumSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonMedium_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
+};
+
+struct ZPushButtonMediumLeftSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonMedium_left_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
+};
+
+struct ZPushButtonMediumRightSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonMedium_right_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
+};
+
+
+template <typename TSvg>
+struct ZPushButton : app::SvgSwitch {
+  ZPushButton() {
     momentary = true;
-    addFrame(Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_unlatched.svg")));
-    addFrame(Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_latched.svg")));
+    addFrame(Svg::load(asset::plugin(pluginInstance, TSvg::unlatched)));
+    addFrame(Svg::load(asset::plugin(pluginInstance, TSvg::latched)));
   }
 };
 
-template <typename TLight = WhiteLight>
-using ZLightPushButtonSmall = LightButton<ZPushButtonSmall, TLight>;
 
-template <typename TLight>
-struct ZPushButtonSmallLightLatch : ZLightPushButtonSmall<TLight> {
-	ZPushButtonSmallLightLatch() {
-		this->momentary = false;
-		this->latch = true;
-	}
+// Stateful latch, no light:
+template <typename TSvg>
+struct ZPushButtonStatefulLatch : app::SvgSwitch {
+  std::shared_ptr<Svg> offSvg;
+  std::shared_ptr<Svg> onSvg;
+
+  ZPushButtonStatefulLatch() {
+    momentary = false;
+    latch = true;
+
+    offSvg = Svg::load(asset::plugin(pluginInstance, TSvg::unlatched));
+    onSvg  = Svg::load(asset::plugin(pluginInstance, TSvg::latched));
+
+    addFrame(offSvg);
+    addFrame(onSvg);
+  }
+
+  void step() override {
+    app::SvgSwitch::step();
+
+    engine::ParamQuantity* pq = this->getParamQuantity();
+    if (pq) {
+      bool on = pq->getValue() > 0.5f;
+      this->sw->setSvg(on ? onSvg : offSvg);
+    }
+  }
 };
 
-template <typename TLight = MediumSimpleLight<WhiteLight>>
-  struct ZPushButtonSmallStatefulLightLatch : app::SvgSwitch {
+
+
+// stateful latch with light:
+template <typename TSvg, typename TLight = MediumSimpleLight<WhiteLight>>
+  struct ZPushButtonStatefulLightLatch : app::SvgSwitch {
     app::ModuleLightWidget* light;
 
     std::shared_ptr<Svg> offSvg;
     std::shared_ptr<Svg> onSvg;
 
-    ZPushButtonSmallStatefulLightLatch() {
+    ZPushButtonStatefulLightLatch() {
       momentary = false;
       latch = true;
 
-      offSvg = Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_unlatched.svg"));
-      onSvg  = Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_latched.svg"));
+      offSvg = Svg::load(asset::plugin(pluginInstance, TSvg::unlatched));
+      onSvg  = Svg::load(asset::plugin(pluginInstance, TSvg::latched));
 
       addFrame(offSvg);
       addFrame(onSvg);
@@ -72,8 +117,8 @@ template <typename TLight = MediumSimpleLight<WhiteLight>>
 
     void step() override {
       app::SvgSwitch::step();
-      engine::ParamQuantity* pq = this->getParamQuantity();
 
+      engine::ParamQuantity* pq = this->getParamQuantity();
       if (pq) {
         bool on = pq->getValue() > 0.5f;
         this->sw->setSvg(on ? onSvg : offSvg);
@@ -83,41 +128,35 @@ template <typename TLight = MediumSimpleLight<WhiteLight>>
     app::ModuleLightWidget* getLight() {
       return light;
     }
-  };
+};
 
 
-  struct ZPushButtonSmallStatefulLatch : app::SvgSwitch {
+// names to reference these by for use:
+using ZPushButtonSmall = ZPushButton<ZPushButtonSmallSvg>;
+using ZPushButtonMedium = ZPushButton<ZPushButtonMediumSvg>;
 
-    std::shared_ptr<Svg> offSvg;
-    std::shared_ptr<Svg> onSvg;
+template <typename TLight = WhiteLight>
+using ZLightPushButtonSmall = LightButton<ZPushButtonSmall, TLight>;
 
-    ZPushButtonSmallStatefulLatch() {
-      momentary = false;
-      latch = true;
+template <typename TLight = WhiteLight>
+using ZLightPushButtonMedium = LightButton<ZPushButtonMedium, TLight>;
 
-      offSvg = Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_unlatched.svg"));
-      onSvg  = Svg::load(asset::plugin(pluginInstance, "res/ZPushButtonSmall_latched.svg"));
+template <typename TLight>
+using ZPushButtonSmallStatefulLightLatch =
+	ZPushButtonStatefulLightLatch<ZPushButtonSmallSvg, TLight>;
 
-      addFrame(offSvg);
-      addFrame(onSvg);
+template <typename TLight>
+using ZPushButtonMediumStatefulLightLatch =
+	ZPushButtonStatefulLightLatch<ZPushButtonMediumSvg, TLight>;
 
-    }
+using ZPushButtonSmallStatefulLatch =
+	ZPushButtonStatefulLatch<ZPushButtonSmallSvg>;
 
-    void step() override {
-      app::SvgSwitch::step();
-      engine::ParamQuantity* pq = this->getParamQuantity();
+using ZPushButtonMediumStatefulLatch =
+	ZPushButtonStatefulLatch<ZPushButtonMediumSvg>;
 
-      if (pq) {
-        bool on = pq->getValue() > 0.5f;
-        this->sw->setSvg(on ? onSvg : offSvg);
-      }
-    }
-
-  };
-
-
-
-
+using ZPushButtonMediumLeft = ZPushButton<ZPushButtonMediumLeftSvg>;
+using ZPushButtonMediumRight = ZPushButton<ZPushButtonMediumRightSvg>;
 
 
 

@@ -25,16 +25,16 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="3.2164768"
-     inkscape:cx="358.3113"
-     inkscape:cy="393.13201"
+     inkscape:zoom="3.5638737"
+     inkscape:cx="68.885718"
+     inkscape:cy="126.96858"
      inkscape:window-width="1480"
      inkscape:window-height="966"
-     inkscape:window-x="200"
-     inkscape:window-y="30"
+     inkscape:window-x="79"
+     inkscape:window-y="98"
      inkscape:window-maximized="0"
      showguides="true"
-     inkscape:current-layer="g1">
+     inkscape:current-layer="layer1">
     <inkscape:grid
        id="grid1"
        units="mm"
@@ -658,7 +658,7 @@
      inkscape:label="components"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:none">
+     style="display:inline">
     <rect
        id="rect219"
        data-name="Screen"
@@ -956,8 +956,8 @@
     <ellipse
        id="ellipse207"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="56.373737"
-       cy="35.791328"
+       cx="56.373707"
+       cy="35.391003"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
        inkscape:label="EXT_MOD_SELECT_SWITCH_UP"
        rx="1.323"
@@ -965,8 +965,8 @@
     <ellipse
        id="ellipse208"
        data-name="Tempo#RoundLargeBlackKnob"
-       cx="43.303802"
-       cy="35.791328"
+       cx="47.304256"
+       cy="35.391003"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
        inkscape:label="EXT_MOD_SELECT_SWITCH_DOWN"
        rx="1.323"
@@ -1000,6 +1000,16 @@
        d="M 69.014564,19.873129 78,19.87313 v 17.458016"
        id="path122"
        sodipodi:nodetypes="ccc" />
+    <text
+       xml:space="preserve"
+       style="display:inline;font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Medium Italic';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;opacity:0.6;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-opacity:1"
+       x="10.670752"
+       y="17.76527"
+       id="text24"><tspan
+         sodipodi:role="line"
+         id="tspan24"
+         x="10.670752"
+         y="17.76527">(octave)</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -1260,23 +1270,23 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       x="43.220196"
-       y="32.056293"
+       x="47.22065"
+       y="31.65597"
        id="text236"><tspan
          sodipodi:role="line"
          id="tspan236"
-         x="43.154049"
-         y="32.056293">PREV</tspan></text>
+         x="47.154503"
+         y="31.65597">PREV</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       x="56.283821"
-       y="32.056293"
+       x="56.283791"
+       y="31.65597"
        id="text237"><tspan
          sodipodi:role="line"
          id="tspan237"
-         x="56.217674"
-         y="32.056293">NEXT</tspan></text>
+         x="56.217644"
+         y="31.65597">NEXT</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
@@ -1327,16 +1337,6 @@
          id="tspan6"
          x="14.384465"
          y="49.866398">LINEAR BIAS</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Medium Italic';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;display:inline;opacity:0.6;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-opacity:1"
-       x="10.670752"
-       y="17.76527"
-       id="text24"><tspan
-         sodipodi:role="line"
-         id="tspan24"
-         x="10.670752"
-         y="17.76527">(octave)</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.0661458px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
