@@ -1,5 +1,6 @@
 #include "plugin.hpp"
-#include "common.hpp"
+#include "constants.hpp"
+#include "modulehelpers.hpp"
 #include "zcomponentlib.hpp"
 #include "ParticipantAdapter.hpp"
 
@@ -128,11 +129,11 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     output1NameString(invalidCardOutputName),
     output2NameString(invalidCardOutputName),
     routes{{
-      {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, VCF_CUTOFF, 10.f, &cutoffClipTimer, nullptr},
-      {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, 10.f, &sourceOneLevelClipTimer, nullptr},
-      {SOURCE_TWO_LEVEL_KNOB_PARAM, SOURCE_TWO_LEVEL_INPUT, SOURCE_TWO_LEVEL, 10.f, &sourceTwoLevelClipTimer, nullptr},
-      {SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, SOURCE_ONE_MOD_AMOUNT_INPUT, SOURCE_ONE_MOD_AMOUNT, 10.f, &sourceOneModAmountClipTimer, nullptr},
-      {SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM, SOURCE_TWO_MOD_AMOUNT_INPUT, SOURCE_TWO_MOD_AMOUNT, 10.f, &sourceTwoModAmountClipTimer, nullptr}
+      {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, VCF_CUTOFF, 10.f, &cutoffClipTimer, nullptr, CvOperation::Add},
+      {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, 10.f, &sourceOneLevelClipTimer, nullptr, CvOperation::Add},
+      {SOURCE_TWO_LEVEL_KNOB_PARAM, SOURCE_TWO_LEVEL_INPUT, SOURCE_TWO_LEVEL, 10.f, &sourceTwoLevelClipTimer, nullptr, CvOperation::Add},
+      {SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, SOURCE_ONE_MOD_AMOUNT_INPUT, SOURCE_ONE_MOD_AMOUNT, 10.f, &sourceOneModAmountClipTimer, nullptr, CvOperation::Add},
+      {SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM, SOURCE_TWO_MOD_AMOUNT_INPUT, SOURCE_TWO_MOD_AMOUNT, 10.f, &sourceTwoModAmountClipTimer, nullptr, CvOperation::Add}
     }} {
 
     setParticipant(this);

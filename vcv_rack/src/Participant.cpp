@@ -20,9 +20,11 @@ bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
     std::memcpy(&storageA.slots[i].props, &devices[i], sizeof(ParticipantProperty));
     std::memcpy(&storageB.slots[i].props, &devices[i], sizeof(ParticipantProperty));
     // output table need to be indexed by slot number
-    if (devices[i].slotNum >= 0 && devices[i].slotNum < kMaxModules) {
+    if (devices[i].slotNum >= 0 && devices[i].slotNum < hnsMaxModules) {
       nameService->setName(devices[i].slotNum * 2, getCardOutputName(devices[i].hardwareId, 1, devices[i].slotNum));
+      nameService->setShortName(devices[i].slotNum * 2, getCardName(devices[i].hardwareId, 1));
       nameService->setName(devices[i].slotNum * 2 + 1, getCardOutputName(devices[i].hardwareId, 2, devices[i].slotNum));
+      nameService->setShortName(devices[i].slotNum * 2 + 1, getCardName(devices[i].hardwareId, 2));
       INFO("register index %zu slot %d: %s :: %s", i, devices[i].slotNum,
            nameService->getNamePtr( devices[i].slotNum * 2 )->c_str(),
            nameService->getNamePtr( devices[i].slotNum * 2 + 1 )->c_str());

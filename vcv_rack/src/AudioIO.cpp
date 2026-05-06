@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 
 #include "AudioIO.hpp"
-#include "common.hpp"
+#include "constants.hpp"
 #include "zcomponentlib.hpp"
 
 namespace zox {
@@ -22,8 +22,8 @@ AudioIO::AudioIO() : out1LevelClipTimer(0.f),
                      buttonMidiController(buttonMappings),
                      routes{
   {
-    {OUT1_LEVEL_KNOB_PARAM, OUT1_LEVEL_INPUT, OUT1_CHANNEL, 10.f, &out1LevelClipTimer, nullptr},
-    {OUT2_LEVEL_KNOB_PARAM, OUT2_LEVEL_INPUT, OUT2_CHANNEL, 10.f, &out2LevelClipTimer, nullptr}
+    {OUT1_LEVEL_KNOB_PARAM, OUT1_LEVEL_INPUT, OUT1_CHANNEL, 10.f, &out1LevelClipTimer, nullptr, CvOperation::Add},
+    {OUT2_LEVEL_KNOB_PARAM, OUT2_LEVEL_INPUT, OUT2_CHANNEL, 10.f, &out2LevelClipTimer, nullptr, CvOperation::Add}
   }}
 {
 
@@ -51,8 +51,7 @@ AudioIO::AudioIO() : out1LevelClipTimer(0.f),
   configInput(OUT1_LEVEL_INPUT, "Out1 VCA Level");
   configInput(OUT2_LEVEL_INPUT, "Out2 VCA Level");
 
-  configLight(LEFT_EXPANDER_LIGHT, "Connection Status");
-  configLight(RIGHT_EXPANDER_LIGHT, "Connection Status");
+  configLight(HARDWARE_LINK_LIGHT, "Connection Status");
 
   onReset();
 
@@ -117,8 +116,8 @@ void AudioIO::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
-  if (0) {
-//  if (APP->engine->getFrame() == 80000) {
+//  if (0) {
+  if (APP->engine->getFrame() == 80000) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
@@ -184,19 +183,29 @@ void AudioIO::process(const ProcessArgs& args) {
   if (isMidiClockTick) {
     setStatusLight();
 
+    const float lightTime = args.sampleTime * midiPollClockDivider.getDivision();
+    const float brightnessDeltaTime = 1 / lightTime;
+
     // process all participants for MIDI
     midi::Message midiOutMessage;
     for (size_t i = 0; i < maxVoiceCards; ++i) {
       const Slot *slot = &snap.slots[i];
       if (slot->participant != nullptr && slot->props.isAllocated) {
-        if (slot->participant->pullMidi(args,
-                                        midiPollClockDivider.getDivision(),
-                                        slot->props.midiChannel,
-                                        midiOutMessage)) {
-          INFO("frame %" PRId64 ": midi: slot %ld module id %" PRId64 " send message %02X",
-               args.frame, i, slot->participant->getModuleId(), midiOutMessage.getNote());
-          midiOutput.sendMidiMessage(midiOutMessage);
-        }
+          lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.85f);
+          if (slot->participant->pullMidi(args,
+                                          midiPollClockDivider.getDivision(),
+                                          slot->props.midiChannel,
+                                          midiOutMessage)) {
+            INFO("frame %" PRId64 ": midi: slot %ld module id %" PRId64 " send message %02X",
+                 args.frame, i, slot->participant->getModuleId(), midiOutMessage.getNote());
+            midiOutput.sendMidiMessage(midiOutMessage);
+          }
+      }
+      else if (slot->props.hardwareId) {
+        lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.25f);
+      }
+      else {
+        lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.f);
       }
     }
 
@@ -204,9 +213,6 @@ void AudioIO::process(const ProcessArgs& args) {
       midiOutput.sendMidiMessage(midiOutMessage);
     }
     buttonMidiController.updateLights(this);
-
-    const float lightTime = args.sampleTime * midiPollClockDivider.getDivision();
-    const float brightnessDeltaTime = 1 / lightTime;
 
     out1LevelClipTimer -= lightTime;
     lights[OUT1_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out1LevelClipTimer > 0.f, brightnessDeltaTime);
@@ -230,21 +236,21 @@ uint8_t AudioIO::getHardwareId() { // TODO: should this be an interface?
 
 void AudioIO::setStatusLight() {
   if (discoveryReportReceived) {  // green
-    lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(0.f);
-    lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-    lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+    lights[HARDWARE_LINK_LIGHT + 0].setBrightness(0.f);
+    lights[HARDWARE_LINK_LIGHT + 1].setBrightness(0.5f);
+    lights[HARDWARE_LINK_LIGHT + 2].setBrightness(0.f);
   }
   /* yellow case
      else if (validRightExpander) {
-     lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
-     lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(1.f);
-     lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+     lights[HARDWARE_LINK_LIGHT + 0].setBrightness(1.f);
+     lights[HARDWARE_LINK_LIGHT + 1].setBrightness(1.f);
+     lights[HARDWARE_LINK_LIGHT + 2].setBrightness(0.f);
      }
   */
   else {  // red
-    lights[RIGHT_EXPANDER_LIGHT + 0].setBrightness(1.f);
-    lights[RIGHT_EXPANDER_LIGHT + 1].setBrightness(0.f);
-    lights[RIGHT_EXPANDER_LIGHT + 2].setBrightness(0.f);
+    lights[HARDWARE_LINK_LIGHT + 0].setBrightness(1.f);
+    lights[HARDWARE_LINK_LIGHT + 1].setBrightness(0.f);
+    lights[HARDWARE_LINK_LIGHT + 2].setBrightness(0.f);
   }
 
 }
@@ -478,7 +484,6 @@ void AudioIO::serviceParticipantAttachments() {
 
 
 
-
 struct AudioIOWidget : ModuleWidget {
   AudioIOWidget(AudioIO* module) :
     outputA1Text(nullptr), outputA2Text(nullptr),
@@ -494,138 +499,146 @@ struct AudioIOWidget : ModuleWidget {
       Broker& b = module->getBroker();
       const std::shared_ptr<HardwareNameService> hns = b.getHardwareNameService();
       if (hns) {
-        outputA1Text = hns->getNamePtr(0);
-        outputA2Text = hns->getNamePtr(1);
-        outputB1Text = hns->getNamePtr(2);
-        outputB2Text = hns->getNamePtr(3);
-        outputC1Text = hns->getNamePtr(4);
-        outputC2Text = hns->getNamePtr(5);
-        outputD1Text = hns->getNamePtr(6);
-        outputD2Text = hns->getNamePtr(7);
-        outputE1Text = hns->getNamePtr(8);
-        outputE2Text = hns->getNamePtr(9);
-        outputF1Text = hns->getNamePtr(10);
-        outputF2Text = hns->getNamePtr(11);
+        outputA1Text = hns->getShortNamePtr(0);
+        outputA2Text = hns->getShortNamePtr(1);
+        outputB1Text = hns->getShortNamePtr(2);
+        outputB2Text = hns->getShortNamePtr(3);
+        outputC1Text = hns->getShortNamePtr(4);
+        outputC2Text = hns->getShortNamePtr(5);
+        outputD1Text = hns->getShortNamePtr(6);
+        outputD2Text = hns->getShortNamePtr(7);
+        outputE1Text = hns->getShortNamePtr(8);
+        outputE2Text = hns->getShortNamePtr(9);
+        outputF1Text = hns->getShortNamePtr(10);
+        outputF2Text = hns->getShortNamePtr(11);
       }
     }
 
-    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-    //addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-    addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(53.022, 14.198)), module, AudioIO::HARDWARE_LINK_LIGHT));
+
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(10.475, 21.639)), module, AudioIO::CARD_A_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(17.034, 21.639)), module, AudioIO::CARD_B_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(23.594, 21.639)), module, AudioIO::CARD_C_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(30.153, 21.639)), module, AudioIO::CARD_D_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(36.712, 21.639)), module, AudioIO::CARD_E_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(43.272, 21.639)), module, AudioIO::CARD_F_PATCH_USAGE_LIGHT));
 
 
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.794, 18.162)), module, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.347, 22.854)), module, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.794, 31.224)), module, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.347, 36.41)), module, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.794, 44.285)), module, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.347, 49.472)), module, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.794, 57.347)), module, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.347, 62.533)), module, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.794, 70.408)), module, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.347, 75.595)), module, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(36.794, 83.47)), module, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
-
-    addParam(createLightParamCentered<ZLightLatch<SmallSimpleLight<RedLight>>>(mm2px(Vec(48.347, 88.656)), module, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 39.243)), module, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 39.421)), module, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 44.56)), module, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 44.702)), module, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.66, 49.876)), module, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 49.983)), module, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 55.193)), module, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 55.264)), module, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 60.51)), module, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 60.545)), module, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 65.826)), module, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 65.826)), module, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
 
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(11.275, 104.378)), module, AudioIO::OUT1_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(11.275, 117.427)), module, AudioIO::OUT2_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<VCVSlider>(mm2px(Vec(16.78, 88.244)), module, AudioIO::OUT1_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<VCVSlider>(mm2px(Vec(52.11, 88.244)), module, AudioIO::OUT2_LEVEL_KNOB_PARAM));
 
 
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(26.122, 104.378)), module, AudioIO::OUT1_LEVEL_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(26.122, 117.427)), module, AudioIO::OUT2_LEVEL_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(16.803, 106.104)), module, AudioIO::OUT1_LEVEL_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.11, 106.104)), module, AudioIO::OUT2_LEVEL_INPUT));
 
 
-    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 101.184)), module, AudioIO::OUT1_LEVEL_CLIP_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 114.233)), module, AudioIO::OUT2_LEVEL_CLIP_LIGHT));
+    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 101.184)), module, AudioIO::OUT1_LEVEL_CLIP_LIGHT));
+    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 114.233)), module, AudioIO::OUT2_LEVEL_CLIP_LIGHT));
 
     // mm2px(Vec(22.0, 3.636))
-    cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 16.344)));
-    cardAOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 37.603)));
+    cardAOutput1TextField->setNumChars(10);
+    cardAOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardAOutput1TextField->setText(outputA1Text);
     addChild(cardAOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardAOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 21.035)));
-    cardAOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardAOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 37.603)));
+    cardAOutput2TextField->setNumChars(10);
+    cardAOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardAOutput2TextField->setText(outputA2Text);
     addChild(cardAOutput2TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardBOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 29.406)));
-    cardBOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardBOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 42.884)));
+    cardBOutput1TextField->setNumChars(10);
+    cardBOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardBOutput1TextField->setText(outputB1Text);
     addChild(cardBOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardBOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 34.592)));
-    cardBOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardBOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 42.884)));
+    cardBOutput2TextField->setNumChars(10);
+    cardBOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardBOutput2TextField->setText(outputB2Text);
     addChild(cardBOutput2TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardCOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 42.467)));
-    cardCOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardCOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 48.165)));
+    cardCOutput1TextField->setNumChars(10);
+    cardCOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardCOutput1TextField->setText(outputC1Text);
     addChild(cardCOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardCOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 47.654)));
-    cardCOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardCOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 48.165)));
+    cardCOutput2TextField->setNumChars(10);
+    cardCOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardCOutput2TextField->setText(outputC2Text);
     addChild(cardCOutput2TextField);
 
 
-    // mm2px(Vec(22.0, 3.636))
-    cardDOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 55.529)));
-    cardDOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardDOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 53.446)));
+    cardDOutput1TextField->setNumChars(10);
+    cardDOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardDOutput1TextField->setText(outputD1Text);
     addChild(cardDOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardDOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 60.715)));
-    cardDOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardDOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 53.446)));
+    cardDOutput2TextField->setNumChars(10);
+    cardDOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardDOutput2TextField->setText(outputD2Text);
     addChild(cardDOutput2TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardEOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 68.59)));
-    cardEOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardEOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 58.727)));
+    cardEOutput1TextField->setNumChars(10);
+    cardEOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardEOutput1TextField->setText(outputE1Text);
     addChild(cardEOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardEOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 73.777)));
-    cardEOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardEOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 58.727)));
+    cardEOutput2TextField->setNumChars(10);
+    cardEOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardEOutput2TextField->setText(outputE2Text);
     addChild(cardEOutput2TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardFOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 81.652)));
-    cardFOutput1TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardFOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 64.008)));
+    cardFOutput1TextField->setNumChars(10);
+    cardFOutput1TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardFOutput1TextField->setText(outputF1Text);
     addChild(cardFOutput1TextField);
 
-    // mm2px(Vec(22.0, 3.636))
-    cardFOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(6.321, 86.838)));
-    cardFOutput2TextField->box.size = (mm2px(Vec(22.0, 3.636)));
+    // mm2px(Vec(18.0, 3.636))
+    cardFOutput2TextField = createWidget<CardTextDisplay>(mm2px(Vec(43.705, 64.008)));
+    cardFOutput2TextField->setNumChars(10);
+    cardFOutput2TextField->box.size = (mm2px(Vec(18.0, 3.636)));
     cardFOutput2TextField->setText(outputF2Text);
     addChild(cardFOutput2TextField);
 
-    addChild(createLightCentered<TriangleLeftLight<SmallLight<RedGreenBlueLight>>>(mm2px(Vec(2.0200968, 8.21875)), module, AudioIO::LEFT_EXPANDER_LIGHT));
-    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(59.246, 8.219)), module, AudioIO::RIGHT_EXPANDER_LIGHT));
   }
 
 
@@ -673,33 +686,33 @@ struct AudioIOWidget : ModuleWidget {
 
   CardTextDisplay *cardAOutput1TextField;
   CardTextDisplay *cardAOutput2TextField;
-  std::string *outputA1Text;
-  std::string *outputA2Text;
+  const std::string *outputA1Text;
+  const std::string *outputA2Text;
 
   CardTextDisplay *cardBOutput1TextField;
   CardTextDisplay *cardBOutput2TextField;
-  std::string *outputB1Text;
-  std::string *outputB2Text;
+  const std::string *outputB1Text;
+  const std::string *outputB2Text;
 
   CardTextDisplay *cardCOutput1TextField;
   CardTextDisplay *cardCOutput2TextField;
-  std::string *outputC1Text;
-  std::string *outputC2Text;
+  const std::string *outputC1Text;
+  const std::string *outputC2Text;
 
   CardTextDisplay *cardDOutput1TextField;
   CardTextDisplay *cardDOutput2TextField;
-  std::string *outputD1Text;
-  std::string *outputD2Text;
+  const std::string *outputD1Text;
+  const std::string *outputD2Text;
 
   CardTextDisplay *cardEOutput1TextField;
   CardTextDisplay *cardEOutput2TextField;
-  std::string *outputE1Text;
-  std::string *outputE2Text;
+  const std::string *outputE1Text;
+  const std::string *outputE2Text;
 
   CardTextDisplay *cardFOutput1TextField;
   CardTextDisplay *cardFOutput2TextField;
-  std::string *outputF1Text;
-  std::string *outputF2Text;
+  const std::string *outputF1Text;
+  const std::string *outputF2Text;
 };
 
 

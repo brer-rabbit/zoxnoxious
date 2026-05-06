@@ -20,38 +20,20 @@ Plugin* pluginInstance;
 // (H) card8 Out1
 // (H) card8 Out2
 
-std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
-    std::string cardName;
-    char slotName = 'A' + slot;
-    std::string slotNameString(1, slotName);
-
-    if (cardId == 0x01) {
-        cardName = "Audio Out";
-    }
-    else if (cardId == 0x02) {
-        cardName = "3340!VCO";
-    }
-    else if (cardId == 0x03) {
-        cardName = "3372!VCF";
-    }
-    else if (cardId == 0x04) {
-      cardName = outputNumber == 1 ? "5524!VCF" : "5524!VCO1";
-    }
-    else if (cardId == 0x06) {
-        cardName = "Pole Dancer";
-    }
-    else if (cardId == 0x07) {
-        cardName = "Audio IO";
-    }
-    else {
-        return "----";
-    }
-
-    return (slot == -1 ? "" : slotNameString ) +
-        (outputNumber == 1 ? "1!" : (outputNumber == 2 ? "2!" : "") ) +
-        cardName;
+std::string getCardName(uint8_t cardId, int outputNumber) {
+  if (cardId == 0x01) return "Audio Out";
+  if (cardId == 0x02) return "3340!VCO";
+  if (cardId == 0x03) return "3372!VCF";
+  if (cardId == 0x04) return outputNumber == 1 ? "5524!VCF" : "5524!VCO1";
+  if (cardId == 0x06) return "Pole Dancer";
+  if (cardId == 0x07) return "Audio IO";
+  return "----";
 }
 
+std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
+  char slotName = 'A' + slot;
+  return string::f("%c%d!%s", slotName, outputNumber, getCardName(cardId, outputNumber).c_str());
+}
 
 
 

@@ -3,25 +3,6 @@
 #include "plugin.hpp"
 
 namespace zox {
-  
-// maximum number of channels on a USB Audio interface
-static constexpr int8_t maxAudioChannels = 27;
-static constexpr int8_t maxAudioDevices = 2;
-static constexpr int maxVoiceCards = 6;
-
-static constexpr int8_t invalidSlot = -1;
-static constexpr int8_t invalidOutputDeviceId = -1;
-static constexpr int8_t invalidCvChannelOffset = -1;
-static constexpr int8_t invalidMidiChannel = -1;
-static constexpr uint8_t invalidCardId = 0;
-static constexpr int invalidPrimaryDepth = -1;
-
-static const std::string invalidCardOutputName = "----";
-
-static constexpr uint8_t midiProgramChangeStatus = 0xC;
-
-void setMidiProgramChangeMessage(rack::midi::Message& midiOutMessage, int8_t midiChannel, int8_t program);
-
 
 //----------------------------------------------------------------------------
 // helper class for setting MIDI message and associated UI lights.
@@ -144,6 +125,11 @@ private:
 
 using CvTransform = float (*)(float);
 
+enum class CvOperation {
+  Add,
+  MultiplyNormalled // VCA behavior, unipolar [0,1]
+};
+
 struct CvRoute {
   int knobParam;
   int inputId;
@@ -151,6 +137,7 @@ struct CvRoute {
   float divisor;
   float* timer;
   CvTransform transform; // may be nullptr for identity transform
+  CvOperation op;
 };
 
 inline void processCvRoutes(
@@ -162,28 +149,38 @@ inline void processCvRoutes(
     Param* params,
     Input* inputs)
 {
-    for (int i = 0; i < count; ++i) {
-        const auto& r = routes[i];
-
-        float v = params[r.knobParam].getValue()
-          + inputs[r.inputId].getVoltage() / r.divisor;
-
-        if (r.transform) {
-            v = r.transform(v);
-        }
-
-        bool clipped = (v < 0.f) || (v > 1.f);
-        float clamped = clamp(v, 0.f, 1.f);
-        frame[cvChannelOffset + r.channel] = clamped;
-
-        if (clipped) {
-            *r.timer = clipTime;
-        }
+  for (int i = 0; i < count; ++i) {
+    const auto& r = routes[i];
+    float knob = params[r.knobParam].getValue();
+    float in = inputs[r.inputId].getVoltage() / r.divisor;
+    float v;
+    switch (r.op) {
+      case CvOperation::Add:
+        v = knob + in;
+        break;
+      case CvOperation::MultiplyNormalled:
+        v = inputs[r.inputId].isConnected() ? knob * in : knob;
+        break;
+    default:
+        v = 0.f;
     }
+
+    if (r.transform) {
+      v = r.transform(v);
+    }
+
+    bool clipped = (v < 0.f) || (v > 1.f);
+    float clamped = clamp(v, 0.f, 1.f);
+    frame[cvChannelOffset + r.channel] = clamped;
+
+    if (clipped) {
+      *r.timer = clipTime;
+    }
+  }
 }
 
 inline float dualLinearSwitch0_8(float v) {
-    return v < 0.8f ? v * 0.6f : 2.6f * v - 1.6f;
+  return v < 0.8f ? v * 0.6f : 2.6f * v - 1.6f;
 }
 
 

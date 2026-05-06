@@ -5,6 +5,7 @@
 #include "Participant.hpp"
 #include "ParticipantAdapter.hpp"
 #include "AudioMidi.hpp"
+#include "modulehelpers.hpp"
 
 namespace zox {
 
@@ -53,8 +54,13 @@ struct AudioIO final : rack::engine::Module {
     CARD_D_MIX2_OUTPUT_BUTTON_LIGHT,
     CARD_E_MIX2_OUTPUT_BUTTON_LIGHT,
     CARD_F_MIX2_OUTPUT_BUTTON_LIGHT,
-    ENUMS(LEFT_EXPANDER_LIGHT, 3),
-    ENUMS(RIGHT_EXPANDER_LIGHT, 3),
+    CARD_A_PATCH_USAGE_LIGHT,
+    CARD_B_PATCH_USAGE_LIGHT,
+    CARD_C_PATCH_USAGE_LIGHT,
+    CARD_D_PATCH_USAGE_LIGHT,
+    CARD_E_PATCH_USAGE_LIGHT,
+    CARD_F_PATCH_USAGE_LIGHT,
+    ENUMS(HARDWARE_LINK_LIGHT, 3),
     LIGHTS_LEN
   };
 

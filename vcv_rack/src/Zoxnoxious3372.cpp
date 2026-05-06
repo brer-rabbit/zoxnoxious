@@ -1,6 +1,7 @@
 #include "plugin.hpp"
 #include "zcomponentlib.hpp"
-#include "common.hpp"
+#include "constants.hpp"
+#include "modulehelpers.hpp"
 #include "ParticipantAdapter.hpp"
 
 namespace zox {
@@ -129,14 +130,14 @@ struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
     output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName),
     buttonMidiController(buttonMappings),
     routes{{
-      {NOISE_KNOB_PARAM, NOISE_LEVEL_INPUT, NOISE_LEVEL, 10.f, &noiseClipTimer, nullptr},
-      {OUTPUT_PAN_KNOB_PARAM, OUTPUT_PAN_INPUT, OUTPUT_PAN, 10.f, &outputPanClipTimer, nullptr},
-      {RESONANCE_KNOB_PARAM, RESONANCE_INPUT, RESONANCE, 10.f, &resonanceClipTimer, dualLinearSwitch0_8},
-      {FILTER_VCA_KNOB_PARAM, FILTER_VCA_INPUT, FILTER_VCA, 10.f, &outputVcaClipTimer, nullptr},
-      {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, CUTOFF, 10.f, &cutoffClipTimer, nullptr},
-      {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, 10.f, &sourceOneLevelClipTimer, nullptr},
-      {SOURCE_TWO_LEVEL_KNOB_PARAM, SOURCE_TWO_LEVEL_INPUT, SOURCE_TWO_LEVEL, 10.f, &sourceTwoLevelClipTimer, nullptr},
-      {MOD_AMOUNT_KNOB_PARAM, MOD_AMOUNT_INPUT, MOD_AMOUNT, 10.f, &modAmountClipTimer, nullptr} }} {
+      {NOISE_KNOB_PARAM, NOISE_LEVEL_INPUT, NOISE_LEVEL, 10.f, &noiseClipTimer, nullptr, CvOperation::Add},
+      {OUTPUT_PAN_KNOB_PARAM, OUTPUT_PAN_INPUT, OUTPUT_PAN, 10.f, &outputPanClipTimer, nullptr, CvOperation::Add},
+      {RESONANCE_KNOB_PARAM, RESONANCE_INPUT, RESONANCE, 10.f, &resonanceClipTimer, dualLinearSwitch0_8, CvOperation::Add},
+      {FILTER_VCA_KNOB_PARAM, FILTER_VCA_INPUT, FILTER_VCA, 10.f, &outputVcaClipTimer, nullptr, CvOperation::Add},
+      {CUTOFF_KNOB_PARAM, CUTOFF_INPUT, CUTOFF, 10.f, &cutoffClipTimer, nullptr, CvOperation::Add},
+      {SOURCE_ONE_LEVEL_KNOB_PARAM, SOURCE_ONE_LEVEL_INPUT, SOURCE_ONE_LEVEL, 10.f, &sourceOneLevelClipTimer, nullptr, CvOperation::Add},
+      {SOURCE_TWO_LEVEL_KNOB_PARAM, SOURCE_TWO_LEVEL_INPUT, SOURCE_TWO_LEVEL, 10.f, &sourceTwoLevelClipTimer, nullptr, CvOperation::Add},
+      {MOD_AMOUNT_KNOB_PARAM, MOD_AMOUNT_INPUT, MOD_AMOUNT, 10.f, &modAmountClipTimer, nullptr, CvOperation::Add} }} {
 
     setParticipant(this);
     setLightEnum(RIGHT_EXPANDER_LIGHT);

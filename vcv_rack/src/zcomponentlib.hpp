@@ -1,6 +1,8 @@
 #include "componentlibrary.hpp"
 
 
+// plain simple UI skinning for ports and screws
+
 struct BNCPort : app::SvgPort {
   BNCPort() {
     setSvg(Svg::load(asset::plugin(pluginInstance, "res/BNCFemale.svg")));
@@ -8,54 +10,153 @@ struct BNCPort : app::SvgPort {
 };
 
 
-//
-// Button - VCV Rack button at about 2/3 the size
-//
-
-struct ZButton : app::SvgSwitch {
-  ZButton() {
-    momentary = true;
-    addFrame(Svg::load(asset::plugin(pluginInstance, "res/ZButtonSmall_0.svg")));
-    addFrame(Svg::load(asset::plugin(pluginInstance, "res/ZButtonSmall_1.svg")));
+struct ScrewSlottedKnurled : app::SvgScrew {
+  ScrewSlottedKnurled() {
+    setSvg(Svg::load(asset::plugin(pluginInstance, "res/ScrewSlottedKnurled.svg")));
   }
 };
 
 
-struct ZLatch : ZButton {
-  ZLatch() {
+// colors for lights within the style
+
+struct ZoxAmberLight : GrayModuleLightWidget {
+  ZoxAmberLight() {
+    addBaseColor(nvgRGB(0xff, 0x9a, 0x35));
+  }
+};
+
+
+
+//
+// ZPushButtons -- Medium and Small
+//
+
+struct ZPushButtonSmallSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonSmall_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonSmall_latched.svg";
+};
+
+struct ZPushButtonMediumSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonMedium_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
+};
+
+struct ZPushButtonMediumLeftSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonMedium_left_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
+};
+
+struct ZPushButtonMediumRightSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonMedium_right_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
+};
+
+
+template <typename TSvg>
+struct ZPushButton : app::SvgSwitch {
+  ZPushButton() {
+    momentary = true;
+    addFrame(Svg::load(asset::plugin(pluginInstance, TSvg::unlatched)));
+    addFrame(Svg::load(asset::plugin(pluginInstance, TSvg::latched)));
+  }
+};
+
+
+// Stateful latch, no light:
+template <typename TSvg>
+struct ZPushButtonStatefulLatch : app::SvgSwitch {
+  std::shared_ptr<Svg> offSvg;
+  std::shared_ptr<Svg> onSvg;
+
+  ZPushButtonStatefulLatch() {
     momentary = false;
     latch = true;
+
+    offSvg = Svg::load(asset::plugin(pluginInstance, TSvg::unlatched));
+    onSvg  = Svg::load(asset::plugin(pluginInstance, TSvg::latched));
+
+    addFrame(offSvg);
+    addFrame(onSvg);
+  }
+
+  void step() override {
+    app::SvgSwitch::step();
+
+    engine::ParamQuantity* pq = this->getParamQuantity();
+    if (pq) {
+      bool on = pq->getValue() > 0.5f;
+      this->sw->setSvg(on ? onSvg : offSvg);
+    }
   }
 };
+
+
+
+// stateful latch with light:
+template <typename TSvg, typename TLight = MediumSimpleLight<WhiteLight>>
+  struct ZPushButtonStatefulLightLatch : app::SvgSwitch {
+    app::ModuleLightWidget* light;
+
+    std::shared_ptr<Svg> offSvg;
+    std::shared_ptr<Svg> onSvg;
+
+    ZPushButtonStatefulLightLatch() {
+      momentary = false;
+      latch = true;
+
+      offSvg = Svg::load(asset::plugin(pluginInstance, TSvg::unlatched));
+      onSvg  = Svg::load(asset::plugin(pluginInstance, TSvg::latched));
+
+      addFrame(offSvg);
+      addFrame(onSvg);
+
+      light = new TLight;
+      light->box.pos = box.size.div(2).minus(light->box.size.div(2));
+      addChild(light);
+    }
+
+    void step() override {
+      app::SvgSwitch::step();
+
+      engine::ParamQuantity* pq = this->getParamQuantity();
+      if (pq) {
+        bool on = pq->getValue() > 0.5f;
+        this->sw->setSvg(on ? onSvg : offSvg);
+      }
+    }
+
+    app::ModuleLightWidget* getLight() {
+      return light;
+    }
+};
+
+
+// names to reference these by for use:
+using ZPushButtonSmall = ZPushButton<ZPushButtonSmallSvg>;
+using ZPushButtonMedium = ZPushButton<ZPushButtonMediumSvg>;
+
+template <typename TLight = WhiteLight>
+using ZLightPushButtonSmall = LightButton<ZPushButtonSmall, TLight>;
+
+template <typename TLight = WhiteLight>
+using ZLightPushButtonMedium = LightButton<ZPushButtonMedium, TLight>;
 
 template <typename TLight>
-struct ZLightButton : ZButton {
-  app::ModuleLightWidget* light;
-
-  ZLightButton() {
-    light = new TLight;
-    // Move center of light to center of box
-    light->box.pos = box.size.div(2).minus(light->box.size.div(2));
-    addChild(light);
-  }
-
-  app::ModuleLightWidget* getLight() {
-    return light;
-  }
-};
-
+using ZPushButtonSmallStatefulLightLatch =
+	ZPushButtonStatefulLightLatch<ZPushButtonSmallSvg, TLight>;
 
 template <typename TLight>
-struct ZLightLatch : ZLightButton<TLight> {
-  ZLightLatch() {
-    this->momentary = false;
-    this->latch = true;
-  }
-};
+using ZPushButtonMediumStatefulLightLatch =
+	ZPushButtonStatefulLightLatch<ZPushButtonMediumSvg, TLight>;
 
+using ZPushButtonSmallStatefulLatch =
+	ZPushButtonStatefulLatch<ZPushButtonSmallSvg>;
 
+using ZPushButtonMediumStatefulLatch =
+	ZPushButtonStatefulLatch<ZPushButtonMediumSvg>;
 
-
+using ZPushButtonMediumLeft = ZPushButton<ZPushButtonMediumLeftSvg>;
+using ZPushButtonMediumRight = ZPushButton<ZPushButtonMediumRightSvg>;
 
 
 
@@ -166,14 +267,25 @@ struct TriangleRightLight : TBase {
 static const int cardTextFontSize = 6;
 static const int cardTextLetterSpacing = 0;
 static const int cardTextLeftMargin = 2;
+static const int cardDefaultNumChars = 8;
 
 struct CardTextDisplay : TransparentWidget {
-  std::string *displayString;
+  const std::string *displayString = nullptr;
   std::shared_ptr<Font> font;
+  std::string allSegments;
 
-  CardTextDisplay() : displayString(NULL) {
+  CardTextDisplay() : allSegments(cardDefaultNumChars, '~') {
     font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG14Classic-BoldItalic.ttf"));
   }
+
+  void setNumChars(size_t count) {
+    allSegments.resize(count, '~');
+  }
+
+  void setText(const std::string *theString) {
+    displayString = theString;
+  }
+
 
   void draw(const DrawArgs& args) override {
     const auto vg = args.vg;
@@ -184,12 +296,13 @@ struct CardTextDisplay : TransparentWidget {
     // Draw dark background
     nvgBeginPath(vg);
     nvgRect(vg, 0, 0, box.size.x, box.size.y);
-    //nvgFillColor(vg, nvgRGBA(20, 20, 20, 255));
     nvgFillColor(vg, nvgRGBA(0x3A, 0x1A, 0x00, 0xFF));
     nvgFill(vg);
 
     // If the track name is not empty, then display it
     if (displayString)  {
+      const char *text = displayString->c_str();
+
       bndSetFont(font->handle);
       nvgFontFaceId(vg, font->handle);
       nvgTextLetterSpacing(vg, 0);
@@ -198,23 +311,23 @@ struct CardTextDisplay : TransparentWidget {
       nvgFontSize(vg, cardTextFontSize);
       nvgTextLetterSpacing(vg, cardTextLetterSpacing);
 
-      //nvgFillColor(vg, nvgRGBA(255, 215, 20, 0xff));
-      nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0xff));
+      //nvgFillColor(vg, nvgRGBA(0xff, 0x90, 0x10, 0xff));
+      nvgFillColor(vg, nvgRGBA(0xff, 0xB0, 0x10, 0xff));
       nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
 
       float bounds[4];
-      nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, displayString->c_str(), NULL, bounds);
+      nvgTextBoxBounds(vg, cardTextLeftMargin, 10, 100.0, text, NULL, bounds);
       float textHeight = bounds[3];
-      nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, displayString->c_str(), NULL);
+      nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, text, NULL);
+
+      // light all segments of 14-segment LED with a transparency
+      nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0x20));
+      nvgTextBox(vg, cardTextLeftMargin, (box.size.y / 2.0f) - (textHeight / 2.0f) + 8, 100.0, allSegments.c_str(), NULL);
+
       bndSetFont(APP->window->uiFont->handle);
     }
 
     nvgRestore(vg);
-  }
-
-
-  void setText(std::string *theString) {
-    displayString = theString;
   }
 
 };
