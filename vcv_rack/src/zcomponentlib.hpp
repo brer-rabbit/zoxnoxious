@@ -160,6 +160,26 @@ using ZPushButtonMediumRight = ZPushButton<ZPushButtonMediumRightSvg>;
 
 
 
+
+static constexpr float backgroundWidth = 2.5f;
+static constexpr float x = backgroundWidth / 2.f;
+static constexpr float grooveBottom = 62.f;
+static constexpr float grooveTop = -5.f;
+static constexpr float handleHeight = 0.f;
+static constexpr float yMin = grooveBottom - handleHeight / 2.f;
+static constexpr float yMax = grooveTop    + handleHeight / 2.f;
+
+// slider model
+struct ZoxSlider : app::SvgSlider {
+  ZoxSlider() {
+    setBackgroundSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/ZoxSlider.svg")));
+    setHandleSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/ZoxSliderHandle.svg")));
+    setHandlePos(math::Vec(x, yMin), math::Vec(x, yMax));
+  }
+};
+
+
+
 /** TriangleLeftLight
  * point left.  Usage is like other light sources, eg-
  * createLightCentered<TriangleLeftLight<MediumLight<RedLight>>>

@@ -543,12 +543,12 @@ struct AudioIOWidget : ModuleWidget {
     addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 65.826)), module, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
 
 
-    addParam(createParamCentered<VCVSlider>(mm2px(Vec(16.78, 88.244)), module, AudioIO::OUT1_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<VCVSlider>(mm2px(Vec(52.11, 88.244)), module, AudioIO::OUT2_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<ZoxSlider>(mm2px(Vec(17.28, 89.244)), module, AudioIO::OUT1_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<ZoxSlider>(mm2px(Vec(52.11, 89.244)), module, AudioIO::OUT2_LEVEL_KNOB_PARAM));
 
 
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(16.803, 106.104)), module, AudioIO::OUT1_LEVEL_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.11, 106.104)), module, AudioIO::OUT2_LEVEL_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(17.303, 108.604)), module, AudioIO::OUT1_LEVEL_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.11, 108.604)), module, AudioIO::OUT2_LEVEL_INPUT));
 
 
     //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 101.184)), module, AudioIO::OUT1_LEVEL_CLIP_LIGHT));
