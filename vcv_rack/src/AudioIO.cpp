@@ -116,8 +116,8 @@ void AudioIO::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
-//  if (0) {
-  if (APP->engine->getFrame() == 80000) {
+  if (0) {
+//  if (APP->engine->getFrame() == 80000) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
