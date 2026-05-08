@@ -14,9 +14,9 @@
   "changelogUrl": "",
   "modules": [
     {
-      "slug": "AudioIO",
-      "name": "AudioIO",
-      "description": "Audio In/Out",
+      "slug": "OutputInterface",
+      "name": "OutputInterface",
+      "description": "Output Interface",
       "tags": [
         "Hardware"
       ]

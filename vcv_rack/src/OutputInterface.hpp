@@ -11,7 +11,7 @@ namespace zox {
 
 struct DiscoveredCard;
 
-struct AudioIO final : rack::engine::Module {
+struct OutputInterface final : rack::engine::Module {
   enum ParamId {
     OUT1_LEVEL_KNOB_PARAM,
     OUT2_LEVEL_KNOB_PARAM,
@@ -65,11 +65,11 @@ struct AudioIO final : rack::engine::Module {
   };
 
 
-  AudioIO();
-  ~AudioIO();
+  OutputInterface();
+  ~OutputInterface();
 
   // Global access point: no writes allowed from the audio thread
-  static std::atomic<AudioIO*> instance;
+  static std::atomic<OutputInterface*> instance;
 
   // Broker access
   Broker& getBroker() { return broker; }
@@ -103,9 +103,9 @@ private:
   float out1LevelClipTimer;
   float out2LevelClipTimer;
 
-  static const std::vector<ButtonMapping<AudioIO> > buttonMappings;
+  static const std::vector<ButtonMapping<OutputInterface> > buttonMappings;
   std::vector<ButtonState> buttonStates;
-  ButtonMidiController<AudioIO> buttonMidiController;
+  ButtonMidiController<OutputInterface> buttonMidiController;
 
   uint8_t getHardwareId();
   void setStatusLight();

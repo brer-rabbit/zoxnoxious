@@ -28,4 +28,4 @@ extern Model* modelPoleDancerPersonality;
 extern Model* modelZoxnoxious3340;
 extern Model* modelZoxnoxious3372;
 extern Model* modelZoxnoxious5524;
-extern Model* modelAudioIO;
+extern Model* modelOutputInterface;

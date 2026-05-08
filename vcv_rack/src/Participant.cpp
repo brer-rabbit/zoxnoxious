@@ -1,7 +1,7 @@
 #include <atomic>
 #include <vector>
 #include "Participant.hpp"
-#include "AudioIO.hpp"
+#include "OutputInterface.hpp"
 
 namespace zox {
 
@@ -151,7 +151,7 @@ bool ParticipantLifecycle::isAttached() const {
 }
 
 bool ParticipantLifecycle::heartbeat() {
-  AudioIO* current = AudioIO::instance.load(std::memory_order_acquire);
+  OutputInterface* current = OutputInterface::instance.load(std::memory_order_acquire);
 
   if (isAttached() && (!current || &current->getBroker() != broker)) {
     // Orchestrator vanished or changed
@@ -166,7 +166,7 @@ bool ParticipantLifecycle::heartbeat() {
 }
 
 
-// completeAttach() is called from the AudioIO manager on scanning modules for those that
+// completeAttach() is called from the OutputInterface manager on scanning modules for those that
 // have an ATTACH_REQUESTED state.  This avoids the Participant modules calling attach themselves.
 // Return true on state change to attached.
 bool ParticipantLifecycle::completeAttach(Broker* b, Participant* p) {
