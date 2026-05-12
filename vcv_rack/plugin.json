@@ -61,6 +61,12 @@
       "name": "PoleDancerPersonality",
       "description": "Personality module for Pole Dancer",
       "tags": []
+    },
+    {
+      "slug": "PeepingTom",
+      "name": "PeepingTom",
+      "description": "Pole Mixing Inspector",
+      "tags": []
     }
   ]
 }
