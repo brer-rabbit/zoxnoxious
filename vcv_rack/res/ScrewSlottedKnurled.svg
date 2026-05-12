@@ -24,13 +24,13 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="46.376471"
-     inkscape:cx="6.943176"
-     inkscape:cy="6.5227042"
+     inkscape:zoom="19.843606"
+     inkscape:cx="8.7937646"
+     inkscape:cy="7.9370655"
      inkscape:window-width="1464"
      inkscape:window-height="720"
      inkscape:window-x="48"
-     inkscape:window-y="105"
+     inkscape:window-y="77"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1"
      showguides="false" />
@@ -177,6 +177,14 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <ellipse
+       style="opacity:0.2;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.299997;stroke-linejoin:round"
+       id="ellipse1"
+       cx="10.596235"
+       cy="-0.48632801"
+       transform="matrix(0.67394127,0.73878493,-0.73769049,0.67513905,0,0)"
+       rx="7.3085384"
+       ry="7.3074665" />
     <path
        id="path1"
        style="fill:#b1afb3;fill-opacity:1;stroke:none;stroke-width:0.300002;stroke-linejoin:round"

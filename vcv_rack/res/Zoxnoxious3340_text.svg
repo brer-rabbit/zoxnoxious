@@ -25,16 +25,16 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="3.5638737"
-     inkscape:cx="68.885718"
-     inkscape:cy="126.96858"
+     inkscape:zoom="1.4050388"
+     inkscape:cx="174.01655"
+     inkscape:cy="280.06344"
      inkscape:window-width="1480"
      inkscape:window-height="966"
-     inkscape:window-x="79"
-     inkscape:window-y="98"
+     inkscape:window-x="129"
+     inkscape:window-y="56"
      inkscape:window-maximized="0"
      showguides="true"
-     inkscape:current-layer="layer1">
+     inkscape:current-layer="g1">
     <inkscape:grid
        id="grid1"
        units="mm"
@@ -658,7 +658,7 @@
      inkscape:label="components"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:inline">
+     style="display:none">
     <rect
        id="rect219"
        data-name="Screen"
@@ -1002,7 +1002,7 @@
        sodipodi:nodetypes="ccc" />
     <text
        xml:space="preserve"
-       style="display:inline;font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Medium Italic';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;opacity:0.6;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-opacity:1"
+       style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Medium Italic';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;display:inline;opacity:0.6;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-opacity:1"
        x="10.670752"
        y="17.76527"
        id="text24"><tspan
@@ -1057,7 +1057,7 @@
        inkscape:transform-center-x="-0.29430972"
        inkscape:transform-center-y="-5.9842977"><tspan
          sodipodi:role="line"
-         id="tspan12">MODULE LINK</tspan></text>
+         id="tspan12">INTERFACE LINK</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
@@ -1811,28 +1811,28 @@
        id="path127"
        sodipodi:nodetypes="ccc" />
     <ellipse
-       style="display:inline;opacity:0.711811;fill:#000000;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:0.711811;fill:#111211;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
        id="ellipse233"
        cx="4.4679279"
        cy="121.58274"
        rx="1.4679281"
        ry="1.4679279" />
     <ellipse
-       style="display:inline;opacity:0.711811;fill:#000000;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:0.711811;fill:#111211;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
        id="ellipse135"
        cx="22.644928"
        cy="102.12292"
        rx="1.4679281"
        ry="1.4679279" />
     <ellipse
-       style="display:inline;opacity:0.711811;fill:#000000;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:0.711811;fill:#111211;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
        id="ellipse136"
        cx="22.644928"
        cy="35.111927"
        rx="1.4679281"
        ry="1.4679279" />
     <ellipse
-       style="display:inline;opacity:0.711811;fill:#000000;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:0.711811;fill:#111211;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
        id="ellipse137"
        cx="73.537926"
        cy="66.174927"
