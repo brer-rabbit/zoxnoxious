@@ -1,6 +1,8 @@
 #include "TurnsCountingKnob.hpp"
 #include "plugin.hpp"
 
+namespace zox {
+
 // ---------------------------------------------------------------------------
 //  Implementation notes
 //
@@ -153,4 +155,4 @@ void TurnsCountingKnob::drawCounterWindow(const DrawArgs& args,
 
 }
 
-
+}
