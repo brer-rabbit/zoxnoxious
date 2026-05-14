@@ -138,9 +138,12 @@ void OutputInterface::process(const ProcessArgs& args) {
     discoReport.bytes[15] = 0x03;
     discoReport.bytes[16] = 0x00;
     discoReport.bytes[17] = 0x00;
-    discoReport.bytes[18] = 0x07;
+    discoReport.bytes[18] = 0x00;
     discoReport.bytes[19] = 0x00;
     discoReport.bytes[20] = 0x00;
+    discoReport.bytes[21] = 0x07;
+    discoReport.bytes[22] = 0x00;
+    discoReport.bytes[23] = 0x00;
     processDiscoveryReport(discoReport);
   }
 
@@ -186,12 +189,17 @@ void OutputInterface::process(const ProcessArgs& args) {
     const float lightTime = args.sampleTime * midiPollClockDivider.getDivision();
     const float brightnessDeltaTime = 1 / lightTime;
 
+    // reset all patch usage state to inactive, then selectively activate.
+    for (size_t i = 0; i < maxVoiceCards; ++i) {
+      lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.f);
+    }
+
     // process all participants for MIDI
     midi::Message midiOutMessage;
     for (size_t i = 0; i < maxVoiceCards; ++i) {
       const Slot *slot = &snap.slots[i];
       if (slot->participant != nullptr && slot->props.isAllocated) {
-          lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.85f);
+          lights[CARD_A_PATCH_USAGE_LIGHT + slot->props.slotNum ].setBrightness(0.85f);
           if (slot->participant->pullMidi(args,
                                           midiPollClockDivider.getDivision(),
                                           slot->props.midiChannel,
@@ -202,10 +210,7 @@ void OutputInterface::process(const ProcessArgs& args) {
           }
       }
       else if (slot->props.hardwareId) {
-        lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.25f);
-      }
-      else {
-        lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.f);
+        lights[CARD_A_PATCH_USAGE_LIGHT + slot->props.slotNum ].setBrightness(0.25f);
       }
     }
 

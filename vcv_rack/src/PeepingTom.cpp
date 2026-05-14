@@ -310,6 +310,14 @@ struct PeepingTomDisplay : LedDisplay {
     drawVerticalGridLine(vg, phaseRect, 2.0f, nvgRGBA(180, 180, 180, 30), 1.0f);
   }
 
+  void drawLabel(NVGcontext* vg, const char* text, const Rect& r) {
+    nvgFontSize(vg, 8.f);
+    nvgFillColor(vg, nvgRGBA(220, 220, 220, 120));
+    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+    nvgText(vg, r.pos.x + 2.f, r.pos.y + 2.f, text, NULL);
+  }
+
+
   void drawLayer(const DrawArgs& args, int layer) override {
     if (layer == 1) {
       PoleMixCoefficients c = module ? module->poleMixCoefs : PoleMixCoefficients{};
@@ -325,6 +333,8 @@ struct PeepingTomDisplay : LedDisplay {
         rebuildPhasePoints(c, phaseRect);
       }
 
+      drawLabel(args.vg, "MAG", magRect);
+      drawLabel(args.vg, "PHASE", phaseRect);
       drawGrid(args.vg, magRect, phaseRect);
       drawCurve(args.vg, magPoints, nvgRGB(255, 220, 80)); // Yellow Mag
       drawCurve(args.vg, phasePoints, nvgRGB(80, 180, 255), phaseRect.size.y * 0.4f); // Blue Phase
