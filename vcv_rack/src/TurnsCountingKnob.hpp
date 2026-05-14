@@ -3,6 +3,8 @@
 
 using namespace rack;
 
+namespace zox {
+
 // ---------------------------------------------------------------------------
 //  TurnsCountingKnob
 //
@@ -69,3 +71,5 @@ private:
   // Draw the small counter-window rectangle and the digit inside it.
   void drawCounterWindow(const DrawArgs& args, int turn, float knobRadius) const;
 };
+
+}
