@@ -477,7 +477,7 @@ struct Zoxnoxious5524Widget : ModuleWidget {
       addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(54.5, 28.323)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_KNOB_PARAM));
       addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(116.5, 28.323)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_KNOB_PARAM));
 
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(144.5, 43.915)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM));
+      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(144.5, 45.915)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM));
       addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(110.451, 84.995)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_KNOB_PARAM));
 
       addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(74.202, 91.587)), module, Zoxnoxious5524::VCO_TWO_WAVE_PULSE_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_WAVE_PULSE_BUTTON_LIGHT));
@@ -513,14 +513,14 @@ struct Zoxnoxious5524Widget : ModuleWidget {
 
       addInput(createInputCentered<BNCPort>(mm2px(Vec(54.5, 42.323)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_INPUT));
       addInput(createInputCentered<BNCPort>(mm2px(Vec(116.5, 42.323)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_INPUT));
-      addInput(createInputCentered<BNCPort>(mm2px(Vec(144.5, 57.915)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_INPUT));
+      addInput(createInputCentered<BNCPort>(mm2px(Vec(144.5, 59.915)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_INPUT));
       addInput(createInputCentered<BNCPort>(mm2px(Vec(123.143, 84.995)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_INPUT));
 
       addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(4.8, 121.586)), module, Zoxnoxious5524::RIGHT_EXPANDER_LIGHT));
 
-      addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(149.537, 80.173)), module, Zoxnoxious5524::TZFM_PULSE_STATUS_LIGHT));
-      addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(149.537, 74.173)), module, Zoxnoxious5524::TZFM_SAW_STATUS_LIGHT));
-      addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(149.537, 68.173)), module, Zoxnoxious5524::TZFM_TRI_STATUS_LIGHT));
+      addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(149.537, 90.673)), module, Zoxnoxious5524::TZFM_PULSE_STATUS_LIGHT));
+      addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(149.537, 84.673)), module, Zoxnoxious5524::TZFM_SAW_STATUS_LIGHT));
+      addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(149.537, 78.673)), module, Zoxnoxious5524::TZFM_TRI_STATUS_LIGHT));
       addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(148.537, 35.378)), module, Zoxnoxious5524::WAVESHAPE_PULSE_STATUS_LIGHT));
       addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(148.537, 29.378)), module, Zoxnoxious5524::WAVESHAPE_HALFSINE_STATUS_LIGHT));
       addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(148.537, 23.378)), module, Zoxnoxious5524::WAVESHAPE_SINE_STATUS_LIGHT));
