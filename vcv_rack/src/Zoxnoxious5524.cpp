@@ -284,31 +284,48 @@ struct Zoxnoxious5524 final : ParticipantAdapter, Participant {
 
   bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override {
     bool midiMsgSet = false;
+    bool shapedOn = (params[VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM].getValue() + inputs[VCO_TWO_WAVESHAPE_TZFM_INPUT].getVoltage() / 10.f) > 0.f;
+    bool tzfmDirectOn = params[VCO_TWO_TO_FREQ_VCO_ONE_BUTTON_PARAM].getValue() > 0.5f &&
+      (params[VCO_TWO_MOD_AMOUNT_KNOB_PARAM].getValue() + inputs[VCO_TWO_MOD_AMOUNT_INPUT].getVoltage() / 10.f) > 0.f;
 
     // pullMidi runs at something better than display frame rate, so all UI visual stuff is here
 
     // the pulse doesn't send any midi-- it just allows or limits the pulse width
-    lights[VCO_TWO_WAVE_PULSE_BUTTON_LIGHT].setBrightness(
-      params[VCO_TWO_WAVE_PULSE_BUTTON_PARAM].getValue() > 0.f
-    );
-
+    if (params[VCO_TWO_WAVE_PULSE_BUTTON_PARAM].getValue() > 0.f) {
+      lights[VCO_TWO_WAVE_PULSE_BUTTON_LIGHT].setBrightness(1.f);
+      lights[TZFM_PULSE_STATUS_LIGHT].setBrightness( tzfmDirectOn ? 1.f : 0.25f );
+      lights[WAVESHAPE_PULSE_STATUS_LIGHT].setBrightness( shapedOn ? 1.f : 0.25f );
+    }
+    else {
+      lights[VCO_TWO_WAVE_PULSE_BUTTON_LIGHT].setBrightness(0.f);
+      lights[TZFM_PULSE_STATUS_LIGHT].setBrightness(0.f);
+      lights[WAVESHAPE_PULSE_STATUS_LIGHT].setBrightness(0.f);
+    }
 
     int vcoTwoSaw;
     int vcoTwoTri;
     if (params[VCO_TWO_WAVE_SAW_BUTTON_PARAM].getValue() > 0.f) {
       vcoTwoSaw = 2;
       lights[VCO_TWO_WAVE_SAW_BUTTON_LIGHT].setBrightness(1.f);
+      lights[TZFM_SAW_STATUS_LIGHT].setBrightness( tzfmDirectOn ? 1.f : 0.25f );
+      lights[WAVESHAPE_HALFSINE_STATUS_LIGHT].setBrightness( shapedOn ? 1.f : 0.25f );
     } else {
       vcoTwoSaw = 0;
       lights[VCO_TWO_WAVE_SAW_BUTTON_LIGHT].setBrightness(0.f);
+      lights[TZFM_SAW_STATUS_LIGHT].setBrightness(0.f);
+      lights[WAVESHAPE_HALFSINE_STATUS_LIGHT].setBrightness(0.f);
     }
 
     if (params[VCO_TWO_WAVE_TRI_BUTTON_PARAM].getValue() > 0.f) {
       vcoTwoTri = 1;
       lights[VCO_TWO_WAVE_TRI_BUTTON_LIGHT].setBrightness(1.f);
+      lights[TZFM_TRI_STATUS_LIGHT].setBrightness( tzfmDirectOn ? 1.f : 0.25f );
+      lights[WAVESHAPE_SINE_STATUS_LIGHT].setBrightness( shapedOn ? 1.f : 0.25f );
     } else {
       vcoTwoTri = 0;
       lights[VCO_TWO_WAVE_TRI_BUTTON_LIGHT].setBrightness(0.f);
+      lights[TZFM_TRI_STATUS_LIGHT].setBrightness(0.f);
+      lights[WAVESHAPE_SINE_STATUS_LIGHT].setBrightness(0.f);
     }
 
     // convert the saw & tri params to the MIDI prog change number with four options
@@ -543,9 +560,9 @@ struct Zoxnoxious5524Widget : ModuleWidget {
         addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(151.008, 109.286)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_CLIP_LIGHT));
 */
 
-      mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(165.5, 84.414)));
-      mix1OutputTextField->setNumChars(11);
-      mix1OutputTextField->box.size = (mm2px(Vec(19.0, 3.136)));
+      mix1OutputTextField = createWidget<CardTextDisplay>(mm2px(Vec(163.5, 84.414)));
+      mix1OutputTextField->setNumChars(13);
+      mix1OutputTextField->box.size = (mm2px(Vec(21.0, 3.136)));
       mix1OutputTextField->setText(module ? &module->output1NameString : NULL);
       addChild(mix1OutputTextField);
 

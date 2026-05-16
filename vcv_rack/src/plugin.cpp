@@ -24,7 +24,7 @@ std::string getCardName(uint8_t cardId, int outputNumber) {
   if (cardId == 0x01) return "Audio Out";
   if (cardId == 0x02) return "3340!VCO";
   if (cardId == 0x03) return "3372!VCF";
-  if (cardId == 0x04) return outputNumber == 1 ? "5524!VCF" : "5524!VCO1";
+  if (cardId == 0x04) return outputNumber == 1 ? "5524!VOICE" : "5524!VCO1";
   if (cardId == 0x06) return "Pole Dancer";
   if (cardId == 0x07) return "Audio IO";
   return "----";
