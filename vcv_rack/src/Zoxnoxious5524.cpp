@@ -458,7 +458,7 @@ struct Zoxnoxious5524Widget : ModuleWidget {
         mm2px(Vec(84.5, 28.323)),
         module,
         Zoxnoxious5524::VCO_TWO_VOCT_KNOB_PARAM);
-      knobVco2->setTurns(8);
+      knobVco2->setTurns(6);
       addParam(knobVco2);
       addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(84.5, 62.445)), module, Zoxnoxious5524::VCO_TWO_PW_KNOB_PARAM));
 
@@ -466,7 +466,7 @@ struct Zoxnoxious5524Widget : ModuleWidget {
         mm2px(Vec(174.5, 28.445)),
         module,
         Zoxnoxious5524::VCF_CUTOFF_KNOB_PARAM);
-      knobVCF->setTurns(8);
+      knobVCF->setTurns(10);
       addParam(knobVCF);
 
       addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(168.104, 62.445)), module, Zoxnoxious5524::VCF_RESONANCE_KNOB_PARAM));
