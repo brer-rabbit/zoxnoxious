@@ -1,12 +1,12 @@
 #include "plugin.hpp"
 
-#include "AudioIO.hpp"
+#include "OutputInterface.hpp"
 #include "constants.hpp"
 #include "zcomponentlib.hpp"
 
 namespace zox {
 
-std::atomic<AudioIO*> AudioIO::instance { nullptr };
+std::atomic<OutputInterface*> OutputInterface::instance { nullptr };
 
 static constexpr int midiPollRateHz = 100;
 
@@ -16,7 +16,7 @@ enum cvChannel {
 };
 
 
-AudioIO::AudioIO() : out1LevelClipTimer(0.f),
+OutputInterface::OutputInterface() : out1LevelClipTimer(0.f),
                      out2LevelClipTimer(0.f),
                      buttonStates(buttonMappings.size()),
                      buttonMidiController(buttonMappings),
@@ -62,7 +62,7 @@ AudioIO::AudioIO() : out1LevelClipTimer(0.f),
 }
 
 
-AudioIO::~AudioIO() {
+OutputInterface::~OutputInterface() {
   for (auto it = audioPorts.begin(); it != audioPorts.end(); ++it) {
     (*it)->setDriverId(-1);
     delete *it;
@@ -70,20 +70,20 @@ AudioIO::~AudioIO() {
 }
 
 
-void AudioIO::onAdd(const AddEvent &e) {
+void OutputInterface::onAdd(const AddEvent &e) {
   Module::onAdd(e);
-  AudioIO *expected = nullptr;
-  AudioIO::instance.compare_exchange_strong(expected, this, std::memory_order_release);
+  OutputInterface *expected = nullptr;
+  OutputInterface::instance.compare_exchange_strong(expected, this, std::memory_order_release);
 }
 
 
-void AudioIO::onRemove(const RemoveEvent &e) {
-  AudioIO *expected = this;
-  AudioIO::instance.compare_exchange_strong(expected, nullptr, std::memory_order_release);
+void OutputInterface::onRemove(const RemoveEvent &e) {
+  OutputInterface *expected = this;
+  OutputInterface::instance.compare_exchange_strong(expected, nullptr, std::memory_order_release);
   Module::onRemove(e);
 }
 
-void AudioIO::onReset() {
+void OutputInterface::onReset() {
   for (auto it = audioPorts.begin(); it != audioPorts.end(); ++it) {
     (*it)->setDriverId(-1);
   }
@@ -91,7 +91,7 @@ void AudioIO::onReset() {
 }
 
 
-void AudioIO::onSampleRateChange(const SampleRateChangeEvent& e) {
+void OutputInterface::onSampleRateChange(const SampleRateChangeEvent& e) {
   for (auto it = audioPorts.begin(); it != audioPorts.end(); ++it) {
     (*it)->engineInputBuffer.clear();
     (*it)->engineOutputBuffer.clear();
@@ -102,7 +102,7 @@ void AudioIO::onSampleRateChange(const SampleRateChangeEvent& e) {
 }
 
 
-void AudioIO::process(const ProcessArgs& args) {
+void OutputInterface::process(const ProcessArgs& args) {
   dsp::Frame<maxAudioChannels> sharedFrames[ audioPorts.size() ];
   bool isMidiClockTick = midiPollClockDivider.process();
   bool isOrchestrationClockTick = orchestrationClockDivider.process();
@@ -138,9 +138,12 @@ void AudioIO::process(const ProcessArgs& args) {
     discoReport.bytes[15] = 0x03;
     discoReport.bytes[16] = 0x00;
     discoReport.bytes[17] = 0x00;
-    discoReport.bytes[18] = 0x07;
+    discoReport.bytes[18] = 0x00;
     discoReport.bytes[19] = 0x00;
     discoReport.bytes[20] = 0x00;
+    discoReport.bytes[21] = 0x07;
+    discoReport.bytes[22] = 0x00;
+    discoReport.bytes[23] = 0x00;
     processDiscoveryReport(discoReport);
   }
 
@@ -186,12 +189,17 @@ void AudioIO::process(const ProcessArgs& args) {
     const float lightTime = args.sampleTime * midiPollClockDivider.getDivision();
     const float brightnessDeltaTime = 1 / lightTime;
 
+    // reset all patch usage state to inactive, then selectively activate.
+    for (size_t i = 0; i < maxVoiceCards; ++i) {
+      lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.f);
+    }
+
     // process all participants for MIDI
     midi::Message midiOutMessage;
     for (size_t i = 0; i < maxVoiceCards; ++i) {
       const Slot *slot = &snap.slots[i];
       if (slot->participant != nullptr && slot->props.isAllocated) {
-          lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.85f);
+          lights[CARD_A_PATCH_USAGE_LIGHT + slot->props.slotNum ].setBrightness(0.85f);
           if (slot->participant->pullMidi(args,
                                           midiPollClockDivider.getDivision(),
                                           slot->props.midiChannel,
@@ -202,10 +210,7 @@ void AudioIO::process(const ProcessArgs& args) {
           }
       }
       else if (slot->props.hardwareId) {
-        lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.25f);
-      }
-      else {
-        lights[CARD_A_PATCH_USAGE_LIGHT + i ].setBrightness(0.f);
+        lights[CARD_A_PATCH_USAGE_LIGHT + slot->props.slotNum ].setBrightness(0.25f);
       }
     }
 
@@ -229,12 +234,12 @@ void AudioIO::process(const ProcessArgs& args) {
    * If it doesn't match ZoxnoxiousControlMsg will not have a channel assignment for this card.
    */
 static const uint8_t hardwareId = 0x07;
-uint8_t AudioIO::getHardwareId() { // TODO: should this be an interface?
+uint8_t OutputInterface::getHardwareId() { // TODO: should this be an interface?
   return hardwareId;
 }
 
 
-void AudioIO::setStatusLight() {
+void OutputInterface::setStatusLight() {
   if (discoveryReportReceived) {  // green
     lights[HARDWARE_LINK_LIGHT + 0].setBrightness(0.f);
     lights[HARDWARE_LINK_LIGHT + 1].setBrightness(0.5f);
@@ -259,7 +264,7 @@ static const uint8_t midiManufacturerId = 0x7d;
 static const uint8_t midiSysexDiscoveryReport = 0x01;
 
 
-void AudioIO::processMidiInMessage(const midi::Message &msg) {
+void OutputInterface::processMidiInMessage(const midi::Message &msg) {
   // the only thing being processed as of now is the Discovery Report
   INFO("processing MIDI message");
   if (msg.getStatus() == 0xf && msg.getSize() > 3 && msg.bytes[1] == midiManufacturerId) {
@@ -326,7 +331,7 @@ struct DiscoveredCard {
 };
 
 
-void AudioIO::processDiscoveryReport(const midi::Message &msg) {
+void OutputInterface::processDiscoveryReport(const midi::Message &msg) {
   constexpr int byteOffset = 3; // actual data starts at this offset after sysex header
   int msgSize = msg.getSize(); // cache
 
@@ -367,7 +372,7 @@ void AudioIO::processDiscoveryReport(const midi::Message &msg) {
 // note the midi channel is assigned here.  By convention with the zoxnoxiousd daemon
 // the first in the report has channel 0, then 1, etc.
 // "Discovered card number maps to MIDI channel number.  Not actual slot number."
-void AudioIO::applyDiscoveryReport(DiscoveredCard *cards) {
+void OutputInterface::applyDiscoveryReport(DiscoveredCard *cards) {
   int assignedMidiChannel = 0;
   ParticipantProperty deviceTree[maxVoiceCards] = {};
   size_t participant_count = 0;
@@ -408,7 +413,7 @@ void AudioIO::applyDiscoveryReport(DiscoveredCard *cards) {
 
 
 // send all audio frames to the audio ports
-void AudioIO::sendFramesToDevices(rack::dsp::Frame<maxAudioChannels> *sharedFrame, int numFrames) {
+void OutputInterface::sendFramesToDevices(rack::dsp::Frame<maxAudioChannels> *sharedFrame, int numFrames) {
   for (int deviceNum = 0; deviceNum < numFrames; ++deviceNum) {
     if (!audioPorts[deviceNum]->engineInputBuffer.full()) {
       audioPorts[deviceNum]->engineInputBuffer.push(sharedFrame[deviceNum]);
@@ -420,7 +425,7 @@ void AudioIO::sendFramesToDevices(rack::dsp::Frame<maxAudioChannels> *sharedFram
 
 
 
-json_t* AudioIO::dataToJson() {
+json_t* OutputInterface::dataToJson() {
   json_t* rootJ = json_object();
   json_object_set_new(rootJ, "midiInput", midiInput.toJson());
   json_object_set_new(rootJ, "midiOutput", midiOutput.toJson());
@@ -431,7 +436,7 @@ json_t* AudioIO::dataToJson() {
   return rootJ;
 }
 
-void AudioIO::dataFromJson(json_t* rootJ) {
+void OutputInterface::dataFromJson(json_t* rootJ) {
   json_t* midiInputJ = json_object_get(rootJ, "midiInput");
   if (midiInputJ) {
     midiInput.fromJson(midiInputJ);
@@ -453,12 +458,12 @@ void AudioIO::dataFromJson(json_t* rootJ) {
 
 
 
-bool AudioIO::isPrimary() const {
-    return AudioIO::instance.load(std::memory_order_relaxed) == this;
+bool OutputInterface::isPrimary() const {
+    return OutputInterface::instance.load(std::memory_order_relaxed) == this;
 }
 
 
-void AudioIO::serviceParticipantAttachments() {
+void OutputInterface::serviceParticipantAttachments() {
 
   for (int64_t moduleId : APP->engine->getModuleIds()) {
     Module *m = APP->engine->getModule(moduleId);
@@ -484,8 +489,8 @@ void AudioIO::serviceParticipantAttachments() {
 
 
 
-struct AudioIOWidget : ModuleWidget {
-  AudioIOWidget(AudioIO* module) :
+struct OutputInterfaceWidget : ModuleWidget {
+  OutputInterfaceWidget(OutputInterface* module) :
     outputA1Text(nullptr), outputA2Text(nullptr),
     outputB1Text(nullptr), outputB2Text(nullptr),
     outputC1Text(nullptr), outputC2Text(nullptr),
@@ -493,7 +498,7 @@ struct AudioIOWidget : ModuleWidget {
     outputE1Text(nullptr), outputE2Text(nullptr),
     outputF1Text(nullptr), outputF2Text(nullptr) {
     setModule(module);
-    setPanel(createPanel(asset::plugin(pluginInstance, "res/AudioIO.svg")));
+    setPanel(createPanel(asset::plugin(pluginInstance, "res/OutputInterface.svg")));
 
     if (module != nullptr) {
       Broker& b = module->getBroker();
@@ -519,40 +524,40 @@ struct AudioIOWidget : ModuleWidget {
     addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
     addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(53.022, 14.198)), module, AudioIO::HARDWARE_LINK_LIGHT));
+    addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(53.022, 14.198)), module, OutputInterface::HARDWARE_LINK_LIGHT));
 
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(10.475, 21.639)), module, AudioIO::CARD_A_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(17.034, 21.639)), module, AudioIO::CARD_B_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(23.594, 21.639)), module, AudioIO::CARD_C_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(30.153, 21.639)), module, AudioIO::CARD_D_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(36.712, 21.639)), module, AudioIO::CARD_E_PATCH_USAGE_LIGHT));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(43.272, 21.639)), module, AudioIO::CARD_F_PATCH_USAGE_LIGHT));
-
-
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 39.243)), module, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 39.421)), module, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 44.56)), module, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 44.702)), module, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.66, 49.876)), module, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 49.983)), module, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 55.193)), module, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 55.264)), module, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 60.51)), module, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 60.545)), module, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 65.826)), module, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 65.826)), module, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, AudioIO::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(10.475, 21.639)), module, OutputInterface::CARD_A_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(17.034, 21.639)), module, OutputInterface::CARD_B_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(23.594, 21.639)), module, OutputInterface::CARD_C_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(30.153, 21.639)), module, OutputInterface::CARD_D_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(36.712, 21.639)), module, OutputInterface::CARD_E_PATCH_USAGE_LIGHT));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(43.272, 21.639)), module, OutputInterface::CARD_F_PATCH_USAGE_LIGHT));
 
 
-    addParam(createParamCentered<ZoxSlider>(mm2px(Vec(17.28, 89.244)), module, AudioIO::OUT1_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<ZoxSlider>(mm2px(Vec(52.11, 89.244)), module, AudioIO::OUT2_LEVEL_KNOB_PARAM));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 39.243)), module, OutputInterface::CARD_A_MIX1_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_A_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 39.421)), module, OutputInterface::CARD_A_MIX2_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_A_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 44.56)), module, OutputInterface::CARD_B_MIX1_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_B_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 44.702)), module, OutputInterface::CARD_B_MIX2_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_B_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.66, 49.876)), module, OutputInterface::CARD_C_MIX1_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_C_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 49.983)), module, OutputInterface::CARD_C_MIX2_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_C_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 55.193)), module, OutputInterface::CARD_D_MIX1_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_D_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 55.264)), module, OutputInterface::CARD_D_MIX2_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_D_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 60.51)), module, OutputInterface::CARD_E_MIX1_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_E_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 60.545)), module, OutputInterface::CARD_E_MIX2_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_E_MIX2_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(29.665, 65.826)), module, OutputInterface::CARD_F_MIX1_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_F_MIX1_OUTPUT_BUTTON_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonSmallStatefulLightLatch<TinyLight<ZoxAmberLight>>>(mm2px(Vec(64.674, 65.826)), module, OutputInterface::CARD_F_MIX2_OUTPUT_BUTTON_PARAM, OutputInterface::CARD_F_MIX2_OUTPUT_BUTTON_LIGHT));
 
 
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(17.303, 108.604)), module, AudioIO::OUT1_LEVEL_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.11, 108.604)), module, AudioIO::OUT2_LEVEL_INPUT));
+    addParam(createParamCentered<ZoxSlider>(mm2px(Vec(17.28, 89.244)), module, OutputInterface::OUT1_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<ZoxSlider>(mm2px(Vec(52.11, 89.244)), module, OutputInterface::OUT2_LEVEL_KNOB_PARAM));
 
 
-    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 101.184)), module, AudioIO::OUT1_LEVEL_CLIP_LIGHT));
-    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 114.233)), module, AudioIO::OUT2_LEVEL_CLIP_LIGHT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(17.303, 108.604)), module, OutputInterface::OUT1_LEVEL_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.11, 108.604)), module, OutputInterface::OUT2_LEVEL_INPUT));
+
+
+    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 101.184)), module, OutputInterface::OUT1_LEVEL_CLIP_LIGHT));
+    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 114.233)), module, OutputInterface::OUT2_LEVEL_CLIP_LIGHT));
 
     // mm2px(Vec(22.0, 3.636))
     cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 37.603)));
@@ -643,7 +648,7 @@ struct AudioIOWidget : ModuleWidget {
 
 
   void appendContextMenu(Menu *menu) override {
-    AudioIO *module = dynamic_cast<AudioIO*>(this->module);
+    OutputInterface *module = dynamic_cast<OutputInterface*>(this->module);
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createSubmenuItem("MIDI Out Device", "",
@@ -716,36 +721,36 @@ struct AudioIOWidget : ModuleWidget {
 };
 
 
-const std::string AudioIO::audioPortNum = "audioPort";
+const std::string OutputInterface::audioPortNum = "audioPort";
 
 // see Zoxnoxious MIDI spec for details
 
-const midi::Message AudioIO::MIDI_DISCOVERY_REQUEST_SYSEX = []{
+const midi::Message OutputInterface::MIDI_DISCOVERY_REQUEST_SYSEX = []{
   midi::Message m;
   m.bytes = { 0xF0, 0x7D, 0x02, 0xF7 };
   return m;
 }();
 
-const midi::Message AudioIO::MIDI_SHUTDOWN_SYSEX = []{
+const midi::Message OutputInterface::MIDI_SHUTDOWN_SYSEX = []{
   midi::Message m;
   m.bytes = { 0xF0, 0x7D, 0x03, 0xF7 };
   return m;
 }();
 
-const midi::Message AudioIO::MIDI_RESTART_SYSEX = []{
+const midi::Message OutputInterface::MIDI_RESTART_SYSEX = []{
   midi::Message m;
   m.bytes = { 0xF0, 0x7D, 0x04, 0xF7 };
   return m;
 }();
 
-const midi::Message AudioIO::MIDI_TUNE_REQUEST = []{
+const midi::Message OutputInterface::MIDI_TUNE_REQUEST = []{
   midi::Message m;
   m.bytes = { 0xF6 };
   return m;
 }();
 
 
-const std::vector<ButtonMapping<AudioIO> > AudioIO::buttonMappings = {
+const std::vector<ButtonMapping<OutputInterface> > OutputInterface::buttonMappings = {
     { CARD_A_MIX1_OUTPUT_BUTTON_PARAM, CARD_A_MIX1_OUTPUT_BUTTON_LIGHT, { 0, 1} },
     { CARD_B_MIX1_OUTPUT_BUTTON_PARAM, CARD_B_MIX1_OUTPUT_BUTTON_LIGHT, { 2, 3} },
     { CARD_C_MIX1_OUTPUT_BUTTON_PARAM, CARD_C_MIX1_OUTPUT_BUTTON_LIGHT, { 4, 5} },
@@ -763,5 +768,5 @@ const std::vector<ButtonMapping<AudioIO> > AudioIO::buttonMappings = {
 
 } // namespace zox
 
-Model* modelAudioIO = createModel<zox::AudioIO, zox::AudioIOWidget>("AudioIO");
+Model* modelOutputInterface = createModel<zox::OutputInterface, zox::OutputInterfaceWidget>("OutputInterface");
 

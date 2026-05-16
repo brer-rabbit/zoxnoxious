@@ -85,7 +85,14 @@ struct ZPushButtonStatefulLatch : app::SvgSwitch {
     engine::ParamQuantity* pq = this->getParamQuantity();
     if (pq) {
       bool on = pq->getValue() > 0.5f;
-      this->sw->setSvg(on ? onSvg : offSvg);
+        if (on) {
+          this->sw->setSvg(onSvg);
+          this->shadow->opacity = 0.f;
+        }
+        else {
+          this->sw->setSvg(offSvg);
+          this->shadow->opacity = 0.15f;
+        }
     }
   }
 };
@@ -121,7 +128,14 @@ template <typename TSvg, typename TLight = MediumSimpleLight<WhiteLight>>
       engine::ParamQuantity* pq = this->getParamQuantity();
       if (pq) {
         bool on = pq->getValue() > 0.5f;
-        this->sw->setSvg(on ? onSvg : offSvg);
+        if (on) {
+          this->sw->setSvg(onSvg);
+          this->shadow->opacity = 0.f;
+        }
+        else {
+          this->sw->setSvg(offSvg);
+          this->shadow->opacity = 0.15f;
+        }
       }
     }
 

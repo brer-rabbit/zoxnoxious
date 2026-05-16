@@ -1,6 +1,8 @@
 #include "TurnsCountingKnob.hpp"
 #include "plugin.hpp"
 
+namespace zox {
+
 // ---------------------------------------------------------------------------
 //  Implementation notes
 //
@@ -98,13 +100,10 @@ int TurnsCountingKnob::currentTurn() {
     return 0;
   }
 
-  float norm = math::clamp(pq->getScaledValue(), 0.0f, 1.0f);
-  // Map to [0, numTurns), then floor to get the integer turn index.
-  int turn = static_cast<int>(norm * numTurns);
-  // Clamp so max value gives the last digit, not an out-of-range index.
-  // Note: mechanically (if it was a physical device) this maybe
-  // should be numTurns-1.  The final turn may not count as completed.
-  return math::clamp(turn, 0, numTurns);
+  // get display value and truncate toward zero to get the major digit
+  float displayVal = pq->getDisplayValue();
+  int turn = static_cast<int>(std::floor(displayVal));
+  return turn;
 }
 
 
@@ -143,14 +142,25 @@ void TurnsCountingKnob::drawCounterWindow(const DrawArgs& args,
   nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
   nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0xff));
 
-  char buf[2] = { static_cast<char>('0' + turn), '\0' };
+  char buf[3] = { '0', '\0', '\0' };
+  if (turn < -9 || turn > 9) {
+    // this is out of range!
+    buf[0] = '0';
+  }
+  else if (turn >= 0) {
+    buf[0] = static_cast<char>('0' + turn);
+  }
+  else {
+    buf[0] = '.';
+    buf[1] = static_cast<char>('0' + (-turn));
+  }
+
   nvgText(vg, cx, cy, buf, nullptr);
 
   // then display all segment with a low alpha for realism
   nvgFillColor(vg, nvgRGBA(255, 0x90, 0x10, 0x30));
-  buf[0] = '8';
-  nvgText(vg, cx, cy, buf, nullptr);
+  nvgText(vg, cx, cy, ".8", nullptr);
 
 }
 
-
+}
