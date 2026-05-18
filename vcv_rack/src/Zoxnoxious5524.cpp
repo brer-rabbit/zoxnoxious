@@ -123,8 +123,7 @@ struct Zoxnoxious5524 final : ParticipantAdapter, Participant {
     WAVESHAPE_PULSE_STATUS_LIGHT,
     WAVESHAPE_HALFSINE_STATUS_LIGHT,
     WAVESHAPE_SINE_STATUS_LIGHT,
-    ENUMS(LEFT_EXPANDER_LIGHT, 3),
-    ENUMS(RIGHT_EXPANDER_LIGHT, 3),
+    ENUMS(LINK_STATUS_LIGHT, 3),
     LIGHTS_LEN
   };
 
@@ -195,7 +194,7 @@ struct Zoxnoxious5524 final : ParticipantAdapter, Participant {
       {VCO_MIX_KNOB_PARAM, VCO_MIX_INPUT, VCO_MIX, 10.f, &vcoMixClipTimer, nullptr, CvOperation::Add} }} {
 
     setParticipant(this);
-    setLightEnum(RIGHT_EXPANDER_LIGHT);
+    setLightEnum(LINK_STATUS_LIGHT);
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     configParam(VCO_ONE_VOCT_KNOB_PARAM, 0.f, 1.f, 0.5f, "Frequency", " V", 0.f, 8.f);
@@ -533,7 +532,7 @@ struct Zoxnoxious5524Widget : ModuleWidget {
       addInput(createInputCentered<BNCPort>(mm2px(Vec(144.5, 59.915)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_INPUT));
       addInput(createInputCentered<BNCPort>(mm2px(Vec(123.143, 84.995)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_INPUT));
 
-      addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(4.8, 121.586)), module, Zoxnoxious5524::RIGHT_EXPANDER_LIGHT));
+      addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(4.8, 121.586)), module, Zoxnoxious5524::LINK_STATUS_LIGHT));
 
       addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(149.537, 90.673)), module, Zoxnoxious5524::TZFM_PULSE_STATUS_LIGHT));
       addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(149.537, 84.673)), module, Zoxnoxious5524::TZFM_SAW_STATUS_LIGHT));
