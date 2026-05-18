@@ -51,6 +51,16 @@ struct ZPushButtonMediumRightSvg {
   static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
 };
 
+struct ZPushButtonMediumUpSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonMedium_up_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
+};
+
+struct ZPushButtonMediumDownSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonMedium_down_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
+};
+
 
 template <typename TSvg>
 struct ZPushButton : app::SvgSwitch {
@@ -171,6 +181,8 @@ using ZPushButtonMediumStatefulLatch =
 
 using ZPushButtonMediumLeft = ZPushButton<ZPushButtonMediumLeftSvg>;
 using ZPushButtonMediumRight = ZPushButton<ZPushButtonMediumRightSvg>;
+using ZPushButtonMediumUp = ZPushButton<ZPushButtonMediumUpSvg>;
+using ZPushButtonMediumDown = ZPushButton<ZPushButtonMediumDownSvg>;
 
 
 
