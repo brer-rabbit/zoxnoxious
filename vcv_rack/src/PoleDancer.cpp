@@ -434,18 +434,18 @@ struct PoleDancerWidget : ModuleWidget {
     addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
     addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addParam(createParamCentered<ZPushButtonMediumLeft>(mm2px(Vec(6.461, 20.235)), module, PoleDancer::SOURCE_ONE_DOWN_BUTTON_PARAM));
-    addParam(createParamCentered<ZPushButtonMediumRight>(mm2px(Vec(37.539, 20.235)), module, PoleDancer::SOURCE_ONE_UP_BUTTON_PARAM));
-    addParam(createParamCentered<ZPushButtonMediumLeft>(mm2px(Vec(6.461, 70.437)), module, PoleDancer::SOURCE_TWO_DOWN_BUTTON_PARAM));
-    addParam(createParamCentered<ZPushButtonMediumRight>(mm2px(Vec(37.539, 70.437)), module, PoleDancer::SOURCE_TWO_UP_BUTTON_PARAM));
+    addParam(createParamCentered<ZPushButtonSmallLeft>(mm2px(Vec(6.461, 20.235)), module, PoleDancer::SOURCE_ONE_DOWN_BUTTON_PARAM));
+    addParam(createParamCentered<ZPushButtonSmallRight>(mm2px(Vec(37.639, 20.235)), module, PoleDancer::SOURCE_ONE_UP_BUTTON_PARAM));
+    addParam(createParamCentered<ZPushButtonSmallLeft>(mm2px(Vec(6.461, 70.437)), module, PoleDancer::SOURCE_TWO_DOWN_BUTTON_PARAM));
+    addParam(createParamCentered<ZPushButtonSmallRight>(mm2px(Vec(37.639, 70.437)), module, PoleDancer::SOURCE_TWO_UP_BUTTON_PARAM));
 
     addParam(createParamCentered<ZPushButtonMediumDown>(mm2px(Vec(102.65, 68.437)), module, PoleDancer::REZ_COMP_DOWN_BUTTON_PARAM));
     addParam(createParamCentered<ZPushButtonMediumUp>(mm2px(Vec(93.596, 68.437)), module, PoleDancer::REZ_COMP_UP_BUTTON_PARAM));
 
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 32.734)), module, PoleDancer::SOURCE_ONE_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 52.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 82.936)), module, PoleDancer::SOURCE_TWO_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 102.719)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 32.734)), module, PoleDancer::SOURCE_ONE_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 52.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 82.936)), module, PoleDancer::SOURCE_TWO_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 102.719)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM));
     auto* knob = createParamCentered<TurnsCountingKnob>(
       mm2px(Vec(71.0, 24.223)),
       module,

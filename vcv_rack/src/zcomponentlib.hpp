@@ -36,6 +36,27 @@ struct ZPushButtonSmallSvg {
   static constexpr const char* latched   = "res/ZPushButtonSmall_latched.svg";
 };
 
+struct ZPushButtonSmallLeftSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonSmall_left_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonSmall_latched.svg";
+};
+
+struct ZPushButtonSmallRightSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonSmall_right_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonSmall_latched.svg";
+};
+
+struct ZPushButtonSmallUpSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonSmall_up_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonSmall_latched.svg";
+};
+
+struct ZPushButtonSmallDownSvg {
+  static constexpr const char* unlatched = "res/ZPushButtonSmall_down_unlatched.svg";
+  static constexpr const char* latched   = "res/ZPushButtonSmall_latched.svg";
+};
+
+
 struct ZPushButtonMediumSvg {
   static constexpr const char* unlatched = "res/ZPushButtonMedium_unlatched.svg";
   static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
@@ -60,6 +81,8 @@ struct ZPushButtonMediumDownSvg {
   static constexpr const char* unlatched = "res/ZPushButtonMedium_down_unlatched.svg";
   static constexpr const char* latched   = "res/ZPushButtonMedium_latched.svg";
 };
+
+
 
 
 template <typename TSvg>
@@ -179,6 +202,10 @@ using ZPushButtonSmallStatefulLatch =
 using ZPushButtonMediumStatefulLatch =
 	ZPushButtonStatefulLatch<ZPushButtonMediumSvg>;
 
+using ZPushButtonSmallLeft = ZPushButton<ZPushButtonSmallLeftSvg>;
+using ZPushButtonSmallRight = ZPushButton<ZPushButtonSmallRightSvg>;
+using ZPushButtonSmallUp = ZPushButton<ZPushButtonSmallUpSvg>;
+using ZPushButtonSmallDown = ZPushButton<ZPushButtonSmallDownSvg>;
 using ZPushButtonMediumLeft = ZPushButton<ZPushButtonMediumLeftSvg>;
 using ZPushButtonMediumRight = ZPushButton<ZPushButtonMediumRightSvg>;
 using ZPushButtonMediumUp = ZPushButton<ZPushButtonMediumUpSvg>;
