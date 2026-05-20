@@ -1,3 +1,4 @@
+#include <cmath>
 #include "plugin.hpp"
 #include "constants.hpp"
 #include "modulehelpers.hpp"
@@ -165,8 +166,8 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     configButton(SOURCE_TWO_DOWN_BUTTON_PARAM, "Previous");
     configButton(SOURCE_TWO_UP_BUTTON_PARAM, "Next");
 
-    configButton(REZ_COMP_DOWN_BUTTON_PARAM, "Previous");
-    configButton(REZ_COMP_UP_BUTTON_PARAM, "Next");
+    configButton(REZ_COMP_DOWN_BUTTON_PARAM, "Up"); // semantics reversed
+    configButton(REZ_COMP_UP_BUTTON_PARAM, "Down");
 
     configParam(SOURCE_ONE_LEVEL_KNOB_PARAM, 0.f, 1.f, 0.5f, "Source One Level", "%", 0.f, 100.f);
     configParam(SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM, 0.f, 1.f, 0.f, "Source One Mod", "%", 0.f, 100.f);
@@ -362,6 +363,15 @@ struct PoleDancer final : ParticipantAdapter, Participant {
           rezModeSelectMidiPrograms,
           midiMessage,
           midiChannel)) {
+      lights[REZ_COMP_LIGHT0].setBrightness(0.f);
+      lights[REZ_COMP_LIGHT1].setBrightness(0.f);
+      lights[REZ_COMP_LIGHT2].setBrightness(0.f);
+      lights[REZ_COMP_LIGHT3].setBrightness(0.f);
+      lights[REZ_COMP_LIGHT4].setBrightness(0.f);
+      lights[REZ_COMP_LIGHT5].setBrightness(0.f);
+      lights[REZ_COMP_LIGHT6].setBrightness(0.f);
+      lights[REZ_COMP_LIGHT7].setBrightness(0.f);
+      lights[REZ_COMP_LIGHT0 + static_cast<int>(std::round(params[ REZ_COMP_VALUE_HIDDEN_PARAM ].getValue()))].setBrightness(0.5f);
       return true;
     }
 
@@ -436,70 +446,70 @@ struct PoleDancerWidget : ModuleWidget {
 
     addParam(createParamCentered<ZPushButtonSmallLeft>(mm2px(Vec(6.461, 20.235)), module, PoleDancer::SOURCE_ONE_DOWN_BUTTON_PARAM));
     addParam(createParamCentered<ZPushButtonSmallRight>(mm2px(Vec(37.639, 20.235)), module, PoleDancer::SOURCE_ONE_UP_BUTTON_PARAM));
-    addParam(createParamCentered<ZPushButtonSmallLeft>(mm2px(Vec(6.461, 70.437)), module, PoleDancer::SOURCE_TWO_DOWN_BUTTON_PARAM));
-    addParam(createParamCentered<ZPushButtonSmallRight>(mm2px(Vec(37.639, 70.437)), module, PoleDancer::SOURCE_TWO_UP_BUTTON_PARAM));
+    addParam(createParamCentered<ZPushButtonSmallLeft>(mm2px(Vec(6.461, 73.297)), module, PoleDancer::SOURCE_TWO_DOWN_BUTTON_PARAM));
+    addParam(createParamCentered<ZPushButtonSmallRight>(mm2px(Vec(37.539, 73.297)), module, PoleDancer::SOURCE_TWO_UP_BUTTON_PARAM));
 
-    addParam(createParamCentered<ZPushButtonMediumDown>(mm2px(Vec(102.65, 68.437)), module, PoleDancer::REZ_COMP_DOWN_BUTTON_PARAM));
-    addParam(createParamCentered<ZPushButtonMediumUp>(mm2px(Vec(93.596, 68.437)), module, PoleDancer::REZ_COMP_UP_BUTTON_PARAM));
+    // yes, up<-->down
+    addParam(createParamCentered<ZPushButtonMediumUp>(mm2px(Vec(87.827, 64.937)), module, PoleDancer::REZ_COMP_DOWN_BUTTON_PARAM));
+    addParam(createParamCentered<ZPushButtonMediumDown>(mm2px(Vec(78.772, 64.937)), module, PoleDancer::REZ_COMP_UP_BUTTON_PARAM));
 
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 32.734)), module, PoleDancer::SOURCE_ONE_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 52.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 82.936)), module, PoleDancer::SOURCE_TWO_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 102.719)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 53.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 85.796)), module, PoleDancer::SOURCE_TWO_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 106.579)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM));
     auto* knob = createParamCentered<TurnsCountingKnob>(
-      mm2px(Vec(71.0, 24.223)),
+      mm2px(Vec(54.0, 24.223)),
       module,
       PoleDancer::CUTOFF_KNOB_PARAM);
     knob->setTurns(10);
     addParam(knob);
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.692, 57.752)), module, PoleDancer::RESONANCE_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(70.975, 88.858)), module, PoleDancer::FILTER_VCA_KNOB_PARAM));
-
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(53.906, 57.752)), module, PoleDancer::RESONANCE_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(75.47, 106.612)), module, PoleDancer::FILTER_VCA_KNOB_PARAM));
 
     addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 32.734)), module, PoleDancer::SOURCE_ONE_LEVEL_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 52.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 82.936)), module, PoleDancer::SOURCE_TWO_LEVEL_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 102.719)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(71.0, 38.223)), module, PoleDancer::CUTOFF_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(77.296, 58.0)), module, PoleDancer::RESONANCE_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(71.0, 102.719)), module, PoleDancer::FILTER_VCA_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(49.0, 102.719)), module, PoleDancer::POLE_MIX_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 53.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 85.796)), module, PoleDancer::SOURCE_TWO_LEVEL_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 106.579)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(54.0, 38.223)), module, PoleDancer::CUTOFF_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(54.0, 72.0)), module, PoleDancer::RESONANCE_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(88.571, 106.579)), module, PoleDancer::FILTER_VCA_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(54.0, 106.579)), module, PoleDancer::POLE_MIX_INPUT));
 
     addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(4.488, 122.5)), module, PoleDancer::RIGHT_EXPANDER_LIGHT));
 
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(78.7, 32.694)), module, PoleDancer::CUTOFF_CLIP_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(61.7, 32.694)), module, PoleDancer::CUTOFF_CLIP_LIGHT));
 
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(91.323, 24.677)), module, PoleDancer::REZ_COMP_LIGHT0));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(91.323, 29.676)), module, PoleDancer::REZ_COMP_LIGHT1));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(91.323, 34.676)), module, PoleDancer::REZ_COMP_LIGHT2));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(91.323, 39.676)), module, PoleDancer::REZ_COMP_LIGHT3));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(91.323, 44.676)), module, PoleDancer::REZ_COMP_LIGHT4));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(91.323, 49.676)), module, PoleDancer::REZ_COMP_LIGHT5));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(91.323, 54.676)), module, PoleDancer::REZ_COMP_LIGHT6));
-    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(91.323, 59.676)), module, PoleDancer::REZ_COMP_LIGHT7));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 23.177)), module, PoleDancer::REZ_COMP_LIGHT0));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 28.32)), module, PoleDancer::REZ_COMP_LIGHT1));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 33.462)), module, PoleDancer::REZ_COMP_LIGHT2));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 38.605)), module, PoleDancer::REZ_COMP_LIGHT3));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 43.748)), module, PoleDancer::REZ_COMP_LIGHT4));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 48.89)), module, PoleDancer::REZ_COMP_LIGHT5));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 54.033)), module, PoleDancer::REZ_COMP_LIGHT6));
+    addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 59.176)), module, PoleDancer::REZ_COMP_LIGHT7));
 
 
     // Text fields
-    source1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(10.806, 18.497)));
+    source1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(10.806, 18.4)));
     source1NameTextField->setNumChars(13);
     source1NameTextField->box.size = mm2px(Vec(18.388, 3.636));
     source1NameTextField->setText(module ? &module->source1NameString : NULL);
     addChild(source1NameTextField);
 
-    source2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(10.806, 68.699)));
+    source2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(10.806, 71.409)));
     source2NameTextField->setNumChars(13);
     source2NameTextField->box.size = mm2px(Vec(18.388, 3.636));
     source2NameTextField->setText(module ? &module->source2NameString : NULL);
     addChild(source2NameTextField);
 
-    output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(59.616, 76.044)));
+    output1NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(74.162, 86.947)));
     output1NameTextField->setNumChars(13);
     output1NameTextField->box.size = mm2px(Vec(20.0, 3.636));
     output1NameTextField->setText(module ? &module->output1NameString : NULL);
     addChild(output1NameTextField);
 
-    output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(85.825, 101.519)));
+    output2NameTextField = createWidget<CardTextDisplay>(mm2px(Vec(74.162, 82.36)));
     output2NameTextField->setNumChars(13);
     output2NameTextField->box.size = mm2px(Vec(20.0, 3.636));
     output2NameTextField->setText(module ? &module->output2NameString : NULL);
