@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "constants.hpp"
 #include "plugin.hpp"
 
 namespace zox {
@@ -247,5 +248,14 @@ template <typename NameLookup> inline bool handleUpDownSelector(
   return true;
 }
 
+
+
+// for adding a module via right-click menu
+struct InstantiateExpanderItem : MenuItem {
+  Module* module;
+  Model* model;
+  Vec posit;
+  void onAction(const event::Action &e) override;
+};
 
 } // namespace zox

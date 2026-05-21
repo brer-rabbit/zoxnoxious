@@ -1,5 +1,8 @@
 #include "plugin.hpp"
 #include "zcomponentlib.hpp"
+#include "modulehelpers.hpp"
+
+namespace zox {
 
 std::string names[] = { "Lola", "Candy", "Ginger", "Anastasia", "Cherry", "Destiny", "Scarlett", "Bambi", "Trixie", "Diamond", "Sky", "Delight", "Jezebel", "Journey", "Kitty", "Roxanne", "Portia" };
 
@@ -200,6 +203,32 @@ struct PersonalityDisplay : LedDisplay {
 };
 
 
+
+struct AddZoxExpanderItem : MenuItem {
+  Model* expanderModel = nullptr;
+  Vec targetPos;
+
+  void onAction(const event::Action& e) override {
+    Module* expanderModule = expanderModel->createModule();
+    APP->engine->addModule(expanderModule);
+
+    ModuleWidget* expanderWidget =
+      expanderModel->createModuleWidget(expanderModule);
+
+    if (expanderWidget) {
+      APP->scene->rack->setModulePosNearest(expanderWidget, targetPos);
+      APP->scene->rack->addModule(expanderWidget);
+
+      history::ModuleAdd* h = new history::ModuleAdd;
+      h->name = "add expander";
+      h->setModule(expanderWidget);
+      APP->history->push(h);
+    }
+  }
+};
+
+
+
 struct PoleDancerPersonalityWidget : ModuleWidget {
   PoleDancerPersonalityWidget(PoleDancerPersonality* module) {
     setModule(module);
@@ -222,6 +251,21 @@ struct PoleDancerPersonalityWidget : ModuleWidget {
 
   }
 
+  void appendContextMenu(Menu *menu) override {
+
+    menu->addChild(new MenuSeparator());
+
+    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add workbench (right side)", "");
+    expanderItem->module = module;
+    expanderItem->model = modelPeepingTom;;
+    expanderItem->posit = box.pos;
+    expanderItem->posit.x += box.size.x;
+    menu->addChild(expanderItem);
+  }
+
+
 };
 
-Model* modelPoleDancerPersonality = createModel<PoleDancerPersonality, PoleDancerPersonalityWidget>("PoleDancerPersonality");
+} // namespace zox
+
+Model* modelPoleDancerPersonality = createModel<zox::PoleDancerPersonality, zox::PoleDancerPersonalityWidget>("PoleDancerPersonality");
