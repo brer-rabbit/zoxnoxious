@@ -5,6 +5,7 @@
 namespace zox {
 
 std::string names[] = { "Lola", "Candy", "Ginger", "Anastasia", "Cherry", "Destiny", "Scarlett", "Bambi", "Trixie", "Diamond", "Sky", "Delight", "Jezebel", "Journey", "Kitty", "Roxanne", "Portia" };
+static constexpr int nameCount = sizeof(names) / sizeof(names[0]);
 
 static const int numVoltages = 5;
 
@@ -39,7 +40,7 @@ struct PoleDancerPersonality : Module {
   bool selfAuthoritative = false;
 
   PoleDancerPersonality() :
-    personalityNameString(names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)]), nameStringDirty(true) {
+    personalityNameString(names[APP->engine->getFrame() % nameCount]), nameStringDirty(true) {
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     configParam(DRY_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Dry Mix", "%", 0.f, 10.f);
@@ -87,10 +88,13 @@ struct PoleDancerPersonality : Module {
         voltages[i] = params[DRY_MIX_KNOB_PARAM + i].getValue();
       }
 
+
+      // these are only written at the control rate.  I believe this to be fine.
       if (outputs[POLE_MIX_OUTPUT].isConnected()) {
         outputs[POLE_MIX_OUTPUT].setChannels(numVoltages);
         outputs[POLE_MIX_OUTPUT].writeVoltages(voltages);
       }
+
     }
   }
 
@@ -104,25 +108,15 @@ struct PoleDancerPersonality : Module {
 
   void onReset() override {
     // using getFrame as a rand source
-    personalityNameString = names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)];
+    personalityNameString = names[APP->engine->getFrame() % nameCount];
     nameStringDirty = true;
   }
 
   void onRandomize() override {
-    personalityNameString = names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)];
+    personalityNameString = names[APP->engine->getFrame() % nameCount];
     nameStringDirty = true;
   }
 
-
-  void fromJson(json_t* rootJ) override {
-    Module::fromJson(rootJ);
-    json_t* textJ = json_object_get(rootJ, "personalityNameString");
-    if (textJ) {
-      personalityNameString = json_string_value(textJ);
-    }
-    nameStringDirty = true;
-    selfAuthoritative = true; // re-asset as authoritative after load
-  }
 
   json_t* dataToJson() override {
     json_t* rootJ = json_object();
@@ -136,6 +130,7 @@ struct PoleDancerPersonality : Module {
       personalityNameString = json_string_value(textJ);
     }
     nameStringDirty = true;
+    selfAuthoritative = true; // re-asset as authoritative after load
   }
 
 
