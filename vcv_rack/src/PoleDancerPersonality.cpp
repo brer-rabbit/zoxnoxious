@@ -36,8 +36,8 @@ struct PoleDancerPersonality : Module {
   dsp::ClockDivider clockDivider;
   float voltages[numVoltages];
 
-  FilterVectorSync filterCoefficients[2] = {};
-  bool selfAuthoritative = false;
+  PersonalityMessage expanderMessages[2] = {};
+  bool personalityAuthoritative = false;
 
   PoleDancerPersonality() :
     personalityNameString(names[APP->engine->getFrame() % nameCount]), nameStringDirty(true) {
@@ -53,8 +53,8 @@ struct PoleDancerPersonality : Module {
     clockDivider.setDivision(512);
     memset(voltages, 0, sizeof(float) * numVoltages);
 
-    rightExpander.producerMessage = &filterCoefficients[0];
-    rightExpander.consumerMessage = &filterCoefficients[1];
+    rightExpander.producerMessage = &expanderMessages[0];
+    rightExpander.consumerMessage = &expanderMessages[1];
   }
 
 
@@ -66,21 +66,21 @@ struct PoleDancerPersonality : Module {
       bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbench;
       if (analyzerPresent) {
         // Write to Analyzer
-        FilterVectorSync *toAnalyzer = static_cast<FilterVectorSync*>(rightExpander.module->leftExpander.producerMessage);
-        toAnalyzer->authoritative = selfAuthoritative;
+        PersonalityMessage *toAnalyzer = static_cast<PersonalityMessage*>(rightExpander.module->leftExpander.producerMessage);
+        toAnalyzer->leftAuthoritative = personalityAuthoritative;
         for (int i = 0; i < 5; i++) {
           toAnalyzer->values[i] = params[DRY_MIX_KNOB_PARAM + i].getValue();
         }
         rightExpander.module->leftExpander.messageFlipRequested = true;
 
         // Read from Analyzer (only when I am not authoritative)
-        if (!selfAuthoritative) {
-          FilterVectorSync* fromAnalyzer = static_cast<FilterVectorSync*>(rightExpander.consumerMessage);
+        if (!personalityAuthoritative) {
+          PersonalityMessage* fromAnalyzer = static_cast<PersonalityMessage*>(rightExpander.consumerMessage);
           for (int i = 0; i < 5; i++) {
             params[DRY_MIX_KNOB_PARAM + i].setValue(fromAnalyzer->values[i]);
           }
         }
-        selfAuthoritative = false;  // clear after one cycle
+        personalityAuthoritative = false;  // clear after one cycle
       }
 
 
@@ -102,7 +102,7 @@ struct PoleDancerPersonality : Module {
     // fire on connect AND disconnect
     bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbench;
     if (analyzerPresent) {
-      selfAuthoritative = true;
+      personalityAuthoritative = true;
     }
   }
 
@@ -130,7 +130,7 @@ struct PoleDancerPersonality : Module {
       personalityNameString = json_string_value(textJ);
     }
     nameStringDirty = true;
-    selfAuthoritative = true; // re-asset as authoritative after load
+    personalityAuthoritative = true; // re-asset as authoritative after load
   }
 
 

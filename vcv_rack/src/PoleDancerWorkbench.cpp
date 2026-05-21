@@ -20,7 +20,7 @@ struct PoleMixCoefficients {
 
 
 static constexpr float POLEMIX_VOLTAGE_ANALYZER = 1.25f; // scale for 8X
-static float poleMixAnalyzerIncoming(float v) {
+static float poleMixParamToCoeff(float v) {
   return v * POLEMIX_VOLTAGE_ANALYZER;
 }
 
@@ -84,7 +84,7 @@ struct PoleDancerWorkbench : Module {
   dsp::ClockDivider clockDivider;
   PoleMixCoefficients poleMixCoefs;
 
-  FilterVectorSync filterCoefficients[2] = {};
+  PersonalityMessage expanderMessages[2] = {};
 
   PoleDancerWorkbench() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -94,8 +94,8 @@ struct PoleDancerWorkbench : Module {
     configParam(POLE3_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 3 Mix", "%", 0.f, 10.f);
     configParam(POLE4_MIX_KNOB_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
     clockDivider.setDivision(512);
-    leftExpander.producerMessage = &filterCoefficients[0];
-    leftExpander.consumerMessage = &filterCoefficients[1];
+    leftExpander.producerMessage = &expanderMessages[0];
+    leftExpander.consumerMessage = &expanderMessages[1];
   }
 
 
@@ -103,24 +103,23 @@ struct PoleDancerWorkbench : Module {
 
     if (clockDivider.process()) {
 
-      for (int i = 0; i < 5; ++i) {
-        poleMixCoefs.weight[i] = params[DRY_MIX_KNOB_PARAM + i].getValue();
-      }
-
       bool personalityPresent = leftExpander.module && leftExpander.module->model == modelPoleDancerPersonality;
       if (personalityPresent) {
         // Read from Personality
-        FilterVectorSync* fromPersonality = static_cast<FilterVectorSync*>(leftExpander.consumerMessage);
-        if (fromPersonality->authoritative) {
+        PersonalityMessage* fromPersonality = static_cast<PersonalityMessage*>(leftExpander.consumerMessage);
+        if (fromPersonality->leftAuthoritative) {
           for (int i = 0; i < 5; i++) {
-            poleMixCoefs.weight[i] = poleMixAnalyzerIncoming(fromPersonality->values[i]);
             params[DRY_MIX_KNOB_PARAM + i].setValue(fromPersonality->values[i]);
           }
         }
 
+      for (int i = 0; i < 5; ++i) {
+        poleMixCoefs.weight[i] = poleMixParamToCoeff(params[DRY_MIX_KNOB_PARAM + i].getValue());
+      }
+
         // Write to Left
-        FilterVectorSync* toPersonality = static_cast<FilterVectorSync*>(leftExpander.module->rightExpander.producerMessage);
-        toPersonality->authoritative = false;  // Right never claims authority
+        PersonalityMessage* toPersonality = static_cast<PersonalityMessage*>(leftExpander.module->rightExpander.producerMessage);
+        toPersonality->leftAuthoritative = false;  // Right never claims authority
         for (int i = 0; i < 5; i++) {
           toPersonality->values[i] = params[DRY_MIX_KNOB_PARAM + i].getValue();
         }
