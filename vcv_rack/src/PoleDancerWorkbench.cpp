@@ -1,7 +1,10 @@
 #include <cmath>
 #include <complex>
 #include "plugin.hpp"
+#include "modulehelpers.hpp"
 #include "zcomponentlib.hpp"
+
+namespace zox {
 
 constexpr float MIN_DB = -36.f;
 constexpr float MAX_DB = 24.f;
@@ -11,22 +14,19 @@ constexpr float MAX_W = 100.f;  // towards limiting: 30.f
 
 
 struct PoleMixCoefficients {
-    float a = 0.f; // input/dry
-    float b = 0.f; // pole1
-    float c = 0.f; // pole2
-    float d = 0.f; // pole3
-    float e = 1.f; // pole4
-    float feedback = 0.f;
+  float weight[5] = {};
+  float feedback = 0.f;
 };
 
 
-static constexpr float POLEMIX_VOLTAGE_SCALE = 1.25f; // 1.25V == coefficient 1.0
-static constexpr float RESONANCE_VOLTAGE_SCALE = 2.5f; // 2.5V == coefficient 1.0
-static float poleMixInputToCoeff(float v) {
-    return v / POLEMIX_VOLTAGE_SCALE;
+static constexpr float POLEMIX_VOLTAGE_ANALYZER = 1.25f; // scale for 8X
+static float poleMixAnalyzerIncoming(float v) {
+  return v * POLEMIX_VOLTAGE_ANALYZER;
 }
+
+static constexpr float RESONANCE_VOLTAGE_SCALE = 2.5f; // 2.5V == coefficient 1.0
 static float resonanceInputToCoeff(float v) {
-    return v / RESONANCE_VOLTAGE_SCALE;
+  return v / RESONANCE_VOLTAGE_SCALE;
 }
 
 
@@ -42,11 +42,11 @@ public:
     auto p3 = p2 * p;
     auto p4 = p3 * p;
 
-    auto numerator = coeffs.a * p4 -
-      coeffs.b * p3 +
-      coeffs.c * p2 -
-      coeffs.d * p +
-      coeffs.e;
+    auto numerator = coeffs.weight[0] * p4 -
+      coeffs.weight[1] * p3 +
+      coeffs.weight[2] * p2 -
+      coeffs.weight[3] * p +
+      coeffs.weight[4];
 
     auto denominator = p4 + coeffs.feedback;
 
@@ -59,8 +59,13 @@ public:
 
 
 
-struct PeepingTom : Module {
+struct PoleDancerWorkbench : Module {
   enum ParamId {
+    DRY_MIX_KNOB_PARAM,
+    POLE1_MIX_KNOB_PARAM,
+    POLE2_MIX_KNOB_PARAM,
+    POLE3_MIX_KNOB_PARAM,
+    POLE4_MIX_KNOB_PARAM,
     PARAMS_LEN
   };
   enum InputId {
@@ -69,8 +74,6 @@ struct PeepingTom : Module {
     INPUTS_LEN
   };
   enum OutputId {
-    POLE_MIX_OUTPUT,
-    RESONANCE_OUTPUT,
     OUTPUTS_LEN
   };
   enum LightId {
@@ -81,54 +84,50 @@ struct PeepingTom : Module {
   dsp::ClockDivider clockDivider;
   PoleMixCoefficients poleMixCoefs;
 
+  FilterVectorSync filterCoefficients[2] = {};
 
-  PeepingTom() {
+  PoleDancerWorkbench() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+    configParam(DRY_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Dry Mix", "%", 0.f, 10.f);
+    configParam(POLE1_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 1 Mix", "%", 0.f, 10.f);
+    configParam(POLE2_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 2 Mix", "%", 0.f, 10.f);
+    configParam(POLE3_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 3 Mix", "%", 0.f, 10.f);
+    configParam(POLE4_MIX_KNOB_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
     clockDivider.setDivision(512);
+    leftExpander.producerMessage = &filterCoefficients[0];
+    leftExpander.consumerMessage = &filterCoefficients[1];
   }
 
 
   void process(const ProcessArgs& args) override {
-    if (outputs[POLE_MIX_OUTPUT].isConnected()) {
-        int n = inputs[POLE_MIX_INPUT].getChannels();
-        outputs[POLE_MIX_OUTPUT].setChannels(n);
-
-        for (int ch = 0; ch < n; ++ch) {
-            outputs[POLE_MIX_OUTPUT].setVoltage(
-                inputs[POLE_MIX_INPUT].getVoltage(ch), ch
-            );
-        }
-    }
-
-    if (outputs[RESONANCE_OUTPUT].isConnected()) {
-      outputs[RESONANCE_OUTPUT].setVoltage(inputs[RESONANCE_INPUT].getVoltage());
-    }
 
     if (clockDivider.process()) {
-      readPoleMixCoefficients();
+
+      for (int i = 0; i < 5; ++i) {
+        poleMixCoefs.weight[i] = params[DRY_MIX_KNOB_PARAM + i].getValue();
+      }
+
+      bool personalityPresent = leftExpander.module && leftExpander.module->model == modelPoleDancerPersonality;
+      if (personalityPresent) {
+        // Read from Personality
+        FilterVectorSync* fromPersonality = static_cast<FilterVectorSync*>(leftExpander.consumerMessage);
+        if (fromPersonality->authoritative) {
+          for (int i = 0; i < 5; i++) {
+            poleMixCoefs.weight[i] = poleMixAnalyzerIncoming(fromPersonality->values[i]);
+            params[DRY_MIX_KNOB_PARAM + i].setValue(fromPersonality->values[i]);
+          }
+        }
+
+        // Write to Left
+        FilterVectorSync* toPersonality = static_cast<FilterVectorSync*>(leftExpander.module->rightExpander.producerMessage);
+        toPersonality->authoritative = false;  // Right never claims authority
+        for (int i = 0; i < 5; i++) {
+          toPersonality->values[i] = params[DRY_MIX_KNOB_PARAM + i].getValue();
+        }
+        leftExpander.module->rightExpander.messageFlipRequested = true;
+      }
+
     }
-  }
-
-
-
-  void readPoleMixCoefficients() {
-    PoleMixCoefficients nextPoleMix;
-
-    if (inputs[POLE_MIX_INPUT].isConnected()) {
-      int n = inputs[POLE_MIX_INPUT].getChannels();
-
-      nextPoleMix.a = (n > 0) ? poleMixInputToCoeff(inputs[POLE_MIX_INPUT].getVoltage(0)) : 0.f;
-      nextPoleMix.b = (n > 1) ? poleMixInputToCoeff(inputs[POLE_MIX_INPUT].getVoltage(1)) : 0.f;
-      nextPoleMix.c = (n > 2) ? poleMixInputToCoeff(inputs[POLE_MIX_INPUT].getVoltage(2)) : 0.f;
-      nextPoleMix.d = (n > 3) ? poleMixInputToCoeff(inputs[POLE_MIX_INPUT].getVoltage(3)) : 0.f;
-      nextPoleMix.e = (n > 4) ? poleMixInputToCoeff(inputs[POLE_MIX_INPUT].getVoltage(4)) : 1.f;
-    }
-
-    nextPoleMix.feedback = inputs[RESONANCE_INPUT].isConnected() ?
-      resonanceInputToCoeff(inputs[RESONANCE_INPUT].getVoltage()) :
-      0.f;
-
-    poleMixCoefs = nextPoleMix;
   }
 
 };
@@ -140,11 +139,11 @@ static bool different(float a, float b) {
 }
 
 static bool coeffsChanged(const PoleMixCoefficients& x, const PoleMixCoefficients& y) {
-    return different(x.a, y.a)
-        || different(x.b, y.b)
-        || different(x.c, y.c)
-        || different(x.d, y.d)
-        || different(x.e, y.e)
+    return different(x.weight[0], y.weight[0])
+        || different(x.weight[1], y.weight[1])
+        || different(x.weight[2], y.weight[2])
+        || different(x.weight[3], y.weight[3])
+        || different(x.weight[4], y.weight[4])
         || different(x.feedback, y.feedback);
 }
 
@@ -173,14 +172,14 @@ bool dbToVisibleY(float db, const Rect& r, float* y) {
 }
 
 
-struct PeepingTomDisplay : LedDisplay {
-  PeepingTom* module = nullptr;
+struct PoleDancerWorkbenchDisplay : LedDisplay {
+  PoleDancerWorkbench* module = nullptr;
   PoleMixCoefficients lastCoeffs;
   std::vector<Vec> magPoints;
   std::vector<Vec> phasePoints;
 
 
-  PeepingTomDisplay() {
+  PoleDancerWorkbenchDisplay() {
     magPoints.reserve(POINTS);
     phasePoints.reserve(POINTS);
   }
@@ -346,23 +345,26 @@ struct PeepingTomDisplay : LedDisplay {
 
 
 
-struct PeepingTomWidget : ModuleWidget {
-  PeepingTomWidget(PeepingTom* module) {
+struct PoleDancerWorkbenchWidget : ModuleWidget {
+  PoleDancerWorkbenchWidget(PoleDancerWorkbench* module) {
     setModule(module);
-    setPanel(createPanel(asset::plugin(pluginInstance, "res/PeepingTom.svg")));
+    setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerWorkbench.svg")));
 
-    PeepingTomDisplay* display = createWidget<PeepingTomDisplay>(mm2px(Vec(5.0, 15.0)));
+    PoleDancerWorkbenchDisplay* display = createWidget<PoleDancerWorkbenchDisplay>(mm2px(Vec(5.0, 15.0)));
     display->box.size = mm2px(Vec(60.0, 45.0));
     display->module = module;
     addChild(display);
 
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(15.213, 121.907)), module, PeepingTom::POLE_MIX_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.213, 121.907)), module, PeepingTom::RESONANCE_INPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(55.213, 121.907)), module, PeepingTom::POLE_MIX_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(65.213, 121.907)), module, PeepingTom::RESONANCE_OUTPUT));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 106.579)), module, PoleDancerWorkbench::DRY_MIX_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98, 106.579)), module, PoleDancerWorkbench::POLE1_MIX_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 2, 106.579)), module, PoleDancerWorkbench::POLE2_MIX_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 3, 106.579)), module, PoleDancerWorkbench::POLE3_MIX_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(53.531, 106.579)), module, PoleDancerWorkbench::POLE4_MIX_KNOB_PARAM));
 
   }
 
 };
 
-Model* modelPeepingTom = createModel<PeepingTom, PeepingTomWidget>("PeepingTom");
+} // namespace zox
+
+Model* modelPoleDancerWorkbench = createModel<zox::PoleDancerWorkbench, zox::PoleDancerWorkbenchWidget>("PoleDancerWorkbench");

@@ -8,6 +8,7 @@ std::string names[] = { "Lola", "Candy", "Ginger", "Anastasia", "Cherry", "Desti
 
 static const int numVoltages = 5;
 
+
 struct PoleDancerPersonality : Module {
   enum ParamId {
     DRY_MIX_KNOB_PARAM,
@@ -29,13 +30,16 @@ struct PoleDancerPersonality : Module {
   };
 
   std::string personalityNameString;
-  bool dirty;
+  bool nameStringDirty;
 
   dsp::ClockDivider clockDivider;
   float voltages[numVoltages];
 
+  FilterVectorSync filterCoefficients[2] = {};
+  bool selfAuthoritative = false;
+
   PoleDancerPersonality() :
-    personalityNameString(names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)]), dirty(true) {
+    personalityNameString(names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)]), nameStringDirty(true) {
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     configParam(DRY_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Dry Mix", "%", 0.f, 10.f);
@@ -47,30 +51,66 @@ struct PoleDancerPersonality : Module {
 
     clockDivider.setDivision(512);
     memset(voltages, 0, sizeof(float) * numVoltages);
+
+    rightExpander.producerMessage = &filterCoefficients[0];
+    rightExpander.consumerMessage = &filterCoefficients[1];
   }
 
 
   void process(const ProcessArgs& args) override {
-    if (clockDivider.process() && outputs[POLE_MIX_OUTPUT].isConnected()) {
+
+    if (clockDivider.process()) {
+
+      // expander handling
+      bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbench;
+      if (analyzerPresent) {
+        // Write to Analyzer
+        FilterVectorSync *toAnalyzer = static_cast<FilterVectorSync*>(rightExpander.module->leftExpander.producerMessage);
+        toAnalyzer->authoritative = selfAuthoritative;
+        for (int i = 0; i < 5; i++) {
+          toAnalyzer->values[i] = params[DRY_MIX_KNOB_PARAM + i].getValue();
+        }
+        rightExpander.module->leftExpander.messageFlipRequested = true;
+
+        // Read from Analyzer (only when I am not authoritative)
+        if (!selfAuthoritative) {
+          FilterVectorSync* fromAnalyzer = static_cast<FilterVectorSync*>(rightExpander.consumerMessage);
+          for (int i = 0; i < 5; i++) {
+            params[DRY_MIX_KNOB_PARAM + i].setValue(fromAnalyzer->values[i]);
+          }
+        }
+        selfAuthoritative = false;  // clear after one cycle
+      }
+
+
       for (int i = 0; i < numVoltages; ++i) {
         voltages[i] = params[DRY_MIX_KNOB_PARAM + i].getValue();
       }
 
-      outputs[POLE_MIX_OUTPUT].setChannels(numVoltages);
-      outputs[POLE_MIX_OUTPUT].writeVoltages(voltages);
+      if (outputs[POLE_MIX_OUTPUT].isConnected()) {
+        outputs[POLE_MIX_OUTPUT].setChannels(numVoltages);
+        outputs[POLE_MIX_OUTPUT].writeVoltages(voltages);
+      }
     }
   }
 
+  void onExpanderChange(const ExpanderChangeEvent& e) override {
+    // fire on connect AND disconnect
+    bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbench;
+    if (analyzerPresent) {
+      selfAuthoritative = true;
+    }
+  }
 
   void onReset() override {
     // using getFrame as a rand source
     personalityNameString = names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)];
-    dirty = true;
+    nameStringDirty = true;
   }
 
   void onRandomize() override {
     personalityNameString = names[APP->engine->getFrame() % sizeof(names)/sizeof(std::string)];
-    dirty = true;
+    nameStringDirty = true;
   }
 
 
@@ -80,7 +120,8 @@ struct PoleDancerPersonality : Module {
     if (textJ) {
       personalityNameString = json_string_value(textJ);
     }
-    dirty = true;
+    nameStringDirty = true;
+    selfAuthoritative = true; // re-asset as authoritative after load
   }
 
   json_t* dataToJson() override {
@@ -94,7 +135,7 @@ struct PoleDancerPersonality : Module {
     if (textJ) {
       personalityNameString = json_string_value(textJ);
     }
-    dirty = true;
+    nameStringDirty = true;
   }
 
 
@@ -115,9 +156,9 @@ struct PersonalityTextField : LedDisplayTextField {
 
   void step() override {
     LedDisplayTextField::step();
-    if (module && module->dirty) {
+    if (module && module->nameStringDirty) {
       setText(module->personalityNameString);
-      module->dirty = false;
+      module->nameStringDirty = false;
     }
   }
 
@@ -257,7 +298,7 @@ struct PoleDancerPersonalityWidget : ModuleWidget {
 
     InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add workbench (right side)", "");
     expanderItem->module = module;
-    expanderItem->model = modelPeepingTom;;
+    expanderItem->model = modelPoleDancerWorkbench;;
     expanderItem->posit = box.pos;
     expanderItem->posit.x += box.size.x;
     menu->addChild(expanderItem);

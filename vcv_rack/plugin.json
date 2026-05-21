@@ -63,10 +63,10 @@
       "tags": []
     },
     {
-      "slug": "PeepingTom",
-      "name": "PeepingTom",
+      "slug": "PoleDancerWorkbench",
+      "name": "PoleDancerWorkbench",
       "description": "Pole Mixing Inspector",
-      "tags": []
+      "tags": ["Expander"]
     }
   ]
 }

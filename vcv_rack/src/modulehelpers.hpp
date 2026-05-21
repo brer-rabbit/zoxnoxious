@@ -250,6 +250,15 @@ template <typename NameLookup> inline bool handleUpDownSelector(
 
 
 
+// filter vector:
+// struct that gets passed between modules via expander interface
+struct FilterVectorSync {
+  float values[5] = {};
+  uint32_t generation = 0;
+  bool authoritative = false;
+};
+
+
 // for adding a module via right-click menu
 struct InstantiateExpanderItem : MenuItem {
   Module* module;
