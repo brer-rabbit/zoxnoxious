@@ -397,15 +397,15 @@ struct PoleDancer final : ParticipantAdapter, Participant {
         toAnalyzer->values[3] = inputs[POLE_MIX_INPUT].getVoltage(3);
         toAnalyzer->values[4] = inputs[POLE_MIX_INPUT].getVoltage(4);
       }
-      else {
-        toAnalyzer->values[0] =
-          toAnalyzer->values[1] =
-          toAnalyzer->values[2] =
-          toAnalyzer->values[3] = 0.f;
+      else { // 4-pole lowpass values
+        toAnalyzer->values[0] = 0.f;
+        toAnalyzer->values[1] = 0.f;
+        toAnalyzer->values[2] = 0.f;
+        toAnalyzer->values[3] = 0.f;
         toAnalyzer->values[4] = 1.25f;
       }
 
-      switch (static_cast<int>(params[REZ_COMP_VALUE_HIDDEN_PARAM].getValue())) {
+      switch (static_cast<int>(std::round(params[REZ_COMP_VALUE_HIDDEN_PARAM].getValue()))) {
       case 1:
         toAnalyzer->resonance[3] = -1.f * resonance;
         toAnalyzer->resonance[2] = 2.f * resonance;
