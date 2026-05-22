@@ -43,7 +43,8 @@ void init(Plugin* p) {
 	// Add modules here
         p->addModel(modelPoleDancer);
         p->addModel(modelPoleDancerPersonality);
-        p->addModel(modelPoleDancerWorkbench);
+        p->addModel(modelPoleDancerWorkbenchForPersonality);
+        p->addModel(modelPoleDancerWorkbenchForPoleDancer);
         p->addModel(modelZoxnoxious3372);
         p->addModel(modelZoxnoxious5524);
         p->addModel(modelZoxnoxious3340);

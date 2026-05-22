@@ -63,7 +63,7 @@ struct PoleDancerPersonality : Module {
     if (clockDivider.process()) {
 
       // expander handling
-      bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbench;
+      bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbenchForPersonality;
       if (analyzerPresent) {
         // Write to Analyzer
         PersonalityMessage *toAnalyzer = static_cast<PersonalityMessage*>(rightExpander.module->leftExpander.producerMessage);
@@ -100,7 +100,7 @@ struct PoleDancerPersonality : Module {
 
   void onExpanderChange(const ExpanderChangeEvent& e) override {
     // fire on connect AND disconnect
-    bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbench;
+    bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbenchForPersonality;
     if (analyzerPresent) {
       personalityAuthoritative = true;
     }
@@ -269,7 +269,7 @@ struct PoleDancerPersonalityWidget : ModuleWidget {
 
     InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add workbench (right side)", "");
     expanderItem->module = module;
-    expanderItem->model = modelPoleDancerWorkbench;
+    expanderItem->model = modelPoleDancerWorkbenchForPersonality;
     expanderItem->posit = box.pos;
     expanderItem->posit.x += box.size.x;
     menu->addChild(expanderItem);

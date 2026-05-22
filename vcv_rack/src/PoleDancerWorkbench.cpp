@@ -59,6 +59,30 @@ public:
 
 
 
+// this allows template-izing for PoleDancer and PoleDancerPersonality.  This way, each
+// can only connect to their type of expander.
+struct WorkbenchForPoleDancer {
+  static Model* leftModel() {
+    return modelPoleDancer;
+  }
+
+  static bool hasControls() {
+    return false;
+  }
+};
+
+struct WorkbenchForPersonality {
+  static Model* leftModel() {
+    return modelPoleDancerPersonality;
+  }
+
+  static bool hasControls() {
+    return true;
+  }
+};
+
+
+template <typename Policy>
 struct PoleDancerWorkbench : Module {
   enum ParamId {
     DRY_MIX_PARAM,
@@ -92,6 +116,7 @@ struct PoleDancerWorkbench : Module {
     configParam(POLE2_MIX_PARAM, 0.f, 10.f, 0.f, "Pole 2 Mix", "%", 0.f, 10.f);
     configParam(POLE3_MIX_PARAM, 0.f, 10.f, 0.f, "Pole 3 Mix", "%", 0.f, 10.f);
     configParam(POLE4_MIX_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
+    configParam(RESONANCE_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
     clockDivider.setDivision(512);
     leftExpander.producerMessage = &expanderMessages[0];
     leftExpander.consumerMessage = &expanderMessages[1];
@@ -102,8 +127,7 @@ struct PoleDancerWorkbench : Module {
 
     if (clockDivider.process()) {
 
-      bool personalityPresent = leftExpander.module && (leftExpander.module->model == modelPoleDancerPersonality || leftExpander.module->model == modelPoleDancer);
-      if (personalityPresent) {
+      if (leftPresent()) {
         // Read from Personality
         PersonalityMessage* fromPersonality = static_cast<PersonalityMessage*>(leftExpander.consumerMessage);
         if (fromPersonality->leftAuthoritative) {
@@ -130,6 +154,11 @@ struct PoleDancerWorkbench : Module {
     }
   }
 
+
+  // policy method for template
+  bool leftPresent() const {
+    return leftExpander.module && leftExpander.module->model == Policy::leftModel();
+  }
 };
 
 
@@ -172,8 +201,10 @@ bool dbToVisibleY(float db, const Rect& r, float* y) {
 }
 
 
+template <typename Policy>
 struct PoleDancerWorkbenchDisplay : LedDisplay {
-  PoleDancerWorkbench* module = nullptr;
+  using ModuleType = PoleDancerWorkbench<Policy>;
+  ModuleType* module = nullptr;
   PoleMixCoefficients lastCoeffs;
   std::vector<Vec> magPoints;
   std::vector<Vec> phasePoints;
@@ -344,22 +375,31 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
 };
 
 
-
+template <typename Policy>
 struct PoleDancerWorkbenchWidget : ModuleWidget {
-  PoleDancerWorkbenchWidget(PoleDancerWorkbench* module) {
-    setModule(module);
-    setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerWorkbench.svg")));
+  using ModuleType = PoleDancerWorkbench<Policy>;
 
-    PoleDancerWorkbenchDisplay* display = createWidget<PoleDancerWorkbenchDisplay>(mm2px(Vec(5.0, 15.0)));
+  PoleDancerWorkbenchWidget(ModuleType* module) {
+    setModule(module);
+    if (Policy::hasControls()) {
+        setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerWorkbench.svg")));
+    }
+    else {
+      setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerWorkbench.svg")));
+    }
+
+    auto* display = createWidget<PoleDancerWorkbenchDisplay<Policy> >(mm2px(Vec(5.0, 15.0)));
     display->box.size = mm2px(Vec(60.0, 60.0));
     display->module = module;
     addChild(display);
 
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 106.579)), module, PoleDancerWorkbench::DRY_MIX_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98, 106.579)), module, PoleDancerWorkbench::POLE1_MIX_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 2, 106.579)), module, PoleDancerWorkbench::POLE2_MIX_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 3, 106.579)), module, PoleDancerWorkbench::POLE3_MIX_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(53.531, 106.579)), module, PoleDancerWorkbench::POLE4_MIX_PARAM));
+    if (Policy::hasControls()) {
+      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 106.579)), module, ModuleType::DRY_MIX_PARAM));
+      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98, 106.579)), module, ModuleType::POLE1_MIX_PARAM));
+      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 2, 106.579)), module, ModuleType::POLE2_MIX_PARAM));
+      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 3, 106.579)), module, ModuleType::POLE3_MIX_PARAM));
+      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(53.531, 106.579)), module, ModuleType::POLE4_MIX_PARAM));
+    }
 
   }
 
@@ -367,4 +407,18 @@ struct PoleDancerWorkbenchWidget : ModuleWidget {
 
 } // namespace zox
 
-Model* modelPoleDancerWorkbench = createModel<zox::PoleDancerWorkbench, zox::PoleDancerWorkbenchWidget>("PoleDancerWorkbench");
+using PoleDancerWorkbenchForPoleDancer = zox::PoleDancerWorkbench<zox::WorkbenchForPoleDancer>;
+using PoleDancerWorkbenchForPersonality = zox::PoleDancerWorkbench<zox::WorkbenchForPersonality>;
+using PoleDancerWorkbenchForPoleDancerWidget = zox::PoleDancerWorkbenchWidget<zox::WorkbenchForPoleDancer>;
+using PoleDancerWorkbenchForPersonalityWidget = zox::PoleDancerWorkbenchWidget<zox::WorkbenchForPersonality>;
+
+Model* modelPoleDancerWorkbenchForPoleDancer =
+  createModel<PoleDancerWorkbenchForPoleDancer,
+              PoleDancerWorkbenchForPoleDancerWidget
+              >("PoleDancerWorkbench-PoleDancer");
+
+Model* modelPoleDancerWorkbenchForPersonality =
+  createModel<PoleDancerWorkbenchForPersonality,
+              PoleDancerWorkbenchForPersonalityWidget
+              >("PoleDancerWorkbench-Personality");
+

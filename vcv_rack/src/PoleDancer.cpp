@@ -384,7 +384,7 @@ struct PoleDancer final : ParticipantAdapter, Participant {
 
 
     // Expander handling.  This does not read from analyzer.  Write only.
-    bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbench;
+    bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbenchForPoleDancer;
     if (analyzerPresent) {
       // Write to Analyzer
       PersonalityMessage *toAnalyzer = static_cast<PersonalityMessage*>(rightExpander.module->leftExpander.producerMessage);
@@ -561,7 +561,7 @@ struct PoleDancerWidget : ModuleWidget {
 
     InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add workbench (right side)", "");
     expanderItem->module = module;
-    expanderItem->model = modelPoleDancerWorkbench;
+    expanderItem->model = modelPoleDancerWorkbenchForPoleDancer;
     expanderItem->posit = box.pos;
     expanderItem->posit.x += box.size.x;
     menu->addChild(expanderItem);
