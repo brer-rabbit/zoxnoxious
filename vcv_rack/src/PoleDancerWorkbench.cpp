@@ -382,7 +382,7 @@ struct PoleDancerWorkbenchWidget : ModuleWidget {
   PoleDancerWorkbenchWidget(ModuleType* module) {
     setModule(module);
     if (Policy::hasControls()) {
-        setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerWorkbench.svg")));
+        setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerPersonalityWorkbench.svg")));
     }
     else {
       setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerWorkbench.svg")));
