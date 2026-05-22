@@ -137,16 +137,18 @@ struct PoleDancerPersonality : Module {
 };
 
 
-static const int fontSize = 9;
+static const int fontSize = 12;
 
 struct PersonalityTextField : LedDisplayTextField {
   PoleDancerPersonality* module;
+  std::shared_ptr<Font> font;
 
   // override to set color & posiiton
   PersonalityTextField() {
     LedDisplayTextField();
-    color = nvgRGB(255, 105, 180);
-    textOffset = math::Vec(0, -6);
+    color = nvgRGB(230, 235, 232);
+    textOffset = math::Vec(0, -3);
+    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DIN_1451_Std_Engschrift.otf"));
   }
 
   void step() override {
@@ -169,9 +171,10 @@ struct PersonalityTextField : LedDisplayTextField {
 
     if (layer == 1) {
       // Text
-      std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
       if (font && font->handle >= 0) {
         bndSetFont(font->handle);
+
+        nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
 
         NVGcolor highlightColor = color;
         highlightColor.a = 0.5;
@@ -182,12 +185,13 @@ struct PersonalityTextField : LedDisplayTextField {
                           box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
                           -1, color, fontSize, text.c_str(), highlightColor, begin, end);
 
-        bndSetFont(APP->window->uiFont->handle);
+        bndSetFont(font->handle);
       }
     }
 
     Widget::drawLayer(args, layer);
     nvgResetScissor(args.vg);
+    bndSetFont(APP->window->uiFont->handle);
   }
 
 
@@ -219,7 +223,7 @@ struct PersonalityDisplay : LedDisplay {
     // Black background
     nvgBeginPath(args.vg);
     nvgRect(args.vg, RECT_ARGS(r));
-    NVGcolor fillColor = nvgRGB(0x12, 0x12, 0x12);
+    NVGcolor fillColor = nvgRGB(0x2a, 0x27, 0x23);
     nvgFillColor(args.vg, fillColor);
     nvgFill(args.vg);
 
@@ -246,17 +250,22 @@ struct PoleDancerPersonalityWidget : ModuleWidget {
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerPersonality.svg")));
 
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+    /*
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(21.760, 18.524)), module, PoleDancerPersonality::DRY_MIX_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(21.760, 33.120)), module, PoleDancerPersonality::POLE1_MIX_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(21.760, 47.670)), module, PoleDancerPersonality::POLE2_MIX_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(21.760, 62.273)), module, PoleDancerPersonality::POLE3_MIX_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(21.760, 76.849)), module, PoleDancerPersonality::POLE4_MIX_KNOB_PARAM));
+    */
 
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.213, 121.907)), module, PoleDancerPersonality::POLE_MIX_OUTPUT));
+    addOutput(createOutputCentered<BNCPort>(mm2px(Vec(15.24, 106.579)), module, PoleDancerPersonality::POLE_MIX_OUTPUT));
 
     // personality name
-    PersonalityDisplay *personalityDisplay = createWidget<PersonalityDisplay>(mm2px(Vec(3.457, 8.411)));
-    personalityDisplay->box.size = mm2px(Vec(23.513, 3.636));
+    PersonalityDisplay *personalityDisplay = createWidget<PersonalityDisplay>(mm2px(Vec(3.457, 22.0)));
+    personalityDisplay->box.size = mm2px(Vec(23.513, 4.5));
     //personalityDisplay->box.size = mm2px(Vec(35, 10));
     personalityDisplay->setModule(module);
     addChild(personalityDisplay);

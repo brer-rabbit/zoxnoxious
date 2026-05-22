@@ -31,13 +31,13 @@
      inkscape:document-units="mm"
      showgrid="false"
      height="128.5mm"
-     inkscape:zoom="2.4070043"
-     inkscape:cx="121.10489"
-     inkscape:cy="377.64785"
+     inkscape:zoom="0.83846735"
+     inkscape:cx="341.69488"
+     inkscape:cy="264.76881"
      inkscape:window-width="1544"
      inkscape:window-height="881"
      inkscape:window-x="30"
-     inkscape:window-y="117"
+     inkscape:window-y="89"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer2"
      width="71.12mm"
@@ -2431,7 +2431,7 @@
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="graphics"
-     style="display:none">
+     style="display:inline">
     <ellipse
        style="display:inline;opacity:0.711811;fill:#111011;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
        id="ellipse136"

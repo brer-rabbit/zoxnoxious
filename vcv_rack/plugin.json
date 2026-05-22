@@ -63,18 +63,22 @@
       "tags": []
     },
     {
-        "slug": "PoleDancerWorkbench-PoleDancer",
+      "slug": "PoleDancerWorkbench-PoleDancer",
       "name": "PoleDancerWorkbench",
       "description": "Pole Mixing Inspector",
-      "hidden" : true,
-      "tags": ["Expander"]
+      "hidden": true,
+      "tags": [
+        "Expander"
+      ]
     },
     {
       "slug": "PoleDancerWorkbench-Personality",
       "name": "PoleDancerWorkbench",
       "description": "Pole Mixing Inspector",
-      "hidden" : true,
-      "tags": ["Expander"]
+      "hidden": true,
+      "tags": [
+        "Expander"
+      ]
     }
   ]
 }

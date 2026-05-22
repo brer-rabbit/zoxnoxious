@@ -24,9 +24,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.6585849"
-     inkscape:cx="88.328309"
-     inkscape:cy="194.1414"
+     inkscape:zoom="1.8134726"
+     inkscape:cx="130.96421"
+     inkscape:cy="358.97979"
      inkscape:window-width="1568"
      inkscape:window-height="907"
      inkscape:window-x="46"
@@ -430,7 +430,8 @@
        y1="78.340706"
        x2="53.546638"
        y2="123.97127"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(3.9492699e-6)" />
     <linearGradient
        id="linearGradient1-8"
        inkscape:collect="always">
@@ -625,8 +626,8 @@
        id="rect9-0"
        width="110.63232"
        height="127.37232"
-       x="0.56384051"
-       y="0.56384075" />
+       x="0.56384444"
+       y="0.56384057" />
     <rect
        style="font-variation-settings:normal;display:inline;opacity:0.675985;vector-effect:none;fill:url(#linearGradient1);fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
        id="rect1"
@@ -922,14 +923,14 @@
          y="14.874364">LINK</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
-       x="20.699303"
-       y="121.71616"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
+       x="14.810044"
+       y="122.38055"
        id="text204-9"><tspan
          sodipodi:role="line"
          id="tspan201"
-         x="20.633156"
-         y="121.71616">BACKPLANE CONTROL</tspan></text>
+         x="14.743898"
+         y="122.38055">BACKPLANE CONTROL</tspan></text>
     <rect
        style="display:inline;opacity:0.55;fill:#f6f2ec;stroke-width:0.0999996;stroke-miterlimit:1;-inkscape-stroke:none"
        id="rect4"
@@ -1167,8 +1168,8 @@
        rx="1.4679281"
        ry="1.4679279" />
     <path
-       style="display:inline;opacity:0.85;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.111565px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 39.812607,121.80174 1.91043,-2.61292 0.925248,-0.0176 -0.02913,2.7518 2.092705,-0.0149 -0.05323,-2.72317 0.929889,-0.0307 1.779465,2.66434 1.033481,-0.0157 0.01498,-2.53008 1.860597,2.42526 -0.0083,-2.48493 1.032253,-0.0219 0.0083,2.60426 2.073109,0.0448 -0.03908,-2.65606 0.973584,-0.008 1.840998,2.70202 1.04723,-0.0153 0.0287,-2.70285 1.05554,-0.0518 0.0969,2.79316 2.083578,-6.9e-4 -0.10565,-2.7476 1.11589,-0.008 0.0445,2.75792 1.757,-0.024 0.0449,-2.7476 1.17943,0.008 1.60766,2.79818"
+       style="display:inline;opacity:0.85;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.15;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 47.233543,122.41893 1.512405,-2.06853 0.732479,-0.0139 -0.02306,2.17849 1.656705,-0.0118 -0.04214,-2.15582 0.736153,-0.0243 1.408725,2.10924 0.818163,-0.0124 0.01186,-2.00295 1.472954,1.91997 -0.0066,-1.96721 0.817191,-0.0173 0.0066,2.06168 1.641191,0.0355 -0.03094,-2.10269 0.770745,-0.006 1.457439,2.13907 0.829046,-0.0121 0.02272,-2.13973 0.835625,-0.041 0.07671,2.21122 1.649479,-5.4e-4 -0.08364,-2.17516 0.883402,-0.006 0.03523,2.18333 1.390941,-0.019 0.03554,-2.17516 0.933704,0.006 1.272715,2.2152"
        id="path22502-2"
        sodipodi:nodetypes="cccccccccccccccccccccccccccccc"
        inkscape:export-filename="/Users/kyle.farrell/Documents/zoxnoxious.png"
