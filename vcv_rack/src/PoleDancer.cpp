@@ -142,6 +142,9 @@ struct PoleDancer final : ParticipantAdapter, Participant {
 
   std::array<CvRoute,5> routes;
 
+  PersonalityMessage expanderMessages[2] = {};
+  float resonance = 0.f;
+
   PoleDancer() :
     source1NameString(invalidCardOutputName),
     source2NameString(invalidCardOutputName),
@@ -198,6 +201,10 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     output2NameString.reserve(16);
     rezCompModeNameString.reserve(16);
     rezCompModeNameString = rezCompModes[0];
+
+    rightExpander.producerMessage = &expanderMessages[0];
+    rightExpander.consumerMessage = &expanderMessages[1];
+
   }
 
   /* Participant interface: return Module identifier */
@@ -221,10 +228,10 @@ struct PoleDancer final : ParticipantAdapter, Participant {
                     inputs.data());
 
     // qvca
-    v = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltage() / 10.f;
-    clipped = (v < 0.f) || (v > 1.f);
+    resonance = params[RESONANCE_KNOB_PARAM].getValue() + inputs[RESONANCE_INPUT].getVoltage() / 10.f;
+    clipped = (resonance < 0.f) || (resonance > 1.f);
     if (clipped) {
-        resonanceClipTimer = clipTime;
+      resonanceClipTimer = clipTime;
     }
     // Resonance slope & max will vary depending on Resonance Compensation mode
     // for consistency between modes, try to get oscillation to start around 80%.
@@ -233,19 +240,19 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     case 2: // modified 2P-bandpass
         // oscillation starts at 16%, max rez is at 33%
         // map 80% --> 16% and 100% --> 33%
-        v = v < 0.80f ? 0.20f * v : 0.85f * v - 0.52f;
-        sharedFrame.samples[offset + Q_VCA] = clamp(v, 0.f, 0.34f);
+        resonance = resonance < 0.80f ? 0.20f * resonance : 0.85f * resonance - 0.52f;
+        sharedFrame.samples[offset + Q_VCA] = clamp(resonance, 0.f, 0.34f);
         break;
     case 3: // oddball comp
         // oscillation starts at 26%, max rez is at 50%
         // map 80% --> 26% and 100% --> 50%
-        v = v < 0.80f ? 0.325f * v : 1.2f * v - 0.7f;
-        sharedFrame.samples[offset + Q_VCA] = clamp(v, 0.f, 0.51f);
+        resonance = resonance < 0.80f ? 0.325f * resonance : 1.2f * resonance - 0.7f;
+        sharedFrame.samples[offset + Q_VCA] = clamp(resonance, 0.f, 0.51f);
         break;
     default: // uncomp and 4P-bandpass
         // map 80% --> 70% and 100% --> 100%
-        v = v < 0.80f ? 0.875f * v : 1.5f * v - 0.5f;
-        sharedFrame.samples[offset + Q_VCA] = clamp(v, 0.f, 1.f);
+        resonance = resonance < 0.80f ? 0.875f * resonance : 1.5f * resonance - 0.5f;
+        sharedFrame.samples[offset + Q_VCA] = clamp(resonance, 0.f, 1.f);
         break;
     }
 
@@ -375,6 +382,32 @@ struct PoleDancer final : ParticipantAdapter, Participant {
       return true;
     }
 
+
+    // Expander handling.  This does not read from analyzer.  Write only.
+    bool analyzerPresent = rightExpander.module && rightExpander.module->model == modelPoleDancerWorkbench;
+    if (analyzerPresent) {
+      // Write to Analyzer
+      PersonalityMessage *toAnalyzer = static_cast<PersonalityMessage*>(rightExpander.module->leftExpander.producerMessage);
+      toAnalyzer->leftAuthoritative = true; // always authoritative
+      // unlike way above, the gain value is ignored.  Just display filter response.
+      if (inputs[POLE_MIX_INPUT].isConnected()) {
+        toAnalyzer->values[0] = inputs[POLE_MIX_INPUT].getVoltage(0);
+        toAnalyzer->values[1] = inputs[POLE_MIX_INPUT].getVoltage(1);
+        toAnalyzer->values[2] = inputs[POLE_MIX_INPUT].getVoltage(2);
+        toAnalyzer->values[3] = inputs[POLE_MIX_INPUT].getVoltage(3);
+        toAnalyzer->values[4] = inputs[POLE_MIX_INPUT].getVoltage(4);
+      }
+      else {
+        toAnalyzer->values[0] =
+          toAnalyzer->values[1] =
+          toAnalyzer->values[2] =
+          toAnalyzer->values[3] = 0.f;
+        toAnalyzer->values[4] = 0.25f;
+      }
+      toAnalyzer->resonance = resonance;
+      rightExpander.module->leftExpander.messageFlipRequested = true;
+    }
+
     return false;
   }
 
@@ -432,6 +465,10 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     INFO("poledancer: setting comp mode to %s", rezCompModeNameString.c_str());
   }
 };
+
+
+
+
 
 
 struct PoleDancerWidget : ModuleWidget {
@@ -515,6 +552,19 @@ struct PoleDancerWidget : ModuleWidget {
     output2NameTextField->setText(module ? &module->output2NameString : NULL);
     addChild(output2NameTextField);
 
+  }
+
+
+  void appendContextMenu(Menu *menu) override {
+
+    menu->addChild(new MenuSeparator());
+
+    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add workbench (right side)", "");
+    expanderItem->module = module;
+    expanderItem->model = modelPoleDancerWorkbench;
+    expanderItem->posit = box.pos;
+    expanderItem->posit.x += box.size.x;
+    menu->addChild(expanderItem);
   }
 
 

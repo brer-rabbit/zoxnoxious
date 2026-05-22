@@ -254,6 +254,7 @@ template <typename NameLookup> inline bool handleUpDownSelector(
 // struct that gets passed between modules via expander interface
 struct PersonalityMessage {
   float values[5] = {};
+  float resonance;
   bool leftAuthoritative = false;
 };
 

@@ -240,30 +240,6 @@ struct PersonalityDisplay : LedDisplay {
 
 
 
-struct AddZoxExpanderItem : MenuItem {
-  Model* expanderModel = nullptr;
-  Vec targetPos;
-
-  void onAction(const event::Action& e) override {
-    Module* expanderModule = expanderModel->createModule();
-    APP->engine->addModule(expanderModule);
-
-    ModuleWidget* expanderWidget =
-      expanderModel->createModuleWidget(expanderModule);
-
-    if (expanderWidget) {
-      APP->scene->rack->setModulePosNearest(expanderWidget, targetPos);
-      APP->scene->rack->addModule(expanderWidget);
-
-      history::ModuleAdd* h = new history::ModuleAdd;
-      h->name = "add expander";
-      h->setModule(expanderWidget);
-      APP->history->push(h);
-    }
-  }
-};
-
-
 
 struct PoleDancerPersonalityWidget : ModuleWidget {
   PoleDancerPersonalityWidget(PoleDancerPersonality* module) {
@@ -293,7 +269,7 @@ struct PoleDancerPersonalityWidget : ModuleWidget {
 
     InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add workbench (right side)", "");
     expanderItem->module = module;
-    expanderItem->model = modelPoleDancerWorkbench;;
+    expanderItem->model = modelPoleDancerWorkbench;
     expanderItem->posit = box.pos;
     expanderItem->posit.x += box.size.x;
     menu->addChild(expanderItem);

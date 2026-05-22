@@ -24,9 +24,9 @@ static float poleMixParamToCoeff(float v) {
   return v * POLEMIX_VOLTAGE_ANALYZER;
 }
 
-static constexpr float RESONANCE_VOLTAGE_SCALE = 2.5f; // 2.5V == coefficient 1.0
-static float resonanceInputToCoeff(float v) {
-  return v / RESONANCE_VOLTAGE_SCALE;
+static constexpr float RESONANCE_VOLTAGE_SCALE = 4.f; // 2.5V == coefficient 1.0
+static float resonanceParamToCoeff(float v) {
+  return v * RESONANCE_VOLTAGE_SCALE;
 }
 
 
@@ -61,16 +61,15 @@ public:
 
 struct PoleDancerWorkbench : Module {
   enum ParamId {
-    DRY_MIX_KNOB_PARAM,
-    POLE1_MIX_KNOB_PARAM,
-    POLE2_MIX_KNOB_PARAM,
-    POLE3_MIX_KNOB_PARAM,
-    POLE4_MIX_KNOB_PARAM,
+    DRY_MIX_PARAM,
+    POLE1_MIX_PARAM,
+    POLE2_MIX_PARAM,
+    POLE3_MIX_PARAM,
+    POLE4_MIX_PARAM,
+    RESONANCE_PARAM,
     PARAMS_LEN
   };
   enum InputId {
-    POLE_MIX_INPUT,
-    RESONANCE_INPUT,
     INPUTS_LEN
   };
   enum OutputId {
@@ -88,11 +87,11 @@ struct PoleDancerWorkbench : Module {
 
   PoleDancerWorkbench() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-    configParam(DRY_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Dry Mix", "%", 0.f, 10.f);
-    configParam(POLE1_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 1 Mix", "%", 0.f, 10.f);
-    configParam(POLE2_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 2 Mix", "%", 0.f, 10.f);
-    configParam(POLE3_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 3 Mix", "%", 0.f, 10.f);
-    configParam(POLE4_MIX_KNOB_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
+    configParam(DRY_MIX_PARAM, 0.f, 10.f, 0.f, "Dry Mix", "%", 0.f, 10.f);
+    configParam(POLE1_MIX_PARAM, 0.f, 10.f, 0.f, "Pole 1 Mix", "%", 0.f, 10.f);
+    configParam(POLE2_MIX_PARAM, 0.f, 10.f, 0.f, "Pole 2 Mix", "%", 0.f, 10.f);
+    configParam(POLE3_MIX_PARAM, 0.f, 10.f, 0.f, "Pole 3 Mix", "%", 0.f, 10.f);
+    configParam(POLE4_MIX_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
     clockDivider.setDivision(512);
     leftExpander.producerMessage = &expanderMessages[0];
     leftExpander.consumerMessage = &expanderMessages[1];
@@ -103,25 +102,27 @@ struct PoleDancerWorkbench : Module {
 
     if (clockDivider.process()) {
 
-      bool personalityPresent = leftExpander.module && leftExpander.module->model == modelPoleDancerPersonality;
+      bool personalityPresent = leftExpander.module && (leftExpander.module->model == modelPoleDancerPersonality || leftExpander.module->model == modelPoleDancer);
       if (personalityPresent) {
         // Read from Personality
         PersonalityMessage* fromPersonality = static_cast<PersonalityMessage*>(leftExpander.consumerMessage);
         if (fromPersonality->leftAuthoritative) {
           for (int i = 0; i < 5; i++) {
-            params[DRY_MIX_KNOB_PARAM + i].setValue(fromPersonality->values[i]);
+            params[DRY_MIX_PARAM + i].setValue(fromPersonality->values[i]);
           }
+          params[RESONANCE_PARAM].setValue(fromPersonality->resonance);
         }
 
       for (int i = 0; i < 5; ++i) {
-        poleMixCoefs.weight[i] = poleMixParamToCoeff(params[DRY_MIX_KNOB_PARAM + i].getValue());
+        poleMixCoefs.weight[i] = poleMixParamToCoeff(params[DRY_MIX_PARAM + i].getValue());
       }
+      poleMixCoefs.feedback = resonanceParamToCoeff(params[RESONANCE_PARAM].getValue());
 
-        // Write to Left
+        // Write to Left.  Resonance is not written.
         PersonalityMessage* toPersonality = static_cast<PersonalityMessage*>(leftExpander.module->rightExpander.producerMessage);
         toPersonality->leftAuthoritative = false;  // Right never claims authority
         for (int i = 0; i < 5; i++) {
-          toPersonality->values[i] = params[DRY_MIX_KNOB_PARAM + i].getValue();
+          toPersonality->values[i] = params[DRY_MIX_PARAM + i].getValue();
         }
         leftExpander.module->rightExpander.messageFlipRequested = true;
       }
@@ -350,15 +351,15 @@ struct PoleDancerWorkbenchWidget : ModuleWidget {
     setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerWorkbench.svg")));
 
     PoleDancerWorkbenchDisplay* display = createWidget<PoleDancerWorkbenchDisplay>(mm2px(Vec(5.0, 15.0)));
-    display->box.size = mm2px(Vec(60.0, 45.0));
+    display->box.size = mm2px(Vec(60.0, 60.0));
     display->module = module;
     addChild(display);
 
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 106.579)), module, PoleDancerWorkbench::DRY_MIX_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98, 106.579)), module, PoleDancerWorkbench::POLE1_MIX_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 2, 106.579)), module, PoleDancerWorkbench::POLE2_MIX_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 3, 106.579)), module, PoleDancerWorkbench::POLE3_MIX_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(53.531, 106.579)), module, PoleDancerWorkbench::POLE4_MIX_KNOB_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 106.579)), module, PoleDancerWorkbench::DRY_MIX_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98, 106.579)), module, PoleDancerWorkbench::POLE1_MIX_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 2, 106.579)), module, PoleDancerWorkbench::POLE2_MIX_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 3, 106.579)), module, PoleDancerWorkbench::POLE3_MIX_PARAM));
+    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(53.531, 106.579)), module, PoleDancerWorkbench::POLE4_MIX_PARAM));
 
   }
 
