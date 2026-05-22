@@ -404,7 +404,33 @@ struct PoleDancer final : ParticipantAdapter, Participant {
           toAnalyzer->values[3] = 0.f;
         toAnalyzer->values[4] = 1.25f;
       }
-      toAnalyzer->resonance = resonance;
+
+      switch (static_cast<int>(params[REZ_COMP_VALUE_HIDDEN_PARAM].getValue())) {
+      case 1:
+        toAnalyzer->resonance[3] = -1.f * resonance;
+        toAnalyzer->resonance[2] = 2.f * resonance;
+        toAnalyzer->resonance[1] = -1.f * resonance;
+        toAnalyzer->resonance[0] = 0.f;
+        break;
+      case 2:
+        toAnalyzer->resonance[3] = 1.f * resonance;
+        toAnalyzer->resonance[2] = 0.f;
+        toAnalyzer->resonance[1] = 1.f * resonance;
+        toAnalyzer->resonance[0] = 0.f;
+        break;
+      case 3:
+        toAnalyzer->resonance[3] = 1.f * resonance;
+        toAnalyzer->resonance[2] = 0.f;
+        toAnalyzer->resonance[1] = 1.f * resonance;
+        toAnalyzer->resonance[0] = -1.f * resonance;
+        break;
+      default:
+        toAnalyzer->resonance[3] = resonance;
+        toAnalyzer->resonance[2] = 0.f;
+        toAnalyzer->resonance[1] = 0.f;
+        toAnalyzer->resonance[0] = 0.f;
+      }
+
       rightExpander.module->leftExpander.messageFlipRequested = true;
     }
 

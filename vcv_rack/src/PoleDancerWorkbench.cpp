@@ -14,8 +14,8 @@ constexpr float MAX_W = 100.f;  // towards limiting: 30.f
 
 
 struct PoleMixCoefficients {
-  float weight[5] = {};
-  float feedback = 0.f;
+  float weight[5] = {0.f, 0.f, 0.f, 0.f, 1.f};
+  float fb[4] = {};
 };
 
 
@@ -30,29 +30,42 @@ static float resonanceParamToCoeff(float v) {
 }
 
 
+static constexpr float sign[5] = {+1, -1, +1, -1, +1};
 
 class PoleMixResponseModel {
 public:
   PoleMixCoefficients coeffs;
 
   std::complex<float> eval(float w) const {
-    std::complex<float> s(0.0f, w);
-    auto p = s + 1.0f;
+    std::complex<float> s(0.f, w);
+    auto p = s + 1.f;
+
     auto p2 = p * p;
     auto p3 = p2 * p;
-    auto p4 = p3 * p;
+    auto p4 = p2 * p2;
 
-    auto numerator = coeffs.weight[0] * p4 -
-      coeffs.weight[1] * p3 +
-      coeffs.weight[2] * p2 -
-      coeffs.weight[3] * p +
-      coeffs.weight[4];
+    std::complex<float> pTerms[5] = {
+      p4,  // weight[0]
+      p3,  // weight[1]
+      p2,  // weight[2]
+      p,   // weight[3]
+      1.f  // weight[4]
+    };
 
-    auto denominator = p4 + coeffs.feedback;
+    std::complex<float> numerator = 0.f;
+    for (int i = 0; i < 5; ++i)
+      numerator += sign[i] * coeffs.weight[i] * pTerms[i];
 
-    // if denominator gets too small return zero zero
-    return (std::abs(denominator) < 1e-9f) ?
-      std::complex<float>(0.f, 0.f) : numerator / denominator;
+    std::complex<float> denominator =
+      p4
+      + coeffs.fb[0] * p3
+      + coeffs.fb[1] * p2
+      + coeffs.fb[2] * p
+      + coeffs.fb[3];
+
+    return std::abs(denominator) < 1e-9f
+      ? std::complex<float>(0.f, 0.f)
+      : numerator / denominator;
   }
 
 };
@@ -90,7 +103,10 @@ struct PoleDancerWorkbench : Module {
     POLE2_MIX_PARAM,
     POLE3_MIX_PARAM,
     POLE4_MIX_PARAM,
-    RESONANCE_PARAM,
+    RESONANCE_P1_PARAM,
+    RESONANCE_P2_PARAM,
+    RESONANCE_P3_PARAM,
+    RESONANCE_P4_PARAM,
     PARAMS_LEN
   };
   enum InputId {
@@ -116,7 +132,10 @@ struct PoleDancerWorkbench : Module {
     configParam(POLE2_MIX_PARAM, 0.f, 10.f, 0.f, "Pole 2 Mix", "%", 0.f, 10.f);
     configParam(POLE3_MIX_PARAM, 0.f, 10.f, 0.f, "Pole 3 Mix", "%", 0.f, 10.f);
     configParam(POLE4_MIX_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
-    configParam(RESONANCE_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
+    configParam(RESONANCE_P1_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
+    configParam(RESONANCE_P2_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
+    configParam(RESONANCE_P3_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
+    configParam(RESONANCE_P4_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
     clockDivider.setDivision(512);
     leftExpander.producerMessage = &expanderMessages[0];
     leftExpander.consumerMessage = &expanderMessages[1];
@@ -134,13 +153,17 @@ struct PoleDancerWorkbench : Module {
           for (int i = 0; i < 5; i++) {
             params[DRY_MIX_PARAM + i].setValue(fromPersonality->values[i]);
           }
-          params[RESONANCE_PARAM].setValue(fromPersonality->resonance);
+          for (int i = 0; i < 4; ++i) {
+            params[RESONANCE_P1_PARAM + i].setValue(fromPersonality->resonance[i]);
+          }
         }
 
       for (int i = 0; i < 5; ++i) {
         poleMixCoefs.weight[i] = poleMixParamToCoeff(params[DRY_MIX_PARAM + i].getValue());
       }
-      poleMixCoefs.feedback = resonanceParamToCoeff(params[RESONANCE_PARAM].getValue());
+      for (int i = 0; i < 4; ++i) {
+        poleMixCoefs.fb[i] = resonanceParamToCoeff(params[RESONANCE_P1_PARAM + i].getValue());
+      }
 
         // Write to Left.  Resonance is not written.
         PersonalityMessage* toPersonality = static_cast<PersonalityMessage*>(leftExpander.module->rightExpander.producerMessage);
@@ -169,11 +192,14 @@ static bool different(float a, float b) {
 
 static bool coeffsChanged(const PoleMixCoefficients& x, const PoleMixCoefficients& y) {
     return different(x.weight[0], y.weight[0])
-        || different(x.weight[1], y.weight[1])
-        || different(x.weight[2], y.weight[2])
-        || different(x.weight[3], y.weight[3])
-        || different(x.weight[4], y.weight[4])
-        || different(x.feedback, y.feedback);
+      || different(x.weight[1], y.weight[1])
+      || different(x.weight[2], y.weight[2])
+      || different(x.weight[3], y.weight[3])
+      || different(x.weight[4], y.weight[4])
+      || different(x.fb[0], y.fb[0])
+      || different(x.fb[1], y.fb[1])
+      || different(x.fb[2], y.fb[2])
+      || different(x.fb[3], y.fb[3]);
 }
 
 
@@ -366,7 +392,7 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
       drawLabel(args.vg, "MAG", magRect);
       drawLabel(args.vg, "PHASE", phaseRect);
       drawGrid(args.vg, magRect, phaseRect);
-      drawCurve(args.vg, magPoints, nvgRGB(255, 220, 80)); // Yellow Mag
+      drawCurve(args.vg, magPoints, nvgRGB(0xff, 0x9a, 0x35));
       drawCurve(args.vg, phasePoints, nvgRGB(80, 180, 255), phaseRect.size.y * 0.4f); // Blue Phase
     }
     LedDisplay::drawLayer(args, layer);
