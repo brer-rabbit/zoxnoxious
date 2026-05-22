@@ -402,7 +402,7 @@ struct PoleDancer final : ParticipantAdapter, Participant {
           toAnalyzer->values[1] =
           toAnalyzer->values[2] =
           toAnalyzer->values[3] = 0.f;
-        toAnalyzer->values[4] = 0.25f;
+        toAnalyzer->values[4] = 1.25f;
       }
       toAnalyzer->resonance = resonance;
       rightExpander.module->leftExpander.messageFlipRequested = true;
