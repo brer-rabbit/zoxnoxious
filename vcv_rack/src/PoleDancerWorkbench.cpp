@@ -439,6 +439,11 @@ struct PoleDancerWorkbenchWidget : ModuleWidget {
       setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerWorkbench.svg")));
     }
 
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH / 2, 0)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
     auto* display = createWidget<PoleDancerWorkbenchDisplay<Policy> >(mm2px(Vec(5.5, 15.0)));
     display->box.size = mm2px(Vec(60.0, 60.0));
     display->module = module;
