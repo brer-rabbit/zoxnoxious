@@ -148,7 +148,7 @@ struct PersonalityTextField : LedDisplayTextField {
     LedDisplayTextField();
     color = nvgRGB(230, 235, 232);
     textOffset = math::Vec(0, -3);
-    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DIN_1451_Std_Engschrift.otf"));
+    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/OSP-DIN.ttf"));
   }
 
   void step() override {
