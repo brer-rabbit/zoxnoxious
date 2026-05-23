@@ -9,9 +9,12 @@ namespace zox {
 constexpr float MIN_DB = -36.f;
 constexpr float MAX_DB = 24.f;
 constexpr int POINTS = 256;
-constexpr float MIN_W = 0.01f;  // towards limiting: 0.05f
-constexpr float MAX_W = 100.f;  // towards limiting: 30.f
 
+// utility for range of drawing the scope
+struct ScopeRange {
+  float minW = 0.01f;
+  float maxW = 100.f;
+};
 
 struct PoleMixCoefficients {
   float weight[5] = {0.f, 0.f, 0.f, 0.f, 1.f};
@@ -107,6 +110,7 @@ struct PoleDancerWorkbench : Module {
     RESONANCE_P2_PARAM,
     RESONANCE_P3_PARAM,
     RESONANCE_P4_PARAM,
+    SCOPE_SCALE_PARAM,
     PARAMS_LEN
   };
   enum InputId {
@@ -122,6 +126,7 @@ struct PoleDancerWorkbench : Module {
 
   dsp::ClockDivider clockDivider;
   PoleMixCoefficients poleMixCoefs;
+  ScopeRange scopeRange;
 
   PersonalityMessage expanderMessages[2] = {};
 
@@ -136,6 +141,7 @@ struct PoleDancerWorkbench : Module {
     configParam(RESONANCE_P2_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
     configParam(RESONANCE_P3_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
     configParam(RESONANCE_P4_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
+    configSwitch(SCOPE_SCALE_PARAM, 0.f, 2.f, 1.f, "Scope Scale", {"Wide", "Normal", "Narrow"});
     clockDivider.setDivision(512);
     leftExpander.producerMessage = &expanderMessages[0];
     leftExpander.consumerMessage = &expanderMessages[1];
@@ -175,6 +181,22 @@ struct PoleDancerWorkbench : Module {
       }
 
     }
+
+    switch (static_cast<int>(std::round(params[SCOPE_SCALE_PARAM].getValue()))) {
+    case 2:
+      scopeRange.minW = 0.1;
+      scopeRange.maxW = 10.f;
+      break;
+    case 1:
+      scopeRange.minW = 0.01;
+      scopeRange.maxW = 100.f;
+      break;
+    default:
+      scopeRange.minW = 0.001;
+      scopeRange.maxW = 1000.f;
+      break;
+    }
+
   }
 
 
@@ -203,11 +225,10 @@ static bool coeffsChanged(const PoleMixCoefficients& x, const PoleMixCoefficient
 }
 
 
-float wToX(float w, const Rect& r) {
-  float t = std::log(w / MIN_W) / std::log(MAX_W / MIN_W);
+float wToX(float w, const Rect& r, const ScopeRange& range) {
+  float t = std::log(w / range.minW) / std::log(range.maxW / range.minW);
   return r.pos.x + t * r.size.x;
 }
-
 
 float dbToY(float db, const Rect& r) {
 
@@ -234,14 +255,14 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
   PoleMixCoefficients lastCoeffs;
   std::vector<Vec> magPoints;
   std::vector<Vec> phasePoints;
-
+  ScopeRange lastRange;
 
   PoleDancerWorkbenchDisplay() {
     magPoints.reserve(POINTS);
     phasePoints.reserve(POINTS);
   }
 
-  void rebuildMagnitudePoints(const PoleMixCoefficients& c, const Rect& r) {
+  void rebuildMagnitudePoints(const PoleMixCoefficients& c, const Rect& r, const ScopeRange& range) {
     magPoints.clear();
 
     PoleMixResponseModel model;
@@ -251,7 +272,7 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
 
     for (int i = 0; i < POINTS; ++i) {
       float t = float(i) / float(POINTS - 1);
-      float w = MIN_W * std::pow(MAX_W / MIN_W, t);
+      float w = range.minW * std::pow(range.maxW / range.minW, t);
 
       auto h = model.eval(w);
       float mag = std::max(std::abs(h), 1e-9f);
@@ -270,14 +291,14 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
   }
 
 
-  void rebuildPhasePoints(const PoleMixCoefficients& c, const Rect& r) {
+  void rebuildPhasePoints(const PoleMixCoefficients& c, const Rect& r, const ScopeRange& range) {
     phasePoints.clear();
     PoleMixResponseModel model;
     model.coeffs = c;
 
     for (int i = 0; i < POINTS; ++i) {
       float t = float(i) / float(POINTS - 1);
-      float w = MIN_W * std::pow(MAX_W / MIN_W, t);
+      float w = range.minW * std::pow(range.maxW / range.minW, t);
       auto h = model.eval(w);
         
       float phase = std::arg(h); // Value in (-π, π]
@@ -329,12 +350,12 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
     nvgStroke(vg);
   }
 
-  void drawVerticalGridLine(NVGcontext* vg, const Rect& r, float w, NVGcolor color, float width) {
+  void drawVerticalGridLine(NVGcontext* vg, const Rect& r, float w, NVGcolor color, float width, const ScopeRange& range) {
 
-    if (w < MIN_W || w > MAX_W)
+    if (w < range.minW || w > range.maxW)
       return;
 
-    float x = wToX(w, r);
+    float x = wToX(w, r, range);
 
     nvgBeginPath(vg);
     nvgMoveTo(vg, x, r.pos.y);
@@ -345,7 +366,7 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
   }
 
 
-  void drawGrid(NVGcontext* vg, const Rect& magRect, const Rect& phaseRect) {
+  void drawGrid(NVGcontext* vg, const Rect& magRect, const Rect& phaseRect, const ScopeRange& range) {
     // 0 dB line only in magnitude plot
     float y0 = dbToY(0.f, magRect);
 
@@ -357,18 +378,19 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
     nvgStroke(vg);
 
     // frequency grid lines, broken across both plots
-    drawVerticalGridLine(vg, magRect, 0.5f, nvgRGBA(180, 180, 180, 30), 1.0f);
-    drawVerticalGridLine(vg, magRect, 1.0f, nvgRGBA(180, 180, 180, 90), 1.0f);
-    drawVerticalGridLine(vg, magRect, 2.0f, nvgRGBA(180, 180, 180, 30), 1.0f);
+    drawVerticalGridLine(vg, magRect, 0.5f, nvgRGBA(180, 180, 180, 30), 1.0f, range);
+    drawVerticalGridLine(vg, magRect, 1.0f, nvgRGBA(180, 180, 180, 90), 1.0f, range);
+    drawVerticalGridLine(vg, magRect, 2.0f, nvgRGBA(180, 180, 180, 30), 1.0f, range);
 
-    drawVerticalGridLine(vg, phaseRect, 0.5f, nvgRGBA(180, 180, 180, 30), 1.0f);
-    drawVerticalGridLine(vg, phaseRect, 1.0f, nvgRGBA(180, 180, 180, 90), 1.0f);
-    drawVerticalGridLine(vg, phaseRect, 2.0f, nvgRGBA(180, 180, 180, 30), 1.0f);
+    drawVerticalGridLine(vg, phaseRect, 0.5f, nvgRGBA(180, 180, 180, 30), 1.0f, range);
+    drawVerticalGridLine(vg, phaseRect, 1.0f, nvgRGBA(180, 180, 180, 90), 1.0f, range);
+    drawVerticalGridLine(vg, phaseRect, 2.0f, nvgRGBA(180, 180, 180, 30), 1.0f, range);
   }
 
   void drawLabel(NVGcontext* vg, const char* text, const Rect& r) {
     nvgFontSize(vg, 8.f);
-    nvgFillColor(vg, nvgRGBA(220, 220, 220, 120));
+    //nvgFillColor(vg, nvgRGBA(200, 200, 200, 120));
+    nvgFillColor(vg, nvgRGBA(240, 240, 240, 180));
     nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
     nvgText(vg, r.pos.x + 2.f, r.pos.y + 2.f, text, NULL);
   }
@@ -377,21 +399,24 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
   void drawLayer(const DrawArgs& args, int layer) override {
     if (layer == 1) {
       PoleMixCoefficients c = module ? module->poleMixCoefs : PoleMixCoefficients{};
+      ScopeRange range = module ? module->scopeRange : ScopeRange{};
 
       // Split the box: 60% for Magnitude, 40% for Phase
       float splitY = box.size.y * 0.6f;
       Rect magRect = Rect(Vec(0, 0), Vec(box.size.x, splitY)).shrink(Vec(4, 4));
       Rect phaseRect = Rect(Vec(0, splitY), Vec(box.size.x, box.size.y - splitY)).shrink(Vec(4, 4));
 
-      if (coeffsChanged(c, lastCoeffs)) {
+      if (coeffsChanged(c, lastCoeffs) ||
+          different(range.minW, lastRange.minW)) { // assume minW will change if window changes
         lastCoeffs = c;
-        rebuildMagnitudePoints(c, magRect);
-        rebuildPhasePoints(c, phaseRect);
+        lastRange = range;
+        rebuildMagnitudePoints(c, magRect, range);
+        rebuildPhasePoints(c, phaseRect, range);
       }
 
       drawLabel(args.vg, "MAG", magRect);
       drawLabel(args.vg, "PHASE", phaseRect);
-      drawGrid(args.vg, magRect, phaseRect);
+      drawGrid(args.vg, magRect, phaseRect, range);
       drawCurve(args.vg, magPoints, nvgRGB(0xff, 0x9a, 0x35));
       drawCurve(args.vg, phasePoints, nvgRGB(80, 180, 255), phaseRect.size.y * 0.4f); // Blue Phase
     }
@@ -414,19 +439,22 @@ struct PoleDancerWorkbenchWidget : ModuleWidget {
       setPanel(createPanel(asset::plugin(pluginInstance, "res/PoleDancerWorkbench.svg")));
     }
 
-    auto* display = createWidget<PoleDancerWorkbenchDisplay<Policy> >(mm2px(Vec(5.0, 15.0)));
+    auto* display = createWidget<PoleDancerWorkbenchDisplay<Policy> >(mm2px(Vec(5.5, 15.0)));
     display->box.size = mm2px(Vec(60.0, 60.0));
     display->module = module;
     addChild(display);
 
     if (Policy::hasControls()) {
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589, 106.579)), module, ModuleType::DRY_MIX_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98, 106.579)), module, ModuleType::POLE1_MIX_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 2, 106.579)), module, ModuleType::POLE2_MIX_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(17.589 + 8.98 * 3, 106.579)), module, ModuleType::POLE3_MIX_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(53.531, 106.579)), module, ModuleType::POLE4_MIX_PARAM));
+      addParam(createParamCentered<Trimpot>(mm2px(Vec(13.323, 89.323)), module, ModuleType::DRY_MIX_PARAM));
+      addParam(createParamCentered<Trimpot>(mm2px(Vec(24.448, 89.323)), module, ModuleType::POLE1_MIX_PARAM));
+      addParam(createParamCentered<Trimpot>(mm2px(Vec(35.573, 89.323)), module, ModuleType::POLE2_MIX_PARAM));
+      addParam(createParamCentered<Trimpot>(mm2px(Vec(46.698, 89.323)), module, ModuleType::POLE3_MIX_PARAM));
+      addParam(createParamCentered<Trimpot>(mm2px(Vec(57.823, 89.323)), module, ModuleType::POLE4_MIX_PARAM));
+      addParam(createParamCentered<CKSSThree>(mm2px(Vec(13.323, 108.526)), module, ModuleType::SCOPE_SCALE_PARAM));
     }
-
+    else {
+      addParam(createParamCentered<CKSSThree>(mm2px(Vec(13.323, 90.526)), module, ModuleType::SCOPE_SCALE_PARAM));
+    }
   }
 
 };
