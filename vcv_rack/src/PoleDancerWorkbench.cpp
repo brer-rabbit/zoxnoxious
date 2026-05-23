@@ -378,13 +378,13 @@ struct PoleDancerWorkbenchDisplay : LedDisplay {
     nvgStroke(vg);
 
     // frequency grid lines, broken across both plots
-    drawVerticalGridLine(vg, magRect, 0.5f, nvgRGBA(180, 180, 180, 30), 1.0f, range);
-    drawVerticalGridLine(vg, magRect, 1.0f, nvgRGBA(180, 180, 180, 90), 1.0f, range);
-    drawVerticalGridLine(vg, magRect, 2.0f, nvgRGBA(180, 180, 180, 30), 1.0f, range);
+    drawVerticalGridLine(vg, magRect, 0.5f, nvgRGBA(180, 180, 180, 100), 1.0f, range);
+    drawVerticalGridLine(vg, magRect, 1.0f, nvgRGBA(180, 180, 180, 150), 1.0f, range);
+    drawVerticalGridLine(vg, magRect, 2.0f, nvgRGBA(180, 180, 180, 100), 1.0f, range);
 
-    drawVerticalGridLine(vg, phaseRect, 0.5f, nvgRGBA(180, 180, 180, 30), 1.0f, range);
-    drawVerticalGridLine(vg, phaseRect, 1.0f, nvgRGBA(180, 180, 180, 90), 1.0f, range);
-    drawVerticalGridLine(vg, phaseRect, 2.0f, nvgRGBA(180, 180, 180, 30), 1.0f, range);
+    drawVerticalGridLine(vg, phaseRect, 0.5f, nvgRGBA(180, 180, 180, 100), 1.0f, range);
+    drawVerticalGridLine(vg, phaseRect, 1.0f, nvgRGBA(180, 180, 180, 150), 1.0f, range);
+    drawVerticalGridLine(vg, phaseRect, 2.0f, nvgRGBA(180, 180, 180, 100), 1.0f, range);
   }
 
   void drawLabel(NVGcontext* vg, const char* text, const Rect& r) {
