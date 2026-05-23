@@ -41,30 +41,24 @@ public:
 
   std::complex<float> eval(float w) const {
     std::complex<float> s(0.f, w);
-    auto p = s + 1.f;
 
-    auto p2 = p * p;
-    auto p3 = p2 * p;
-    auto p4 = p2 * p2;
-
-    std::complex<float> pTerms[5] = {
-      p4,  // weight[0]
-      p3,  // weight[1]
-      p2,  // weight[2]
-      p,   // weight[3]
-      1.f  // weight[4]
-    };
+    // pTerms = { p^4, p^3, p^2, p^1, p^0 }
+    std::complex<float> pTerms[5];
+    pTerms[3] = s + 1.f; 
+    pTerms[2] = pTerms[3] * pTerms[3];
+    pTerms[1] = pTerms[2] * pTerms[3];
+    pTerms[0] = pTerms[2] * pTerms[2];
+    pTerms[4] = 1.f;
 
     std::complex<float> numerator = 0.f;
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 5; ++i) {
       numerator += sign[i] * coeffs.weight[i] * pTerms[i];
+    }
 
-    std::complex<float> denominator =
-      p4
-      + coeffs.fb[0] * p3
-      + coeffs.fb[1] * p2
-      + coeffs.fb[2] * p
-      + coeffs.fb[3];
+    std::complex<float> denominator = pTerms[0];
+    for (int i = 0; i < 4; ++i) {
+      denominator += coeffs.fb[i] * pTerms[i + 1];
+    }
 
     return std::abs(denominator) < 1e-9f
       ? std::complex<float>(0.f, 0.f)
