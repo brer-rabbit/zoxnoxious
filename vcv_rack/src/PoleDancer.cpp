@@ -46,7 +46,7 @@ enum cvChannel {
   Q_VCA,
 };
 
-static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Mode 1", "Alt Mode 2" };
+static const std::string rezCompModes[] = { "Uncompensated", "Bandpass 4P", "Alt Mode 1", "Alt Mode 2", "Small Formant", "Large Formant", "Broad", "Nasal" };
 
 
 static constexpr float mixerGain = 8.f;
@@ -70,16 +70,6 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     REZ_COMP_VALUE_HIDDEN_PARAM,
     REZ_COMP_DOWN_BUTTON_PARAM,
     REZ_COMP_UP_BUTTON_PARAM,
-    /*
-    REZ_COMP_MODE0,
-    REZ_COMP_MODE1,
-    REZ_COMP_MODE2,
-    REZ_COMP_MODE3,
-    REZ_COMP_MODE4,
-    REZ_COMP_MODE5,
-    REZ_COMP_MODE6,
-    REZ_COMP_MODE7,
-    */
     PARAMS_LEN
   };
   enum InputId {
@@ -138,7 +128,7 @@ struct PoleDancer final : ParticipantAdapter, Participant {
 
   static constexpr int8_t sourceOneSelectMidiPrograms[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
   static constexpr int8_t sourceTwoSelectMidiPrograms[] = { 8, 9, 10, 11, 12, 13, 14, 15 };
-  static constexpr int8_t rezModeSelectMidiPrograms[] = { 24, 25, 26, 27 };
+  static constexpr int8_t rezModeSelectMidiPrograms[] = { 24, 25, 26, 27, 28, 29, 30, 31 };
 
   std::array<CvRoute,5> routes;
 
@@ -194,7 +184,7 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     // no UI elements for these
     configSwitch(SOURCE_ONE_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source One", {"0", "1", "2", "3", "4", "5", "6", "7"} );
     configSwitch(SOURCE_TWO_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Source Two", {"0", "1", "2", "3", "4", "5", "6", "7"} );
-    configSwitch(REZ_COMP_VALUE_HIDDEN_PARAM, 0.f, 3.f, 0.f, "Rez Compensation", {"0", "1", "2", "3"} );
+    configSwitch(REZ_COMP_VALUE_HIDDEN_PARAM, 0.f, 7.f, 0.f, "Rez Compensation", {"0", "1", "2", "3", "4", "5", "6", "7"} );
     source1NameString.reserve(16);
     source2NameString.reserve(16);
     output1NameString.reserve(16);
@@ -364,7 +354,7 @@ struct PoleDancer final : ParticipantAdapter, Participant {
           params[REZ_COMP_UP_BUTTON_PARAM],
           params[REZ_COMP_DOWN_BUTTON_PARAM],
           params[REZ_COMP_VALUE_HIDDEN_PARAM],
-          3,
+          7,
           [&](int i){ return rezCompModes[i]; },
           rezCompModeNameString,
           rezModeSelectMidiPrograms,
@@ -424,8 +414,32 @@ struct PoleDancer final : ParticipantAdapter, Participant {
         toAnalyzer->resonance[1] = 1.f * resonance;
         toAnalyzer->resonance[0] = -1.f * resonance;
         break;
+      case 4:
+        toAnalyzer->resonance[3] = -1.f * resonance;
+        toAnalyzer->resonance[2] = 0.f;
+        toAnalyzer->resonance[1] = 0.f;
+        toAnalyzer->resonance[0] = 1.f * resonance;
+        break;
+      case 5:
+        toAnalyzer->resonance[3] = -1.f * resonance;
+        toAnalyzer->resonance[2] = 0.f;
+        toAnalyzer->resonance[1] = -1.f * resonance;
+        toAnalyzer->resonance[0] = 1.f * resonance;
+        break;
+      case 6:
+        toAnalyzer->resonance[3] = -1.f * resonance;
+        toAnalyzer->resonance[2] = 2.f * resonance;
+        toAnalyzer->resonance[1] = 0.f;
+        toAnalyzer->resonance[0] = 0.f;
+        break;
+      case 7:
+        toAnalyzer->resonance[3] = 1.f * resonance;
+        toAnalyzer->resonance[2] = -2.f * resonance;
+        toAnalyzer->resonance[1] = 1.f * resonance;
+        toAnalyzer->resonance[0] = -1.f * resonance;
+        break;
       default:
-        toAnalyzer->resonance[3] = resonance;
+        toAnalyzer->resonance[3] = 1.f * resonance;
         toAnalyzer->resonance[2] = 0.f;
         toAnalyzer->resonance[1] = 0.f;
         toAnalyzer->resonance[0] = 0.f;
@@ -521,27 +535,27 @@ struct PoleDancerWidget : ModuleWidget {
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 85.796)), module, PoleDancer::SOURCE_TWO_LEVEL_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 106.579)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM));
     auto* knob = createParamCentered<TurnsCountingKnob>(
-      mm2px(Vec(54.0, 24.223)),
+      mm2px(Vec(52.75, 24.223)),
       module,
       PoleDancer::CUTOFF_KNOB_PARAM);
     knob->setTurns(10);
     addParam(knob);
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(53.906, 57.752)), module, PoleDancer::RESONANCE_KNOB_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(52.75, 57.752)), module, PoleDancer::RESONANCE_KNOB_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(75.47, 106.612)), module, PoleDancer::FILTER_VCA_KNOB_PARAM));
 
     addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 32.734)), module, PoleDancer::SOURCE_ONE_LEVEL_INPUT));
     addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 53.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_INPUT));
     addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 85.796)), module, PoleDancer::SOURCE_TWO_LEVEL_INPUT));
     addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 106.579)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(54.0, 38.223)), module, PoleDancer::CUTOFF_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(54.0, 72.0)), module, PoleDancer::RESONANCE_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.75, 38.223)), module, PoleDancer::CUTOFF_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.75, 72.0)), module, PoleDancer::RESONANCE_INPUT));
     addInput(createInputCentered<BNCPort>(mm2px(Vec(88.571, 106.579)), module, PoleDancer::FILTER_VCA_INPUT));
-    addInput(createInputCentered<BNCPort>(mm2px(Vec(54.0, 106.579)), module, PoleDancer::POLE_MIX_INPUT));
+    addInput(createInputCentered<BNCPort>(mm2px(Vec(52.75, 106.579)), module, PoleDancer::POLE_MIX_INPUT));
 
     addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(4.488, 122.5)), module, PoleDancer::RIGHT_EXPANDER_LIGHT));
 
-    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(61.7, 32.694)), module, PoleDancer::CUTOFF_CLIP_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(60.45, 32.694)), module, PoleDancer::CUTOFF_CLIP_LIGHT));
 
     addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 23.177)), module, PoleDancer::REZ_COMP_LIGHT0));
     addChild(createLightCentered<SmallLight<ZoxAmberLight>>(mm2px(Vec(78.237, 28.32)), module, PoleDancer::REZ_COMP_LIGHT1));
