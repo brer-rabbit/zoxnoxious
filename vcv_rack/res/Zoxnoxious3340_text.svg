@@ -25,16 +25,16 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="3.8381396"
-     inkscape:cx="358.11621"
-     inkscape:cy="410.74587"
+     inkscape:zoom="1.1317714"
+     inkscape:cx="159.48451"
+     inkscape:cy="226.63588"
      inkscape:window-width="1480"
      inkscape:window-height="966"
      inkscape:window-x="129"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
      showguides="true"
-     inkscape:current-layer="g1">
+     inkscape:current-layer="layer1">
     <inkscape:grid
        id="grid1"
        units="mm"
@@ -660,354 +660,6 @@
        y="0.56384075" />
   </g>
   <g
-     inkscape:label="components"
-     inkscape:groupmode="layer"
-     id="layer1"
-     style="display:none">
-    <ellipse
-       id="ellipse212"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="40.500343"
-       cy="102.92023"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="LINEAR_FM_BUTTON"
-       rx="1.323"
-       ry="1.3229166" />
-    <ellipse
-       id="ellipse210"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="40.500343"
-       cy="91.458267"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="EXP_FM_BUTTON"
-       rx="1.323"
-       ry="1.3229166" />
-    <circle
-       id="circle191"
-       data-name="In03#PJ301MPort"
-       cx="66.5"
-       cy="72.10997"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="SYNC_PHASE_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <ellipse
-       id="ellipse191"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="66.500076"
-       cy="58.276142"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="SYNC_PHASE_KNOB"
-       rx="1.3230188"
-       ry="1.3229166" />
-    <ellipse
-       id="circle229"
-       data-name="RGreen1#RedLight"
-       cx="4.4679279"
-       cy="121.58274"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="COM_STATUS"
-       rx="0.79400003"
-       ry="0.79374999" />
-    <ellipse
-       id="ellipse211"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="40.500343"
-       cy="113.75739"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="EXT_MOD_PWM_BUTTON"
-       rx="1.323"
-       ry="1.3229166" />
-    <circle
-       id="circle538"
-       data-name="In03#PJ301MPort"
-       cx="40.5"
-       cy="72.10997"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="EXT_MOD_AMOUNT_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <ellipse
-       id="ellipse539"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="40.5"
-       cy="58.110172"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="EXT_MOD_AMOUNT_KNOB"
-       rx="1.323"
-       ry="1.3229166" />
-    <ellipse
-       id="circle192"
-       data-name="RGreen1#RedLight"
-       cx="73.537926"
-       cy="66.174927"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264587"
-       inkscape:label="SYNC_PHASE_CLIP"
-       rx="0.79400003"
-       ry="0.79374999" />
-    <ellipse
-       id="ellipse279"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="101.89226"
-       cy="107.7698"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="MIX2_SAW_BUTTON"
-       rx="1.323"
-       ry="1.3229166" />
-    <ellipse
-       id="ellipse280"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="88.834137"
-       cy="107.7698"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="MIX2_PULSE_BUTTON"
-       rx="1.323"
-       ry="1.3229166" />
-    <circle
-       id="circle173"
-       data-name="In03#PJ301MPort"
-       cx="103"
-       cy="31.115938"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="MIX1_PULSE_VCA_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <ellipse
-       id="ellipse173"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="88.836105"
-       cy="31.115938"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="MIX1_PULSE_KNOB"
-       rx="1.323"
-       ry="1.3229166" />
-    <circle
-       id="circle195"
-       data-name="In03#PJ301MPort"
-       cx="103"
-       cy="51.465546"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="MIX1_SAW_VCA_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <ellipse
-       id="ellipse195"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="88.836105"
-       cy="51.465546"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="MIX1_SAW_KNOB"
-       rx="1.323"
-       ry="1.3229166" />
-    <circle
-       id="circle201"
-       data-name="In03#PJ301MPort"
-       cx="103"
-       cy="72.185799"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="MIX1_TRIANGLE_VCA_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <ellipse
-       id="ellipse201"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="88.836105"
-       cy="72.185799"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="MIX1_TRIANGLE_KNOB"
-       rx="1.323"
-       ry="1.3229166" />
-    <ellipse
-       id="ellipse215"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="72.159866"
-       cy="99.296425"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="SYNC_POS_BUTTON"
-       rx="1.323"
-       ry="1.3229166" />
-    <ellipse
-       id="ellipse216"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="60.840137"
-       cy="99.296425"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="SYNC_HARD_BUTTON"
-       rx="1.323"
-       ry="1.3229166" />
-    <rect
-       id="rect5"
-       data-name="Screen"
-       y="93.921021"
-       width="18"
-       height="3.6367228"
-       x="85.523071"
-       style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713632"
-       inkscape:label="OUT2_TEXT" />
-    <ellipse
-       id="ellipse247"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="72.159866"
-       cy="110.69586"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="SYNC_NEG_BUTTON"
-       rx="1.323"
-       ry="1.3229166" />
-    <ellipse
-       id="ellipse248"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="60.840137"
-       cy="110.69586"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="SYNC_SOFT_BUTTON"
-       rx="1.323"
-       ry="1.3229166" />
-    <circle
-       id="circle17206"
-       data-name="In03#PJ301MPort"
-       cx="14.5"
-       cy="40.111916"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="FREQ_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <ellipse
-       id="circle32678"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="14.5"
-       cy="26.1117"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="FREQ_KNOB"
-       rx="1.323"
-       ry="1.3229166" />
-    <circle
-       id="circle177"
-       data-name="In03#PJ301MPort"
-       cx="14.499981"
-       cy="106.97791"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="PULSE_WIDTH_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <ellipse
-       id="ellipse177"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="14.499981"
-       cy="92.977554"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="PULSE_WIDTH_KNOB"
-       rx="1.323"
-       ry="1.3229166" />
-    <circle
-       id="circle537"
-       data-name="In03#PJ301MPort"
-       cx="14.5"
-       cy="72.10997"
-       r="1.3229166"
-       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
-       inkscape:label="LINEAR_INPUT"
-       inkscape:transform-center-x="-0.12594097"
-       inkscape:transform-center-y="12.007235" />
-    <ellipse
-       id="ellipse538"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="14.5"
-       cy="58.110172"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="LINEAR_KNOB"
-       rx="1.323"
-       ry="1.3229166" />
-    <circle
-       id="circle17"
-       data-name="RGreen1#RedLight"
-       cx="22.644928"
-       cy="35.111927"
-       r="0.79374999"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="FREQ_CLIP" />
-    <circle
-       id="circle178"
-       data-name="RGreen1#RedLight"
-       cx="22.644928"
-       cy="102.12292"
-       r="0.79374999"
-       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
-       inkscape:label="PULSE_WIDTH_CLIP" />
-    <rect
-       id="rect12209"
-       data-name="Screen"
-       y="24.91222"
-       width="24.596848"
-       height="3.6367228"
-       x="40.68084"
-       style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713632"
-       inkscape:label="MODULATION_TEXT" />
-    <ellipse
-       id="ellipse207"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="56.373707"
-       cy="35.391003"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="EXT_MOD_SELECT_SWITCH_UP"
-       rx="1.323"
-       ry="1.3229166" />
-    <ellipse
-       id="ellipse208"
-       data-name="Tempo#RoundLargeBlackKnob"
-       cx="47.304256"
-       cy="35.391003"
-       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
-       inkscape:label="EXT_MOD_SELECT_SWITCH_DOWN"
-       rx="1.323"
-       ry="1.3229166" />
-    <rect
-       id="rect1"
-       data-name="Screen"
-       y="13.5"
-       width="18"
-       height="3.6367228"
-       x="85.523071"
-       style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713632"
-       inkscape:label="OUT1_TEXT" />
-    <path
-       style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       d="M 51.105595,40.010419 H 52 v 76.046931"
-       id="path120"
-       sodipodi:nodetypes="ccc" />
-    <path
-       style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       d="M 56.214231,40.010419 H 55.1 v 76.046931"
-       id="path121"
-       sodipodi:nodetypes="ccc" />
-    <path
-       style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       d="M 36.480074,19.87313 H 29.1 v 17.458016"
-       id="path119"
-       sodipodi:nodetypes="ccc" />
-    <path
-       style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       d="M 69.014564,19.873129 78,19.87313 v 17.458016"
-       id="path122"
-       sodipodi:nodetypes="ccc" />
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Medium Italic';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;display:inline;opacity:0.6;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-opacity:1"
-       x="10.670752"
-       y="17.76527"
-       id="text24"><tspan
-         sodipodi:role="line"
-         id="tspan24"
-         x="10.670752"
-         y="17.76527">(octave)</tspan></text>
-  </g>
-  <g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Text"
@@ -1016,13 +668,13 @@
        xml:space="preserve"
        style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76391px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Medium Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;opacity:0.6;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.264587;stroke-opacity:1"
        x="75.677399"
-       y="69.350845"
+       y="59.350712"
        id="text192"
        transform="scale(1.0000133,0.9999867)"><tspan
          sodipodi:role="line"
          id="tspan192"
          x="75.677399"
-         y="69.350845"
+         y="59.350712"
          style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:1.76391px;font-family:Futura;-inkscape-font-specification:'Futura, Medium Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.264587;stroke-opacity:1">clip</tspan></text>
     <text
        xml:space="preserve"
@@ -1038,12 +690,12 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="57.45578"
-       y="49.758221"
+       y="39.758221"
        id="text209"><tspan
          sodipodi:role="line"
          id="tspan4"
          x="57.45578"
-         y="49.758221">EDGE DETECT</tspan></text>
+         y="39.758221">EDGE DETECT</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;opacity:0.6;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
@@ -1058,42 +710,42 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="33.612679"
-       y="83.983948"
+       y="73.983948"
        id="text212"><tspan
          sodipodi:role="line"
          id="tspan105"
          x="33.612679"
-         y="83.983948">ROUTING</tspan></text>
+         y="73.983948">ROUTING</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
        x="40.464359"
-       y="98.935516"
+       y="88.935516"
        id="text213"><tspan
          sodipodi:role="line"
          id="tspan242"
          x="40.398212"
-         y="98.935516">LINEAR FM</tspan></text>
+         y="88.935516">LINEAR FM</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
        x="40.464359"
-       y="109.77233"
+       y="99.772331"
        id="text214"><tspan
          sodipodi:role="line"
          id="tspan244"
          x="40.398212"
-         y="109.77233">PWM</tspan></text>
+         y="99.772331">PWM</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
        x="40.464359"
-       y="87.723152"
+       y="77.723152"
        id="text243"><tspan
          sodipodi:role="line"
          id="tspan243"
          x="40.398212"
-         y="87.723152">EXP FM</tspan></text>
+         y="77.723152">EXP FM</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
@@ -1128,22 +780,22 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.15875px;text-anchor:start;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="29.948"
-       y="45.262737"
+       y="35.262737"
        id="text116"><tspan
          sodipodi:role="line"
          id="tspan3"
          x="29.948"
-         y="45.262737">MODULATION</tspan></text>
+         y="35.262737">MODULATION</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="57.551735"
-       y="45.262238"
+       y="35.262238"
        id="text117"><tspan
          sodipodi:role="line"
          id="tspan117"
          x="57.551735"
-         y="45.262238">SYNC</tspan></text>
+         y="35.262238">SYNC</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
@@ -1168,52 +820,52 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="58.048435"
-       y="83.870461"
+       y="73.870461"
        id="text314"><tspan
          sodipodi:role="line"
          id="tspan2"
          x="58.048435"
-         y="83.870461">SYNC MODE</tspan></text>
+         y="73.870461">SYNC MODE</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
        x="60.80521"
-       y="95.356956"
+       y="85.356956"
        id="text222"><tspan
          sodipodi:role="line"
          id="tspan245"
          x="60.739063"
-         y="95.356956">HARD</tspan></text>
+         y="85.356956">HARD</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
        x="71.14122"
-       y="95.356956"
+       y="85.356956"
        id="text223"><tspan
          sodipodi:role="line"
          id="tspan17"
          x="71.075073"
-         y="95.356956">REV</tspan></text>
+         y="85.356956">REV</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
        x="60.80098"
-       y="106.45506"
+       y="96.455063"
        id="text248"><tspan
          sodipodi:role="line"
          id="tspan346"
          x="60.734833"
-         y="106.45506">SOFT</tspan></text>
+         y="96.455063">SOFT</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
        x="71.14122"
-       y="106.45403"
+       y="96.454033"
        id="text249"><tspan
          sodipodi:role="line"
          id="tspan18"
          x="71.075073"
-         y="106.45403">REV</tspan></text>
+         y="96.454033">REV</tspan></text>
     <text
        inkscape:export-ydpi="600.01202"
        inkscape:export-xdpi="600.01202"
@@ -1257,32 +909,12 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;display:inline;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="37.983475"
-       y="23.037458"
+       y="24.037458"
        id="text107"><tspan
          sodipodi:role="line"
          id="tspan21"
          x="37.983475"
-         y="23.037458">MOD/SYNC SOURCE</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       x="47.22065"
-       y="31.65597"
-       id="text236"><tspan
-         sodipodi:role="line"
-         id="tspan236"
-         x="47.154503"
-         y="31.65597">PREV</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       x="56.283791"
-       y="31.65597"
-       id="text237"><tspan
-         sodipodi:role="line"
-         id="tspan237"
-         x="56.217644"
-         y="31.65597">NEXT</tspan></text>
+         y="24.037458">MOD/SYNC SOURCE</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
@@ -1337,22 +969,22 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.0661458px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="38.650757"
-       y="49.860195"
+       y="39.860195"
        id="text208"><tspan
          sodipodi:role="line"
          id="tspan9"
          x="38.617683"
-         y="49.860195">DEPTH</tspan></text>
+         y="39.860195">DEPTH</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.0661458px;text-anchor:middle;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
        x="45.54599"
-       y="49.833969"
+       y="39.833969"
        id="text10"><tspan
          sodipodi:role="line"
          id="tspan10"
          x="45.512917"
-         y="49.833969">%</tspan></text>
+         y="39.833969">%</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82224px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:-0.132292px;text-anchor:middle;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.15;stroke-dasharray:none;stroke-opacity:1"
@@ -1381,33 +1013,33 @@
      style="display:inline">
     <text
        x="62.628246"
-       y="65.003777"
+       y="55.003777"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11668px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;opacity:0.65;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:1;stroke-opacity:1"
        id="text37"><tspan
          sodipodi:role="line"
          id="tspan44"
          x="62.628246"
-         y="65.003777"
+         y="55.003777"
          style="stroke-width:1">-1</tspan></text>
     <text
        x="66.503395"
-       y="52.02301"
+       y="42.02301"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11668px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;opacity:0.65;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:1;stroke-opacity:1"
        id="text39"><tspan
          sodipodi:role="line"
          id="tspan45"
          x="66.503395"
-         y="52.02301"
+         y="42.02301"
          style="stroke-width:1">0</tspan></text>
     <text
        x="69.878914"
-       y="65.003777"
+       y="55.003777"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11668px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;opacity:0.65;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:1;stroke-opacity:1"
        id="text41"><tspan
          sodipodi:role="line"
          id="tspan46"
          x="69.878914"
-         y="65.003777"
+         y="55.003777"
          style="stroke-width:1">+1</tspan></text>
     <path
        style="display:inline;opacity:0.65;fill:none;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
@@ -1494,42 +1126,42 @@
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 40.4995,58.001866 -2.5,4.330127"
+       d="m 40.4995,48.001865 -2.5,4.330127"
        id="path53" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 40.5005,58.001866 2.5,4.330127"
+       d="m 40.5005,48.001865 2.5,4.330127"
        id="path59" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="M 40.499034,58.000741 35.669405,56.706646"
+       d="M 40.499034,48.00074 35.669405,46.706645"
        id="path60" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="M 40.5,58 V 53"
+       d="m 40.5,47.999999 v -5"
        id="path61" />
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 40.500966,58.000741 4.829629,-1.294095"
+       d="m 40.500966,48.00074 4.829629,-1.294095"
        id="path62" />
     <text
        x="36.499275"
-       y="64.697639"
+       y="54.697639"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.65;fill:#f0e8d8;fill-opacity:1"
        id="text63">0</text>
     <text
        x="44.500355"
-       y="64.697639"
+       y="54.697639"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.65;fill:#f0e8d8;fill-opacity:1"
        id="text64"><tspan
          sodipodi:role="line"
          id="tspan5"
          x="44.500355"
-         y="64.697639">100</tspan></text>
+         y="54.697639">100</tspan></text>
     <path
        style="display:inline;opacity:0.65;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
@@ -1649,7 +1281,7 @@
          y="78.750229">1</tspan></text>
     <text
        x="40.400002"
-       y="52.299641"
+       y="42.299641"
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;font-family:Futura;-inkscape-font-specification:'Futura, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;display:inline;opacity:0.65;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="text5">50</text>
     <path
@@ -1665,28 +1297,376 @@
     <path
        style="display:inline;opacity:0.65;fill:none;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 66.503368,58.100908 -2.87504,4.97965"
+       d="m 66.503368,48.100907 -2.87504,4.97965"
        id="path4" />
     <path
        style="display:inline;opacity:0.65;fill:none;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="M 66.502902,58.099783 60.948751,56.611574"
+       d="M 66.502902,48.099782 60.948751,46.611573"
        id="path5" />
     <path
        style="display:inline;opacity:0.65;fill:none;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 66.503868,58.099042 v -5.75"
+       d="m 66.503868,48.099041 v -5.75"
        id="path6" />
     <path
        style="display:inline;opacity:0.65;fill:none;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 66.504834,58.099783 5.554152,-1.488209"
+       d="m 66.504834,48.099782 5.554152,-1.488209"
        id="path7" />
     <path
        style="display:inline;opacity:0.65;fill:none;stroke:#f0e8d8;stroke-width:0.2;stroke-opacity:1"
        inkscape:label="none"
-       d="m 66.504368,58.100908 2.875041,4.97965"
+       d="m 66.504368,48.100907 2.875041,4.97965"
        id="path8" />
+  </g>
+  <g
+     inkscape:label="components"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <ellipse
+       id="ellipse212"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="40.500343"
+       cy="92.920227"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="LINEAR_FM_BUTTON"
+       rx="1.323"
+       ry="1.3229166" />
+    <ellipse
+       id="ellipse210"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="40.500343"
+       cy="81.458267"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="EXP_FM_BUTTON"
+       rx="1.323"
+       ry="1.3229166" />
+    <circle
+       id="circle191"
+       data-name="In03#PJ301MPort"
+       cx="66.5"
+       cy="62.10997"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="SYNC_PHASE_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <ellipse
+       id="ellipse191"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="66.500076"
+       cy="48.276142"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="SYNC_PHASE_KNOB"
+       rx="1.3230188"
+       ry="1.3229166" />
+    <ellipse
+       id="circle229"
+       data-name="RGreen1#RedLight"
+       cx="4.4679279"
+       cy="121.58274"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="COM_STATUS"
+       rx="0.79400003"
+       ry="0.79374999" />
+    <ellipse
+       id="ellipse211"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="40.500343"
+       cy="103.75739"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="EXT_MOD_PWM_BUTTON"
+       rx="1.323"
+       ry="1.3229166" />
+    <circle
+       id="circle538"
+       data-name="In03#PJ301MPort"
+       cx="40.5"
+       cy="62.10997"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="EXT_MOD_AMOUNT_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <ellipse
+       id="ellipse539"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="40.5"
+       cy="48.110172"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="EXT_MOD_AMOUNT_KNOB"
+       rx="1.323"
+       ry="1.3229166" />
+    <ellipse
+       id="circle192"
+       data-name="RGreen1#RedLight"
+       cx="73.537926"
+       cy="56.174927"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264587"
+       inkscape:label="SYNC_PHASE_CLIP"
+       rx="0.79400003"
+       ry="0.79374999" />
+    <ellipse
+       id="ellipse279"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="101.89226"
+       cy="107.7698"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="MIX2_SAW_BUTTON"
+       rx="1.323"
+       ry="1.3229166" />
+    <ellipse
+       id="ellipse280"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="88.834137"
+       cy="107.7698"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="MIX2_PULSE_BUTTON"
+       rx="1.323"
+       ry="1.3229166" />
+    <circle
+       id="circle173"
+       data-name="In03#PJ301MPort"
+       cx="103"
+       cy="31.115938"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="MIX1_PULSE_VCA_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <ellipse
+       id="ellipse173"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="88.836105"
+       cy="31.115938"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="MIX1_PULSE_KNOB"
+       rx="1.323"
+       ry="1.3229166" />
+    <circle
+       id="circle195"
+       data-name="In03#PJ301MPort"
+       cx="103"
+       cy="51.465546"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="MIX1_SAW_VCA_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <ellipse
+       id="ellipse195"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="88.836105"
+       cy="51.465546"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="MIX1_SAW_KNOB"
+       rx="1.323"
+       ry="1.3229166" />
+    <circle
+       id="circle201"
+       data-name="In03#PJ301MPort"
+       cx="103"
+       cy="72.185799"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="MIX1_TRIANGLE_VCA_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <ellipse
+       id="ellipse201"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="88.836105"
+       cy="72.185799"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="MIX1_TRIANGLE_KNOB"
+       rx="1.323"
+       ry="1.3229166" />
+    <ellipse
+       id="ellipse215"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="72.159866"
+       cy="89.296425"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="SYNC_POS_BUTTON"
+       rx="1.323"
+       ry="1.3229166" />
+    <ellipse
+       id="ellipse216"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="60.840137"
+       cy="89.296425"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="SYNC_HARD_BUTTON"
+       rx="1.323"
+       ry="1.3229166" />
+    <rect
+       id="rect5"
+       data-name="Screen"
+       y="93.921021"
+       width="18"
+       height="3.6367228"
+       x="85.523071"
+       style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713632"
+       inkscape:label="OUT2_TEXT" />
+    <ellipse
+       id="ellipse247"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="72.159866"
+       cy="100.69586"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="SYNC_NEG_BUTTON"
+       rx="1.323"
+       ry="1.3229166" />
+    <ellipse
+       id="ellipse248"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="60.840137"
+       cy="100.69586"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="SYNC_SOFT_BUTTON"
+       rx="1.323"
+       ry="1.3229166" />
+    <circle
+       id="circle17206"
+       data-name="In03#PJ301MPort"
+       cx="14.5"
+       cy="40.111916"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="FREQ_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <ellipse
+       id="circle32678"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="14.5"
+       cy="26.1117"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="FREQ_KNOB"
+       rx="1.323"
+       ry="1.3229166" />
+    <circle
+       id="circle177"
+       data-name="In03#PJ301MPort"
+       cx="14.499981"
+       cy="106.97791"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="PULSE_WIDTH_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <ellipse
+       id="ellipse177"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="14.499981"
+       cy="92.977554"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="PULSE_WIDTH_KNOB"
+       rx="1.323"
+       ry="1.3229166" />
+    <circle
+       id="circle537"
+       data-name="In03#PJ301MPort"
+       cx="14.5"
+       cy="72.10997"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#00ff00;stroke-width:0.264583"
+       inkscape:label="LINEAR_INPUT"
+       inkscape:transform-center-x="-0.12594097"
+       inkscape:transform-center-y="12.007235" />
+    <ellipse
+       id="ellipse538"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="14.5"
+       cy="58.110172"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="LINEAR_KNOB"
+       rx="1.323"
+       ry="1.3229166" />
+    <circle
+       id="circle17"
+       data-name="RGreen1#RedLight"
+       cx="22.644928"
+       cy="35.111927"
+       r="0.79374999"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="FREQ_CLIP" />
+    <circle
+       id="circle178"
+       data-name="RGreen1#RedLight"
+       cx="22.644928"
+       cy="102.12292"
+       r="0.79374999"
+       style="display:inline;opacity:0.99;fill:#ff00ff;stroke-width:0.264583"
+       inkscape:label="PULSE_WIDTH_CLIP" />
+    <rect
+       id="rect1"
+       data-name="Screen"
+       y="13.5"
+       width="18"
+       height="3.6367228"
+       x="85.523071"
+       style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713632"
+       inkscape:label="OUT1_TEXT" />
+    <path
+       style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 51.105595,30.010418 H 52 v 76.046932"
+       id="path120"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 56.214231,30.010418 H 55.1 v 76.046932"
+       id="path121"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 36.480074,19.87313 H 29.1 v 17.458016"
+       id="path119"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="display:inline;opacity:0.5;fill:none;stroke:#f0e8d8;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 69.014564,19.873129 78,19.87313 v 17.458016"
+       id="path122"
+       sodipodi:nodetypes="ccc" />
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Medium Italic';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;display:inline;opacity:0.6;fill:#f0e8d8;fill-opacity:1;stroke:none;stroke-width:0.264584;stroke-opacity:1"
+       x="10.670752"
+       y="17.76527"
+       id="text24"><tspan
+         sodipodi:role="line"
+         id="tspan24"
+         x="10.670752"
+         y="17.76527">(octave)</tspan></text>
+    <rect
+       id="rect12209"
+       data-name="Screen"
+       y="25.912218"
+       width="24.596848"
+       height="3.6367228"
+       x="40.68084"
+       style="display:inline;opacity:0.99;fill:#ffff00;stroke-width:0.0713632"
+       inkscape:label="MODULATION_TEXT" />
+    <ellipse
+       id="ellipse207"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="69.322998"
+       cy="27.630381"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="EXT_MOD_SELECT_SWITCH_UP"
+       rx="1.323"
+       ry="1.3229166" />
+    <ellipse
+       id="ellipse208"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="36.423"
+       cy="27.630381"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264591"
+       inkscape:label="EXT_MOD_SELECT_SWITCH_DOWN"
+       rx="1.323"
+       ry="1.3229166" />
   </g>
   <g
      inkscape:label="Graphics"
@@ -1695,7 +1675,7 @@
      style="display:inline">
     <g
        id="g129"
-       transform="translate(4.3459454,-0.57636586)"
+       transform="translate(4.3459454,-10.576367)"
        style="opacity:0.6">
       <path
          style="display:inline;fill:none;stroke:#f0e8d8;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -1734,7 +1714,7 @@
        inkscape:rounded="0"
        inkscape:randomized="0"
        d="m 52.98395,81.949558 -4.178986,6.743023 -3.750136,-6.990619 z"
-       transform="matrix(-0.12799763,0.00628017,-0.00640893,-0.1588655,81.607931,107.03853)" />
+       transform="matrix(-0.12799763,0.00628017,-0.00640893,-0.1588655,81.607931,97.038529)" />
     <path
        sodipodi:type="star"
        style="display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.192015;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
@@ -1750,7 +1730,7 @@
        inkscape:rounded="0"
        inkscape:randomized="0"
        d="m 52.98395,81.949558 -4.178986,6.743023 -3.750136,-6.990619 z"
-       transform="matrix(0.12799763,-0.00628017,0.00640893,0.1588655,68.031386,93.444237)" />
+       transform="matrix(0.12799763,-0.00628017,0.00640893,0.1588655,68.031386,83.444236)" />
     <path
        style="display:inline;opacity:0.85;fill:none;fill-opacity:1;stroke:#f0e8d8;stroke-width:0.15;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-dasharray:none"
        d="m 87.458777,122.41971 1.543745,-2.1114 0.747658,-0.0142 -0.02354,2.22362 1.691035,-0.012 -0.04301,-2.20049 0.751407,-0.0248 1.437917,2.15295 0.835117,-0.0127 0.0121,-2.04446 1.503478,1.95976 -0.0067,-2.00798 0.834124,-0.0177 0.0067,2.1044 1.6752,0.0362 -0.03158,-2.14626 0.786716,-0.006 1.487636,2.18339 0.84623,-0.0124 0.0232,-2.18407 0.85295,-0.0419 0.0783,2.25705 1.68366,-5.6e-4 -0.0854,-2.22023 0.9017,-0.006 0.036,2.22857 1.41977,-0.0194 0.0363,-2.22023 0.95305,0.006 1.29909,2.2611"
@@ -1762,7 +1742,7 @@
        inkscape:connector-curvature="0" />
     <g
        id="g130"
-       transform="translate(14.665188,-10.724507)"
+       transform="translate(14.665188,-20.724508)"
        style="opacity:0.6">
       <path
          sodipodi:type="star"
@@ -1831,16 +1811,16 @@
        style="display:inline;opacity:0.711811;fill:#111211;fill-opacity:1;stroke:#343435;stroke-width:0.3;stroke-miterlimit:1;stroke-dasharray:none;stroke-opacity:1"
        id="ellipse137"
        cx="73.537926"
-       cy="66.174927"
+       cy="56.174927"
        rx="1.4679281"
        ry="1.4679279" />
     <path
        style="opacity:0.85;fill:none;stroke:#f0e8d8;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 74.809148,94.34709 v 1.14699 h -0.0072"
+       d="m 74.809148,84.347089 v 1.14699 h -0.0072"
        id="path18" />
     <path
        style="opacity:0.85;fill:none;stroke:#f0e8d8;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 74.809148,104.8359 v 1.14699 h -0.0072"
+       d="m 74.809148,94.835899 v 1.14699 h -0.0072"
        id="path19" />
     <g
        id="g2"
@@ -1911,7 +1891,7 @@
     <g
        id="g242"
        style="display:inline"
-       transform="translate(-2.6e-4,4.5000015)">
+       transform="translate(-2.6e-4,5.500001)">
       <g
          id="g87-4"
          transform="matrix(1.2431818,0,0,0.03273965,-12.361005,19.240717)"
