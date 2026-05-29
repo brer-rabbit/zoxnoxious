@@ -1,4 +1,5 @@
 #include "plugin.hpp"
+#include "constants.hpp"
 #include "zcomponentlib.hpp"
 #include "modulehelpers.hpp"
 
@@ -47,7 +48,7 @@ struct PoleDancerPersonality : Module {
     configParam(POLE1_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 1 Mix", "%", 0.f, 10.f);
     configParam(POLE2_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 2 Mix", "%", 0.f, 10.f);
     configParam(POLE3_MIX_KNOB_PARAM, 0.f, 10.f, 0.f, "Pole 3 Mix", "%", 0.f, 10.f);
-    configParam(POLE4_MIX_KNOB_PARAM, 0.f, 10.f, 10.f, "Pole 4 Mix", "%", 0.f, 10.f);
+    configParam(POLE4_MIX_KNOB_PARAM, 0.f, 10.f, POLEMIX_VOLTAGE_SCALE, "Pole 4 Mix", "%", 0.f, 10.f);
     configOutput(POLE_MIX_OUTPUT, "Pole Mix Voltage Series");
 
     clockDivider.setDivision(512);
