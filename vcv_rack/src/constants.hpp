@@ -20,6 +20,9 @@ static const std::string invalidCardOutputName = "----";
 
 static constexpr uint8_t midiProgramChangeStatus = 0xC;
 
+// for pole mixing modules
+static constexpr float POLEMIX_VOLTAGE_SCALE = 10.0f / 8.f;
+
 // this doesn't have a really good home other than here
 inline void setMidiProgramChangeMessage(rack::midi::Message& midiOutMessage, int8_t midiChannel, int8_t program) {
   midiOutMessage.setSize(2);

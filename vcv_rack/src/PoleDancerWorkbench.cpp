@@ -38,9 +38,8 @@ struct PoleMixCoefficients {
 };
 
 
-static constexpr float POLEMIX_VOLTAGE_ANALYZER = 0.8f; // 10V --> scale for 8X
 static float poleMixParamToCoeff(float v) {
-  return v * POLEMIX_VOLTAGE_ANALYZER;
+  return v / POLEMIX_VOLTAGE_SCALE;
 }
 
 static constexpr float RESONANCE_VOLTAGE_SCALE = 4.f; // 2.5V == coefficient 1.0

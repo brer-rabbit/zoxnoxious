@@ -392,7 +392,7 @@ struct PoleDancer final : ParticipantAdapter, Participant {
         toAnalyzer->values[1] = 0.f;
         toAnalyzer->values[2] = 0.f;
         toAnalyzer->values[3] = 0.f;
-        toAnalyzer->values[4] = 1.25f;
+        toAnalyzer->values[4] = POLEMIX_VOLTAGE_SCALE;
       }
 
       switch (static_cast<int>(std::round(params[REZ_COMP_VALUE_HIDDEN_PARAM].getValue()))) {
