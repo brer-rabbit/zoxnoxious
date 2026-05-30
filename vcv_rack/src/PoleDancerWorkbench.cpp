@@ -761,11 +761,11 @@ struct PoleDancerWorkbenchWidget : ModuleWidget {
     addChild(display);
 
     if (Policy::hasControls()) {
-      addParam(createParamCentered<Trimpot>(mm2px(Vec(13.323, 91.323)), module, ModuleType::DRY_MIX_PARAM));
-      addParam(createParamCentered<Trimpot>(mm2px(Vec(24.448, 91.323)), module, ModuleType::POLE1_MIX_PARAM));
-      addParam(createParamCentered<Trimpot>(mm2px(Vec(35.573, 91.323)), module, ModuleType::POLE2_MIX_PARAM));
-      addParam(createParamCentered<Trimpot>(mm2px(Vec(46.698, 91.323)), module, ModuleType::POLE3_MIX_PARAM));
-      addParam(createParamCentered<Trimpot>(mm2px(Vec(57.823, 91.323)), module, ModuleType::POLE4_MIX_PARAM));
+      addParam(createParamCentered<ZoxTrimpot>(mm2px(Vec(13.323, 91.323)), module, ModuleType::DRY_MIX_PARAM));
+      addParam(createParamCentered<ZoxTrimpot>(mm2px(Vec(24.448, 91.323)), module, ModuleType::POLE1_MIX_PARAM));
+      addParam(createParamCentered<ZoxTrimpot>(mm2px(Vec(35.573, 91.323)), module, ModuleType::POLE2_MIX_PARAM));
+      addParam(createParamCentered<ZoxTrimpot>(mm2px(Vec(46.698, 91.323)), module, ModuleType::POLE3_MIX_PARAM));
+      addParam(createParamCentered<ZoxTrimpot>(mm2px(Vec(57.823, 91.323)), module, ModuleType::POLE4_MIX_PARAM));
       addParam(createParamCentered<CKSS>(mm2px(Vec(13.323, 110.526)), module, ModuleType::SCOPE_MODE_PARAM));
       addParam(createParamCentered<CKSSThree>(mm2px(Vec(41.698, 110.526)), module, ModuleType::SCOPE_SCALE_PARAM));
     }
