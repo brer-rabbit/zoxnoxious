@@ -48,6 +48,40 @@ struct ZoxTrimpot : app::SvgKnob {
 };
 
 
+struct ZoxKnob : app::SvgKnob {
+  widget::SvgWidget* bg;
+
+  ZoxKnob() {
+    minAngle = -0.83 * M_PI;
+    maxAngle = 0.83 * M_PI;
+
+    bg = new widget::SvgWidget;
+    fb->addChildBelow(bg, tw);
+  }
+};
+
+struct ZoxSmallKnob : ZoxKnob {
+  ZoxSmallKnob() {
+    setSvg(Svg::load(asset::plugin(pluginInstance, "res/ZKnobSmall.svg")));
+    bg->setSvg(Svg::load(asset::plugin(pluginInstance, "res/ZKnobSmall_bg.svg")));
+  }
+};
+
+struct ZoxMediumKnob : ZoxKnob {
+  ZoxMediumKnob() {
+    setSvg(Svg::load(asset::plugin(pluginInstance, "res/ZKnobMedium.svg")));
+    bg->setSvg(Svg::load(asset::plugin(pluginInstance, "res/ZKnobMedium_bg.svg")));
+  }
+};
+
+struct ZoxLargeKnob : ZoxKnob {
+  ZoxLargeKnob() {
+    setSvg(Svg::load(asset::plugin(pluginInstance, "res/ZKnobLarge.svg")));
+    bg->setSvg(Svg::load(asset::plugin(pluginInstance, "res/ZKnobLarge_bg.svg")));
+  }
+};
+
+
 //
 // ZPushButtons -- Medium and Small
 //
