@@ -530,10 +530,10 @@ struct PoleDancerWidget : ModuleWidget {
     addParam(createParamCentered<ZPushButtonMediumUp>(mm2px(Vec(87.827, 64.937)), module, PoleDancer::REZ_COMP_DOWN_BUTTON_PARAM));
     addParam(createParamCentered<ZPushButtonMediumDown>(mm2px(Vec(78.772, 64.937)), module, PoleDancer::REZ_COMP_UP_BUTTON_PARAM));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 32.734)), module, PoleDancer::SOURCE_ONE_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 53.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 85.796)), module, PoleDancer::SOURCE_TWO_LEVEL_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.589, 106.579)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM));
+    addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(17.589, 32.734)), module, PoleDancer::SOURCE_ONE_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(17.589, 53.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_KNOB_PARAM));
+    addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(17.589, 85.796)), module, PoleDancer::SOURCE_TWO_LEVEL_KNOB_PARAM));
+    addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(17.589, 106.579)), module, PoleDancer::SOURCE_TWO_MOD_AMOUNT_KNOB_PARAM));
     auto* knob = createParamCentered<TurnsCountingKnob>(
       mm2px(Vec(52.75, 24.223)),
       module,
@@ -541,8 +541,8 @@ struct PoleDancerWidget : ModuleWidget {
     knob->setTurns(10);
     addParam(knob);
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(52.75, 57.752)), module, PoleDancer::RESONANCE_KNOB_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(75.47, 106.612)), module, PoleDancer::FILTER_VCA_KNOB_PARAM));
+    addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(52.75, 57.752)), module, PoleDancer::RESONANCE_KNOB_PARAM));
+    addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(75.47, 106.612)), module, PoleDancer::FILTER_VCA_KNOB_PARAM));
 
     addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 32.734)), module, PoleDancer::SOURCE_ONE_LEVEL_INPUT));
     addInput(createInputCentered<BNCPort>(mm2px(Vec(30.254, 53.517)), module, PoleDancer::SOURCE_ONE_MOD_AMOUNT_INPUT));

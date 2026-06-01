@@ -328,7 +328,7 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
     addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    //addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.5, 26.112)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
+    //addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(14.5, 26.112)), module, Zoxnoxious3340::FREQ_KNOB_PARAM));
     auto* knob = createParamCentered<TurnsCountingKnob>(
       mm2px(Vec(14.5, 26.112)),   // centre position on panel (mm)
       module,
@@ -336,15 +336,15 @@ struct Zoxnoxious3340Widget : ModuleWidget {
     knob->setTurns(8);
     addParam(knob);
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.5, 92.978)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(14.5, 58.11)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
+    addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(14.5, 92.978)), module, Zoxnoxious3340::PULSE_WIDTH_KNOB_PARAM));
+    addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(14.5, 58.11)), module, Zoxnoxious3340::LINEAR_KNOB_PARAM));
 
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(88.836, 31.116)), module, Zoxnoxious3340::MIX1_PULSE_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(88.836, 72.186)), module, Zoxnoxious3340::MIX1_TRIANGLE_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(88.836, 51.466)), module, Zoxnoxious3340::MIX1_SAW_KNOB_PARAM));
+    addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(88.836, 31.116)), module, Zoxnoxious3340::MIX1_PULSE_KNOB_PARAM));
+    addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(88.836, 72.186)), module, Zoxnoxious3340::MIX1_TRIANGLE_KNOB_PARAM));
+    addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(88.836, 51.466)), module, Zoxnoxious3340::MIX1_SAW_KNOB_PARAM));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(66.5, 48.21)), module, Zoxnoxious3340::SYNC_PHASE_KNOB_PARAM));
-    addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(40.5, 48.11)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
+    addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(66.5, 48.21)), module, Zoxnoxious3340::SYNC_PHASE_KNOB_PARAM));
+    addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(40.5, 48.11)), module, Zoxnoxious3340::EXT_MOD_AMOUNT_KNOB_PARAM));
 
     addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(60.84, 89.296)), module, Zoxnoxious3340::SYNC_HARD_BUTTON_PARAM, Zoxnoxious3340::SYNC_HARD_BUTTON_LIGHT));
     addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(60.84, 100.696)), module, Zoxnoxious3340::SYNC_POS_BUTTON_PARAM, Zoxnoxious3340::SYNC_POS_BUTTON_LIGHT));

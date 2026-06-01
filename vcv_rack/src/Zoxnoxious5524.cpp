@@ -463,12 +463,12 @@ struct Zoxnoxious5524Widget : ModuleWidget {
       knobVco1->setTurns(8);
       addParam(knobVco1);
 
-      addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.165, 62.445)), module, Zoxnoxious5524::VCO_ONE_PW_KNOB_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(34.334, 28.323)), module, Zoxnoxious5524::VCO_ONE_LINEAR_KNOB_PARAM));
+      addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(14.165, 62.445)), module, Zoxnoxious5524::VCO_ONE_PW_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(34.334, 28.323)), module, Zoxnoxious5524::VCO_ONE_LINEAR_KNOB_PARAM));
 
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(9.677, 99.187)), module, Zoxnoxious5524::VCO_ONE_PULSE_KNOB_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(34.334, 99.187)), module, Zoxnoxious5524::VCO_ONE_TRIANGLE_KNOB_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(22.0, 99.187)), module, Zoxnoxious5524::VCO_ONE_SAW_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(9.677, 99.187)), module, Zoxnoxious5524::VCO_ONE_PULSE_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(34.334, 99.187)), module, Zoxnoxious5524::VCO_ONE_TRIANGLE_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(22.0, 99.187)), module, Zoxnoxious5524::VCO_ONE_SAW_KNOB_PARAM));
 
       auto* knobVco2 = createParamCentered<TurnsCountingKnob>(
         mm2px(Vec(84.5, 28.323)),
@@ -476,7 +476,7 @@ struct Zoxnoxious5524Widget : ModuleWidget {
         Zoxnoxious5524::VCO_TWO_VOCT_KNOB_PARAM);
       knobVco2->setTurns(6);
       addParam(knobVco2);
-      addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(84.5, 62.445)), module, Zoxnoxious5524::VCO_TWO_PW_KNOB_PARAM));
+      addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(84.5, 62.445)), module, Zoxnoxious5524::VCO_TWO_PW_KNOB_PARAM));
 
       auto* knobVCF = createParamCentered<TurnsCountingKnob>(
         mm2px(Vec(174.5, 28.445)),
@@ -485,16 +485,16 @@ struct Zoxnoxious5524Widget : ModuleWidget {
       knobVCF->setTurns(10);
       addParam(knobVCF);
 
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(168.104, 62.445)), module, Zoxnoxious5524::VCF_RESONANCE_KNOB_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(77.294, 109.97)), module, Zoxnoxious5524::VCO_MIX_KNOB_PARAM));
-      addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(174.5, 96.503)), module, Zoxnoxious5524::FINAL_GAIN_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(168.104, 62.445)), module, Zoxnoxious5524::VCF_RESONANCE_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(77.294, 109.97)), module, Zoxnoxious5524::VCO_MIX_KNOB_PARAM));
+      addParam(createParamCentered<ZoxLargeKnob>(mm2px(Vec(174.5, 96.503)), module, Zoxnoxious5524::FINAL_GAIN_KNOB_PARAM));
 
       
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(54.5, 28.323)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_KNOB_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(116.5, 28.323)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(54.5, 28.323)), module, Zoxnoxious5524::VCO_ONE_MOD_AMOUNT_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(116.5, 28.323)), module, Zoxnoxious5524::VCO_TWO_MOD_AMOUNT_KNOB_PARAM));
 
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(144.5, 45.915)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM));
-      addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(110.451, 84.995)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(144.5, 45.915)), module, Zoxnoxious5524::VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM));
+      addParam(createParamCentered<ZoxSmallKnob>(mm2px(Vec(110.451, 84.995)), module, Zoxnoxious5524::VCO_TWO_TRI_VCF_KNOB_PARAM));
 
       addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(74.202, 91.587)), module, Zoxnoxious5524::VCO_TWO_WAVE_PULSE_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_WAVE_PULSE_BUTTON_LIGHT));
       addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(84.5, 91.587)), module, Zoxnoxious5524::VCO_TWO_WAVE_SAW_BUTTON_PARAM, Zoxnoxious5524::VCO_TWO_WAVE_SAW_BUTTON_LIGHT));

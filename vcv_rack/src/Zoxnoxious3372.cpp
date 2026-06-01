@@ -316,11 +316,11 @@ struct Zoxnoxious3372Widget : ModuleWidget {
         addParam(createParamCentered<ZPushButtonSmallLeft>(mm2px(Vec(14.198, 66.266)), module, Zoxnoxious3372::SOURCE_TWO_DOWN_BUTTON_PARAM));
         addParam(createParamCentered<ZPushButtonSmallRight>(mm2px(Vec(21.487, 66.266)), module, Zoxnoxious3372::SOURCE_TWO_UP_BUTTON_PARAM));
 
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(46.976, 28.787)), module, Zoxnoxious3372::MOD_AMOUNT_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.547, 105.453)), module, Zoxnoxious3372::NOISE_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.547, 37.648)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.546, 78.977)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(46.948, 105.233)), module, Zoxnoxious3372::OUTPUT_PAN_KNOB_PARAM));
+        addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(46.976, 28.787)), module, Zoxnoxious3372::MOD_AMOUNT_KNOB_PARAM));
+        addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(15.547, 105.453)), module, Zoxnoxious3372::NOISE_KNOB_PARAM));
+        addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(15.547, 37.648)), module, Zoxnoxious3372::SOURCE_ONE_LEVEL_KNOB_PARAM));
+        addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(15.546, 78.977)), module, Zoxnoxious3372::SOURCE_TWO_LEVEL_KNOB_PARAM));
+        addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(46.948, 105.233)), module, Zoxnoxious3372::OUTPUT_PAN_KNOB_PARAM));
         auto* knob = createParamCentered<TurnsCountingKnob>(
           mm2px(Vec(84.344, 27.787)),
           module,
@@ -328,8 +328,8 @@ struct Zoxnoxious3372Widget : ModuleWidget {
         knob->setTurns(10);
         addParam(knob);
 
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(78.418, 64.5)), module, Zoxnoxious3372::RESONANCE_KNOB_PARAM));
-        addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(78.706, 92.611)), module, Zoxnoxious3372::FILTER_VCA_KNOB_PARAM));
+        addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(78.418, 64.5)), module, Zoxnoxious3372::RESONANCE_KNOB_PARAM));
+        addParam(createParamCentered<ZoxMediumKnob>(mm2px(Vec(78.706, 92.611)), module, Zoxnoxious3372::FILTER_VCA_KNOB_PARAM));
 
         addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(50.857, 45.419)), module, Zoxnoxious3372::FILTER_MOD_SWITCH_PARAM, Zoxnoxious3372::FILTER_MOD_ENABLE_LIGHT));
         addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(50.857, 56.723)), module, Zoxnoxious3372::REZ_MOD_SWITCH_PARAM, Zoxnoxious3372::REZ_MOD_ENABLE_LIGHT));
