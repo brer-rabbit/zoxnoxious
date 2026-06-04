@@ -47,6 +47,7 @@ void init(Plugin* p) {
         p->addModel(modelPoleDancerWorkbenchForPoleDancer);
         p->addModel(modelZoxnoxious3372);
         p->addModel(modelZoxnoxious5524);
+        p->addModel(modelZoxnoxious5524Visual);
         p->addModel(modelZoxnoxious3340);
         p->addModel(modelOutputInterface);
 

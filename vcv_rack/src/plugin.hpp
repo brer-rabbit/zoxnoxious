@@ -30,4 +30,5 @@ extern Model* modelPoleDancerWorkbenchForPersonality;
 extern Model* modelZoxnoxious3340;
 extern Model* modelZoxnoxious3372;
 extern Model* modelZoxnoxious5524;
+extern Model* modelZoxnoxious5524Visual;
 extern Model* modelOutputInterface;

@@ -1,0 +1,325 @@
+#include "plugin.hpp"
+#include "modulehelpers.hpp"
+#include "zcomponentlib.hpp"
+#include "Zoxnoxious5524.hpp"
+
+namespace zox {
+
+
+struct Zoxnoxious5524Visual : Module {
+  enum ParamId {
+    PARAMS_LEN
+  };
+  enum InputId {
+    INPUTS_LEN
+  };
+  enum OutputId {
+    OUTPUTS_LEN
+  };
+  enum LightId {
+    LIGHTS_LEN
+  };
+
+
+  dsp::ClockDivider clockDivider;
+  CouplingDisplayState couplingState;
+
+  Zoxnoxious5524Visual() {
+    config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+    clockDivider.setDivision(40000);
+  }
+
+
+  void process(const ProcessArgs& args) override {
+
+    if (clockDivider.process()) {
+
+      if (leftPresent()) {
+        Zoxnoxious5524* z5524 = dynamic_cast<Zoxnoxious5524*>(leftExpander.module);
+        if (z5524) {
+          couplingState = z5524->getCouplingDisplayState();
+        }
+        
+      }
+      else {
+        couplingState = {};
+      }
+    }
+
+  }
+
+
+  // policy method for template
+  bool leftPresent() const {
+    return leftExpander.module && leftExpander.module->model == modelZoxnoxious5524;
+  }
+};
+
+
+
+struct CoupledVoiceTopologyDisplay : LedDisplay {
+  CouplingDisplayState* state = nullptr;
+
+  static constexpr float W = 120.f;
+  static constexpr float H = 120.f;
+
+  enum WaveMask {
+    WAVE_PULSE = 1 << 0,
+    WAVE_B    = 1 << 1, // RAW: SAW, SHAPED: HALF-SINE
+    WAVE_C    = 1 << 2, // RAW: TRI, SHAPED: SINE
+  };
+
+  CoupledVoiceTopologyDisplay() {
+    box.size = Vec(W, H);
+  }
+
+  float clamp01(float v) const {
+    return clamp(v, 0.f, 1.f);
+  }
+
+  float tzfmActivity(const CouplingDisplayState& s) const {
+    return clamp01(std::max(s.vco2RawToVco1Tzfm, s.vco2ShapedToVco1Tzfm));
+  }
+
+  bool hasPulse(const CouplingDisplayState& s) const {
+    return (s.vco2RawWaveMask & WAVE_PULSE) || (s.vco2ShapedWaveMask & WAVE_PULSE);
+  }
+
+  bool hasSaw(const CouplingDisplayState& s) const {
+    return s.vco2RawWaveMask & WAVE_B;
+  }
+
+  bool hasTri(const CouplingDisplayState& s) const {
+    return s.vco2RawWaveMask & WAVE_C;
+  }
+
+  bool hasHalfSine(const CouplingDisplayState& s) const {
+    return s.vco2ShapedWaveMask & WAVE_B;
+  }
+
+  bool hasSine(const CouplingDisplayState& s) const {
+    return s.vco2ShapedWaveMask & WAVE_C;
+  }
+
+  NVGcolor bgColor() const {
+    return nvgRGB(7, 12, 13);
+  }
+
+  NVGcolor nodeFill() const {
+    return nvgRGB(25, 39, 40);
+  }
+
+  NVGcolor nodeStroke(float a = 1.f) const {
+    return nvgRGBAf(0.48f, 0.65f, 0.60f, a);
+  }
+
+  NVGcolor textColor(float a = 1.f) const {
+    return nvgRGBAf(0.70f, 0.88f, 0.78f, a);
+  }
+
+  NVGcolor pathColor(float activity, float baseAlpha = 0.14f) const {
+    float a = baseAlpha + 0.86f * clamp01(activity);
+    return nvgRGBAf(0.58f, 1.00f, 0.72f, a);
+  }
+
+  void drawText(NVGcontext* vg, Vec p, const char* text, float size,
+                int align = NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
+                float alpha = 1.f) {
+    nvgFontSize(vg, size);
+    nvgFontFaceId(vg, APP->window->uiFont->handle);
+    nvgTextAlign(vg, align);
+    nvgFillColor(vg, textColor(alpha));
+    nvgText(vg, p.x, p.y, text, NULL);
+  }
+
+  void drawNode(NVGcontext* vg, Rect r, const char* label) {
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, r.pos.x, r.pos.y, r.size.x, r.size.y, 2.5f);
+    nvgFillColor(vg, nodeFill());
+    nvgFill(vg);
+
+    nvgStrokeWidth(vg, 0.9f);
+    nvgStrokeColor(vg, nodeStroke(0.95f));
+    nvgStroke(vg);
+
+    drawText(vg, r.getCenter(), label, 7.0f);
+  }
+
+  void drawArrowLine(NVGcontext* vg, Vec a, Vec b, float activity,
+                     const char* label, float labelOffsetY = 0.f,
+                     bool secondary = false) {
+    activity = clamp01(activity);
+
+    float width = secondary ? 0.65f : 0.95f + 2.35f * activity;
+    NVGcolor c = pathColor(activity, secondary ? 0.08f : 0.14f);
+
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, a.x, a.y);
+    nvgLineTo(vg, b.x, b.y);
+    nvgStrokeWidth(vg, width);
+    nvgStrokeColor(vg, c);
+    nvgStroke(vg);
+
+    Vec d = b.minus(a);
+    float len = std::sqrt(d.x * d.x + d.y * d.y);
+    if (len > 0.001f) {
+      d = d.div(len);
+      Vec n = Vec(-d.y, d.x);
+
+      float ah = secondary ? 3.2f : 4.8f;
+      float aw = secondary ? 1.9f : 2.9f;
+
+      Vec p1 = b;
+      Vec p2 = b.minus(d.mult(ah)).plus(n.mult(aw));
+      Vec p3 = b.minus(d.mult(ah)).minus(n.mult(aw));
+
+      nvgBeginPath(vg);
+      nvgMoveTo(vg, p1.x, p1.y);
+      nvgLineTo(vg, p2.x, p2.y);
+      nvgLineTo(vg, p3.x, p3.y);
+      nvgClosePath(vg);
+      nvgFillColor(vg, c);
+      nvgFill(vg);
+    }
+
+    if (label && label[0]) {
+      Vec mid = a.plus(b).mult(0.5f);
+      drawText(
+        vg,
+        Vec(mid.x, mid.y + labelOffsetY),
+        label,
+        secondary ? 4.3f : 5.2f,
+        NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
+        secondary ? 0.68f : 0.92f
+        );
+    }
+  }
+
+  void drawWaveLamp(NVGcontext* vg, Vec p, const char* label, bool active, float pathActivity) {
+    float a = active ? (0.35f + 0.65f * clamp01(pathActivity)) : 0.16f;
+
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, p.x - 6.0f, p.y - 4.0f, 12.0f, 8.0f, 1.8f);
+    nvgFillColor(vg, nvgRGBAf(0.05f, 0.10f, 0.09f, active ? 0.85f : 0.32f));
+    nvgFill(vg);
+
+    nvgStrokeWidth(vg, active ? 0.9f : 0.45f);
+    nvgStrokeColor(vg, nvgRGBAf(0.48f, 0.95f, 0.65f, a));
+    nvgStroke(vg);
+
+    drawText(vg, p, label, 3.8f, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, a);
+  }
+
+  void drawWaveBank(NVGcontext* vg, const CouplingDisplayState& s, Vec p) {
+    float a = tzfmActivity(s);
+
+    drawText(vg, Vec(p.x, p.y - 7.0f), "TZFM SOURCE", 3.8f,
+             NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 0.52f + 0.35f * a);
+
+    drawWaveLamp(vg, Vec(p.x - 27.0f, p.y), "P",   hasPulse(s),    a);
+    drawWaveLamp(vg, Vec(p.x - 13.5f, p.y), "SAW", hasSaw(s),      a);
+    drawWaveLamp(vg, Vec(p.x,        p.y), "TRI", hasTri(s),      a);
+    drawWaveLamp(vg, Vec(p.x + 13.5f, p.y), "H-S", hasHalfSine(s), a);
+    drawWaveLamp(vg, Vec(p.x + 27.0f, p.y), "SIN", hasSine(s),    a);
+  }
+
+  void drawLayer(const DrawArgs& args, int layer) override {
+    LedDisplay::drawLayer(args, layer);
+    if (layer != 1)
+      return;
+
+    NVGcontext* vg = args.vg;
+    nvgSave(vg);
+
+    nvgScale(vg, box.size.x / W, box.size.y / H);
+
+    const CouplingDisplayState emptyState;
+    const CouplingDisplayState& s = state ? *state : emptyState;
+
+    // Background
+    nvgBeginPath(vg);
+    nvgRect(vg, 0, 0, W, H);
+    nvgFillColor(vg, bgColor());
+    nvgFill(vg);
+
+    // Border
+    nvgBeginPath(vg);
+    nvgRect(vg, 1.0f, 1.0f, W - 2.0f, H - 2.0f);
+    nvgStrokeWidth(vg, 1.0f);
+    nvgStrokeColor(vg, nvgRGBAf(0.35f, 0.55f, 0.50f, 0.78f));
+    nvgStroke(vg);
+
+    Rect vco1(Vec(8, 40), Vec(30, 18));
+    Rect vco2(Vec(82, 40), Vec(30, 18));
+    Rect vcf(Vec(45, 92), Vec(30, 18));
+
+    // VCO2 -> VCO1 secondary sync lane
+    float syncActivity = (s.syncHardSub || s.syncSoft) ? 1.f : 0.f;
+    const char* syncLabel =
+      (s.syncHardSub && s.syncSoft) ? "SYNC: BOTH" :
+      (s.syncHardSub ? "HARD SUBSYNC" :
+       (s.syncSoft ? "SOFT SYNC" : "SYNC"));
+
+    drawArrowLine(vg, Vec(82, 32), Vec(38, 32),
+                  syncActivity, syncLabel, 0.0f, true);
+
+    // VCO2 -> VCO1 primary TZFM lane, collapsed raw/shaped view
+    drawArrowLine(vg, Vec(82, 45), Vec(38, 45),
+                  tzfmActivity(s), "TZFM", -6.0f);
+
+    // VCO1 -> VCO2 exponential FM
+    drawArrowLine(vg, Vec(38, 53), Vec(82, 53),
+                  s.vco1ToVco2ExpFm, "EXP FM", 6.0f);
+
+    // VCO1 -> VCO2 wave select, secondary
+    drawArrowLine(vg, Vec(38, 66), Vec(82, 66),
+                  s.vco1ToVco2WaveSelect ? 1.f : 0.f,
+                  "WAVE SEL", 0.0f, true);
+
+    // VCO -> VCF modulation paths
+    drawArrowLine(vg, Vec(28, 58), Vec(52, 92),
+                  s.vco1ToVcfExpFm, "EXP", -2.0f);
+
+    drawArrowLine(vg, Vec(92, 58), Vec(68, 92),
+                  s.vco2ToVcfLinFm, "LIN", -2.0f);
+
+    // Waveform source annunciator, attached conceptually to TZFM path
+//    drawWaveBank(vg, s, Vec(60, 76));
+
+    // Nodes last, so paths tuck behind them
+    drawNode(vg, vco1, "VCO1");
+    drawNode(vg, vco2, "VCO2");
+    drawNode(vg, vcf, "VCF");
+
+    nvgRestore(vg);
+  }
+};
+
+
+struct Zoxnoxious5524VisualWidget : ModuleWidget {
+
+  Zoxnoxious5524VisualWidget(Zoxnoxious5524Visual* module) {
+    setModule(module);
+
+    setPanel(createPanel(asset::plugin(pluginInstance, "res/Zoxnoxious5524Viz.svg")));
+
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+    if (module) {
+      auto* display = createWidget<CoupledVoiceTopologyDisplay>(mm2px(Vec(5.5, 15.0)));
+      display->box.size = mm2px(Vec(60.0, 60.0));
+      display->state = &module->couplingState;
+      addChild(display);
+    }
+
+  }
+
+};
+
+
+} // namespace zox
+
+Model* modelZoxnoxious5524Visual = createModel<zox::Zoxnoxious5524Visual, zox::Zoxnoxious5524VisualWidget>("Zoxnoxious5524Visual");

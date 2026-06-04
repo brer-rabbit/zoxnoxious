@@ -48,6 +48,14 @@
       ]
     },
     {
+      "slug": "Zoxnoxious5524Visual",
+      "name": "Zoxnoxious5524 Visaulizer",
+      "description": "dual VCO voice visualizer",
+      "tags": [
+          "Hardware", "Expander"
+      ]
+    },
+    {
       "slug": "PoleDancer",
       "name": "PoleDancer",
       "description": "morphing multimode analog filter",
