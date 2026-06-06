@@ -250,11 +250,11 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
              NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE,
              0.48f + 0.35f * a);
 
-    drawWaveLamp(vg, Vec(52, 110), "PLS", hasPulse(s), a);
+    drawWaveLamp(vg, Vec(52, 110), "PULSE", hasPulse(s), a);
     drawWaveLamp(vg, Vec(66, 110), "SAW", hasSaw(s), s.vco2RawToVco1Tzfm);
     drawWaveLamp(vg, Vec(80, 110), "TRI", hasTri(s), s.vco2RawToVco1Tzfm);
-    drawWaveLamp(vg, Vec(94, 110), "H-S", hasHalfSine(s), s.vco2ShapedToVco1Tzfm);
-    drawWaveLamp(vg, Vec(108, 110), "SIN", hasSine(s), s.vco2ShapedToVco1Tzfm);
+    drawWaveLamp(vg, Vec(94, 110), "½SIN", hasHalfSine(s), s.vco2ShapedToVco1Tzfm);
+    drawWaveLamp(vg, Vec(108, 110), "SINE", hasSine(s), s.vco2ShapedToVco1Tzfm);
   }
 
   void drawLayer(const DrawArgs& args, int layer) override {
