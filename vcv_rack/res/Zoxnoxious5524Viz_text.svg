@@ -26,12 +26,12 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="1.3916699"
-     inkscape:cx="127.54461"
-     inkscape:cy="208.38274"
+     inkscape:cx="89.101589"
+     inkscape:cy="251.49642"
      inkscape:window-width="1480"
      inkscape:window-height="867"
-     inkscape:window-x="200"
-     inkscape:window-y="25"
+     inkscape:window-x="177"
+     inkscape:window-y="44"
      inkscape:window-maximized="0"
      showguides="true"
      inkscape:current-layer="layer2"
@@ -458,7 +458,7 @@
        y="9.0000019"
        id="text27-8"><tspan
          sodipodi:role="line"
-         id="tspan2">MODULATION VISUALIZER</tspan></text>
+         id="tspan2">VOICE ARCHITECTURE</tspan></text>
     <text
        x="35.863205"
        y="122.69843"
@@ -466,7 +466,7 @@
        id="text19"
        transform="matrix(1.009523,0,0,1.0095231,-0.56958815,-0.56883276)"><tspan
          sodipodi:role="line"
-         id="tspan3">Z5524 TOPOLOGY VISUALIZER</tspan></text>
+         id="tspan3">Z5524 MODULATION VISUALIZER</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
