@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "plugin.hpp"
 #include "modulehelpers.hpp"
 #include "zcomponentlib.hpp"
@@ -76,12 +77,34 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     return clamp(v, 0.f, 1.f);
   }
 
-  float tzfmActivity(const CouplingDisplayState& s) const {
-    return clamp01(std::max(s.vco2RawToVco1Tzfm, s.vco2ShapedToVco1Tzfm));
+
+  float tzfmPulseActivity(const CouplingDisplayState& s) const {
+    return clamp01(std::max(hasRawPulse(s) ? s.vco2RawToVco1Tzfm : 0.f,
+                            hasShapedPulse(s) ? s.vco2ShapedToVco1Tzfm : 0.f));
   }
 
-  bool hasPulse(const CouplingDisplayState& s) const {
-    return (s.vco2RawWaveMask & WAVE_PULSE) || (s.vco2ShapedWaveMask & WAVE_PULSE);
+  float tzfmActivity(const CouplingDisplayState& s) const {
+    return clamp01(std::max(
+                     { tzfmPulseActivity(s),
+                         (hasSaw(s) || hasTri(s)) ? s.vco2RawToVco1Tzfm : 0.f,
+                         (hasHalfSine(s) || hasSine(s)) ? s.vco2ShapedToVco1Tzfm : 0.f
+                         }));
+  }
+
+  float tzfmRawActivity(const CouplingDisplayState& s) const {
+    return clamp01(hasRawPulse(s) || hasSaw(s) || hasTri(s) ? s.vco2RawToVco1Tzfm : 0.f);
+  }
+
+  float tzfmShapedActivity(const CouplingDisplayState& s) const {
+    return clamp01(hasShapedPulse(s) || hasHalfSine(s) || hasSine(s) ? s.vco2ShapedToVco1Tzfm : 0.f);
+  }
+
+  bool hasRawPulse(const CouplingDisplayState& s) const {
+    return s.vco2RawWaveMask & WAVE_PULSE;
+  }
+
+  bool hasShapedPulse(const CouplingDisplayState& s) const {
+    return s.vco2ShapedWaveMask & WAVE_PULSE;
   }
 
   bool hasSaw(const CouplingDisplayState& s) const {
@@ -155,10 +178,12 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
       ? (secondary ? 0.72f : 0.94f)
       : (secondary ? 0.28f : 0.34f);
 
-    activity = clamp01(activity);
+    // optional clamping: remove so lines can go phat
+    float normalized = clamp(activity, 0.f, 1.f);
+    float overdrive = clamp(activity - 1.f, 0.f, 0.5f);
 
-    float width = secondary ? 0.65f : 0.95f + 2.35f * activity;
-    NVGcolor c = pathColor(activity, secondary ? 0.08f : 0.14f);
+    float width = secondary ? 0.65f : 0.95f + 2.35f * normalized + 2.0f * overdrive;
+    NVGcolor c = pathColor(normalized, secondary ? 0.08f : 0.14f);
 
     Vec d = b.minus(a);
     float len = std::sqrt(d.x * d.x + d.y * d.y);
@@ -244,13 +269,14 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
   }
 
   void drawWaveBank(NVGcontext* vg, const CouplingDisplayState& s) {
-    float a = tzfmActivity(s);
+    float a = tzfmPulseActivity(s);
+    bool tzfmActive = tzfmRawActivity(s) || tzfmShapedActivity(s);
 
-    drawText(vg, Vec(20, 110), "TZFM SRC", 4.0f,
+    drawText(vg, Vec(20, 110), "TZFM SRC:", 4.0f,
              NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE,
-             0.48f + 0.35f * a);
+             tzfmActive ? 0.83f : 0.48f);
 
-    drawWaveLamp(vg, Vec(52, 110), "PULSE", hasPulse(s), a);
+    drawWaveLamp(vg, Vec(52, 110), "PULSE", hasRawPulse(s) || hasShapedPulse(s), a);
     drawWaveLamp(vg, Vec(66, 110), "SAW", hasSaw(s), s.vco2RawToVco1Tzfm);
     drawWaveLamp(vg, Vec(80, 110), "TRI", hasTri(s), s.vco2RawToVco1Tzfm);
     drawWaveLamp(vg, Vec(94, 110), "½SIN", hasHalfSine(s), s.vco2ShapedToVco1Tzfm);
@@ -288,7 +314,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
 
     // Secondary rail paths
     const char* syncLabel =
-      (s.syncHardSub && s.syncSoft) ? "SYNC BOTH" :
+      (s.syncHardSub && s.syncSoft) ? "H&S SYNC" :
       (s.syncHardSub ? "HARD SUB" :
        (s.syncSoft ? "SOFT SYNC" : "SYNC"));
 
@@ -300,7 +326,8 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
 
     // Primary box-to-box paths
     drawArrowLine(vg, Vec(81, 27), Vec(42, 27),
-                  tzfmActivity(s), "TZFM", -4.0f);
+                  0.75f * tzfmRawActivity(s) + 0.75f * tzfmShapedActivity(s),
+                  "TZFM", -4.0f);
 
     drawArrowLine(vg, Vec(39, 35), Vec(78, 35),
                   s.vco1ToVco2ExpFm, "EXP FM", 4.0f);
