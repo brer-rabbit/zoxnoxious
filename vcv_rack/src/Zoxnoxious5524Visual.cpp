@@ -309,8 +309,8 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     float syncActivity = (s.syncHardSub || s.syncSoft) ? 1.f : 0.f;
     float waveSelActivity = s.vco1ToVco2WaveSelect ? 1.f : 0.f;
 
-    drawBusRail(vg, 42, 12, 50, std::max(syncActivity, waveSelActivity));
-    drawBusRail(vg, 78, 12, 50, std::max(syncActivity, waveSelActivity));
+    drawBusRail(vg, 41, 12, 50, std::max(syncActivity, waveSelActivity));
+    drawBusRail(vg, 79, 12, 50, std::max(syncActivity, waveSelActivity));
 
     // Secondary rail paths
     const char* syncLabel =
@@ -318,22 +318,22 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
       (s.syncHardSub ? "HARD SUB" :
        (s.syncSoft ? "SOFT SYNC" : "SYNC"));
 
-    drawArrowLine(vg, Vec(78, 15), Vec(42, 15),
+    drawArrowLine(vg, Vec(79, 15), Vec(41, 15),
                   syncActivity, syncLabel, -3.0f, true);
 
-    drawArrowLine(vg, Vec(42, 49), Vec(78, 49),
+    drawArrowLine(vg, Vec(41, 49), Vec(79, 49),
                   waveSelActivity, "SHAPE MOD", 3.0f, true);
 
     // Primary box-to-box paths
-    drawArrowLine(vg, Vec(81, 27), Vec(42, 27),
+    drawArrowLine(vg, Vec(80, 27), Vec(41, 27),
                   0.75f * tzfmRawActivity(s) + 0.75f * tzfmShapedActivity(s),
                   "TZFM", -4.0f);
 
-    drawArrowLine(vg, Vec(39, 35), Vec(78, 35),
+    drawArrowLine(vg, Vec(40, 35), Vec(79, 35),
                   s.vco1ToVco2ExpFm, "EXP FM", 4.0f);
 
     // VCO-to-VCF modulation paths
-    drawArrowLine(vg, Vec(28, 40), Vec(50, 69),
+    drawArrowLine(vg, Vec(28, 40), Vec(50, 71),
                   s.vco1ToVcfExpFm, nullptr);
 
     drawText(vg, Vec(31, 57), "EXP", 4.6f,
@@ -341,10 +341,10 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
              s.vco1ToVcfExpFm > 0.f ? 0.94f : 0.34f);
 
 
-    drawArrowLine(vg, Vec(92, 40), Vec(70, 69),
+    drawArrowLine(vg, Vec(92, 40), Vec(70, 71),
                   s.vco2ToVcfLinFm, nullptr);
 
-    drawText(vg, Vec(89, 57), "LINEAR", 4.6f,
+    drawText(vg, Vec(91, 57), "LINEAR", 4.6f,
              NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
              s.vco2ToVcfLinFm > 0.f ? 0.94f : 0.34f);
 
