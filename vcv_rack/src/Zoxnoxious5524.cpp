@@ -461,14 +461,13 @@ struct Zoxnoxious5524Widget : ModuleWidget {
     Zoxnoxious5524* module = getModule<Zoxnoxious5524>();
     menu->addChild(new MenuSeparator);
     menu->addChild(createIndexPtrSubmenuItem("Pulse Width", {"Allow DC", "Limit"}, &module->pwLimit));
-    /*
-    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add workbench (right side)", "");
+
+    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add visaulizer (right side)", "");
     expanderItem->module = module;
-    expanderItem->model = modelPoleDancerWorkbenchForPoleDancer;
+    expanderItem->model = modelZoxnoxious5524Visual;
     expanderItem->posit = box.pos;
     expanderItem->posit.x += box.size.x;
     menu->addChild(expanderItem);
-    */
   }
 
   CardTextDisplay *mix1OutputTextField;
