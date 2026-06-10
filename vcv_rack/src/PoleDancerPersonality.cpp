@@ -142,14 +142,14 @@ static const int fontSize = 12;
 
 struct PersonalityTextField : LedDisplayTextField {
   PoleDancerPersonality* module;
-  std::shared_ptr<Font> font;
+  std::string fontPath;
 
   // override to set color & posiiton
   PersonalityTextField() {
     LedDisplayTextField();
     color = nvgRGB(230, 235, 232);
     textOffset = math::Vec(0, -3);
-    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/OSP-DIN.ttf"));
+    fontPath = asset::plugin(pluginInstance, "res/fonts/OSP-DIN.ttf");
   }
 
   void step() override {
@@ -172,6 +172,7 @@ struct PersonalityTextField : LedDisplayTextField {
 
     if (layer == 1) {
       // Text
+      auto font = APP->window->loadFont(fontPath);
       if (font && font->handle >= 0) {
         bndSetFont(font->handle);
 

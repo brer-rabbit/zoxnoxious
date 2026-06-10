@@ -300,11 +300,11 @@ static const int cardDefaultNumChars = 8;
 
 struct CardTextDisplay : TransparentWidget {
   const std::string *displayString = nullptr;
-  std::shared_ptr<Font> font;
   std::string allSegments;
+  std::string fontPath;
 
   CardTextDisplay() : allSegments(cardDefaultNumChars, '~') {
-    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/DSEG14Classic-BoldItalic.ttf"));
+    fontPath = asset::plugin(pluginInstance, "res/fonts/DSEG14Classic-BoldItalic.ttf");
   }
 
   void setNumChars(size_t count) {
@@ -319,6 +319,11 @@ struct CardTextDisplay : TransparentWidget {
   void draw(const DrawArgs& args) override {
     const auto vg = args.vg;
 
+    std::shared_ptr<Font> font = APP->window->loadFont(fontPath);
+    if (!font || font->handle < 0) {
+      return;
+    }
+
     // Save the drawing context to restore later
     nvgSave(vg);
 
@@ -331,6 +336,7 @@ struct CardTextDisplay : TransparentWidget {
     // If the track name is not empty, then display it
     if (displayString)  {
       const char *text = displayString->c_str();
+
 
       bndSetFont(font->handle);
       nvgFontFaceId(vg, font->handle);
