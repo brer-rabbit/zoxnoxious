@@ -34,14 +34,14 @@ Zoxnoxious5524::Zoxnoxious5524() : output1NameString(invalidCardOutputName),
                                output2NameString(invalidCardOutputName),
                                buttonMidiController(buttonMappings),
                                routes{{
-    {VCO_ONE_SAW_KNOB_PARAM, VCO_ONE_SAW_INPUT, VCO_ONE_SAW, 10.f, &vcoOneSawClipTimer, nullptr, CvOperation::Add},
-    {VCO_ONE_PULSE_KNOB_PARAM, VCO_ONE_PULSE_INPUT, VCO_ONE_PULSE, 10.f, &vcoOnePulseClipTimer, nullptr, CvOperation::Add},
+    {VCO_ONE_SAW_KNOB_PARAM, VCO_ONE_SAW_INPUT, VCO_ONE_SAW, 10.f, &vcoOneSawClipTimer, nullptr, CvOperation::MultiplyNormalled},
+    {VCO_ONE_PULSE_KNOB_PARAM, VCO_ONE_PULSE_INPUT, VCO_ONE_PULSE, 10.f, &vcoOnePulseClipTimer, nullptr, CvOperation::MultiplyNormalled},
     {VCO_TWO_MOD_AMOUNT_KNOB_PARAM, VCO_TWO_MOD_AMOUNT_INPUT, VCO_TWO_MOD_AMOUNT, 10.f, &vcoTwoModAmountClipTimer, nullptr, CvOperation::Add},
     {VCO_TWO_WAVESHAPE_TZFM_KNOB_PARAM, VCO_TWO_WAVESHAPE_TZFM_INPUT, VCO_TWO_WAVESHAPE_TZFM, 10.f, &vcoTwoWaveshapeTzfmClipTimer, nullptr, CvOperation::Add},
     {VCO_ONE_PW_KNOB_PARAM,VCO_ONE_PW_INPUT, VCO_ONE_PW, 10.f, &vcoOnePwClipTimer, nullptr, CvOperation::Add},
     {VCO_ONE_VOCT_KNOB_PARAM, VCO_ONE_VOCT_INPUT, VCO_ONE_VOCT, 8.f, &vcoOneVoctClipTimer, nullptr, CvOperation::Add},
     {VCO_ONE_LINEAR_KNOB_PARAM, VCO_ONE_LINEAR_INPUT, VCO_ONE_LINEAR, 10.f, &vcoOneLinearClipTimer, nullptr, CvOperation::Add},
-    {VCO_ONE_TRIANGLE_KNOB_PARAM, VCO_ONE_TRIANGLE_INPUT, VCO_ONE_TRIANGLE, 10.f, &vcoOneTriangleClipTimer, nullptr, CvOperation::Add},
+    {VCO_ONE_TRIANGLE_KNOB_PARAM, VCO_ONE_TRIANGLE_INPUT, VCO_ONE_TRIANGLE, 10.f, &vcoOneTriangleClipTimer, nullptr, CvOperation::MultiplyNormalled},
     {VCF_CUTOFF_KNOB_PARAM,VCF_CUTOFF_INPUT, VCF_CUTOFF, 10.f, &vcfCutoffClipTimer, nullptr, CvOperation::Add},
     {VCO_TWO_VOCT_KNOB_PARAM, VCO_TWO_VOCT_INPUT, VCO_TWO_VOCT, 6.f, &vcoTwoVoctClipTimer, nullptr, CvOperation::Add},
     {VCO_ONE_MOD_AMOUNT_KNOB_PARAM, VCO_ONE_MOD_AMOUNT_INPUT, VCO_ONE_MOD_AMOUNT, 10.f, &vcoOneModAmountClipTimer, nullptr, CvOperation::Add},
@@ -103,7 +103,7 @@ Zoxnoxious5524::Zoxnoxious5524() : output1NameString(invalidCardOutputName),
   configInput(VCO_ONE_MOD_AMOUNT_INPUT, "VCO One Mod Level");
   configInput(VCO_TWO_MOD_AMOUNT_INPUT, "VCO Two Mod Level");
   configInput(VCO_TWO_WAVESHAPE_TZFM_INPUT, "VCO Two Waveshape to VCO One TZFM");
-  configInput(VCO_TWO_TRI_VCF_INPUT, "VCO Two Triangel to VCF Cutoff Frequency");
+  configInput(VCO_TWO_TRI_VCF_INPUT, "VCO Two Triangle to VCF Cutoff Frequency");
 
   output1NameString.reserve(16);
   output2NameString.reserve(16);
