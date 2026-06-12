@@ -60,6 +60,8 @@ struct Zoxnoxious5524Visual : Module {
 struct CoupledVoiceTopologyDisplay : LedDisplay {
   CouplingDisplayState* state = nullptr;
 
+  enum class DisplayColor { Green, Amber };
+
   static constexpr float W = 120.f;
   static constexpr float H = 120.f;
 
@@ -135,22 +137,41 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     return nvgRGBAf(0.48f, 0.65f, 0.60f, a);
   }
 
-  NVGcolor textColor(float a = 1.f) const {
-    return nvgRGBAf(0.70f, 0.88f, 0.78f, a);
-  }
-
   NVGcolor pathColor(float activity, float baseAlpha = 0.12f) const {
     float a = baseAlpha + 0.88f * clamp01(activity);
     return nvgRGBAf(0.58f, 1.00f, 0.72f, a);
   }
 
+  NVGcolor displayTextColor(DisplayColor color, float a = 1.f) const {
+    switch (color) {
+    case DisplayColor::Amber:
+      return nvgRGBAf(0.88f, 0.62f, 0.24f, a);
+    case DisplayColor::Green:
+    default:
+      return nvgRGBAf(0.70f, 0.88f, 0.78f, a);
+    }
+  }
+
+  NVGcolor displayPathColor(DisplayColor color, float activity, float baseAlpha = 0.12f) const {
+    float a = baseAlpha + 0.88f * clamp(activity, 0.f, 1.f);
+
+    switch (color) {
+    case DisplayColor::Amber:
+      return nvgRGBAf(0.88f, 0.62f, 0.24f, a);
+    case DisplayColor::Green:
+    default:
+      return nvgRGBAf(0.58f, 1.00f, 0.72f, a);
+    }
+  }
+
+
   void drawText(NVGcontext* vg, Vec p, const char* text, float size,
                 int align = NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
-                float alpha = 1.f) {
+                float alpha = 1.f, DisplayColor color = DisplayColor::Green) {
     nvgFontSize(vg, size);
     nvgFontFaceId(vg, APP->window->uiFont->handle);
     nvgTextAlign(vg, align);
-    nvgFillColor(vg, textColor(alpha));
+    nvgFillColor(vg, displayTextColor(color, alpha));
     nvgText(vg, p.x, p.y, text, NULL);
   }
 
@@ -173,17 +194,15 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
                      float activity,
                      const char* label = nullptr,
                      float labelOffsetY = 0.f,
-                     bool secondary = false) {
+                     bool secondary = false,
+                     DisplayColor color = DisplayColor::Green) {
     float labelAlpha = activity > 0.f
       ? (secondary ? 0.72f : 0.94f)
       : (secondary ? 0.28f : 0.34f);
 
-    // optional clamping: remove so lines can go phat
     float normalized = clamp(activity, 0.f, 1.f);
     float overdrive = clamp(activity - 1.f, 0.f, 0.5f);
-
     float width = secondary ? 0.65f : 0.95f + 2.35f * normalized + 2.0f * overdrive;
-    NVGcolor c = pathColor(normalized, secondary ? 0.08f : 0.14f);
 
     Vec d = b.minus(a);
     float len = std::sqrt(d.x * d.x + d.y * d.y);
@@ -197,6 +216,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
 
     float ah = secondary ? 3.2f : 4.8f;
     float aw = secondary ? 1.9f : 2.9f;
+    float alpha = secondary ? 0.08f : 0.14f;
 
     // Stop the shaft before the arrowhead
     Vec shaftEnd = b.minus(d.mult(ah * 0.9f));
@@ -208,7 +228,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     nvgMoveTo(vg, a.x, a.y);
     nvgLineTo(vg, shaftEnd.x, shaftEnd.y);
     nvgStrokeWidth(vg, width);
-    nvgStrokeColor(vg, c);
+    nvgStrokeColor(vg, displayPathColor(color, activity, alpha));
     nvgStroke(vg);
 
     //
@@ -223,7 +243,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     nvgLineTo(vg, p2.x, p2.y);
     nvgLineTo(vg, p3.x, p3.y);
     nvgClosePath(vg);
-    nvgFillColor(vg, c);
+    nvgFillColor(vg, displayPathColor(color, activity, alpha));
     nvgFill(vg);
 
     //
@@ -253,7 +273,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     nvgStroke(vg);
   }
 
-  void drawWaveLamp(NVGcontext* vg, Vec p, const char* label, bool active, float pathActivity) {
+  void drawWaveLamp(NVGcontext* vg, Vec p, const char* label, bool active, float pathActivity, DisplayColor color = DisplayColor::Green) {
     float a = active ? (pathActivity > 0.f ? 1.f : 0.35f) : 0.16f;
 
     nvgBeginPath(vg);
@@ -262,10 +282,10 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     nvgFill(vg);
 
     nvgStrokeWidth(vg, active ? 0.9f : 0.45f);
-    nvgStrokeColor(vg, nvgRGBAf(0.48f, 0.95f, 0.65f, a));
+    nvgStrokeColor(vg, displayTextColor(color, a));
     nvgStroke(vg);
 
-    drawText(vg, p, label, 3.7f, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, a);
+    drawText(vg, p, label, 3.7f, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, a, color);
   }
 
   void drawWaveBank(NVGcontext* vg, const CouplingDisplayState& s) {
@@ -279,8 +299,8 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     drawWaveLamp(vg, Vec(52, 110), "PULSE", hasRawPulse(s) || hasShapedPulse(s), a);
     drawWaveLamp(vg, Vec(66, 110), "SAW", hasSaw(s), s.vco2RawToVco1Tzfm);
     drawWaveLamp(vg, Vec(80, 110), "TRI", hasTri(s), s.vco2RawToVco1Tzfm);
-    drawWaveLamp(vg, Vec(94, 110), "½SIN", hasHalfSine(s), s.vco2ShapedToVco1Tzfm);
-    drawWaveLamp(vg, Vec(108, 110), "SINE", hasSine(s), s.vco2ShapedToVco1Tzfm);
+    drawWaveLamp(vg, Vec(94, 110), "½SIN", hasHalfSine(s), s.vco2ShapedToVco1Tzfm, DisplayColor::Amber);
+    drawWaveLamp(vg, Vec(108, 110), "SINE", hasSine(s), s.vco2ShapedToVco1Tzfm, DisplayColor::Amber);
   }
 
   void drawLayer(const DrawArgs& args, int layer) override {
@@ -325,9 +345,16 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
                   waveSelActivity, "SHAPE MOD", 3.0f, true);
 
     // Primary box-to-box paths
-    drawArrowLine(vg, Vec(80, 27), Vec(41, 27),
-                  0.75f * tzfmRawActivity(s) + 0.75f * tzfmShapedActivity(s),
+    drawArrowLine(vg, Vec(80, 24.2f), Vec(41, 24.2f),
+                  tzfmRawActivity(s) > 0.f ?
+                  0.75f * tzfmRawActivity(s) :
+                  (tzfmShapedActivity(s) > 0.f ? 0.01f : 0.f),
                   "TZFM", -4.0f);
+
+    drawArrowLine(vg, Vec(80, 29.8f), Vec(41, 29.8f),
+                  0.75f * tzfmShapedActivity(s),
+                  nullptr, -4.0f, false,
+                  DisplayColor::Amber);
 
     drawArrowLine(vg, Vec(40, 35), Vec(79, 35),
                   s.vco1ToVco2ExpFm, "EXP FM", 4.0f);
