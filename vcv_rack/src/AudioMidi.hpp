@@ -1,3 +1,4 @@
+#pragma once
 #include <algorithm>
 #include "plugin.hpp"
 #include "constants.hpp"

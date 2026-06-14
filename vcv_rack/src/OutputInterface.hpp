@@ -5,6 +5,7 @@
 #include "Participant.hpp"
 #include "ParticipantAdapter.hpp"
 #include "AudioMidi.hpp"
+#include "HardwareDiscovery.hpp"
 #include "modulehelpers.hpp"
 
 namespace zox {
@@ -96,6 +97,8 @@ struct OutputInterface final : rack::engine::Module {
   static const midi::Message MIDI_TUNE_REQUEST;
 
   bool isPrimary() const;
+
+  HardwareDiscoveryConfig hardwareDiscoveryConfig;
 
 private:
   Broker broker;

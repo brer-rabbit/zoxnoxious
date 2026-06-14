@@ -72,6 +72,9 @@ OutputInterface::~OutputInterface() {
 
 void OutputInterface::onAdd(const AddEvent &e) {
   Module::onAdd(e);
+
+  HardwareDiscoveryResult result = discoverHardware(midiInput, midiOutput, audioPorts, hardwareDiscoveryConfig);
+
   OutputInterface *expected = nullptr;
   OutputInterface::instance.compare_exchange_strong(expected, this, std::memory_order_release);
 }
@@ -116,8 +119,8 @@ void OutputInterface::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
-  if (0) {
-//  if (APP->engine->getFrame() == 80000) {
+//  if (0) {
+  if (APP->engine->getFrame() == 80000) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
@@ -433,6 +436,11 @@ json_t* OutputInterface::dataToJson() {
     std::string thisAudioPortNum = audioPortNum + std::to_string(deviceNum);
     json_object_set_new(rootJ, thisAudioPortNum.c_str(), audioPorts[deviceNum]->toJson());
   }
+
+  json_object_set_new(rootJ, "autoDetectHardware", json_boolean(hardwareDiscoveryConfig.autoDetect));
+  json_object_set_new(rootJ, "bindMidi", json_boolean(hardwareDiscoveryConfig.bindMidi));
+  json_object_set_new(rootJ, "bindAudio", json_boolean(hardwareDiscoveryConfig.bindAudio));
+
   return rootJ;
 }
 
@@ -454,6 +462,16 @@ void OutputInterface::dataFromJson(json_t* rootJ) {
       audioPorts[deviceNum]->fromJson(audioPortJ);
     }
   }
+
+  // only false if user explicitly sets to false
+  json_t* autoDetectHwJ = json_object_get(rootJ, "autoDetectHardware");
+  hardwareDiscoveryConfig.autoDetect = autoDetectHwJ ? json_boolean_value(autoDetectHwJ) : true;
+
+  json_t* bindMidiJ = json_object_get(rootJ, "bindMidi");
+  hardwareDiscoveryConfig.bindMidi = bindMidiJ ? json_boolean_value(bindMidiJ) : true;
+  json_t* bindAudioJ = json_object_get(rootJ, "bindAudio");
+  hardwareDiscoveryConfig.bindAudio = bindAudioJ ? json_boolean_value(bindAudioJ) : true;
+
 }
 
 
@@ -649,18 +667,28 @@ struct OutputInterfaceWidget : ModuleWidget {
 
   void appendContextMenu(Menu *menu) override {
     OutputInterface *module = dynamic_cast<OutputInterface*>(this->module);
+    if (!module) {
+      return;
+    }
 
     menu->addChild(new MenuSeparator);
+    menu->addChild(createIndexPtrSubmenuItem("Auto Detect HW",
+      {"No", "Yes"}, &module->hardwareDiscoveryConfig.autoDetect));
+    menu->addChild(createIndexPtrSubmenuItem("Bind USB MIDI",
+      {"No", "Yes"}, &module->hardwareDiscoveryConfig.bindMidi));
+    menu->addChild(createIndexPtrSubmenuItem("Bind USB Audio",
+      {"No", "Yes"}, &module->hardwareDiscoveryConfig.bindAudio));
+
+    menu->addChild(new MenuSeparator);
+
     menu->addChild(createSubmenuItem("MIDI Out Device", "",
                                      [=](Menu* menu) {
                                        appendMidiMenu(menu, &module->midiOutput);
                                      }));
-    menu->addChild(new MenuSeparator);
     menu->addChild(createSubmenuItem("MIDI In Device", "",
                                      [=](Menu* menu) {
                                        appendMidiMenu(menu, &module->midiInput);
                                      }));
-    menu->addChild(new MenuSeparator);
     menu->addChild(createSubmenuItem("Audio Device 0", "",
                                      [=](Menu* menu) {
                                        appendAudioMenu(menu, module->audioPorts[0]);
