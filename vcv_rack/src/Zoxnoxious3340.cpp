@@ -280,6 +280,22 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   }
 
 
+  bool pullGraphInfo(ParticipantGraphInfo& info) override {
+    info.moduleId = getId();
+    info.hardwareId = hardwareId;
+    if (extModSelectSwitchValue >= 0 && extModSelectSwitchValue <= 12) {
+      info.source1.valid = true;
+      info.source1.slotNum = extModSelectSwitchValue / 2;
+      info.source1.port = (extModSelectSwitchValue % 2 == 0) ? GraphPort::A : GraphPort::B;
+    }
+    else {
+      info.source1.valid = false;
+    }
+    info.source2.valid = false;
+    return true;
+  }
+
+
   void onAttach() override {
     if (lifecycle.nameService == nullptr) {
       return;

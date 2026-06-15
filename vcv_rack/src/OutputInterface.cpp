@@ -9,6 +9,7 @@ namespace zox {
 std::atomic<OutputInterface*> OutputInterface::instance { nullptr };
 
 static constexpr int midiPollRateHz = 100;
+static constexpr int graphPollRateHz = 1;
 
 enum cvChannel {
     OUT2_CHANNEL = 0,
@@ -57,8 +58,9 @@ OutputInterface::OutputInterface() : out1LevelClipTimer(0.f),
 
   orchestrationClockDivider.setDivision(APP->engine->getSampleRate());  // once per second
   midiPollClockDivider.setDivision(static_cast<int>(APP->engine->getSampleRate()) / midiPollRateHz);
+  graphPollClockDivider.setDivision(static_cast<int>(APP->engine->getSampleRate()) / graphPollRateHz);
 
-
+  participantGraphs.reserve(maxVoiceCards);
 }
 
 
@@ -97,6 +99,7 @@ void OutputInterface::onSampleRateChange(const SampleRateChangeEvent& e) {
     (*it)->engineOutputBuffer.clear();
   }
 
+  graphPollClockDivider.setDivision(static_cast<int>(e.sampleRate) / graphPollRateHz);
   midiPollClockDivider.setDivision(static_cast<int>(e.sampleRate) / midiPollRateHz);
   orchestrationClockDivider.setDivision(static_cast<int>(e.sampleRate));
 }
@@ -106,6 +109,7 @@ void OutputInterface::process(const ProcessArgs& args) {
   dsp::Frame<maxAudioChannels> sharedFrames[ audioPorts.size() ];
   bool isMidiClockTick = midiPollClockDivider.process();
   bool isOrchestrationClockTick = orchestrationClockDivider.process();
+  bool isGraphPollClockTick = graphPollClockDivider.process();
 
   const Broker::Snapshot snap = broker.snapshot();
 
@@ -116,8 +120,8 @@ void OutputInterface::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
-  if (0) {
-//  if (APP->engine->getFrame() == 80000) {
+//  if (0) {
+  if (APP->engine->getFrame() == 80000) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
@@ -224,17 +228,71 @@ void OutputInterface::process(const ProcessArgs& args) {
     out2LevelClipTimer -= lightTime;
     lights[OUT2_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out2LevelClipTimer > 0.f, brightnessDeltaTime);
   }
+
+  if (isGraphPollClockTick) {
+    participantGraphs.clear();
+    for (size_t i = 0; i < maxVoiceCards; ++i) {
+      const Slot &slot = snap.slots[i];
+      if (slot.participant != nullptr && slot.props.isAllocated) {
+        ParticipantGraphInfo info = ParticipantGraphInfo{};
+        if (slot.participant->pullGraphInfo(info)) {
+          // got the participant graph info, need to get the moduleId for any valid slots
+          if (info.source1.valid) {
+            // TODO: consider replacing findModuleIdBySlot with HardwareNameService lookup function
+            info.source1.moduleId = findModuleIdBySlot(snap, info.source1.slotNum);
+          }
+          if (info.source2.valid) {
+            info.source2.moduleId = findModuleIdBySlot(snap, info.source2.slotNum);
+          }
+          participantGraphs.push_back(info);
+        }
+      }
+    }
+    dumpParticipantGraphs();
+  }
 }
+
+
     
+static const char* graphPortName(GraphPort port) {
+  return port == GraphPort::A ? "A" : "B";
+}
+
+void OutputInterface::dumpParticipantGraphs() const {
+  INFO("Participant graph dump: %zu participants", participantGraphs.size());
+
+  for (const ParticipantGraphInfo& info : participantGraphs) {
+    INFO("  node moduleId=%lld hardwareId=%d",
+      (long long) info.moduleId,
+      info.hardwareId);
+
+    const GraphSource sources[2] = {info.source1, info.source2};
+
+    for (int i = 0; i < 2; ++i) {
+      const GraphSource& src = sources[i];
+
+      if (!src.valid) {
+        INFO("    source%d: none", i + 1);
+        continue;
+      }
+
+      INFO("    source%d: slot=%d moduleId=%lld port=%s",
+        i + 1,
+        src.slotNum,
+        (long long) src.moduleId,
+        graphPortName(src.port));
+    }
+  }
+}
 
 
-  /** getCardHardwareId
-   * return the hardware Id of this card.
-   * This must match the numeric identifier the Pi has in the etc/zoxnoxiousd.cfg file.
-   * If it doesn't match ZoxnoxiousControlMsg will not have a channel assignment for this card.
-   */
+/** getCardHardwareId
+ * return the hardware Id of this card.
+ * This must match the numeric identifier the Pi has in the etc/zoxnoxiousd.cfg file.
+ * If it doesn't match ZoxnoxiousControlMsg will not have a channel assignment for this card.
+ */
 static const uint8_t hardwareId = 0x07;
-uint8_t OutputInterface::getHardwareId() { // TODO: should this be an interface?
+uint8_t OutputInterface::getHardwareId() {
   return hardwareId;
 }
 
@@ -485,6 +543,21 @@ void OutputInterface::serviceParticipantAttachments() {
       }
     }
   }
+}
+
+
+
+// findModuleIdBySlot: iterate over ParticipantProperty looking for slotNum.
+// return moduleId.  return -1 if not found.
+int64_t OutputInterface::findModuleIdBySlot(const Broker::Snapshot& snap, int8_t slotNum) {
+
+  for (size_t i = 0; i < maxVoiceCards; ++i) {
+    const Slot& slot = snap.slots[i];
+    if (slot.props.isAllocated && slot.props.slotNum == slotNum) {
+      return slot.props.moduleId;
+    }
+  }
+  return -1;
 }
 
 

@@ -504,6 +504,28 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     rezCompModeNameString = rezCompModes[ rezCompModeInt ];
     INFO("poledancer: setting comp mode to %s", rezCompModeNameString.c_str());
   }
+
+
+  bool pullGraphInfo(ParticipantGraphInfo& info) override {
+    info.moduleId = getId();
+    info.hardwareId = hardwareId;
+
+    int sourceOneIndex = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
+    int sourceOneSource = source1Sources[sourceOneIndex];
+
+    int sourceTwoIndex = static_cast<int>(params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue());
+    int sourceTwoSource = source2Sources[sourceTwoIndex];
+
+    info.source1.valid = true;
+    info.source1.slotNum = sourceOneSource / 2;
+    info.source1.port = (sourceOneSource % 2 == 0) ? GraphPort::A : GraphPort::B;
+    info.source2.valid = true;
+    info.source2.slotNum = sourceTwoSource / 2;
+    info.source2.port = (sourceTwoSource % 2 == 0) ? GraphPort::A : GraphPort::B;
+    return true;
+  }
+
+
 };
 
 

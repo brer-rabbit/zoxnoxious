@@ -142,6 +142,13 @@ const std::shared_ptr<HardwareNameService> Broker::getHardwareNameService() cons
 }
 
 
+
+bool Participant::pullGraphInfo(ParticipantGraphInfo& info) {
+  return false;
+}
+
+
+
 bool ParticipantLifecycle::wantAttach() const {
   return state.load(std::memory_order_acquire) == AttachState::AttachRequested;
 }

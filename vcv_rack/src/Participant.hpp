@@ -122,6 +122,32 @@ private:
 
 
 
+//
+// Graph objects are purely for display of module connections
+//
+
+// graphing / output topology declarations
+enum class GraphPort : uint8_t { A, B };
+
+struct GraphSource {
+  bool valid = false;
+  int64_t moduleId = -1;
+  int8_t slotNum = invalidSlot;
+  GraphPort port = GraphPort::A;
+};
+
+struct ParticipantGraphInfo {
+  int64_t moduleId = -1;
+  uint8_t hardwareId = 0;
+
+  GraphSource source1;
+  GraphSource source2;
+};
+
+
+// end graph objects
+
+
 struct Participant {
   virtual ~Participant() = default;
 
@@ -143,6 +169,9 @@ struct Participant {
   // Called at 100-200 Hz (TBD).  Actual frequency can be inferred from clockDivision.
   // This is also a good place to do any module state changes for UI elements such as lights.
   virtual bool pullMidi(const rack::engine::Module::ProcessArgs& args, uint32_t clockDivision, int midiChannel, rack::midi::Message &midiMessage) = 0;
+
+  // method to pull connection info: specify what modules this is connected _from_
+  virtual bool pullGraphInfo(ParticipantGraphInfo& info);
 
 };
 

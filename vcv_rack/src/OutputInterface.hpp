@@ -9,6 +9,8 @@
 
 namespace zox {
 
+// primary stuff:
+
 struct DiscoveredCard;
 
 struct OutputInterface final : rack::engine::Module {
@@ -117,6 +119,7 @@ private:
   bool discoveryReportReceived = false;
   dsp::ClockDivider orchestrationClockDivider;
   dsp::ClockDivider midiPollClockDivider;
+  dsp::ClockDivider graphPollClockDivider;
 
   void processMidiInMessage(const midi::Message &msg);
   void processDiscoveryReport(const midi::Message &msg);
@@ -127,6 +130,12 @@ private:
   void serviceParticipantAttachments();
 
   std::array<CvRoute,2> routes;
+
+  // graph sources
+  std::vector<ParticipantGraphInfo> participantGraphs;
+
+  int64_t findModuleIdBySlot(const Broker::Snapshot& snap, int8_t slotNum);
+  void dumpParticipantGraphs() const;
 
   static const std::string audioPortNum;
 };
