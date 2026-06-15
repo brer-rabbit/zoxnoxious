@@ -230,8 +230,8 @@ void OutputInterface::process(const ProcessArgs& args) {
     lights[OUT2_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out2LevelClipTimer > 0.f, brightnessDeltaTime);
   }
 
-  if (isGraphPollClockTick) {
-    //if (rightExpander.module && rightExpander.module->model == TBD)
+  if (isGraphPollClockTick &&
+      rightExpander.module && rightExpander.module->model == modelOutputInterfaceVisualizer) {
     // Write to Analyzer
     ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(rightExpander.producerMessage);
     message->participantInfoCount = 0;
@@ -273,52 +273,11 @@ void OutputInterface::process(const ProcessArgs& args) {
         message->output2Sources[message->output2SourceCount++] = inputToOut2;
       }
     }
-    // TODO: include the OutputInteface inputs
-    dumpParticipantGraphs();
     rightExpander.messageFlipRequested = true;
   }
 }
 
 
-    
-static const char* graphPortName(GraphPort port) {
-  return port == GraphPort::A ? "A" : "B";
-}
-
-void OutputInterface::dumpParticipantGraphs() const {
-  ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(rightExpander.producerMessage);
-
-  INFO("Participant graph dump: %zu participants", message->participantInfoCount);
-
-  for (size_t i = 0; i < message->participantInfoCount; ++i) {
-    const ParticipantGraphInfo& info = message->participantInfos[i];
-    INFO("  node moduleId=%lld hardwareId=%d",
-      (long long) info.moduleId,
-      info.hardwareId);
-
-    const GraphSource sources[2] = {info.source1, info.source2};
-
-    for (int i = 0; i < 2; ++i) {
-      const GraphSource& src = sources[i];
-      if (!src.valid) {
-        INFO("    source%d: none", i + 1);
-        continue;
-      }
-
-      INFO("    source%d: slot=%d moduleId=%lld port=%s",
-        i + 1, src.slotNum, (long long) src.moduleId, graphPortName(src.port));
-    }
-  }
-
-  for (size_t i = 0; i < message->output1SourceCount; ++i) {
-    const GraphSource& g = message->output1Sources[i];
-    INFO("  Out1: %lld", g.moduleId);
-  }
-  for (size_t i = 0; i < message->output2SourceCount; ++i) {
-    const GraphSource& g = message->output2Sources[i];
-    INFO("  Out2: %lld", g.moduleId);
-  }
-}
 
 
 /** getCardHardwareId
