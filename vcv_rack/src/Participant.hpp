@@ -134,11 +134,15 @@ struct GraphSource {
   int64_t moduleId = -1;
   int8_t slotNum = invalidSlot;
   GraphPort port = GraphPort::A;
+  // inputWeight set by input VCA level or similar
+  float inputWeight = 0.5f;
 };
 
 struct ParticipantGraphInfo {
   int64_t moduleId = -1;
   uint8_t hardwareId = 0;
+  // outputWeight set by output VCA levels or similar
+  float outputWeight = 0.5f;
 
   GraphSource source1;
   GraphSource source2;

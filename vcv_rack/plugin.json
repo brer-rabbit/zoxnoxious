@@ -22,6 +22,14 @@
       ]
     },
     {
+      "slug": "OutputInterfaceVisualizer",
+      "name": "OutputInterfaceVisualizer",
+      "description": "Output Interface Visaulizer",
+      "tags": [
+        "Hardware"
+      ]
+    },
+    {
       "slug": "Zoxnoxious3340",
       "name": "Zoxnoxious3340",
       "description": "Hardware 3340 VCO",

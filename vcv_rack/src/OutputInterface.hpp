@@ -13,6 +13,15 @@ namespace zox {
 
 struct DiscoveredCard;
 
+struct ParticipantGraphMessage {
+  ParticipantGraphInfo participantInfos[maxVoiceCards];
+  size_t participantInfoCount = 0;
+  GraphSource output1Sources[maxVoiceCards];
+  size_t output1SourceCount = 0;
+  GraphSource output2Sources[maxVoiceCards];
+  size_t output2SourceCount = 0;
+};
+
 struct OutputInterface final : rack::engine::Module {
   enum ParamId {
     OUT1_LEVEL_KNOB_PARAM,
@@ -131,8 +140,8 @@ private:
 
   std::array<CvRoute,2> routes;
 
-  // graph sources
-  std::vector<ParticipantGraphInfo> participantGraphs;
+  // graph sources: these will be passed via expander
+  ParticipantGraphMessage graphMessages[2];
 
   int64_t findModuleIdBySlot(const Broker::Snapshot& snap, int8_t slotNum);
   void dumpParticipantGraphs() const;

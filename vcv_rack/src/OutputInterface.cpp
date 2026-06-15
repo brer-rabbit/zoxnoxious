@@ -60,7 +60,8 @@ OutputInterface::OutputInterface() : out1LevelClipTimer(0.f),
   midiPollClockDivider.setDivision(static_cast<int>(APP->engine->getSampleRate()) / midiPollRateHz);
   graphPollClockDivider.setDivision(static_cast<int>(APP->engine->getSampleRate()) / graphPollRateHz);
 
-  participantGraphs.reserve(maxVoiceCards);
+  rightExpander.producerMessage = &graphMessages[0];
+  rightExpander.consumerMessage = &graphMessages[1];
 }
 
 
@@ -230,7 +231,13 @@ void OutputInterface::process(const ProcessArgs& args) {
   }
 
   if (isGraphPollClockTick) {
-    participantGraphs.clear();
+    //if (rightExpander.module && rightExpander.module->model == TBD)
+    // Write to Analyzer
+    ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(rightExpander.producerMessage);
+    message->participantInfoCount = 0;
+    message->output1SourceCount = 0;
+    message->output2SourceCount = 0;
+
     for (size_t i = 0; i < maxVoiceCards; ++i) {
       const Slot &slot = snap.slots[i];
       if (slot.participant != nullptr && slot.props.isAllocated) {
@@ -244,11 +251,31 @@ void OutputInterface::process(const ProcessArgs& args) {
           if (info.source2.valid) {
             info.source2.moduleId = findModuleIdBySlot(snap, info.source2.slotNum);
           }
-          participantGraphs.push_back(info);
+          message->participantInfos[message->participantInfoCount++] = info;
         }
       }
     }
+    for (int i = 0; i < maxVoiceCards; ++i) {
+      if (params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i].getValue()) {
+        GraphSource inputToOut1;
+        inputToOut1.valid = true;
+        inputToOut1.slotNum = i;
+        inputToOut1.moduleId = findModuleIdBySlot(snap, i);
+        inputToOut1.port = GraphPort::A;
+        message->output1Sources[message->output1SourceCount++] = inputToOut1;
+      }
+      if (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].getValue()) {
+        GraphSource inputToOut2;
+        inputToOut2.valid = true;
+        inputToOut2.slotNum = i;
+        inputToOut2.moduleId = findModuleIdBySlot(snap, i);
+        inputToOut2.port = GraphPort::B;
+        message->output2Sources[message->output2SourceCount++] = inputToOut2;
+      }
+    }
+    // TODO: include the OutputInteface inputs
     dumpParticipantGraphs();
+    rightExpander.messageFlipRequested = true;
   }
 }
 
@@ -259,9 +286,12 @@ static const char* graphPortName(GraphPort port) {
 }
 
 void OutputInterface::dumpParticipantGraphs() const {
-  INFO("Participant graph dump: %zu participants", participantGraphs.size());
+  ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(rightExpander.producerMessage);
 
-  for (const ParticipantGraphInfo& info : participantGraphs) {
+  INFO("Participant graph dump: %zu participants", message->participantInfoCount);
+
+  for (size_t i = 0; i < message->participantInfoCount; ++i) {
+    const ParticipantGraphInfo& info = message->participantInfos[i];
     INFO("  node moduleId=%lld hardwareId=%d",
       (long long) info.moduleId,
       info.hardwareId);
@@ -270,18 +300,23 @@ void OutputInterface::dumpParticipantGraphs() const {
 
     for (int i = 0; i < 2; ++i) {
       const GraphSource& src = sources[i];
-
       if (!src.valid) {
         INFO("    source%d: none", i + 1);
         continue;
       }
 
       INFO("    source%d: slot=%d moduleId=%lld port=%s",
-        i + 1,
-        src.slotNum,
-        (long long) src.moduleId,
-        graphPortName(src.port));
+        i + 1, src.slotNum, (long long) src.moduleId, graphPortName(src.port));
     }
+  }
+
+  for (size_t i = 0; i < message->output1SourceCount; ++i) {
+    const GraphSource& g = message->output1Sources[i];
+    INFO("  Out1: %lld", g.moduleId);
+  }
+  for (size_t i = 0; i < message->output2SourceCount; ++i) {
+    const GraphSource& g = message->output2Sources[i];
+    INFO("  Out2: %lld", g.moduleId);
   }
 }
 
