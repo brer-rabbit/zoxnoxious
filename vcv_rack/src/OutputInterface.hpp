@@ -13,6 +13,7 @@ namespace zox {
 
 struct DiscoveredCard;
 
+// message that gets passed to expander interface to visualizer
 struct ParticipantGraphMessage {
   ParticipantGraphInfo participantInfos[maxVoiceCards];
   size_t participantInfoCount = 0;

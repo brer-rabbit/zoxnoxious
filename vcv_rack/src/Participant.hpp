@@ -121,7 +121,6 @@ private:
 };
 
 
-
 //
 // Graph objects are purely for display of module connections
 //
@@ -147,7 +146,6 @@ struct ParticipantGraphInfo {
   GraphSource source1;
   GraphSource source2;
 };
-
 
 // end graph objects
 
