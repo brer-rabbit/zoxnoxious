@@ -302,6 +302,7 @@ struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
   bool pullGraphInfo(ParticipantGraphInfo& info) override {
     info.moduleId = getId();
     info.hardwareId = hardwareId;
+    info.slotNum = lifecycle.slotNum;
 
     int sourceOneIndex = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
     int sourceOneSource = source1Sources[sourceOneIndex];

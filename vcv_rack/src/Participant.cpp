@@ -37,7 +37,9 @@ bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
   // flag anything not specified as invalid
   for (; i < maxVoiceCards; ++i) {
     storageA.slots[i].props.hardwareId = invalidCardId;
+    storageA.slots[i].props.moduleId = -1;
     storageB.slots[i].props.hardwareId = invalidCardId;
+    storageB.slots[i].props.moduleId = -1;
   }
 
   // set published non-null: allow the participant registrations to proceed
@@ -99,6 +101,7 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
   for (size_t i = 0; i < maxVoiceCards; ++i) {
     if (next.slots[i].props.moduleId == moduleId) {
       next.slots[i].props.isAllocated = false;
+      next.slots[i].props.moduleId = -1;
       removed = true;
       break;
     }
@@ -139,12 +142,6 @@ const Broker::Snapshot& Broker::snapshot() const {
 
 const std::shared_ptr<HardwareNameService> Broker::getHardwareNameService() const {
   return nameService;
-}
-
-
-
-bool Participant::pullGraphInfo(ParticipantGraphInfo& info) {
-  return false;
 }
 
 

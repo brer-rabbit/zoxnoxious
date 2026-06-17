@@ -35,6 +35,15 @@ std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot) {
   return string::f("%c%d!%s", slotName, outputNumber, getCardName(cardId, outputNumber).c_str());
 }
 
+const char* getCardNameByHardwareId(uint8_t cardId) {
+  if (cardId == 0x01) return "Audio Out";
+  if (cardId == 0x02) return "3340 VCO";
+  if (cardId == 0x03) return "3372 VCF";
+  if (cardId == 0x04) return "5524 VOICE";
+  if (cardId == 0x06) return "Pole Dancer";
+  if (cardId == 0x07) return "Audio IO";
+  return "----";
+}
 
 
 void init(Plugin* p) {

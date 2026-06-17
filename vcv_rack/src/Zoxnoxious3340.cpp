@@ -283,6 +283,7 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   bool pullGraphInfo(ParticipantGraphInfo& info) override {
     info.moduleId = getId();
     info.hardwareId = hardwareId;
+    info.slotNum = lifecycle.slotNum;
     if (extModSelectSwitchValue >= 0 && extModSelectSwitchValue <= 12) {
       info.source1.valid = true;
       info.source1.slotNum = extModSelectSwitchValue / 2;

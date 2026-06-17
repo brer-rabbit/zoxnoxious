@@ -263,6 +263,16 @@ uint8_t Zoxnoxious5524::getHardwareId() const {
   return hardwareId;
 }
 
+
+bool Zoxnoxious5524::pullGraphInfo(ParticipantGraphInfo& info) {
+  info.moduleId = getId();
+  info.hardwareId = hardwareId;
+  info.slotNum = lifecycle.slotNum;
+  info.source1.valid = false;
+  info.source2.valid = false;
+  return true;
+}
+
   /* Participant interface: return Module identifier */
 int64_t Zoxnoxious5524::getModuleId() {
   return getId();

@@ -46,12 +46,12 @@ public:
 struct Participant;
 
 struct ParticipantProperty {
-  int64_t moduleId;
-  uint8_t hardwareId;
+  int64_t moduleId = -1;
+  uint8_t hardwareId = invalidCardId;
   int8_t cvChannelOffset;
   int8_t outputDeviceId;
   int8_t midiChannel;
-  int8_t slotNum;
+  int8_t slotNum = invalidSlot;
   bool isAllocated;
 };
 
@@ -129,8 +129,9 @@ private:
 enum class GraphPort : uint8_t { A, B };
 
 struct GraphSource {
-  bool valid = false;
   int64_t moduleId = -1;
+  bool valid = false;
+  uint8_t hardwareId = 0;
   int8_t slotNum = invalidSlot;
   GraphPort port = GraphPort::A;
   // inputWeight set by input VCA level or similar
@@ -139,6 +140,7 @@ struct GraphSource {
 
 struct ParticipantGraphInfo {
   int64_t moduleId = -1;
+  int8_t slotNum = invalidSlot;
   uint8_t hardwareId = 0;
   // outputWeight set by output VCA levels or similar
   float outputWeight = 0.5f;
@@ -173,7 +175,8 @@ struct Participant {
   virtual bool pullMidi(const rack::engine::Module::ProcessArgs& args, uint32_t clockDivision, int midiChannel, rack::midi::Message &midiMessage) = 0;
 
   // method to pull connection info: specify what modules this is connected _from_
-  virtual bool pullGraphInfo(ParticipantGraphInfo& info);
+  // at the very least this needs to set slotNum, moduleId, and hardwareId
+  virtual bool pullGraphInfo(ParticipantGraphInfo& info) = 0;
 
 };
 

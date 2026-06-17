@@ -181,6 +181,7 @@ struct Zoxnoxious5524 final : ParticipantAdapter, Participant {
   Zoxnoxious5524();
   void pullSamples(const rack::engine::Module::ProcessArgs &args, dsp::Frame<maxAudioChannels> &sharedFrame, int offset) override;
   bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override;
+  bool pullGraphInfo(ParticipantGraphInfo& info) override;
 
   uint8_t getHardwareId() const override;
   int64_t getModuleId() override;

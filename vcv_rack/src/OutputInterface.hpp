@@ -17,8 +17,12 @@ struct DiscoveredCard;
 struct ParticipantGraphMessage {
   ParticipantGraphInfo participantInfos[maxVoiceCards];
   size_t participantInfoCount = 0;
+
+  ParticipantGraphInfo outputInterfaceInfo;
+
   GraphSource output1Sources[maxVoiceCards];
   size_t output1SourceCount = 0;
+
   GraphSource output2Sources[maxVoiceCards];
   size_t output2SourceCount = 0;
 };
