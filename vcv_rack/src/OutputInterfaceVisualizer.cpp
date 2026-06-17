@@ -251,20 +251,6 @@ struct GraphLayout {
 };
 
 
-static Vec gridCenter(const Rect& r, int col, int row) {
-  const float marginX = 8.f;
-  const float marginY = 8.f;
-
-  const float usableW = r.size.x - 2.f * marginX;
-  const float usableH = r.size.y - 2.f * marginY;
-
-  const float colW = usableW / 4.f;
-  const float rowH = usableH / 3.f;
-
-  return Vec(r.pos.x + marginX + colW * (col + 0.5f),
-             r.pos.y + marginY + rowH * (row + 0.5f) );
-}
-
 
 static Rect nodeRectFromCenter(Vec center, Vec size) {
   return Rect(center.minus(size.div(2.f)), size);
@@ -312,23 +298,57 @@ static int chooseColumn(const GraphRenderSnapshot& s, int8_t slot) {
   if (node.kind == RenderNodeKind::Output) {
     return 3;
   }
-  if (nodeFeedsNodeThatFeedsOutput(s, slot)) {
-    return 0;
-  }
   if (nodeFeedsOutput(s, slot)) {
+    return 2;
+  }
+  
+  if (nodeFeedsNodeThatFeedsOutput(s, slot)) {
     return 1;
   }
+  
   return 0;
 }
+
+
+static Vec voiceNodeCenter(const Rect& r, int col, int row, int rowCount) {
+  const float leftMargin = 10.f;
+  const float rightOutputGutter = 30.f;
+  const float marginY = 18.f;
+
+  const float usableW = r.size.x - leftMargin - rightOutputGutter;
+  const float usableH = r.size.y - 2.f * marginY;
+
+  const float colW = usableW / 3.f;
+
+  float y = r.pos.y + r.size.y * 0.5f;
+  if (rowCount > 1) {
+    y = r.pos.y + marginY + (usableH / float(rowCount - 1)) * row;
+  }
+
+  return Vec(r.pos.x + leftMargin + colW * (col + 0.5f), y);
+}
+
+
+static Vec outputCenter(const Rect& r, int outputIndex) {
+  const float rightMargin = 18.f;
+  const float marginY = 24.f;
+
+  float y = outputIndex == 0
+    ? r.pos.y + marginY
+    : r.pos.y + r.size.y - marginY;
+
+  return Vec(r.pos.x + r.size.x - rightMargin, y);
+}
+
 
 
 struct SystemRoutingVisualizerDisplay : LedDisplay {
   GraphRenderSnapshot *snapshot = nullptr;
 
-  static constexpr float nodeW = 32.f;
-  static constexpr float nodeH = 16.f;
+  static constexpr float nodeW = 36.f;
+  static constexpr float nodeH = 18.f;
   static constexpr float outputW = 20.f;
-  static constexpr float outputH = 12.f;
+  static constexpr float outputH = 14.f;
 
   SystemRoutingVisualizerDisplay() {
   }
@@ -336,7 +356,15 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
   void buildLayout(GraphLayout& layout, const Rect& box) {
     layout = GraphLayout{};
-    int rowIndex[3] = {};
+
+    int colForSlot[maxGraphNodes];
+    int rowForSlot[maxGraphNodes];
+    int colCounts[4] = {};
+
+    for (int i = 0; i < maxGraphNodes; ++i) {
+      colForSlot[i] = -1;
+      rowForSlot[i] = -1;
+    }
 
     for (int slot = 0; slot < maxGraphNodes; ++slot) {
       const GraphRenderNode& node = snapshot->nodes[slot];
@@ -345,17 +373,27 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         continue;
       }
 
-      // contract: chooseColumn returns the inclusive range 0:3
       int col = chooseColumn(*snapshot, slot);
-      int row = rowIndex[col]++;
-      if (row > 2) {
-        row = rowIndex[++col]++;
-      }
-      layout.nodeCenters[slot] = gridCenter(box, col, row);
+      if (col < 0) col = 0;
+      if (col > 2) col = 2;
+
+      colForSlot[slot] = col;
+      rowForSlot[slot] = colCounts[col]++;
     }
 
-    layout.output1Center = gridCenter(box, 3, 0);
-    layout.output2Center = gridCenter(box, 3, 2);
+    for (int slot = 0; slot < maxGraphNodes; ++slot) {
+      if (colForSlot[slot] < 0) {
+        continue;
+      }
+
+      layout.nodeCenters[slot] = voiceNodeCenter(box,
+                                                 colForSlot[slot],
+                                                 rowForSlot[slot],
+                                                 colCounts[colForSlot[slot]]);
+    }
+
+    layout.output1Center = outputCenter(box, 0);
+    layout.output2Center = outputCenter(box, 1);
   }
 
 
@@ -386,7 +424,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     nvgText(vg, p.x, p.y, text, NULL);
   }
 
-  void drawNode(NVGcontext* vg, Vec center, Vec size, const char* label) {
+  void drawNode(NVGcontext* vg, Vec center, Vec size, int slot, const char* label) {
     Rect r = nodeRectFromCenter(center, size);
 
     nvgBeginPath(vg);
@@ -398,13 +436,21 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     nvgStrokeColor(vg, nodeStroke(0.95f));
     nvgStroke(vg);
 
-    drawText(vg, r.getCenter(), label, 5.5f);
+    if (slot >= 0) {
+      char slotBuf[4];
+      snprintf(slotBuf, sizeof(slotBuf), "%c:", slot + 'A');
+      drawText(vg, Vec(r.pos.x + 3.5f, center.y - 3.5f), slotBuf, 6.2f, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+      drawText(vg, Vec(r.pos.x + 3.5f, center.y + 3.5f), label, 6.0f, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+    }
+    else {
+      drawText(vg, r.getCenter(), label, 6.0f);
+    }
   }
 
   void drawOutputs(NVGcontext* vg, const GraphLayout& layout) {
     const Vec outputSize = Vec(outputW, outputH);
-    drawNode(vg, layout.output1Center, outputSize, "OUT1");
-    drawNode(vg, layout.output2Center, outputSize, "OUT2");
+    drawNode(vg, layout.output1Center, outputSize, -1, "OUT1");
+    drawNode(vg, layout.output2Center, outputSize, -1, "OUT2");
   }
 
   void drawNodes(NVGcontext* vg, const GraphLayout& layout) {
@@ -416,9 +462,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       if (!node.valid || node.kind == RenderNodeKind::Output) {
         continue;
       }
-
-      drawNode(vg, layout.nodeCenters[slot],
-               nodeSize, getCardNameByHardwareId(node.hardwareId));
+      drawNode(vg, layout.nodeCenters[slot], nodeSize, slot, getCardNameByHardwareId(node.hardwareId));
     }
 
     drawOutputs(vg, layout);
@@ -469,8 +513,8 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     Rect localBox = Rect(Vec(0.f, 0.f), box.size);
     buildLayout(layout, localBox);
 
-    drawNodes(args.vg, layout);
     drawEdges(args.vg, layout);
+    drawNodes(args.vg, layout);
   }
 
 
