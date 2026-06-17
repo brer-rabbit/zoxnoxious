@@ -153,7 +153,7 @@ struct OutputInterfaceVisualizer final : Module {
 
   OutputInterfaceVisualizer() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-    clockDivider.setDivision(512);
+    clockDivider.setDivision(512 * 30);
   }
 
 
@@ -231,7 +231,7 @@ struct OutputInterfaceVisualizer final : Module {
         ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(leftExpander.module->rightExpander.consumerMessage);
         if (message) {
           buildGraphRenderSnapshot(*message);
-          //dumpGraphRenderSnapshot();
+          dumpGraphRenderSnapshot();
         }
       }
     }
@@ -239,6 +239,16 @@ struct OutputInterfaceVisualizer final : Module {
 
 };
 
+
+
+// ---- visualizer
+
+struct GraphLayout {
+  Vec nodeCenters[maxGraphNodes];
+
+  Vec output1Center;
+  Vec output2Center;
+};
 
 
 static Vec gridCenter(const Rect& r, int col, int row) {
@@ -255,65 +265,99 @@ static Vec gridCenter(const Rect& r, int col, int row) {
              r.pos.y + marginY + rowH * (row + 0.5f) );
 }
 
-#if 0
-static void buildLayout(const GraphRenderSnapshot& snapshot, GraphLayout& layout, const Rect& box) {
-
-  for (size_t i = 0; i < snapshot.edgeCount; ++i) {
-    const GraphEdgeRenderInfo &edge = snapshot.edges[i];
-    addNode(layout, edge.fromModuleId);
-
-    if (edge.targetKind == GraphTargetKind::Participant) {
-      addNode(layout, edge.toModuleId);
-    }
-  }
-
-  for (size_t i = 0; i < layout.nodeCount; ++i) {
-    GraphNodeRenderInfo& n = layout.nodes[i];
-
-    if (nodeIsDestination(snapshot, n.moduleId)) {
-      n.col = 1;
-    }
-    else {
-      n.col = 0;
-    }
-  }
-
-  int rowCounts[3] = {0, 0, 0};
-
-  for (size_t i = 0; i < layout.nodeCount; ++i) {
-    GraphNodeRenderInfo& n = layout.nodes[i];
-
-    if (n.col < 0) n.col = 0;
-    if (n.col > 2) n.col = 2;
-
-    n.row = rowCounts[n.col]++;
-  }
-
-  for (size_t i = 0; i < layout.nodeCount; ++i) {
-    GraphNodeRenderInfo& n = layout.nodes[i];
-    n.center = gridCenter(box, n.col, n.row);
-  }
-
-  layout.output1Center = gridCenter(box, 3, 0);
-  layout.output2Center = gridCenter(box, 3, 2);
-}
-
 
 static Rect nodeRectFromCenter(Vec center, Vec size) {
   return Rect(center.minus(size.div(2.f)), size);
 }
 
 
-struct SystemRoutingVisualizerDisplay : LedDisplay {
-  GraphRenderSnapshot *snapshot;
+static bool edgeTargetsOutput(const GraphRenderEdge& e) {
+  return e.valid &&
+    (e.targetKind == RenderTargetKind::Output1 ||
+     e.targetKind == RenderTargetKind::Output2);
+}
 
-  static constexpr float nodeW = 22.f;
-  static constexpr float nodeH = 12.f;
+static bool nodeFeedsOutput(const GraphRenderSnapshot& s, int8_t slot) {
+  for (size_t i = 0; i < s.edgeCount; ++i) {
+    const GraphRenderEdge& e = s.edges[i];
+    if (e.valid && e.fromSlotNum == slot && edgeTargetsOutput(e)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static bool nodeFeedsNodeThatFeedsOutput(const GraphRenderSnapshot& s, int8_t slot) {
+  for (size_t i = 0; i < s.edgeCount; ++i) {
+    const GraphRenderEdge& e = s.edges[i];
+    if (!e.valid) {
+      continue;
+    }
+    if (e.targetKind != RenderTargetKind::VoiceCard) {
+      continue;
+    }
+    if (e.fromSlotNum != slot) {
+      continue;
+    }
+    if (nodeFeedsOutput(s, e.toSlotNum)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static int chooseColumn(const GraphRenderSnapshot& s, int8_t slot) {
+  const GraphRenderNode& node = s.nodes[slot];
+
+  if (node.kind == RenderNodeKind::Output) {
+    return 3;
+  }
+  if (nodeFeedsNodeThatFeedsOutput(s, slot)) {
+    return 0;
+  }
+  if (nodeFeedsOutput(s, slot)) {
+    return 1;
+  }
+  return 0;
+}
+
+
+struct SystemRoutingVisualizerDisplay : LedDisplay {
+  GraphRenderSnapshot *snapshot = nullptr;
+
+  static constexpr float nodeW = 32.f;
+  static constexpr float nodeH = 16.f;
   static constexpr float outputW = 20.f;
-  static constexpr float outputH = 10.f;
+  static constexpr float outputH = 12.f;
 
   SystemRoutingVisualizerDisplay() {
   }
+
+
+  void buildLayout(GraphLayout& layout, const Rect& box) {
+    layout = GraphLayout{};
+    int rowIndex[3] = {};
+
+    for (int slot = 0; slot < maxGraphNodes; ++slot) {
+      const GraphRenderNode& node = snapshot->nodes[slot];
+
+      if (!node.valid || node.kind == RenderNodeKind::Output) {
+        continue;
+      }
+
+      // contract: chooseColumn returns the inclusive range 0:3
+      int col = chooseColumn(*snapshot, slot);
+      int row = rowIndex[col]++;
+      if (row > 2) {
+        row = rowIndex[++col]++;
+      }
+      layout.nodeCenters[slot] = gridCenter(box, col, row);
+    }
+
+    layout.output1Center = gridCenter(box, 3, 0);
+    layout.output2Center = gridCenter(box, 3, 2);
+  }
+
 
 
   NVGcolor bgColor() const {
@@ -327,7 +371,6 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   NVGcolor nodeStroke(float a = 1.f) const {
     return nvgRGBAf(0.48f, 0.65f, 0.60f, a);
   }
-
 
   NVGcolor displayTextColor(float a = 1.f) const {
     return nvgRGBAf(0.70f, 0.88f, 0.78f, a);
@@ -355,27 +398,65 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     nvgStrokeColor(vg, nodeStroke(0.95f));
     nvgStroke(vg);
 
-    drawText(vg, r.getCenter(), label, 6.0f);
+    drawText(vg, r.getCenter(), label, 5.5f);
+  }
+
+  void drawOutputs(NVGcontext* vg, const GraphLayout& layout) {
+    const Vec outputSize = Vec(outputW, outputH);
+    drawNode(vg, layout.output1Center, outputSize, "OUT1");
+    drawNode(vg, layout.output2Center, outputSize, "OUT2");
   }
 
   void drawNodes(NVGcontext* vg, const GraphLayout& layout) {
     const Vec nodeSize = Vec(nodeW, nodeH);
 
-    for (size_t i = 0; i < layout.nodeCount; ++i) {
-      const GraphNodeRenderInfo& node = layout.nodes[i];
+    for (int slot = 0; slot < maxGraphNodes; ++slot) {
+      const GraphRenderNode& node = snapshot->nodes[slot];
 
-      if (!node.valid)
+      if (!node.valid || node.kind == RenderNodeKind::Output) {
         continue;
+      }
 
-      drawNode(vg, node.center, nodeSize, getCardNameByHardwareId(node.hardwareId));
+      drawNode(vg, layout.nodeCenters[slot],
+               nodeSize, getCardNameByHardwareId(node.hardwareId));
     }
+
+    drawOutputs(vg, layout);
   }
 
-  void drawOutputs(NVGcontext* vg, const GraphLayout& layout) {
-    const Vec outputSize = Vec(outputW, outputH);
 
-    drawNode(vg, layout.output1Center, outputSize, "OUT1");
-    drawNode(vg, layout.output2Center, outputSize, "OUT2");
+  void drawEdges(NVGcontext* vg, const GraphLayout& layout) {
+    for (size_t i = 0; i < snapshot->edgeCount; ++i) {
+      const GraphRenderEdge& edge = snapshot->edges[i];
+
+      if (!edge.valid) {
+        continue;
+      }
+
+      Vec p1 = layout.nodeCenters[edge.fromSlotNum];
+      Vec p2;
+
+      switch (edge.targetKind) {
+      case RenderTargetKind::VoiceCard:
+        p2 = layout.nodeCenters[edge.toSlotNum];
+        break;
+
+      case RenderTargetKind::Output1:
+        p2 = layout.output1Center;
+        break;
+
+      case RenderTargetKind::Output2:
+        p2 = layout.output2Center;
+        break;
+      }
+
+      nvgBeginPath(vg);
+      nvgMoveTo(vg, p1.x, p1.y);
+      nvgLineTo(vg, p2.x, p2.y);
+      nvgStrokeColor(vg, displayTextColor());
+      nvgStrokeWidth(vg, 1.2f);
+      nvgStroke(vg);
+    }
   }
 
 
@@ -386,15 +467,15 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
     GraphLayout layout;
     Rect localBox = Rect(Vec(0.f, 0.f), box.size);
-    buildLayout(*snapshot, layout, localBox);
+    buildLayout(layout, localBox);
 
     drawNodes(args.vg, layout);
-    drawOutputs(args.vg, layout);
+    drawEdges(args.vg, layout);
   }
 
 
 };
-#endif
+
 
 struct OutputInterfaceVisualizerWidget : ModuleWidget {
 
@@ -409,12 +490,10 @@ struct OutputInterfaceVisualizerWidget : ModuleWidget {
     addChild(createWidget<ScrewSlottedKnurled>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     if (module) {
-#if 0
       auto* display = createWidget<SystemRoutingVisualizerDisplay>(mm2px(Vec(5.5, 15.0)));
       display->box.size = mm2px(Vec(60.0, 60.0));
       display->snapshot = &module->graphSnapshot;
       addChild(display);
-#endif
     }
   }
 };
