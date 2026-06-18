@@ -386,7 +386,7 @@ struct EdgeRoute {
   AnchorSide toSide = AnchorSide::Left;
 };
 
-static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, float boxSizeY) {
+static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, float midY) {
   EdgeRoute route;
 
   const float dx = toCenter.x - fromCenter.x;
@@ -409,7 +409,7 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, fl
   if (std::fabs(dy) < 4.f) {
     route.kind = EdgeRouteKind::Feedback;
     // route feedback above or below?  Check where we are in the box
-    if (fromCenter.y < boxSizeY * 0.5f) {
+    if (fromCenter.y < midY) {
       route.fromSide = AnchorSide::Top;
       route.toSide = AnchorSide::Top;
     }
@@ -566,8 +566,30 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   }
 
 
-  void drawEdges(NVGcontext* vg, const GraphLayout& layout) {
+  Vec fromAnchorFor(const Vec& nodeCenter, const AnchorSide &fromSide, const GraphPort& fromPort) {
     const Vec nodeSize = Vec(nodeW, nodeH);
+    Vec anchorPoint;
+
+    switch (fromSide) {
+    case AnchorSide::Left:
+      anchorPoint = leftAnchor(nodeCenter, nodeSize);
+      break;
+    case AnchorSide::Right:
+      anchorPoint = rightAnchor(nodeCenter, nodeSize, fromPort);
+      break;
+    case AnchorSide::Top:
+      anchorPoint = topAnchor(nodeCenter, nodeSize, fromPort);
+      break;
+    case AnchorSide::Bottom:
+      anchorPoint = bottomAnchor(nodeCenter, nodeSize, fromPort);
+      break;
+    }
+    return anchorPoint;
+  }
+
+  // contract:
+  // toSlotNum and fromSlotNum are valid indices
+  void drawEdges(NVGcontext* vg, const GraphLayout& layout) {
     const Vec outputSize = Vec(outputW, outputH);
 
     for (size_t i = 0; i < snapshot->edgeCount; ++i) {
@@ -592,23 +614,13 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         break;
       }
 
-      EdgeRoute edgeRoute = chooseEdgeRoute(p1, p2, edge.fromSlotNum == edge.toSlotNum, box.size.y);
+      EdgeRoute edgeRoute = chooseEdgeRoute(p1, p2,
+                                            edge.fromSlotNum == edge.toSlotNum,
+                                            box.size.y * 0.5f);
 
-      switch (edgeRoute.fromSide) {
-      case AnchorSide::Left:
-        p1 = leftAnchor(layout.nodeCenters[edge.fromSlotNum], nodeSize);
-        break;
-      case AnchorSide::Right:
-        p1 = rightAnchor(layout.nodeCenters[edge.fromSlotNum], nodeSize, edge.fromPort);
-        break;
-      case AnchorSide::Top:
-        p1 = topAnchor(layout.nodeCenters[edge.fromSlotNum], nodeSize, edge.fromPort);
-        break;
-      case AnchorSide::Bottom:
-        p1 = bottomAnchor(layout.nodeCenters[edge.fromSlotNum], nodeSize, edge.fromPort);
-        break;
-      }
+      p1 = fromAnchorFor(layout.nodeCenters[edge.fromSlotNum], edgeRoute.fromSide, edge.fromPort);
 
+      const Vec nodeSize = Vec(nodeW, nodeH);
       switch (edge.targetKind) {
       case RenderTargetKind::VoiceCard:
 
@@ -628,30 +640,38 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         }
 
         break;
-
       case RenderTargetKind::Output1:
         p2 = leftAnchor(layout.output1Center, outputSize);
         break;
-
       case RenderTargetKind::Output2:
         p2 = leftAnchor(layout.output2Center, outputSize);
         break;
       }
 
-      float gutterY = (edgeRoute.fromSide == AnchorSide::Top ?
-                       (std::min(p1.y, p2.y) - 14.f) :
-                       (std::max(p1.y, p2.y) + 14.f));
+      if (edgeRoute.kind == EdgeRouteKind::Feedback) {
+        float gutterY;
+        float gutterOffset = 3.f + 2.5f * edge.fromSlotNum;
 
-      switch (edgeRoute.kind) {
-      case EdgeRouteKind::Feedback:
+        if (edgeRoute.fromSide == edgeRoute.toSide) {
+          gutterY = (edgeRoute.fromSide == AnchorSide::Top ?
+                     (std::min(p1.y, p2.y) - gutterOffset) :
+                     (std::max(p1.y, p2.y) + gutterOffset));
+        }
+        else {
+          gutterY = (edgeRoute.fromSide == AnchorSide::Top ?
+                     (std::min(p1.y, p2.y) + gutterOffset) :
+                     (std::max(p1.y, p2.y) - gutterOffset));
+        }
         nvgBeginPath(vg);
         nvgMoveTo(vg, p1.x, p1.y);
         nvgLineTo(vg, p1.x, gutterY);
         nvgLineTo(vg, p2.x, gutterY);
         nvgLineTo(vg, p2.x, p2.y);
+        nvgStrokeColor(vg, displayTextColor());
+        nvgStrokeWidth(vg, 1.2f);
         nvgStroke(vg);
-        break;
-      default:
+      }
+      else {
         nvgBeginPath(vg);
         nvgMoveTo(vg, p1.x, p1.y);
         nvgLineTo(vg, p2.x, p2.y);
