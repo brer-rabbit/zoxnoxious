@@ -153,7 +153,7 @@ struct OutputInterfaceVisualizer final : Module {
 
   OutputInterfaceVisualizer() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-    clockDivider.setDivision(512 * 30);
+    clockDivider.setDivision(512);
   }
 
 
@@ -231,7 +231,7 @@ struct OutputInterfaceVisualizer final : Module {
         ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(leftExpander.module->rightExpander.consumerMessage);
         if (message) {
           buildGraphRenderSnapshot(*message);
-          dumpGraphRenderSnapshot();
+          //dumpGraphRenderSnapshot();
         }
       }
     }
@@ -292,12 +292,16 @@ static bool nodeFeedsNodeThatFeedsOutput(const GraphRenderSnapshot& s, int8_t sl
   return false;
 }
 
-static int chooseColumn(const GraphRenderSnapshot& s, int8_t slot) {
-  const GraphRenderNode& node = s.nodes[slot];
 
-  if (node.kind == RenderNodeKind::Output) {
-    return 3;
-  }
+// choose a preferred column for the slot.  Must only return 0, 1, or 2.
+// Does not handle RenderNodeKind::Output.
+static int chooseColumn(const GraphRenderSnapshot& s, int8_t slot) {
+  /*
+   * const GraphRenderNode& node = s.nodes[slot];
+   * if (node.kind == RenderNodeKind::Output) {
+   *  return 3;
+   * }
+  */
   if (nodeFeedsOutput(s, slot)) {
     return 2;
   }
@@ -313,7 +317,7 @@ static int chooseColumn(const GraphRenderSnapshot& s, int8_t slot) {
 static Vec voiceNodeCenter(const Rect& r, int col, int row, int rowCount) {
   const float leftMargin = 10.f;
   const float rightOutputGutter = 30.f;
-  const float marginY = 18.f;
+  const float marginY = 28.f;
 
   const float usableW = r.size.x - leftMargin - rightOutputGutter;
   const float usableH = r.size.y - 2.f * marginY;
@@ -331,13 +335,95 @@ static Vec voiceNodeCenter(const Rect& r, int col, int row, int rowCount) {
 
 static Vec outputCenter(const Rect& r, int outputIndex) {
   const float rightMargin = 18.f;
-  const float marginY = 24.f;
+  const float marginY = 48.f;
 
   float y = outputIndex == 0
     ? r.pos.y + marginY
     : r.pos.y + r.size.y - marginY;
 
   return Vec(r.pos.x + r.size.x - rightMargin, y);
+}
+
+static float portOffset(GraphPort port) {
+  return port == GraphPort::A ? -4.f : 4.f;
+}
+
+static Vec rightAnchor(Vec center, Vec size) {
+  return Vec(center.x + size.x * 0.5f, center.y);
+}
+
+static Vec rightAnchor(Vec center, Vec size, GraphPort port) {
+  return Vec(center.x + size.x * 0.5f, center.y + portOffset(port));
+}
+
+static Vec leftAnchor(Vec center, Vec size) {
+  return Vec(center.x - size.x * 0.5f, center.y);
+}
+
+static Vec topAnchor(Vec center, Vec size) {
+  return Vec(center.x - 8.f, center.y - size.y * 0.5f);
+}
+
+static Vec topAnchor(Vec center, Vec size, GraphPort port) {
+  return Vec(center.x + portOffset(port) + 6.f, center.y - size.y * 0.5f);
+}
+
+static Vec bottomAnchor(Vec center, Vec size) {
+  return Vec(center.x - 8.f, center.y + size.y * 0.5f);
+}
+
+static Vec bottomAnchor(Vec center, Vec size, GraphPort port) {
+  return Vec(center.x + portOffset(port) + 6.f, center.y + size.y * 0.5f);
+}
+
+
+enum class AnchorSide : uint8_t { Left, Right, Top, Bottom };
+enum class EdgeRouteKind : uint8_t { Normal, Vertical, Feedback, SelfLoop };
+
+struct EdgeRoute {
+  EdgeRouteKind kind = EdgeRouteKind::Normal;
+  AnchorSide fromSide = AnchorSide::Right;
+  AnchorSide toSide = AnchorSide::Left;
+};
+
+static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, float boxSizeY) {
+  EdgeRoute route;
+
+  const float dx = toCenter.x - fromCenter.x;
+  const float dy = toCenter.y - fromCenter.y;
+
+  if (selfLoop) {
+    route.kind = EdgeRouteKind::SelfLoop;
+    route.fromSide = AnchorSide::Bottom;
+    route.toSide = AnchorSide::Left;
+    return route;
+  }
+
+  if (dx >= 8.f) {
+    route.kind = EdgeRouteKind::Normal;
+    route.fromSide = AnchorSide::Right;
+    route.toSide = AnchorSide::Left;
+    return route;
+  }
+
+  if (std::fabs(dy) < 4.f) {
+    route.kind = EdgeRouteKind::Feedback;
+    // route feedback above or below?  Check where we are in the box
+    if (fromCenter.y < boxSizeY * 0.5f) {
+      route.fromSide = AnchorSide::Top;
+      route.toSide = AnchorSide::Top;
+    }
+    else {
+      route.fromSide = AnchorSide::Bottom;
+      route.toSide = AnchorSide::Bottom;
+    }
+    return route;
+  }
+
+  route.kind = dx < 0.f ? EdgeRouteKind::Feedback : EdgeRouteKind::Vertical;
+  route.fromSide = dy > 0.f ? AnchorSide::Bottom : AnchorSide::Top;
+  route.toSide   = dy > 0.f ? AnchorSide::Top    : AnchorSide::Bottom;
+  return route;
 }
 
 
@@ -350,16 +436,18 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   static constexpr float outputW = 20.f;
   static constexpr float outputH = 14.f;
 
-  SystemRoutingVisualizerDisplay() {
-  }
-
-
+  // create a dynamic vertical stack for each column.
+  // colForSlot is a lookup for which column index was assigned to a node.
+  // rowForSlot is a lookup for the row the slot is assigned.
+  // colCounts tracks how many nodes have been assigned to each column.
+  // Two passes:
+  // (1) chooseColumn gets the node's preferred column
   void buildLayout(GraphLayout& layout, const Rect& box) {
     layout = GraphLayout{};
 
     int colForSlot[maxGraphNodes];
     int rowForSlot[maxGraphNodes];
-    int colCounts[4] = {};
+    int colCounts[3] = {};
 
     for (int i = 0; i < maxGraphNodes; ++i) {
       colForSlot[i] = -1;
@@ -373,9 +461,18 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         continue;
       }
 
+      // by contract chooseColumn must return in the 0:2 range
       int col = chooseColumn(*snapshot, slot);
-      if (col < 0) col = 0;
-      if (col > 2) col = 2;
+      if (colCounts[col] >= 3) {
+        if (col == 2) {
+          // six voice cards max, if col == 2 then col 1 must have space
+          col = 1;
+        }
+        else {
+          // col 0 or 1 and it's full.  The next column right must have at least one spot
+          col++;
+        }
+      }
 
       colForSlot[slot] = col;
       rowForSlot[slot] = colCounts[col]++;
@@ -470,6 +567,9 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
 
   void drawEdges(NVGcontext* vg, const GraphLayout& layout) {
+    const Vec nodeSize = Vec(nodeW, nodeH);
+    const Vec outputSize = Vec(outputW, outputH);
+
     for (size_t i = 0; i < snapshot->edgeCount; ++i) {
       const GraphRenderEdge& edge = snapshot->edges[i];
 
@@ -477,29 +577,88 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         continue;
       }
 
+      // get the intent of the edge: which way is it going?
       Vec p1 = layout.nodeCenters[edge.fromSlotNum];
       Vec p2;
-
       switch (edge.targetKind) {
-      case RenderTargetKind::VoiceCard:
-        p2 = layout.nodeCenters[edge.toSlotNum];
-        break;
-
       case RenderTargetKind::Output1:
         p2 = layout.output1Center;
         break;
-
       case RenderTargetKind::Output2:
         p2 = layout.output2Center;
         break;
+      case RenderTargetKind::VoiceCard:
+        p2 = layout.nodeCenters[edge.toSlotNum];
+        break;
       }
 
-      nvgBeginPath(vg);
-      nvgMoveTo(vg, p1.x, p1.y);
-      nvgLineTo(vg, p2.x, p2.y);
-      nvgStrokeColor(vg, displayTextColor());
-      nvgStrokeWidth(vg, 1.2f);
-      nvgStroke(vg);
+      EdgeRoute edgeRoute = chooseEdgeRoute(p1, p2, edge.fromSlotNum == edge.toSlotNum, box.size.y);
+
+      switch (edgeRoute.fromSide) {
+      case AnchorSide::Left:
+        p1 = leftAnchor(layout.nodeCenters[edge.fromSlotNum], nodeSize);
+        break;
+      case AnchorSide::Right:
+        p1 = rightAnchor(layout.nodeCenters[edge.fromSlotNum], nodeSize, edge.fromPort);
+        break;
+      case AnchorSide::Top:
+        p1 = topAnchor(layout.nodeCenters[edge.fromSlotNum], nodeSize, edge.fromPort);
+        break;
+      case AnchorSide::Bottom:
+        p1 = bottomAnchor(layout.nodeCenters[edge.fromSlotNum], nodeSize, edge.fromPort);
+        break;
+      }
+
+      switch (edge.targetKind) {
+      case RenderTargetKind::VoiceCard:
+
+        switch (edgeRoute.toSide) {
+        case AnchorSide::Left:
+          p2 = leftAnchor(layout.nodeCenters[edge.toSlotNum], nodeSize);
+          break;
+        case AnchorSide::Right:
+          p2 = rightAnchor(layout.nodeCenters[edge.toSlotNum], nodeSize);
+          break;
+        case AnchorSide::Top:
+          p2 = topAnchor(layout.nodeCenters[edge.toSlotNum], nodeSize);
+          break;
+        case AnchorSide::Bottom:
+          p2 = bottomAnchor(layout.nodeCenters[edge.toSlotNum], nodeSize);
+          break;
+        }
+
+        break;
+
+      case RenderTargetKind::Output1:
+        p2 = leftAnchor(layout.output1Center, outputSize);
+        break;
+
+      case RenderTargetKind::Output2:
+        p2 = leftAnchor(layout.output2Center, outputSize);
+        break;
+      }
+
+      float gutterY = (edgeRoute.fromSide == AnchorSide::Top ?
+                       (std::min(p1.y, p2.y) - 14.f) :
+                       (std::max(p1.y, p2.y) + 14.f));
+
+      switch (edgeRoute.kind) {
+      case EdgeRouteKind::Feedback:
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, p1.x, p1.y);
+        nvgLineTo(vg, p1.x, gutterY);
+        nvgLineTo(vg, p2.x, gutterY);
+        nvgLineTo(vg, p2.x, p2.y);
+        nvgStroke(vg);
+        break;
+      default:
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, p1.x, p1.y);
+        nvgLineTo(vg, p2.x, p2.y);
+        nvgStrokeColor(vg, displayTextColor());
+        nvgStrokeWidth(vg, 1.2f);
+        nvgStroke(vg);
+      }
     }
   }
 
@@ -513,8 +672,8 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     Rect localBox = Rect(Vec(0.f, 0.f), box.size);
     buildLayout(layout, localBox);
 
-    drawEdges(args.vg, layout);
     drawNodes(args.vg, layout);
+    drawEdges(args.vg, layout);
   }
 
 
