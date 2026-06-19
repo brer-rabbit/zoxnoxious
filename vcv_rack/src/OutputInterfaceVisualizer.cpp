@@ -428,6 +428,49 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, fl
 
 
 
+static float getAverageConnectionY(int slot, int colForSlot[], int rowForSlot[], const GraphRenderSnapshot& s) {
+  float totalY = 0.f;
+  int count = 0;
+  for (size_t i = 0; i < s.edgeCount; ++i) {
+    const GraphRenderEdge& e = s.edges[i];
+    if (e.valid && e.fromSlotNum == slot && colForSlot[e.toSlotNum] == colForSlot[slot] + 1) {
+      totalY += rowForSlot[e.toSlotNum];
+      count++;
+    }
+  }
+  return (count > 0) ? (totalY / count) : rowForSlot[slot];
+}
+
+static void optimizeLayout(int colForSlot[], int rowForSlot[], const GraphRenderSnapshot& s) {
+  // Iterate from right to left (Column 2 down to 0)
+  for (int col = 1; col >= 0; --col) {
+    // Find all nodes in the current column
+    std::vector<int> colNodes;
+    for (int i = 0; i < maxGraphNodes; ++i) {
+      if (colForSlot[i] == col) colNodes.push_back(i);
+    }
+
+    // Simple Bubble-Sort style optimization to minimize vertical distance
+    // to connected nodes in the next column
+    for (size_t i = 0; i < colNodes.size(); ++i) {
+      for (size_t j = i + 1; j < colNodes.size(); ++j) {
+        int nodeA = colNodes[i];
+        int nodeB = colNodes[j];
+
+        // Calculate "average connection Y" for both nodes in the next column
+        float costA = getAverageConnectionY(nodeA, colForSlot, rowForSlot, s);
+        float costB = getAverageConnectionY(nodeB, colForSlot, rowForSlot, s);
+
+        // If nodeB is "higher up" but has a lower Y-connection target, swap them
+        if (costB < costA) {
+          std::swap(rowForSlot[nodeA], rowForSlot[nodeB]);
+        }
+      }
+    }
+  }
+}
+
+
 struct SystemRoutingVisualizerDisplay : LedDisplay {
   GraphRenderSnapshot *snapshot = nullptr;
 
@@ -478,11 +521,15 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       rowForSlot[slot] = colCounts[col]++;
     }
 
+    // make it look good
+    optimizeLayout(colForSlot, rowForSlot, *snapshot);
+
     for (int slot = 0; slot < maxGraphNodes; ++slot) {
       if (colForSlot[slot] < 0) {
         continue;
       }
 
+      // todo: play with this for initial node placement by quantity
       layout.nodeCenters[slot] = voiceNodeCenter(box,
                                                  colForSlot[slot],
                                                  rowForSlot[slot],
