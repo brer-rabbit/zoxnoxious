@@ -566,31 +566,59 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   }
 
 
-  Vec fromAnchorFor(const Vec& nodeCenter, const AnchorSide &fromSide, const GraphPort& fromPort) {
+  Vec anchorForSideAndPort(const Vec& nodeCenter, const AnchorSide &side, const GraphPort& port) {
     const Vec nodeSize = Vec(nodeW, nodeH);
     Vec anchorPoint;
 
-    switch (fromSide) {
+    switch (side) {
     case AnchorSide::Left:
       anchorPoint = leftAnchor(nodeCenter, nodeSize);
       break;
     case AnchorSide::Right:
-      anchorPoint = rightAnchor(nodeCenter, nodeSize, fromPort);
+      anchorPoint = rightAnchor(nodeCenter, nodeSize, port);
       break;
     case AnchorSide::Top:
-      anchorPoint = topAnchor(nodeCenter, nodeSize, fromPort);
+      anchorPoint = topAnchor(nodeCenter, nodeSize, port);
       break;
     case AnchorSide::Bottom:
-      anchorPoint = bottomAnchor(nodeCenter, nodeSize, fromPort);
+      anchorPoint = bottomAnchor(nodeCenter, nodeSize, port);
       break;
     }
     return anchorPoint;
   }
 
+  Vec anchorForSideAndTargetKind(const Vec& nodeCenter, const AnchorSide& side, const RenderTargetKind& targetKind) {
+    const Vec nodeSize = Vec(nodeW, nodeH);
+    const Vec outputSize = Vec(outputW, outputH);
+    Vec anchorPoint;
+
+    if (targetKind == RenderTargetKind::VoiceCard) {
+      switch (side) {
+      case AnchorSide::Left:
+        anchorPoint = leftAnchor(nodeCenter, nodeSize);
+        break;
+      case AnchorSide::Right:
+        anchorPoint = rightAnchor(nodeCenter, nodeSize);
+        break;
+      case AnchorSide::Top:
+        anchorPoint = topAnchor(nodeCenter, nodeSize);
+        break;
+      case AnchorSide::Bottom:
+        anchorPoint = bottomAnchor(nodeCenter, nodeSize);
+        break;
+      }
+    }
+    else {
+      anchorPoint = leftAnchor(nodeCenter, outputSize);
+    }
+
+    return anchorPoint;
+  }
+
+
   // contract:
   // toSlotNum and fromSlotNum are valid indices
   void drawEdges(NVGcontext* vg, const GraphLayout& layout) {
-    const Vec outputSize = Vec(outputW, outputH);
 
     for (size_t i = 0; i < snapshot->edgeCount; ++i) {
       const GraphRenderEdge& edge = snapshot->edges[i];
@@ -618,35 +646,18 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
                                             edge.fromSlotNum == edge.toSlotNum,
                                             box.size.y * 0.5f);
 
-      p1 = fromAnchorFor(layout.nodeCenters[edge.fromSlotNum], edgeRoute.fromSide, edge.fromPort);
-
-      const Vec nodeSize = Vec(nodeW, nodeH);
+      p1 = anchorForSideAndPort(layout.nodeCenters[edge.fromSlotNum], edgeRoute.fromSide, edge.fromPort);
       switch (edge.targetKind) {
       case RenderTargetKind::VoiceCard:
-
-        switch (edgeRoute.toSide) {
-        case AnchorSide::Left:
-          p2 = leftAnchor(layout.nodeCenters[edge.toSlotNum], nodeSize);
-          break;
-        case AnchorSide::Right:
-          p2 = rightAnchor(layout.nodeCenters[edge.toSlotNum], nodeSize);
-          break;
-        case AnchorSide::Top:
-          p2 = topAnchor(layout.nodeCenters[edge.toSlotNum], nodeSize);
-          break;
-        case AnchorSide::Bottom:
-          p2 = bottomAnchor(layout.nodeCenters[edge.toSlotNum], nodeSize);
-          break;
-        }
-
+        p2 = anchorForSideAndTargetKind(layout.nodeCenters[edge.toSlotNum], edgeRoute.toSide, edge.targetKind);
         break;
       case RenderTargetKind::Output1:
-        p2 = leftAnchor(layout.output1Center, outputSize);
+        p2 = anchorForSideAndTargetKind(layout.output1Center, edgeRoute.toSide, edge.targetKind);
         break;
       case RenderTargetKind::Output2:
-        p2 = leftAnchor(layout.output2Center, outputSize);
+        p2 = anchorForSideAndTargetKind(layout.output2Center, edgeRoute.toSide, edge.targetKind);
         break;
-      }
+      }        
 
       if (edgeRoute.kind == EdgeRouteKind::Feedback) {
         float gutterY;
@@ -662,12 +673,13 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
                      (std::min(p1.y, p2.y) + gutterOffset) :
                      (std::max(p1.y, p2.y) - gutterOffset));
         }
+
         nvgBeginPath(vg);
         nvgMoveTo(vg, p1.x, p1.y);
         nvgLineTo(vg, p1.x, gutterY);
         nvgLineTo(vg, p2.x, gutterY);
         nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, displayTextColor());
+        nvgStrokeColor(vg, displayTextColor(edge.weight));
         nvgStrokeWidth(vg, 1.2f);
         nvgStroke(vg);
       }
@@ -675,7 +687,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         nvgBeginPath(vg);
         nvgMoveTo(vg, p1.x, p1.y);
         nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, displayTextColor());
+        nvgStrokeColor(vg, displayTextColor(edge.weight));
         nvgStrokeWidth(vg, 1.2f);
         nvgStroke(vg);
       }
