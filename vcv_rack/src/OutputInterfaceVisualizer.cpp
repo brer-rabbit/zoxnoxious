@@ -339,7 +339,7 @@ static int chooseColumn(const GraphRenderSnapshot& s, int8_t slot) {
 
 
 static Vec voiceNodeCenter(const Rect& r, int col, int row, int rowCount) {
-  const float leftMargin = 4.f;
+  const float leftMargin = 5.f;
   const float rightOutputGutter = 30.f;
   const float marginY = 28.f;
 
