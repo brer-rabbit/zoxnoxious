@@ -191,6 +191,11 @@ struct Zoxnoxious5524 final : ParticipantAdapter, Participant {
   json_t* dataToJson() override;
   void dataFromJson(json_t* rootJ) override;
 
+private:
+  // for pullGraphInfo
+  float output1Weight = 0.f;
+  float output2Weight = 0.f;
+
 };
 
 } // namespace zox

@@ -134,6 +134,12 @@ void Zoxnoxious5524::pullSamples(const rack::engine::Module::ProcessArgs &args, 
     sharedFrame.samples[offset + VCO_TWO_PW] = 1.f;
   }
 
+  // graph weight info
+  output1Weight = sharedFrame.samples[offset + FINAL_GAIN];
+  output2Weight = std::max(sharedFrame.samples[offset + VCO_ONE_TRIANGLE],
+                           std::max(sharedFrame.samples[offset + VCO_ONE_SAW],
+                                    sharedFrame.samples[offset + VCO_ONE_PULSE]));
+
 }
 
 
@@ -270,6 +276,8 @@ bool Zoxnoxious5524::pullGraphInfo(ParticipantGraphInfo& info) {
   info.slotNum = lifecycle.slotNum;
   info.source1.valid = false;
   info.source2.valid = false;
+  info.output1Weight = output1Weight;
+  info.output2Weight = output2Weight;
   return true;
 }
 
