@@ -358,7 +358,7 @@ static Vec voiceNodeCenter(const Rect& r, int col, int row, int rowCount) {
 
 
 static Vec outputCenter(const Rect& r, int outputIndex) {
-  const float rightMargin = 18.f;
+  const float rightMargin = 14.f;
   const float marginY = 48.f;
 
   float y = outputIndex == 0
@@ -582,6 +582,14 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     return nvgRGBAf(0.70f, 0.88f, 0.78f, a);
   }
 
+  float edgeAlpha(float weight) {
+    return 0.30f + 0.70f * weight;
+  }
+
+  float edgeWidth(float weight) {
+    return 0.8f + 0.8f * weight;
+  }
+
   void drawText(NVGcontext* vg, Vec p, const char* text, float size,
                 int align = NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
                 float alpha = 1.f) {
@@ -750,16 +758,16 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         nvgLineTo(vg, p1.x, gutterY);
         nvgLineTo(vg, p2.x, gutterY);
         nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, displayTextColor(edge.weight));
-        nvgStrokeWidth(vg, 1.2f);
+        nvgStrokeColor(vg, displayTextColor(edgeAlpha(edge.weight)));
+        nvgStrokeWidth(vg, edgeWidth(edge.weight));
         nvgStroke(vg);
       }
       else {
         nvgBeginPath(vg);
         nvgMoveTo(vg, p1.x, p1.y);
         nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, displayTextColor(edge.weight));
-        nvgStrokeWidth(vg, 1.2f);
+        nvgStrokeColor(vg, displayTextColor(edgeAlpha(edge.weight)));
+        nvgStrokeWidth(vg, edgeWidth(edge.weight));
         nvgStroke(vg);
       }
     }
@@ -775,8 +783,8 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     Rect localBox = Rect(Vec(0.f, 0.f), box.size);
     buildLayout(layout, localBox);
 
-    drawNodes(args.vg, layout);
     drawEdges(args.vg, layout);
+    drawNodes(args.vg, layout);
   }
 
 
