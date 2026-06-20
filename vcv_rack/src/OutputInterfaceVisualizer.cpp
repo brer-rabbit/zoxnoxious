@@ -28,8 +28,11 @@ struct GraphRenderNode {
   int row = 0;
   Vec center;
 
-  uint8_t hardwareId = 0;
+  uint8_t hardwareId = invalidCardId;
   RenderNodeKind kind = RenderNodeKind::VoiceCard;
+
+  float output1Weight = 0.5f;
+  float output2Weight = 0.5f;
 
   bool valid = false;
 };
@@ -38,7 +41,7 @@ struct GraphRenderEdge {
   int8_t fromSlotNum = invalidSlot;
   uint8_t fromHardwareId = 0;
   int64_t fromModuleId = -1;
-  GraphPort fromPort = GraphPort::A;
+  GraphPort fromPort = GraphPort::OUT1;
 
   RenderTargetKind targetKind = RenderTargetKind::VoiceCard;
 
@@ -97,24 +100,45 @@ struct OutputInterfaceVisualizer final : Module {
       edge.toHardwareId = participantInfo.hardwareId;
       edge.toModuleId = participantInfo.moduleId;
       edge.valid = true;
-      edge.weight = source.inputWeight * participantInfo.outputWeight;
+      edge.weight = source.inputWeight;
     }
   }
 
 
-  void addNode(int8_t slotNum, uint8_t hardwareId, int64_t moduleId, RenderNodeKind kind) {
-    if (slotNum >= 0 && slotNum < maxGraphNodes) {
-      if (moduleId >= 0) {
-        graphSnapshot.nodes[slotNum].valid = true;
-        graphSnapshot.nodes[slotNum].moduleId = moduleId;
-        graphSnapshot.nodes[slotNum].hardwareId = hardwareId;
-        graphSnapshot.nodes[slotNum].kind = kind;
+  void addNode(const ParticipantGraphInfo& info, RenderNodeKind kind) {
+    if (info.slotNum >= 0 && info.slotNum < maxGraphNodes) {
+      if (info.moduleId >= 0) {
+        graphSnapshot.nodes[info.slotNum].valid = true;
+        graphSnapshot.nodes[info.slotNum].moduleId = info.moduleId;
+        graphSnapshot.nodes[info.slotNum].hardwareId = info.hardwareId;
+        graphSnapshot.nodes[info.slotNum].kind = kind;
+        graphSnapshot.nodes[info.slotNum].output1Weight = info.output1Weight;
+        graphSnapshot.nodes[info.slotNum].output2Weight = info.output2Weight;
       }
       else {
-        graphSnapshot.nodes[slotNum].valid = false;
+        graphSnapshot.nodes[info.slotNum].valid = false;
       }
     }
   }
+
+  // iterate over all the edges:
+  // find the "from" slot and incorporate the source weight via simple multiply
+  void calculateEdgeWeights() {
+    for (size_t i = 0; i < graphSnapshot.edgeCount; ++i) {
+
+      if (graphSnapshot.edges[i].valid &&
+          graphSnapshot.edges[i].fromSlotNum >= 0 &&
+          graphSnapshot.edges[i].fromSlotNum < maxGraphNodes &&
+          graphSnapshot.nodes[ graphSnapshot.edges[i].fromSlotNum ].moduleId != -1 &&
+          graphSnapshot.nodes[ graphSnapshot.edges[i].fromSlotNum ].hardwareId != invalidCardId) {
+
+        graphSnapshot.edges[i].weight *= (graphSnapshot.edges[i].fromPort == GraphPort::OUT1) ?
+          graphSnapshot.nodes[ graphSnapshot.edges[i].fromSlotNum ].output1Weight :
+          graphSnapshot.nodes[ graphSnapshot.edges[i].fromSlotNum ].output2Weight;
+      }
+    }
+  }
+
 
   void buildGraphRenderSnapshot(const ParticipantGraphMessage& message) {
     graphSnapshot = GraphRenderSnapshot{};
@@ -126,16 +150,14 @@ struct OutputInterfaceVisualizer final : Module {
           continue;
       }
 
-      addNode(info.slotNum, info.hardwareId, info.moduleId, RenderNodeKind::VoiceCard);
+      addNode(info, RenderNodeKind::VoiceCard);
       addSource(info, info.source1, RenderTargetKind::VoiceCard);
       addSource(info, info.source2, RenderTargetKind::VoiceCard);
     }
 
 
     // always show the output nodes
-    addNode(message.outputInterfaceInfo.slotNum,
-            message.outputInterfaceInfo.hardwareId,
-            message.outputInterfaceInfo.moduleId,
+    addNode(message.outputInterfaceInfo,
             RenderNodeKind::Output);
 
     // add Output1 sources
@@ -148,6 +170,8 @@ struct OutputInterfaceVisualizer final : Module {
       addSource(message.outputInterfaceInfo, message.output2Sources[i], RenderTargetKind::Output2);
     }
 
+    calculateEdgeWeights();
+
   }
 
 
@@ -158,7 +182,7 @@ struct OutputInterfaceVisualizer final : Module {
 
 
   static const char* graphPortName(GraphPort port) {
-    return port == GraphPort::A ? "A" : "B";
+    return port == GraphPort::OUT1 ? "OUT1" : "OUT2";
   }
 
   static const char* renderNodeKindName(RenderNodeKind kind) {
@@ -315,7 +339,7 @@ static int chooseColumn(const GraphRenderSnapshot& s, int8_t slot) {
 
 
 static Vec voiceNodeCenter(const Rect& r, int col, int row, int rowCount) {
-  const float leftMargin = 10.f;
+  const float leftMargin = 4.f;
   const float rightOutputGutter = 30.f;
   const float marginY = 28.f;
 
@@ -345,7 +369,7 @@ static Vec outputCenter(const Rect& r, int outputIndex) {
 }
 
 static float portOffset(GraphPort port) {
-  return port == GraphPort::A ? -4.f : 4.f;
+  return port == GraphPort::OUT1 ? -4.f : 4.f;
 }
 
 static Vec rightAnchor(Vec center, Vec size) {
@@ -613,7 +637,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   }
 
 
-  Vec anchorForSideAndPort(const Vec& nodeCenter, const AnchorSide &side, const GraphPort& port) {
+  Vec anchorForSideAndPort(const Vec& nodeCenter, AnchorSide side, GraphPort port) {
     const Vec nodeSize = Vec(nodeW, nodeH);
     Vec anchorPoint;
 
@@ -634,7 +658,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     return anchorPoint;
   }
 
-  Vec anchorForSideAndTargetKind(const Vec& nodeCenter, const AnchorSide& side, const RenderTargetKind& targetKind) {
+  Vec anchorForSideAndTargetKind(const Vec& nodeCenter, AnchorSide side, RenderTargetKind targetKind) {
     const Vec nodeSize = Vec(nodeW, nodeH);
     const Vec outputSize = Vec(outputW, outputH);
     Vec anchorPoint;

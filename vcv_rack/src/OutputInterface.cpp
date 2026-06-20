@@ -287,7 +287,7 @@ void OutputInterface::process(const ProcessArgs& args) {
         inputToOut1.slotNum = i;
         inputToOut1.moduleId = snap.slots[i].props.moduleId;
         inputToOut1.hardwareId = snap.slots[i].props.hardwareId;
-        inputToOut1.port = GraphPort::A;
+        inputToOut1.port = GraphPort::OUT1;
         inputToOut1.valid = inputToOut1.moduleId != -1;
         if (message->output1SourceCount < maxVoiceCards) {
           message->output1Sources[message->output1SourceCount++] = inputToOut1;
@@ -301,7 +301,7 @@ void OutputInterface::process(const ProcessArgs& args) {
         inputToOut2.slotNum = i;
         inputToOut2.moduleId = snap.slots[i].props.moduleId;
         inputToOut2.hardwareId = snap.slots[i].props.hardwareId;
-        inputToOut2.port = GraphPort::B;
+        inputToOut2.port = GraphPort::OUT2;
         inputToOut2.valid = inputToOut2.moduleId != -1;
         if (message->output2SourceCount < maxVoiceCards) {
           message->output2Sources[message->output2SourceCount++] = inputToOut2;

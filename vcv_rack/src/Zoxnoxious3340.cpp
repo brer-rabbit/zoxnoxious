@@ -111,8 +111,10 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   std::array<CvRoute,8> routes;
 
   // for pullGraphInfo
-  float inputWeight = 0.f;
-  float outputWeight = 0.f;
+  float inputModWeight = 0.f;
+  float inputSyncWeight = 0.f;
+  float output1Weight = 0.f;
+  float output2Weight = 0.f;
 
   Zoxnoxious3340() :
     buttonMidiController(buttonMappings),
@@ -192,8 +194,8 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
                     params.data(),
                     inputs.data());
 
-    inputWeight = sharedFrame.samples[offset + EXT_MOD_AMOUNT_CHANNEL];
-    outputWeight = std::max(sharedFrame.samples[offset + MIX1_PULSE_VCA_CHANNEL],
+    inputModWeight = sharedFrame.samples[offset + EXT_MOD_AMOUNT_CHANNEL];
+    output1Weight = std::max(sharedFrame.samples[offset + MIX1_PULSE_VCA_CHANNEL],
                             std::max(sharedFrame.samples[offset + MIX1_SAW_VCA_CHANNEL],
                                      sharedFrame.samples[offset + MIX1_TRIANGLE_VCA_CHANNEL]));
   }
@@ -244,6 +246,14 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     // lights may lead midi messages if above buttons are skipped on this clock.  oh well.
     buttonMidiController.updateLights(this);
 
+    // weight for the visualizer
+    inputSyncWeight = params[SYNC_POS_BUTTON_PARAM].getValue() > 0.f ||
+      params[SYNC_NEG_BUTTON_PARAM].getValue() > 0.f ||
+      params[SYNC_HARD_BUTTON_PARAM].getValue() > 0.f ||
+      params[SYNC_SOFT_BUTTON_PARAM].getValue() > 0.f ? 0.75f : 0.f;
+
+    output2Weight = (params[MIX2_PULSE_BUTTON_PARAM].getValue() +
+                     params[MIX2_SAW_BUTTON_PARAM].getValue()) * 0.5;
 
     // Then clipping lights.
     // clipping light timer
@@ -292,12 +302,13 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     info.moduleId = getId();
     info.hardwareId = hardwareId;
     info.slotNum = lifecycle.slotNum;
-    info.outputWeight = outputWeight;
+    info.output1Weight = output1Weight;
+    info.output2Weight = output2Weight;
     if (extModSelectSwitchValue >= 0 && extModSelectSwitchValue <= 12) {
       info.source1.valid = true;
       info.source1.slotNum = extModSelectSwitchValue / 2;
-      info.source1.port = (extModSelectSwitchValue % 2 == 0) ? GraphPort::A : GraphPort::B;
-      info.source1.inputWeight = inputWeight;
+      info.source1.port = (extModSelectSwitchValue % 2 == 0) ? GraphPort::OUT1 : GraphPort::OUT2;
+      info.source1.inputWeight = std::max(inputModWeight, inputSyncWeight);
     }
     else {
       info.source1.valid = false;

@@ -126,14 +126,14 @@ private:
 //
 
 // graphing / output topology declarations
-enum class GraphPort : uint8_t { A, B };
+enum class GraphPort : uint8_t { OUT1, OUT2 };
 
 struct GraphSource {
   int64_t moduleId = -1;
   bool valid = false;
   uint8_t hardwareId = 0;
   int8_t slotNum = invalidSlot;
-  GraphPort port = GraphPort::A;
+  GraphPort port = GraphPort::OUT1;
   // inputWeight set by input VCA level or similar
   float inputWeight = 0.5f;
 };
@@ -142,8 +142,10 @@ struct ParticipantGraphInfo {
   int64_t moduleId = -1;
   int8_t slotNum = invalidSlot;
   uint8_t hardwareId = 0;
-  // outputWeight set by output VCA levels or similar
-  float outputWeight = 0.5f;
+  // outputWeight could be set by output VCA levels or
+  // something that makes sense for the module
+  float output1Weight = 0.5f;
+  float output2Weight = 0.5f;
 
   GraphSource source1;
   GraphSource source2;
