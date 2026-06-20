@@ -110,6 +110,9 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
   bool extModSelectChanged = false;
   std::array<CvRoute,8> routes;
 
+  // for pullGraphInfo
+  float inputWeight = 0.f;
+  float outputWeight = 0.f;
 
   Zoxnoxious3340() :
     buttonMidiController(buttonMappings),
@@ -188,6 +191,11 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
                     sharedFrame.samples,
                     params.data(),
                     inputs.data());
+
+    inputWeight = sharedFrame.samples[offset + EXT_MOD_AMOUNT_CHANNEL];
+    outputWeight = std::max(sharedFrame.samples[offset + MIX1_PULSE_VCA_CHANNEL],
+                            std::max(sharedFrame.samples[offset + MIX1_SAW_VCA_CHANNEL],
+                                     sharedFrame.samples[offset + MIX1_TRIANGLE_VCA_CHANNEL]));
   }
 
 
@@ -284,10 +292,12 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     info.moduleId = getId();
     info.hardwareId = hardwareId;
     info.slotNum = lifecycle.slotNum;
+    info.outputWeight = outputWeight;
     if (extModSelectSwitchValue >= 0 && extModSelectSwitchValue <= 12) {
       info.source1.valid = true;
       info.source1.slotNum = extModSelectSwitchValue / 2;
       info.source1.port = (extModSelectSwitchValue % 2 == 0) ? GraphPort::A : GraphPort::B;
+      info.source1.inputWeight = inputWeight;
     }
     else {
       info.source1.valid = false;

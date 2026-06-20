@@ -251,14 +251,8 @@ void OutputInterface::process(const ProcessArgs& args) {
           int8_t source1Slot = info.source1.slotNum;
           if (source1Slot >= 0 && source1Slot < maxVoiceCards) {
             info.source1.moduleId = snap.slots[source1Slot].props.moduleId;
-            if (info.source1.moduleId != -1) {
-              info.source1.valid = true;
-              info.source1.hardwareId = snap.slots[source1Slot].props.hardwareId;
-            }
-            else {
-              info.source1.valid = true;
-              info.source1.hardwareId = snap.slots[source1Slot].props.hardwareId;
-            }
+            info.source1.valid = true;
+            info.source1.hardwareId = snap.slots[source1Slot].props.hardwareId;
           }
           else {
             info.source1.valid = false;
@@ -269,14 +263,8 @@ void OutputInterface::process(const ProcessArgs& args) {
           int8_t source2Slot = info.source2.slotNum;
           if (source2Slot >= 0 && source2Slot < maxVoiceCards) {
             info.source2.moduleId = snap.slots[source2Slot].props.moduleId;
-            if (info.source2.moduleId != -1) {
-              info.source2.valid = true;
-              info.source2.hardwareId = snap.slots[source2Slot].props.hardwareId;
-            }
-            else {
-              info.source2.valid = true;
-              info.source2.hardwareId = snap.slots[source2Slot].props.hardwareId;
-            }
+            info.source2.valid = true;
+            info.source2.hardwareId = snap.slots[source2Slot].props.hardwareId;
           }
           else {
             info.source2.valid = false;
