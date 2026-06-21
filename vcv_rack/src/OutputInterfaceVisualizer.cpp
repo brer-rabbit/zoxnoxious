@@ -5,8 +5,13 @@
 
 namespace zox {
 
-static constexpr int8_t maxGraphNodes = maxVoiceCards + 1; // allow for output interface
-static constexpr size_t maxGraphEdges = 24; // was 16
+// maxGraphNodes: number of voice cards + output node.
+// maxGraphEdges: each voice card can have two inputs, then two final outputs with six each
+static constexpr int8_t maxGraphNodes = maxVoiceCards + 1;
+static constexpr size_t maxGraphEdges = maxVoiceCards * 2 + 2 * 6;
+
+static constexpr int graphRenderRateHz = 60;
+
 
 enum class RenderNodeKind : uint8_t {
   VoiceCard,
@@ -23,11 +28,6 @@ enum class RenderTargetKind : uint8_t {
 // slotNum not present here: the slotNum is the index in an array of these
 struct GraphRenderNode {
   int64_t moduleId = -1; // for Rack-side presence only
-
-  int col = 0;
-  int row = 0;
-  Vec center;
-
   uint8_t hardwareId = invalidCardId;
   RenderNodeKind kind = RenderNodeKind::VoiceCard;
 
@@ -49,7 +49,7 @@ struct GraphRenderEdge {
   uint8_t toHardwareId = 0;
   int64_t toModuleId = -1;
 
-  float weight = 1.f;                 // ignore visually for now
+  float weight = 1.f;
   bool valid = false;
 };
 
@@ -116,7 +116,7 @@ struct OutputInterfaceVisualizer final : Module {
         graphSnapshot.nodes[info.slotNum].output2Weight = info.output2Weight;
       }
       else {
-        graphSnapshot.nodes[info.slotNum].valid = false;
+        graphSnapshot.nodes[info.slotNum] = GraphRenderNode{};
       }
     }
   }
@@ -125,16 +125,17 @@ struct OutputInterfaceVisualizer final : Module {
   // find the "from" slot and incorporate the source weight via simple multiply
   void calculateEdgeWeights() {
     for (size_t i = 0; i < graphSnapshot.edgeCount; ++i) {
+      const GraphRenderEdge& edge = graphSnapshot.edges[i];
+      const GraphRenderNode& fromNode = graphSnapshot.nodes[edge.fromSlotNum];
 
-      if (graphSnapshot.edges[i].valid &&
-          graphSnapshot.edges[i].fromSlotNum >= 0 &&
-          graphSnapshot.edges[i].fromSlotNum < maxGraphNodes &&
-          graphSnapshot.nodes[ graphSnapshot.edges[i].fromSlotNum ].moduleId != -1 &&
-          graphSnapshot.nodes[ graphSnapshot.edges[i].fromSlotNum ].hardwareId != invalidCardId) {
+      if (edge.valid &&
+          edge.fromSlotNum >= 0 &&
+          edge.fromSlotNum < maxGraphNodes &&
+          fromNode.moduleId != -1 &&
+          fromNode.hardwareId != invalidCardId) {
 
-        graphSnapshot.edges[i].weight *= (graphSnapshot.edges[i].fromPort == GraphPort::OUT1) ?
-          graphSnapshot.nodes[ graphSnapshot.edges[i].fromSlotNum ].output1Weight :
-          graphSnapshot.nodes[ graphSnapshot.edges[i].fromSlotNum ].output2Weight;
+        graphSnapshot.edges[i].weight *= (edge.fromPort == GraphPort::OUT1 ?
+                                          fromNode.output1Weight : fromNode.output2Weight);
       }
     }
   }
@@ -177,7 +178,12 @@ struct OutputInterfaceVisualizer final : Module {
 
   OutputInterfaceVisualizer() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-    clockDivider.setDivision(512);
+    // division should really be frame rate-- this need not be frequent at all
+    clockDivider.setDivision((static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
+  }
+
+  void onSampleRateChange(const SampleRateChangeEvent& e) override {
+    clockDivider.setDivision((static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
   }
 
 
@@ -213,13 +219,11 @@ struct OutputInterfaceVisualizer final : Module {
       if (!node.valid)
         continue;
 
-      INFO("  slot=%zu moduleId=%lld hwId=%u kind=%s col=%d row=%d",
+      INFO("  slot=%zu moduleId=%lld hwId=%u kind=%s",
            i,
            (long long)node.moduleId,
            node.hardwareId,
-           renderNodeKindName(node.kind),
-           node.col,
-           node.row);
+           renderNodeKindName(node.kind));
     }
 
     INFO("Edges: count=%zu", graphSnapshot.edgeCount);
@@ -368,8 +372,10 @@ static Vec outputCenter(const Rect& r, int outputIndex) {
   return Vec(r.pos.x + r.size.x - rightMargin, y);
 }
 
+
+static constexpr float kPortAnchorOffset = 4.f;
 static float portOffset(GraphPort port) {
-  return port == GraphPort::OUT1 ? -4.f : 4.f;
+  return port == GraphPort::OUT1 ? -kPortAnchorOffset : kPortAnchorOffset;
 }
 
 static Vec rightAnchor(Vec center, Vec size) {
@@ -410,6 +416,12 @@ struct EdgeRoute {
   AnchorSide toSide = AnchorSide::Left;
 };
 
+
+// nodes more than kMinForwardDx pixels to the right: draw a straight edge
+static constexpr float kMinForwardDx = 8.f;
+// nodes within kSameRowDyTolerance are treated as a co-row, use gutter routing
+static constexpr float kSameRowDyTolerance = 4.f;
+
 static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, float midY) {
   EdgeRoute route;
 
@@ -423,16 +435,17 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, fl
     return route;
   }
 
-  if (dx >= 8.f) {
+  if (dx >= kMinForwardDx) {
     route.kind = EdgeRouteKind::Normal;
     route.fromSide = AnchorSide::Right;
     route.toSide = AnchorSide::Left;
     return route;
   }
 
-  if (std::fabs(dy) < 4.f) {
+  if (std::fabs(dy) < kSameRowDyTolerance) {
+    // feedback routing: choose top-to-top if we're above the mid-Y point
+    // otherwise bottom-to-bottom.  This keeps the middle gutters clear (mostly)
     route.kind = EdgeRouteKind::Feedback;
-    // route feedback above or below?  Check where we are in the box
     if (fromCenter.y < midY) {
       route.fromSide = AnchorSide::Top;
       route.toSide = AnchorSide::Top;
@@ -495,6 +508,8 @@ static void optimizeLayout(int colForSlot[], int rowForSlot[], const GraphRender
 }
 
 
+static constexpr int kNumColumns = 3;
+
 struct SystemRoutingVisualizerDisplay : LedDisplay {
   GraphRenderSnapshot *snapshot = nullptr;
 
@@ -514,7 +529,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
     int colForSlot[maxGraphNodes];
     int rowForSlot[maxGraphNodes];
-    int colCounts[3] = {};
+    int colCounts[kNumColumns] = {};
 
     for (int i = 0; i < maxGraphNodes; ++i) {
       colForSlot[i] = -1;
@@ -529,8 +544,10 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       }
 
       // by contract chooseColumn must return in the 0:2 range
+      // some liberty is taken here in that we know 6 voice cards max.
+      // With a 3x3 matrix, if one column is full the other columns must have space.
       int col = chooseColumn(*snapshot, slot);
-      if (colCounts[col] >= 3) {
+      if (colCounts[col] >= kNumColumns) {
         if (col == 2) {
           // six voice cards max, if col == 2 then col 1 must have space
           col = 1;
@@ -600,6 +617,41 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     nvgText(vg, p.x, p.y, text, NULL);
   }
 
+  // Draw a filled arrowhead at 'tip' pointing in the direction from 'tail' toward 'tip'.
+  // halfBase and height control the triangle size.
+  void drawArrowhead(NVGcontext* vg, Vec tail, Vec tip,
+                     float halfBase = 3.5f, float height = 6.f,
+                     NVGcolor color = nvgRGB(0,0,0)) {
+    float dx = tip.x - tail.x;
+    float dy = tip.y - tail.y;
+    float len = std::sqrt(dx * dx + dy * dy);
+    if (len < 0.001f) return;
+
+    // unit vector along edge direction
+    float ux = dx / len;
+    float uy = dy / len;
+    // perpendicular
+    float px = -uy;
+    float py =  ux;
+
+    // base centre: step back 'height' from tip
+    Vec base = Vec(tip.x - ux * height, tip.y - uy * height);
+
+    Vec left  = Vec(base.x + px * halfBase, base.y + py * halfBase);
+    Vec right = Vec(base.x - px * halfBase, base.y - py * halfBase);
+
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, tip.x, tip.y);
+    nvgLineTo(vg, left.x, left.y);
+    nvgLineTo(vg, right.x, right.y);
+    nvgClosePath(vg);
+    nvgFillColor(vg, color);
+    nvgFill(vg);
+  }
+
+
+  static constexpr float kNodeLabelOffsetY = 3.5f;
+  static constexpr float kNodeLabelMarginX = 3.5f;
   void drawNode(NVGcontext* vg, Vec center, Vec size, int slot, const char* label) {
     Rect r = nodeRectFromCenter(center, size);
 
@@ -615,8 +667,10 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     if (slot >= 0) {
       char slotBuf[4];
       snprintf(slotBuf, sizeof(slotBuf), "%c:", slot + 'A');
-      drawText(vg, Vec(r.pos.x + 3.5f, center.y - 3.5f), slotBuf, 6.2f, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-      drawText(vg, Vec(r.pos.x + 3.5f, center.y + 3.5f), label, 6.0f, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+      drawText(vg, Vec(r.pos.x + kNodeLabelMarginX, center.y - kNodeLabelOffsetY), slotBuf,
+               6.0f, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+      drawText(vg, Vec(r.pos.x + kNodeLabelMarginX, center.y + kNodeLabelOffsetY), label,
+               6.0f, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
     }
     else {
       drawText(vg, r.getCenter(), label, 6.0f);
@@ -738,8 +792,12 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         break;
       }        
 
+      NVGcolor edgeColor = displayTextColor(edgeAlpha(edge.weight));
+
       if (edgeRoute.kind == EdgeRouteKind::Feedback) {
         float gutterY;
+        // stagger feedback gutters by slot number so parallel feedback paths
+        // don't overlap.  Gutter starts a 3px growing by 2.5 per slot.
         float gutterOffset = 3.f + 2.5f * edge.fromSlotNum;
 
         if (edgeRoute.fromSide == edgeRoute.toSide) {
@@ -753,22 +811,25 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
                      (std::max(p1.y, p2.y) - gutterOffset));
         }
 
+        Vec arrowTail = Vec(p2.x, gutterY);
         nvgBeginPath(vg);
         nvgMoveTo(vg, p1.x, p1.y);
         nvgLineTo(vg, p1.x, gutterY);
         nvgLineTo(vg, p2.x, gutterY);
         nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, displayTextColor(edgeAlpha(edge.weight)));
+        nvgStrokeColor(vg, edgeColor);
         nvgStrokeWidth(vg, edgeWidth(edge.weight));
         nvgStroke(vg);
+        drawArrowhead(vg, arrowTail, p2, 2.f + 2.f * edge.weight, 5.f, edgeColor);
       }
       else {
         nvgBeginPath(vg);
         nvgMoveTo(vg, p1.x, p1.y);
         nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, displayTextColor(edgeAlpha(edge.weight)));
+        nvgStrokeColor(vg, edgeColor);
         nvgStrokeWidth(vg, edgeWidth(edge.weight));
         nvgStroke(vg);
+        drawArrowhead(vg, p1, p2, 2.f + 2.f * edge.weight, 5.f, edgeColor);
       }
     }
   }
