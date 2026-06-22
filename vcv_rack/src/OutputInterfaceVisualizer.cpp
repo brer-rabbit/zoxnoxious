@@ -15,7 +15,6 @@ static constexpr int graphRenderRateHz = 60;
 
 enum class RenderNodeKind : uint8_t {
   VoiceCard,
-  Output,
   ExternalInput
 };
 
@@ -126,16 +125,18 @@ struct OutputInterfaceVisualizer final : Module {
   void calculateEdgeWeights() {
     for (size_t i = 0; i < graphSnapshot.edgeCount; ++i) {
       const GraphRenderEdge& edge = graphSnapshot.edges[i];
-      const GraphRenderNode& fromNode = graphSnapshot.nodes[edge.fromSlotNum];
 
       if (edge.valid &&
           edge.fromSlotNum >= 0 &&
-          edge.fromSlotNum < maxGraphNodes &&
-          fromNode.moduleId != -1 &&
-          fromNode.hardwareId != invalidCardId) {
+          edge.fromSlotNum < maxGraphNodes) {
 
-        graphSnapshot.edges[i].weight *= (edge.fromPort == GraphPort::OUT1 ?
-                                          fromNode.output1Weight : fromNode.output2Weight);
+        const GraphRenderNode& fromNode = graphSnapshot.nodes[edge.fromSlotNum];
+
+        if (fromNode.moduleId != -1 &&
+            fromNode.hardwareId != invalidCardId) {
+          graphSnapshot.edges[i].weight *= (edge.fromPort == GraphPort::OUT1 ?
+                                            fromNode.output1Weight : fromNode.output2Weight);
+        }
       }
     }
   }
@@ -156,11 +157,6 @@ struct OutputInterfaceVisualizer final : Module {
       addSource(info, info.source2, RenderTargetKind::VoiceCard);
     }
 
-
-    // always show the output nodes
-    addNode(message.outputInterfaceInfo,
-            RenderNodeKind::Output);
-
     // add Output1 sources
     for (size_t i = 0; i < message.output1SourceCount; ++i) {
       addSource(message.outputInterfaceInfo, message.output1Sources[i], RenderTargetKind::Output1);
@@ -176,13 +172,21 @@ struct OutputInterfaceVisualizer final : Module {
   }
 
 
+  static constexpr int minClockDivision = 60;
+
   OutputInterfaceVisualizer() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+
+    int calcClockDivision = std::max(minClockDivision,
+                                     (static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
     // division should really be frame rate-- this need not be frequent at all
-    clockDivider.setDivision((static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
+    clockDivider.setDivision(calcClockDivision);
   }
 
   void onSampleRateChange(const SampleRateChangeEvent& e) override {
+    int calcClockDivision = std::max(minClockDivision,
+                                     (static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
+
     clockDivider.setDivision((static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
   }
 
@@ -194,7 +198,6 @@ struct OutputInterfaceVisualizer final : Module {
   static const char* renderNodeKindName(RenderNodeKind kind) {
     switch (kind) {
     case RenderNodeKind::VoiceCard:     return "VoiceCard";
-    case RenderNodeKind::Output:        return "Output";
     case RenderNodeKind::ExternalInput: return "ExternalInput";
     }
     return "?";
@@ -322,14 +325,8 @@ static bool nodeFeedsNodeThatFeedsOutput(const GraphRenderSnapshot& s, int8_t sl
 
 
 // choose a preferred column for the slot.  Must only return 0, 1, or 2.
-// Does not handle RenderNodeKind::Output.
 static int chooseColumn(const GraphRenderSnapshot& s, int8_t slot) {
-  /*
-   * const GraphRenderNode& node = s.nodes[slot];
-   * if (node.kind == RenderNodeKind::Output) {
-   *  return 3;
-   * }
-  */
+
   if (nodeFeedsOutput(s, slot)) {
     return 2;
   }
@@ -539,7 +536,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     for (int slot = 0; slot < maxGraphNodes; ++slot) {
       const GraphRenderNode& node = snapshot->nodes[slot];
 
-      if (!node.valid || node.kind == RenderNodeKind::Output) {
+      if (!node.valid) {
         continue;
       }
 
@@ -600,11 +597,11 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   }
 
   float edgeAlpha(float weight) {
-    return 0.30f + 0.70f * weight;
+    return clamp(0.30f + 0.70f * weight, 0.3f, 1.f);
   }
 
   float edgeWidth(float weight) {
-    return 0.8f + 0.8f * weight;
+    return clamp(0.8f + 0.8f * weight, 0.8f, 1.6f);
   }
 
   void drawText(NVGcontext* vg, Vec p, const char* text, float size,
@@ -689,7 +686,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     for (int slot = 0; slot < maxGraphNodes; ++slot) {
       const GraphRenderNode& node = snapshot->nodes[slot];
 
-      if (!node.valid || node.kind == RenderNodeKind::Output) {
+      if (!node.valid) {
         continue;
       }
       drawNode(vg, layout.nodeCenters[slot], nodeSize, slot, getCardNameByHardwareId(node.hardwareId));
