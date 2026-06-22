@@ -462,47 +462,72 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, fl
 
 
 
-static float getAverageConnectionY(int slot, int colForSlot[], int rowForSlot[], const GraphRenderSnapshot& s) {
+// Returns the average row index of right-column nodes this slot connects to.
+// For col-2 nodes connecting to outputs: Output1 is treated as row -0.5,
+// Output2 as row 2.5 (i.e. above/below the 0-2 row range) so col-2 nodes
+// feeding Output1 float to the top and those feeding Output2 float to the bottom.
+static float getAverageConnectionY(int slot, int colForSlot[], int rowForSlot[],
+                                   const GraphRenderSnapshot& s) {
   float totalY = 0.f;
   int count = 0;
+  int myCol = colForSlot[slot];
+
   for (size_t i = 0; i < s.edgeCount; ++i) {
     const GraphRenderEdge& e = s.edges[i];
-    if (e.valid && e.fromSlotNum == slot && colForSlot[e.toSlotNum] == colForSlot[slot] + 1) {
-      totalY += rowForSlot[e.toSlotNum];
-      count++;
+    if (!e.valid || e.fromSlotNum != slot) {
+      continue;
+    }
+
+    if (myCol == 2) {
+      // Score against which output this slot feeds
+      if (e.targetKind == RenderTargetKind::Output1) {
+        totalY += -0.5f;   // attracts node toward top of column
+        ++count;
+      }
+      else if (e.targetKind == RenderTargetKind::Output2) {
+        totalY += 2.5f;    // attracts node toward bottom of column
+        ++count;
+      }
+    }
+    else {
+      // cols 0 and 1: score against connected nodes in the next column
+      if (e.targetKind == RenderTargetKind::VoiceCard &&
+          e.toSlotNum >= 0 && e.toSlotNum < maxGraphNodes &&
+          colForSlot[e.toSlotNum] == myCol + 1) {
+        totalY += rowForSlot[e.toSlotNum];
+        ++count;
+      }
     }
   }
-  return (count > 0) ? (totalY / count) : rowForSlot[slot];
+  return (count > 0) ? (totalY / count) : static_cast<float>(rowForSlot[slot]);
 }
 
-static void optimizeLayout(int colForSlot[], int rowForSlot[], const GraphRenderSnapshot& s) {
-  // Iterate from right to left (Column 2 down to 0)
-  for (int col = 1; col >= 0; --col) {
-    // Find all nodes in the current column
+
+static void sortRowsByNextColumnTargets(int colForSlot[], int rowForSlot[], const GraphRenderSnapshot& s) {
+  // One pass per column from right (col 2) to left (col 0), so that
+  // col-2 ordering is settled before col-1 references it, etc.
+  for (int col = 2; col >= 0; --col) {
     std::vector<int> colNodes;
     for (int i = 0; i < maxGraphNodes; ++i) {
       if (colForSlot[i] == col) colNodes.push_back(i);
     }
+    if (colNodes.size() < 2) continue;
 
-    // Simple Bubble-Sort style optimization to minimize vertical distance
-    // to connected nodes in the next column
-    for (size_t i = 0; i < colNodes.size(); ++i) {
-      for (size_t j = i + 1; j < colNodes.size(); ++j) {
-        int nodeA = colNodes[i];
-        int nodeB = colNodes[j];
+    // Sort node slots by their average-connection-Y score ascending,
+    // then reassign rows 0..N-1 in that order.
+    std::stable_sort(colNodes.begin(), colNodes.end(),
+                     [&](int a, int b) {
+                       float ya = getAverageConnectionY(a, colForSlot, rowForSlot, s);
+                       float yb = getAverageConnectionY(b, colForSlot, rowForSlot, s);
+                       return ya < yb;
+                     });
 
-        // Calculate "average connection Y" for both nodes in the next column
-        float costA = getAverageConnectionY(nodeA, colForSlot, rowForSlot, s);
-        float costB = getAverageConnectionY(nodeB, colForSlot, rowForSlot, s);
-
-        // If nodeB is "higher up" but has a lower Y-connection target, swap them
-        if (costB < costA) {
-          std::swap(rowForSlot[nodeA], rowForSlot[nodeB]);
-        }
-      }
+    for (int r = 0; r < static_cast<int>(colNodes.size()); ++r) {
+      rowForSlot[colNodes[r]] = r;
     }
   }
 }
+
 
 
 static constexpr int kNumColumns = 3;
@@ -560,7 +585,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     }
 
     // make it look good
-    optimizeLayout(colForSlot, rowForSlot, *snapshot);
+    sortRowsByNextColumnTargets(colForSlot, rowForSlot, *snapshot);
 
     for (int slot = 0; slot < maxGraphNodes; ++slot) {
       if (colForSlot[slot] < 0) {
