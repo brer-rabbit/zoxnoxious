@@ -187,7 +187,7 @@ struct OutputInterfaceVisualizer final : Module {
     int calcClockDivision = std::max(minClockDivision,
                                      (static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
 
-    clockDivider.setDivision((static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
+    clockDivider.setDivision(calcClockDivision);
   }
 
 
