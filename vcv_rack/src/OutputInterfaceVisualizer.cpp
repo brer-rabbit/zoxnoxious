@@ -1,3 +1,6 @@
+#include <array>
+#include <algorithm>
+
 #include "plugin.hpp"
 
 #include "zcomponentlib.hpp"
@@ -7,7 +10,7 @@ namespace zox {
 
 // maxGraphNodes: number of voice cards + output node.
 // maxGraphEdges: each voice card can have two inputs, then two final outputs with six each
-static constexpr int8_t maxGraphNodes = maxVoiceCards + 1;
+static constexpr int8_t maxGraphNodes = maxVoiceCards;
 static constexpr size_t maxGraphEdges = maxVoiceCards * 2 + 2 * 6;
 
 static constexpr int graphRenderRateHz = 60;
@@ -23,6 +26,10 @@ enum class RenderTargetKind : uint8_t {
   Output1,
   Output2
 };
+
+//======================================================
+// Graph model
+//======================================================
 
 // slotNum not present here: the slotNum is the index in an array of these
 struct GraphRenderNode {
@@ -60,6 +67,11 @@ struct GraphRenderSnapshot {
 };
 
 
+//======================================================
+// Module Definition
+//======================================================
+
+
 struct OutputInterfaceVisualizer final : Module {
   enum ParamId {
     PARAMS_LEN
@@ -88,7 +100,8 @@ struct OutputInterfaceVisualizer final : Module {
     }
 
     // this filters to only instantiated/rendered edges by policy
-    if (source.valid && source.slotNum != invalidSlot && source.moduleId >= 0) {
+    if (source.valid && source.moduleId >= 0 &&
+        source.slotNum >= 0 && source.slotNum < maxGraphNodes) {
       GraphRenderEdge& edge = graphSnapshot.edges[graphSnapshot.edgeCount++];
       edge.fromSlotNum = source.slotNum;
       edge.fromHardwareId = source.hardwareId;
@@ -126,10 +139,7 @@ struct OutputInterfaceVisualizer final : Module {
     for (size_t i = 0; i < graphSnapshot.edgeCount; ++i) {
       const GraphRenderEdge& edge = graphSnapshot.edges[i];
 
-      if (edge.valid &&
-          edge.fromSlotNum >= 0 &&
-          edge.fromSlotNum < maxGraphNodes) {
-
+      if (edge.valid) {
         const GraphRenderNode& fromNode = graphSnapshot.nodes[edge.fromSlotNum];
 
         if (fromNode.moduleId != -1 &&
@@ -272,7 +282,9 @@ struct OutputInterfaceVisualizer final : Module {
 
 
 
-// ---- visualizer
+//======================================================
+// Layout
+//======================================================
 
 struct GraphLayout {
   Vec nodeCenters[maxGraphNodes];
@@ -288,71 +300,214 @@ static Rect nodeRectFromCenter(Vec center, Vec size) {
 }
 
 
-static bool edgeTargetsOutput(const GraphRenderEdge& e) {
-  return e.valid &&
-    (e.targetKind == RenderTargetKind::Output1 ||
-     e.targetKind == RenderTargetKind::Output2);
+//======================================================
+// Graph Analysis
+//======================================================
+
+
+static int edgeTargetsOutput(const GraphRenderEdge& e) {
+  int score = 0;
+  if (e.valid) {
+    if (e.targetKind == RenderTargetKind::Output1) {
+      score += 1;
+    }
+    if (e.targetKind == RenderTargetKind::Output2) {
+      score += 1;
+    }
+  }
+  return score;
 }
 
-static bool nodeFeedsOutput(const GraphRenderSnapshot& s, int8_t slot) {
+static int nodeFeedsOutput(const GraphRenderSnapshot& s, int8_t slot) {
+  int totalStrength = 0;
   for (size_t i = 0; i < s.edgeCount; ++i) {
     const GraphRenderEdge& e = s.edges[i];
-    if (e.valid && e.fromSlotNum == slot && edgeTargetsOutput(e)) {
-      return true;
+    if (e.valid && e.fromSlotNum == slot) {
+      totalStrength += edgeTargetsOutput(e);
     }
   }
-  return false;
+  return totalStrength;
 }
 
-static bool nodeFeedsNodeThatFeedsOutput(const GraphRenderSnapshot& s, int8_t slot) {
+
+struct GraphAnalysis {
+  int distance = maxGraphNodes;   // lower is closer to output; maxGraphNodes value is "infinity"
+  int outputStrength = 0;         // 0, 1, or 2
+  int forwardEdgeCount = 0;       // edges to next column / downstream nodes
+};
+
+// a "forward edge" is from an node that feeds another internal node where the second
+// node is closer to the output.  Most typically this would be a node that feeds the output.
+// in a VCO --> VCF --> Output, analyzing the VCO, it has one forward edge.
+static void computeForwardEdgeCounts(const GraphRenderSnapshot& s,
+                                     GraphAnalysis analysis[maxGraphNodes]) {
   for (size_t i = 0; i < s.edgeCount; ++i) {
     const GraphRenderEdge& e = s.edges[i];
-    if (!e.valid) {
+
+    if (!e.valid || e.targetKind != RenderTargetKind::VoiceCard) {
       continue;
     }
-    if (e.targetKind != RenderTargetKind::VoiceCard) {
-      continue;
-    }
-    if (e.fromSlotNum != slot) {
-      continue;
-    }
-    if (nodeFeedsOutput(s, e.toSlotNum)) {
-      return true;
+
+    const int srcDist = analysis[e.fromSlotNum].distance;
+    const int dstDist = analysis[e.toSlotNum].distance;
+
+    // A useful downstream edge moves closer to an output.
+    if (dstDist < srcDist) {
+      analysis[e.fromSlotNum].forwardEdgeCount++;
     }
   }
-  return false;
 }
 
 
-// choose a preferred column for the slot.  Must only return 0, 1, or 2.
-static int chooseColumn(const GraphRenderSnapshot& s, int8_t slot) {
+// Compute the minimum hop-distance from each slot to any output node.
+// Distance 1 = directly feeds an output.
+// Distance 2 = feeds a node that feeds an output.
+// Distance (maxGraphNodes) = no path found (orphan/disconnected).
+// Returns an array indexed by slot number.
+static void computeGraphAnalysis(const GraphRenderSnapshot& s,
+                                 GraphAnalysis distOut[maxGraphNodes]) {
 
-  if (nodeFeedsOutput(s, slot)) {
-    return 2;
+  // pre-cond: distout[].distance initialized to maxGraphNodes (inifinity)
+  // BFS frontier: start with nodes that directly feed an output
+  std::vector<int> frontier;
+
+  for (int slot = 0; slot < maxGraphNodes; ++slot) {
+    if (!s.nodes[slot].valid) {
+      continue;
+    }
+
+    distOut[slot].outputStrength = nodeFeedsOutput(s, slot);
+    if (distOut[slot].outputStrength > 0) {
+      distOut[slot].distance = 1;
+      frontier.push_back(slot);
+    }
   }
-  
-  if (nodeFeedsNodeThatFeedsOutput(s, slot)) {
-    return 1;
+
+  // BFS: propagate distance backward through VoiceCard->VoiceCard edges
+  while (!frontier.empty()) {
+    std::vector<int> next;
+    for (int target : frontier) {
+      // find any node that feeds 'target' via a VoiceCard edge
+      for (size_t i = 0; i < s.edgeCount; ++i) {
+        const GraphRenderEdge& e = s.edges[i];
+        if (!e.valid) continue;
+        if (e.targetKind != RenderTargetKind::VoiceCard) continue;
+        if (e.toSlotNum != target) continue;
+        int src = e.fromSlotNum;
+        if (src < 0 || src >= maxGraphNodes) continue;
+        int candidate = distOut[target].distance + 1;
+        if (candidate < distOut[src].distance) {
+          distOut[src].distance = candidate;
+          next.push_back(src);
+        }
+      }
+    }
+    frontier = std::move(next);
   }
-  
+
+  computeForwardEdgeCounts(s, distOut);
+}
+
+
+// columnPriority is used when a column overflows to establish a score
+// of which nodes stay in the column and which get booted.
+static int columnPriority(const GraphAnalysis& a) {
+  int score = 0;
+  // Strongest reason to stay near the output.
+  score += a.outputStrength * 100;
+  // Closer to output is better.
+  score += (maxGraphNodes - a.distance) * 10;
+  // Node bridges into output-feeding nodes.
+  score += a.forwardEdgeCount * 5;
+
+  return score;
+}
+
+
+using SlotArray = std::array<int, maxGraphNodes>;
+static constexpr int kNumColumns = 3;
+
+static void resolveSingleColumnOverflow(SlotArray& colForSlot,
+                                        const GraphAnalysis analysis[maxGraphNodes],
+                                        int overflowCol) {
+  if (overflowCol < 0) {
+    return;
+  }
+
+  std::array<int, maxGraphNodes> overflowSlots;
+  int overflowCount = 0;
+
+  for (int slot = 0; slot < maxGraphNodes; ++slot) {
+    if (colForSlot[slot] == overflowCol) {
+      overflowSlots[overflowCount++] = slot;
+    }
+  }
+
+  if (overflowCount <= 3) {
+    return;
+  }
+
+  std::stable_sort(overflowSlots.begin(),
+                   overflowSlots.begin() + overflowCount,
+                   [&](int a, int b) {
+                     return columnPriority(analysis[a]) > columnPriority(analysis[b]);
+                   });
+
+  int colCounts[kNumColumns] = {};
+  for (int slot = 0; slot < maxGraphNodes; ++slot) {
+    int col = colForSlot[slot];
+    if (col >= 0 && col < kNumColumns) {
+      colCounts[col]++;
+    }
+  }
+
+  // where to dump the overflowed nodes.
+  // If column 2 overflows move left
+  // If column 0 overflows move right
+  // If column 1 overflows, either side will have space
+  for (int i = 3; i < overflowCount; ++i) {
+    int slot = overflowSlots[i];
+
+    int targetCol = -1;
+    if (overflowCol > 0 && colCounts[overflowCol - 1] < 3) {
+      targetCol = overflowCol - 1;
+    }
+    else if (overflowCol < kNumColumns - 1 && colCounts[overflowCol + 1] < 3) {
+      targetCol = overflowCol + 1;
+    }
+
+    if (targetCol >= 0) {
+      colForSlot[slot] = targetCol;
+      colCounts[overflowCol]--;
+      colCounts[targetCol]++;
+    }
+  }
+}
+
+
+
+// Map hop-distance to a 0-2 column index.
+// distance 1 --> col 2 (closest to output)
+// distance 2 --> col 1
+// distance 3+ (or unreachable) --> col 0
+static int distanceToColumn(int dist) {
+  if (dist == 1) return 2;
+  if (dist == 2) return 1;
   return 0;
 }
 
 
-static Vec voiceNodeCenter(const Rect& r, int col, int row, int rowCount) {
+// place the node on per the col/row.  Assume a 3x3 matrix.
+static Vec voiceNodeCenter(const Rect& r, int col, int row) {
   const float leftMargin = 5.f;
   const float rightOutputGutter = 30.f;
   const float marginY = 28.f;
 
   const float usableW = r.size.x - leftMargin - rightOutputGutter;
   const float usableH = r.size.y - 2.f * marginY;
-
   const float colW = usableW / 3.f;
 
-  float y = r.pos.y + r.size.y * 0.5f;
-  if (rowCount > 1) {
-    y = r.pos.y + marginY + (usableH / float(rowCount - 1)) * row;
-  }
+  const float y = r.pos.y + marginY + (usableH / 2.f) * row;
 
   return Vec(r.pos.x + leftMargin + colW * (col + 0.5f), y);
 }
@@ -461,76 +616,122 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, fl
 }
 
 
+//----------------
+// Row placement
+//----------------
 
-// Returns the average row index of right-column nodes this slot connects to.
-// For col-2 nodes connecting to outputs: Output1 is treated as row -0.5,
-// Output2 as row 2.5 (i.e. above/below the 0-2 row range) so col-2 nodes
-// feeding Output1 float to the top and those feeding Output2 float to the bottom.
-static float getAverageConnectionY(int slot, int colForSlot[], int rowForSlot[],
-                                   const GraphRenderSnapshot& s) {
-  float totalY = 0.f;
+static constexpr float kOutput1Row = 0.5f;
+static constexpr float kOutput2Row = 1.5f;
+
+static float barycenterForSlot(int slot,
+                               const SlotArray& colForSlot,
+                               const SlotArray& rowForSlot,
+                               const GraphRenderSnapshot& s) {
+  const int myCol = colForSlot[slot];
+
+  float total = 0.f;
   int count = 0;
-  int myCol = colForSlot[slot];
 
   for (size_t i = 0; i < s.edgeCount; ++i) {
     const GraphRenderEdge& e = s.edges[i];
+
     if (!e.valid || e.fromSlotNum != slot) {
       continue;
     }
 
-    if (myCol == 2) {
-      // Score against which output this slot feeds
-      if (e.targetKind == RenderTargetKind::Output1) {
-        totalY += -0.5f;   // attracts node toward top of column
-        ++count;
-      }
-      else if (e.targetKind == RenderTargetKind::Output2) {
-        totalY += 2.5f;    // attracts node toward bottom of column
-        ++count;
-      }
+    if (e.targetKind == RenderTargetKind::Output1) {
+      total += kOutput1Row;
+      count++;
     }
-    else {
-      // cols 0 and 1: score against connected nodes in the next column
-      if (e.targetKind == RenderTargetKind::VoiceCard &&
-          e.toSlotNum >= 0 && e.toSlotNum < maxGraphNodes &&
-          colForSlot[e.toSlotNum] == myCol + 1) {
-        totalY += rowForSlot[e.toSlotNum];
-        ++count;
-      }
+    else if (e.targetKind == RenderTargetKind::Output2) {
+      total += kOutput2Row;
+      count++;
+    }
+    else if (e.targetKind == RenderTargetKind::VoiceCard &&
+             e.toSlotNum >= 0 &&
+             e.toSlotNum < maxGraphNodes &&
+             colForSlot[e.toSlotNum] == myCol + 1 &&
+             rowForSlot[e.toSlotNum] >= 0) {
+      total += rowForSlot[e.toSlotNum];
+      count++;
     }
   }
-  return (count > 0) ? (totalY / count) : static_cast<float>(rowForSlot[slot]);
+
+  return count > 0 ? total / count : 1.f;
 }
 
 
-static void sortRowsByNextColumnTargets(int colForSlot[], int rowForSlot[], const GraphRenderSnapshot& s) {
-  // One pass per column from right (col 2) to left (col 0), so that
-  // col-2 ordering is settled before col-1 references it, etc.
+static void assignRowsByBarycenter(const SlotArray& colForSlot,
+                                   SlotArray& rowForSlot,
+                                   const GraphRenderSnapshot& s) {
   for (int col = 2; col >= 0; --col) {
-    std::vector<int> colNodes;
-    for (int i = 0; i < maxGraphNodes; ++i) {
-      if (colForSlot[i] == col) colNodes.push_back(i);
+    std::array<int, 3> slots;
+    int count = 0;
+
+    for (int slot = 0; slot < maxGraphNodes; ++slot) {
+      if (colForSlot[slot] == col && count < 3) {
+        slots[count++] = slot;
+      }
     }
-    if (colNodes.size() < 2) continue;
 
-    // Sort node slots by their average-connection-Y score ascending,
-    // then reassign rows 0..N-1 in that order.
-    std::stable_sort(colNodes.begin(), colNodes.end(),
-                     [&](int a, int b) {
-                       float ya = getAverageConnectionY(a, colForSlot, rowForSlot, s);
-                       float yb = getAverageConnectionY(b, colForSlot, rowForSlot, s);
-                       return ya < yb;
-                     });
+    if (count == 0) {
+      continue;
+    }
 
-    for (int r = 0; r < static_cast<int>(colNodes.size()); ++r) {
-      rowForSlot[colNodes[r]] = r;
+    float score[3] = {};
+    for (int i = 0; i < count; ++i) {
+      score[i] = barycenterForSlot(slots[i], colForSlot, rowForSlot, s);
+    }
+
+    // run through all permutations.  For a 3x3 with 6 nodes this isn't much.
+    // only first two elements are used for the count=2 use case
+    static const int rowPerms[6][3] = {
+      {0, 1, 2},
+      {0, 2, 1},
+      {1, 0, 2},
+      {1, 2, 0},
+      {2, 0, 1},
+      {2, 1, 0}
+    };
+
+    float bestCost = 1e9f;
+    int bestRows[3] = {1, 1, 1};
+
+    const int permCount = (count == 1) ? 3 : (count == 2 ? 6 : 6);
+
+    for (int p = 0; p < permCount; ++p) {
+      float cost = 0.f;
+
+      for (int i = 0; i < count; ++i) {
+        int candidateRow;
+
+        if (count == 1) {
+          candidateRow = p; // rows 0,1,2
+        }
+        else {
+          candidateRow = rowPerms[p][i];
+        }
+
+        // calculate distance of how far it is pulled from ideal position
+        cost += std::fabs(candidateRow - score[i]);
+      }
+
+      if (cost < bestCost) {
+        bestCost = cost;
+        for (int i = 0; i < count; ++i) {
+          bestRows[i] = (count == 1) ? p : rowPerms[p][i];
+        }
+      }
+    }
+
+    for (int i = 0; i < count; ++i) {
+      rowForSlot[slots[i]] = bestRows[i];
     }
   }
 }
 
 
 
-static constexpr int kNumColumns = 3;
 
 struct SystemRoutingVisualizerDisplay : LedDisplay {
   GraphRenderSnapshot *snapshot = nullptr;
@@ -545,18 +746,24 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   // rowForSlot is a lookup for the row the slot is assigned.
   // colCounts tracks how many nodes have been assigned to each column.
   // Two passes:
-  // (1) chooseColumn gets the node's preferred column
+  // (1) BFS distance from output drives each node's preferred column
   void buildLayout(GraphLayout& layout, const Rect& box) {
     layout = GraphLayout{};
 
-    int colForSlot[maxGraphNodes];
-    int rowForSlot[maxGraphNodes];
+    SlotArray colForSlot;
+    SlotArray rowForSlot;
     int colCounts[kNumColumns] = {};
 
-    for (int i = 0; i < maxGraphNodes; ++i) {
-      colForSlot[i] = -1;
-      rowForSlot[i] = -1;
-    }
+    colForSlot.fill(-1);
+    rowForSlot.fill(-1);
+
+    // Compute BFS distances from outputs for all slots
+    GraphAnalysis distToOutput[maxGraphNodes];
+    computeGraphAnalysis(*snapshot, distToOutput);
+
+    // given 6 nodes in a 3x3, it's only possible for one column to overflow.  Track
+    // that here.  A value of -1 indicates no overflow.
+    int overflowCol = -1;
 
     for (int slot = 0; slot < maxGraphNodes; ++slot) {
       const GraphRenderNode& node = snapshot->nodes[slot];
@@ -565,27 +772,30 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         continue;
       }
 
-      // by contract chooseColumn must return in the 0:2 range
-      // some liberty is taken here in that we know 6 voice cards max.
-      // With a 3x3 matrix, if one column is full the other columns must have space.
-      int col = chooseColumn(*snapshot, slot);
-      if (colCounts[col] >= kNumColumns) {
-        if (col == 2) {
-          // six voice cards max, if col == 2 then col 1 must have space
-          col = 1;
-        }
-        else {
-          // col 0 or 1 and it's full.  The next column right must have at least one spot
-          col++;
-        }
+      // distance-to-output drives column: dist1-->col2, dist2-->col1, else-->col0
+      int col = distanceToColumn(distToOutput[slot].distance);
+      colForSlot[slot] = col;
+      colCounts[col]++;
+      if (colCounts[col] > 3) {
+        overflowCol = col;
       }
 
-      colForSlot[slot] = col;
-      rowForSlot[slot] = colCounts[col]++;
+      // row assigned here for now
     }
 
-    // make it look good
-    sortRowsByNextColumnTargets(colForSlot, rowForSlot, *snapshot);
+    resolveSingleColumnOverflow(colForSlot, distToOutput, overflowCol);
+    // rebuild colCounts after resolving overflow
+    std::fill(std::begin(colCounts), std::end(colCounts), 0);
+    for (int slot = 0; slot < maxGraphNodes; ++slot) {
+      int col = colForSlot[slot];
+      if (col >= 0 && col < kNumColumns) {
+        colCounts[col]++;
+      }
+    }
+
+
+    //sortRowsByNextColumnTargets(colForSlot, rowForSlot, *snapshot);
+    assignRowsByBarycenter(colForSlot, rowForSlot, *snapshot);
 
     for (int slot = 0; slot < maxGraphNodes; ++slot) {
       if (colForSlot[slot] < 0) {
@@ -595,8 +805,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       // todo: play with this for initial node placement by quantity
       layout.nodeCenters[slot] = voiceNodeCenter(box,
                                                  colForSlot[slot],
-                                                 rowForSlot[slot],
-                                                 colCounts[colForSlot[slot]]);
+                                                 rowForSlot[slot]);
     }
 
     layout.output1Center = outputCenter(box, 0);
