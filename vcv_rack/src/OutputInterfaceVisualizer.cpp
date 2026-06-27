@@ -74,6 +74,8 @@ struct GraphRenderSnapshot {
 
 struct OutputInterfaceVisualizer final : Module {
   enum ParamId {
+    DISPLAY_PRIMARY_EDGE_PARAM,
+    DISPLAY_SECONDARY_EDGE_PARAM,
     PARAMS_LEN
   };
   enum InputId {
@@ -83,6 +85,8 @@ struct OutputInterfaceVisualizer final : Module {
     OUTPUTS_LEN
   };
   enum LightId {
+    DISPLAY_PRIMARY_EDGE_LIGHT,
+    DISPLAY_SECONDARY_EDGE_LIGHT,
     LIGHTS_LEN
   };
 
@@ -92,6 +96,9 @@ struct OutputInterfaceVisualizer final : Module {
   GraphRenderSnapshot snapshotB;
   std::atomic<GraphRenderSnapshot*> publishedSnapshot;
   GraphRenderSnapshot* writeSnapshot;
+
+  bool displayPrimaryEdges = true;
+  bool displaySecondaryEdges = true;
 
   void addSource(const ParticipantGraphInfo& participantInfo,
                  const GraphSource source,
@@ -190,6 +197,8 @@ struct OutputInterfaceVisualizer final : Module {
 
   OutputInterfaceVisualizer() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+    configButton(DISPLAY_PRIMARY_EDGE_PARAM, "Show Primary Connections");
+    configButton(DISPLAY_SECONDARY_EDGE_PARAM, "Show Secondary Connections");
 
     int calcClockDivision = std::max(minClockDivision,
                                      (static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
@@ -282,6 +291,13 @@ struct OutputInterfaceVisualizer final : Module {
     if (clockDivider.process()) {
       if (leftExpander.module && leftExpander.module->model == modelOutputInterface) {
         ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(leftExpander.module->rightExpander.consumerMessage);
+
+        displayPrimaryEdges = params[DISPLAY_PRIMARY_EDGE_PARAM].getValue();
+        lights[DISPLAY_PRIMARY_EDGE_LIGHT].setBrightness(displayPrimaryEdges);
+
+        displaySecondaryEdges = params[DISPLAY_SECONDARY_EDGE_PARAM].getValue();
+        lights[DISPLAY_SECONDARY_EDGE_LIGHT].setBrightness(displaySecondaryEdges);
+
         if (message) {
 
           if (writeSnapshot == &snapshotA) {
@@ -986,8 +1002,86 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   }
 
 
+  void drawForwardEdge(NVGcontext* vg, Vec from, Vec to,
+                       const GraphRenderEdge& edge, NVGcolor edgeColor) {
+    nvgBeginPath(vg);
+    Vec midPoint = from;
+    midPoint.x += (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 2.f * edge.fromSlotNum;
+    midPoint.y = to.y;
+    nvgMoveTo(vg, from.x, from.y);
+    nvgLineTo(vg, midPoint.x, from.y);
+    nvgLineTo(vg, midPoint.x, to.y);
+    nvgLineTo(vg, to.x, to.y);
+    nvgStrokeColor(vg, edgeColor);
+    nvgStrokeWidth(vg, edgeWidth(edge.weight));
+    nvgStroke(vg);
+    drawArrowhead(vg, midPoint, to, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+  }
+
+
+  void drawFeedbackEdge(NVGcontext* vg, Vec from, Vec to,
+                       const GraphRenderEdge& edge, NVGcolor edgeColor) {
+    Vec leftGutter;
+    Vec rightGutter;
+    // stagger feedback gutters by slot number so parallel feedback paths
+    // don't overlap.  Gutter starts a 3px growing by 2.5 per slot.
+    float verticalGutterOffset = nodeH + 2.5f * edge.fromSlotNum;
+
+    if (to.y < from.y) {
+      // gutter goes above
+      // forward amount determined by fromPort
+      rightGutter.x = from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 1.f * edge.fromSlotNum;
+      rightGutter.y = from.y - verticalGutterOffset;
+      leftGutter.x = to.x - (4.f + edge.fromSlotNum);
+      leftGutter.y = to.y;
+    }
+    else {
+      // gutter goes below
+      // forward amount determined by fromPort
+      rightGutter.x = from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 1.f * edge.fromSlotNum;
+      rightGutter.y = from.y + verticalGutterOffset;
+      leftGutter.x = to.x - (4.f + edge.fromSlotNum);
+      leftGutter.y = to.y;
+    }
+
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, from.x, from.y);
+    nvgLineTo(vg, rightGutter.x, from.y);
+    nvgLineTo(vg, rightGutter.x, rightGutter.y);
+    nvgLineTo(vg, leftGutter.x, rightGutter.y);
+    nvgLineTo(vg, leftGutter.x, to.y);
+    nvgLineTo(vg, to.x, to.y);
+    nvgStrokeColor(vg, edgeColor);
+    nvgStrokeWidth(vg, edgeWidth(edge.weight));
+    nvgStroke(vg);
+
+    drawArrowhead(vg, leftGutter, to, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+  }
+
+
+  void drawSelfLoopEdge(NVGcontext* vg, Vec from, Vec to,
+                        const GraphRenderEdge& edge, NVGcolor edgeColor) {
+    nvgBeginPath(vg);
+    Vec farPoint;
+    farPoint.x = to.x - 6.f;
+    farPoint.y = from.y + 4.f;
+    nvgMoveTo(vg, from.x, from.y);
+    nvgLineTo(vg, from.x, farPoint.y);
+    nvgLineTo(vg, farPoint.x, farPoint.y);
+    nvgLineTo(vg, farPoint.x, to.y);
+    nvgLineTo(vg, to.x, to.y);
+    nvgStrokeColor(vg, edgeColor);
+    nvgStrokeWidth(vg, edgeWidth(edge.weight));
+    nvgStroke(vg);
+    Vec arrowTail = to;
+    arrowTail.x -= 6.f;
+    drawArrowhead(vg, arrowTail, to, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+  }
+
+
   // contract:
   // toSlotNum and fromSlotNum are valid indices
+  // module is a valid pointer
   void drawEdges(NVGcontext* vg, const GraphLayout& layout) {
 
     for (size_t i = 0; i < snapshot->edgeCount; ++i) {
@@ -1030,83 +1124,14 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
       NVGcolor edgeColor = displayRouteColor(edgeAlpha(edge.weight));
 
-      if (edgeRoute.kind == EdgeRouteKind::Forward) {
-        nvgBeginPath(vg);
-        Vec midPoint = p1;
-        midPoint.x += (edge.fromPort == GraphPort::OUT1 ? 3.f : 5.f);
-        midPoint.y = p2.y;
-        nvgMoveTo(vg, p1.x, p1.y);
-        nvgLineTo(vg, midPoint.x, p1.y);
-        nvgLineTo(vg, midPoint.x, p2.y);
-        nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, edgeColor);
-        nvgStrokeWidth(vg, edgeWidth(edge.weight));
-        nvgStroke(vg);
-        drawArrowhead(vg, midPoint, p2, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+      if (edgeRoute.kind == EdgeRouteKind::Forward && module->displayPrimaryEdges) {
+        drawForwardEdge(vg, p1, p2, edge, edgeColor);
       }
-      else if (edgeRoute.kind == EdgeRouteKind::Feedback) {
-        Vec leftGutter;
-        Vec rightGutter;
-        // stagger feedback gutters by slot number so parallel feedback paths
-        // don't overlap.  Gutter starts a 3px growing by 2.5 per slot.
-        float verticalGutterOffset = nodeH + 2.5f * edge.fromSlotNum;
-
-        if (p2.y < p1.y) {
-          // gutter goes above
-          // forward amount determined by fromPort
-          rightGutter.x = p1.x + (edge.fromPort == GraphPort::OUT1 ? 3.f : 5.f);
-          rightGutter.y = p1.y - verticalGutterOffset;
-          leftGutter.x = p2.x - (4.f + edge.fromSlotNum);
-          leftGutter.y = p2.y;
-        }
-        else {
-          // gutter goes below
-          // forward amount determined by fromPort
-          rightGutter.x = p1.x + (edge.fromPort == GraphPort::OUT1 ? 3.f : 5.f);
-          rightGutter.y = p1.y + verticalGutterOffset;
-          leftGutter.x = p2.x - (4.f + edge.fromSlotNum);
-          leftGutter.y = p2.y;
-        }
-
-        nvgBeginPath(vg);
-        nvgMoveTo(vg, p1.x, p1.y);
-        nvgLineTo(vg, rightGutter.x, p1.y);
-        nvgLineTo(vg, rightGutter.x, rightGutter.y);
-        nvgLineTo(vg, leftGutter.x, rightGutter.y);
-        nvgLineTo(vg, leftGutter.x, p2.y);
-        nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, edgeColor);
-        nvgStrokeWidth(vg, edgeWidth(edge.weight));
-        nvgStroke(vg);
-
-        drawArrowhead(vg, leftGutter, p2, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+      else if (edgeRoute.kind == EdgeRouteKind::Feedback && module->displaySecondaryEdges) {
+        drawFeedbackEdge(vg, p1, p2, edge, edgeColor);
       }
-      else if (edgeRoute.kind == EdgeRouteKind::SelfLoop) {
-        nvgBeginPath(vg);
-        Vec farPoint;
-        farPoint.x = p2.x - 6.f;
-        farPoint.y = p1.y + 6.f;
-        nvgMoveTo(vg, p1.x, p1.y);
-        nvgLineTo(vg, p1.x, farPoint.y);
-        nvgLineTo(vg, farPoint.x, farPoint.y);
-        nvgLineTo(vg, farPoint.x, p2.y);
-        nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, edgeColor);
-        nvgStrokeWidth(vg, edgeWidth(edge.weight));
-        nvgStroke(vg);
-        Vec arrowTail = p2;
-        arrowTail.x -= 6.f;
-        drawArrowhead(vg, arrowTail, p2, 2.f + 2.f * edge.weight, 5.f, edgeColor);
-      }
-      else {
-        // direct path: here as a fallback.  This should not actually be used.
-        nvgBeginPath(vg);
-        nvgMoveTo(vg, p1.x, p1.y);
-        nvgLineTo(vg, p2.x, p2.y);
-        nvgStrokeColor(vg, edgeColor);
-        nvgStrokeWidth(vg, edgeWidth(edge.weight));
-        nvgStroke(vg);
-        drawArrowhead(vg, p1, p2, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+      else if (edgeRoute.kind == EdgeRouteKind::SelfLoop && module->displaySecondaryEdges) {
+        drawSelfLoopEdge(vg, p1, p2, edge, edgeColor);
       }
     }
   }
@@ -1153,6 +1178,9 @@ struct OutputInterfaceVisualizerWidget : ModuleWidget {
       display->module = module;
       addChild(display);
     }
+
+    addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 88.272)), module, OutputInterfaceVisualizer::DISPLAY_PRIMARY_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_PRIMARY_EDGE_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 98.272)), module, OutputInterfaceVisualizer::DISPLAY_SECONDARY_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_SECONDARY_EDGE_LIGHT));
   }
 };
 
