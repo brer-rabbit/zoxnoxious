@@ -87,14 +87,17 @@ struct OutputInterfaceVisualizer final : Module {
   };
 
   dsp::ClockDivider clockDivider;
-  GraphRenderSnapshot graphSnapshot;
 
+  GraphRenderSnapshot snapshotA;
+  GraphRenderSnapshot snapshotB;
+  std::atomic<GraphRenderSnapshot*> publishedSnapshot;
+  GraphRenderSnapshot* writeSnapshot;
 
   void addSource(const ParticipantGraphInfo& participantInfo,
                  const GraphSource source,
                  const RenderTargetKind targetKind) {
     // fill in the edges of the graph
-    if (graphSnapshot.edgeCount >= maxGraphEdges) {
+    if (writeSnapshot->edgeCount >= maxGraphEdges) {
       WARN("maxGraphEdges exceeded");
       return;
     }
@@ -102,7 +105,7 @@ struct OutputInterfaceVisualizer final : Module {
     // this filters to only instantiated/rendered edges by policy
     if (source.valid && source.moduleId >= 0 &&
         source.slotNum >= 0 && source.slotNum < maxGraphNodes) {
-      GraphRenderEdge& edge = graphSnapshot.edges[graphSnapshot.edgeCount++];
+      GraphRenderEdge& edge = writeSnapshot->edges[writeSnapshot->edgeCount++];
       edge.fromSlotNum = source.slotNum;
       edge.fromHardwareId = source.hardwareId;
       edge.fromModuleId = source.moduleId;
@@ -120,15 +123,15 @@ struct OutputInterfaceVisualizer final : Module {
   void addNode(const ParticipantGraphInfo& info, RenderNodeKind kind) {
     if (info.slotNum >= 0 && info.slotNum < maxGraphNodes) {
       if (info.moduleId >= 0) {
-        graphSnapshot.nodes[info.slotNum].valid = true;
-        graphSnapshot.nodes[info.slotNum].moduleId = info.moduleId;
-        graphSnapshot.nodes[info.slotNum].hardwareId = info.hardwareId;
-        graphSnapshot.nodes[info.slotNum].kind = kind;
-        graphSnapshot.nodes[info.slotNum].output1Weight = info.output1Weight;
-        graphSnapshot.nodes[info.slotNum].output2Weight = info.output2Weight;
+        writeSnapshot->nodes[info.slotNum].valid = true;
+        writeSnapshot->nodes[info.slotNum].moduleId = info.moduleId;
+        writeSnapshot->nodes[info.slotNum].hardwareId = info.hardwareId;
+        writeSnapshot->nodes[info.slotNum].kind = kind;
+        writeSnapshot->nodes[info.slotNum].output1Weight = info.output1Weight;
+        writeSnapshot->nodes[info.slotNum].output2Weight = info.output2Weight;
       }
       else {
-        graphSnapshot.nodes[info.slotNum] = GraphRenderNode{};
+        writeSnapshot->nodes[info.slotNum] = GraphRenderNode{};
       }
     }
   }
@@ -136,15 +139,15 @@ struct OutputInterfaceVisualizer final : Module {
   // iterate over all the edges:
   // find the "from" slot and incorporate the source weight via simple multiply
   void calculateEdgeWeights() {
-    for (size_t i = 0; i < graphSnapshot.edgeCount; ++i) {
-      const GraphRenderEdge& edge = graphSnapshot.edges[i];
+    for (size_t i = 0; i < writeSnapshot->edgeCount; ++i) {
+      const GraphRenderEdge& edge = writeSnapshot->edges[i];
 
       if (edge.valid) {
-        const GraphRenderNode& fromNode = graphSnapshot.nodes[edge.fromSlotNum];
+        const GraphRenderNode& fromNode = writeSnapshot->nodes[edge.fromSlotNum];
 
         if (fromNode.moduleId != -1 &&
             fromNode.hardwareId != invalidCardId) {
-          graphSnapshot.edges[i].weight *= (edge.fromPort == GraphPort::OUT1 ?
+          writeSnapshot->edges[i].weight *= (edge.fromPort == GraphPort::OUT1 ?
                                             fromNode.output1Weight : fromNode.output2Weight);
         }
       }
@@ -152,7 +155,8 @@ struct OutputInterfaceVisualizer final : Module {
   }
 
 
-  void buildGraphRenderSnapshot(const ParticipantGraphMessage& message) {
+  void buildGraphRenderSnapshot(const ParticipantGraphMessage& message,
+                                GraphRenderSnapshot& graphSnapshot) {
     graphSnapshot = GraphRenderSnapshot{};
 
     for (size_t i = 0; i < message.participantInfoCount; ++i) {
@@ -191,12 +195,18 @@ struct OutputInterfaceVisualizer final : Module {
                                      (static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
     // division should really be frame rate-- this need not be frequent at all
     clockDivider.setDivision(calcClockDivision);
+
+    snapshotA = {};
+    snapshotB = {};
+    publishedSnapshot.store(&snapshotA, std::memory_order_release);
+    writeSnapshot = &snapshotB;
+
   }
+
 
   void onSampleRateChange(const SampleRateChangeEvent& e) override {
     int calcClockDivision = std::max(minClockDivision,
                                      (static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
-
     clockDivider.setDivision(calcClockDivision);
   }
 
@@ -223,11 +233,13 @@ struct OutputInterfaceVisualizer final : Module {
   }
 
 
+# if 0
+  // debug
   void dumpGraphRenderSnapshot() const {
     INFO("========== GraphRenderSnapshot ==========");
     INFO("Nodes:");
     for (size_t i = 0; i < maxGraphNodes; ++i) {
-      const GraphRenderNode& node = graphSnapshot.nodes[i];
+      const GraphRenderNode& node = writeSnapshot->nodes[i];
 
       if (!node.valid)
         continue;
@@ -239,10 +251,10 @@ struct OutputInterfaceVisualizer final : Module {
            renderNodeKindName(node.kind));
     }
 
-    INFO("Edges: count=%zu", graphSnapshot.edgeCount);
+    INFO("Edges: count=%zu", writeSnapshot->edgeCount);
 
-    for (size_t i = 0; i < graphSnapshot.edgeCount; ++i) {
-      const GraphRenderEdge& edge = graphSnapshot.edges[i];
+    for (size_t i = 0; i < writeSnapshot->edgeCount; ++i) {
+      const GraphRenderEdge& edge = writeSnapshot->edges[i];
 
       if (!edge.valid)
         continue;
@@ -263,7 +275,7 @@ struct OutputInterfaceVisualizer final : Module {
            edge.weight);
     }
   }
-
+#endif
 
 
   void process(const ProcessArgs& args) override {
@@ -271,7 +283,18 @@ struct OutputInterfaceVisualizer final : Module {
       if (leftExpander.module && leftExpander.module->model == modelOutputInterface) {
         ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(leftExpander.module->rightExpander.consumerMessage);
         if (message) {
-          buildGraphRenderSnapshot(*message);
+
+          if (writeSnapshot == &snapshotA) {
+            buildGraphRenderSnapshot(*message, snapshotA);
+            publishedSnapshot.store(&snapshotA, std::memory_order_release);
+            writeSnapshot = &snapshotB;
+          }
+          else {
+            buildGraphRenderSnapshot(*message, snapshotB);
+            publishedSnapshot.store(&snapshotB, std::memory_order_release);
+            writeSnapshot = &snapshotA;
+          }
+
           //dumpGraphRenderSnapshot();
         }
       }
@@ -547,7 +570,7 @@ static Vec topAnchor(Vec center, Vec size) {
 }
 
 static Vec topAnchor(Vec center, Vec size, GraphPort port) {
-  return Vec(center.x + portOffset(port) + 6.f, center.y - size.y * 0.5f);
+  return Vec(center.x + portOffset(port), center.y - size.y * 0.5f);
 }
 
 static Vec bottomAnchor(Vec center, Vec size) {
@@ -555,66 +578,43 @@ static Vec bottomAnchor(Vec center, Vec size) {
 }
 
 static Vec bottomAnchor(Vec center, Vec size, GraphPort port) {
-  return Vec(center.x + portOffset(port) + 6.f, center.y + size.y * 0.5f);
+  return Vec(center.x + portOffset(port), center.y + size.y * 0.5f);
 }
 
 
 enum class AnchorSide : uint8_t { Left, Right, Top, Bottom };
-enum class EdgeRouteKind : uint8_t { Normal, Vertical, Feedback, SelfLoop };
+enum class EdgeRouteKind : uint8_t { Forward, Feedback, SelfLoop };
 
 struct EdgeRoute {
-  EdgeRouteKind kind = EdgeRouteKind::Normal;
+  EdgeRouteKind kind = EdgeRouteKind::Forward;
   AnchorSide fromSide = AnchorSide::Right;
   AnchorSide toSide = AnchorSide::Left;
 };
 
 
-// nodes more than kMinForwardDx pixels to the right: draw a straight edge
-static constexpr float kMinForwardDx = 8.f;
-// nodes within kSameRowDyTolerance are treated as a co-row, use gutter routing
-static constexpr float kSameRowDyTolerance = 4.f;
-
-static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop, float midY) {
+static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop) {
   EdgeRoute route;
 
-  const float dx = toCenter.x - fromCenter.x;
-  const float dy = toCenter.y - fromCenter.y;
+  route.toSide = AnchorSide::Left;
 
   if (selfLoop) {
     route.kind = EdgeRouteKind::SelfLoop;
     route.fromSide = AnchorSide::Bottom;
-    route.toSide = AnchorSide::Left;
     return route;
   }
 
-  if (dx >= kMinForwardDx) {
-    route.kind = EdgeRouteKind::Normal;
-    route.fromSide = AnchorSide::Right;
-    route.toSide = AnchorSide::Left;
-    return route;
-  }
+  route.fromSide = AnchorSide::Right;
+  const float dx = toCenter.x - fromCenter.x;
 
-  if (std::fabs(dy) < kSameRowDyTolerance) {
-    // feedback routing: choose top-to-top if we're above the mid-Y point
-    // otherwise bottom-to-bottom.  This keeps the middle gutters clear (mostly)
+  if (dx > 0.f) {
+    route.kind = EdgeRouteKind::Forward;
+  }
+  else {
     route.kind = EdgeRouteKind::Feedback;
-    if (fromCenter.y < midY) {
-      route.fromSide = AnchorSide::Top;
-      route.toSide = AnchorSide::Top;
-    }
-    else {
-      route.fromSide = AnchorSide::Bottom;
-      route.toSide = AnchorSide::Bottom;
-    }
-    return route;
   }
 
-  route.kind = dx < 0.f ? EdgeRouteKind::Feedback : EdgeRouteKind::Vertical;
-  route.fromSide = dy > 0.f ? AnchorSide::Bottom : AnchorSide::Top;
-  route.toSide   = dy > 0.f ? AnchorSide::Top    : AnchorSide::Bottom;
   return route;
 }
-
 
 //----------------
 // Row placement
@@ -734,7 +734,8 @@ static void assignRowsByBarycenter(const SlotArray& colForSlot,
 
 
 struct SystemRoutingVisualizerDisplay : LedDisplay {
-  GraphRenderSnapshot *snapshot = nullptr;
+  const GraphRenderSnapshot *snapshot = nullptr;
+  const OutputInterfaceVisualizer *module = nullptr;
 
   static constexpr float nodeW = 36.f;
   static constexpr float nodeH = 18.f;
@@ -829,6 +830,11 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   NVGcolor displayTextColor(float a = 1.f) const {
     return nvgRGBAf(0.70f, 0.88f, 0.78f, a);
   }
+
+  NVGcolor displayRouteColor(float a = 1.f) const {
+    return nvgRGBAf(0.83f, 0.92f, 0.99f, a);
+  }
+
 
   float edgeAlpha(float weight) {
     return clamp(0.30f + 0.70f * weight, 0.3f, 1.f);
@@ -1007,8 +1013,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       }
 
       EdgeRoute edgeRoute = chooseEdgeRoute(p1, p2,
-                                            edge.fromSlotNum == edge.toSlotNum,
-                                            box.size.y * 0.5f);
+                                            edge.fromSlotNum == edge.toSlotNum);
 
       p1 = anchorForSideAndPort(layout.nodeCenters[edge.fromSlotNum], edgeRoute.fromSide, edge.fromPort);
       switch (edge.targetKind) {
@@ -1023,37 +1028,78 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         break;
       }        
 
-      NVGcolor edgeColor = displayTextColor(edgeAlpha(edge.weight));
+      NVGcolor edgeColor = displayRouteColor(edgeAlpha(edge.weight));
 
-      if (edgeRoute.kind == EdgeRouteKind::Feedback) {
-        float gutterY;
-        // stagger feedback gutters by slot number so parallel feedback paths
-        // don't overlap.  Gutter starts a 3px growing by 2.5 per slot.
-        float gutterOffset = 3.f + 2.5f * edge.fromSlotNum;
-
-        if (edgeRoute.fromSide == edgeRoute.toSide) {
-          gutterY = (edgeRoute.fromSide == AnchorSide::Top ?
-                     (std::min(p1.y, p2.y) - gutterOffset) :
-                     (std::max(p1.y, p2.y) + gutterOffset));
-        }
-        else {
-          gutterY = (edgeRoute.fromSide == AnchorSide::Top ?
-                     (std::min(p1.y, p2.y) + gutterOffset) :
-                     (std::max(p1.y, p2.y) - gutterOffset));
-        }
-
-        Vec arrowTail = Vec(p2.x, gutterY);
+      if (edgeRoute.kind == EdgeRouteKind::Forward) {
         nvgBeginPath(vg);
+        Vec midPoint = p1;
+        midPoint.x += (edge.fromPort == GraphPort::OUT1 ? 3.f : 5.f);
+        midPoint.y = p2.y;
         nvgMoveTo(vg, p1.x, p1.y);
-        nvgLineTo(vg, p1.x, gutterY);
-        nvgLineTo(vg, p2.x, gutterY);
+        nvgLineTo(vg, midPoint.x, p1.y);
+        nvgLineTo(vg, midPoint.x, p2.y);
         nvgLineTo(vg, p2.x, p2.y);
         nvgStrokeColor(vg, edgeColor);
         nvgStrokeWidth(vg, edgeWidth(edge.weight));
         nvgStroke(vg);
+        drawArrowhead(vg, midPoint, p2, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+      }
+      else if (edgeRoute.kind == EdgeRouteKind::Feedback) {
+        Vec leftGutter;
+        Vec rightGutter;
+        // stagger feedback gutters by slot number so parallel feedback paths
+        // don't overlap.  Gutter starts a 3px growing by 2.5 per slot.
+        float verticalGutterOffset = nodeH + 2.5f * edge.fromSlotNum;
+
+        if (p2.y < p1.y) {
+          // gutter goes above
+          // forward amount determined by fromPort
+          rightGutter.x = p1.x + (edge.fromPort == GraphPort::OUT1 ? 3.f : 5.f);
+          rightGutter.y = p1.y - verticalGutterOffset;
+          leftGutter.x = p2.x - (4.f + edge.fromSlotNum);
+          leftGutter.y = p2.y;
+        }
+        else {
+          // gutter goes below
+          // forward amount determined by fromPort
+          rightGutter.x = p1.x + (edge.fromPort == GraphPort::OUT1 ? 3.f : 5.f);
+          rightGutter.y = p1.y + verticalGutterOffset;
+          leftGutter.x = p2.x - (4.f + edge.fromSlotNum);
+          leftGutter.y = p2.y;
+        }
+
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, p1.x, p1.y);
+        nvgLineTo(vg, rightGutter.x, p1.y);
+        nvgLineTo(vg, rightGutter.x, rightGutter.y);
+        nvgLineTo(vg, leftGutter.x, rightGutter.y);
+        nvgLineTo(vg, leftGutter.x, p2.y);
+        nvgLineTo(vg, p2.x, p2.y);
+        nvgStrokeColor(vg, edgeColor);
+        nvgStrokeWidth(vg, edgeWidth(edge.weight));
+        nvgStroke(vg);
+
+        drawArrowhead(vg, leftGutter, p2, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+      }
+      else if (edgeRoute.kind == EdgeRouteKind::SelfLoop) {
+        nvgBeginPath(vg);
+        Vec farPoint;
+        farPoint.x = p2.x - 6.f;
+        farPoint.y = p1.y + 6.f;
+        nvgMoveTo(vg, p1.x, p1.y);
+        nvgLineTo(vg, p1.x, farPoint.y);
+        nvgLineTo(vg, farPoint.x, farPoint.y);
+        nvgLineTo(vg, farPoint.x, p2.y);
+        nvgLineTo(vg, p2.x, p2.y);
+        nvgStrokeColor(vg, edgeColor);
+        nvgStrokeWidth(vg, edgeWidth(edge.weight));
+        nvgStroke(vg);
+        Vec arrowTail = p2;
+        arrowTail.x -= 6.f;
         drawArrowhead(vg, arrowTail, p2, 2.f + 2.f * edge.weight, 5.f, edgeColor);
       }
       else {
+        // direct path: here as a fallback.  This should not actually be used.
         nvgBeginPath(vg);
         nvgMoveTo(vg, p1.x, p1.y);
         nvgLineTo(vg, p2.x, p2.y);
@@ -1067,6 +1113,12 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
 
   void drawLayer(const DrawArgs& args, int layer) override {
+    if (!module) {
+      return;
+    }
+
+    snapshot = module->publishedSnapshot.load(std::memory_order_acquire);
+
     if (layer != 1 || !snapshot) {
       return;
     }
@@ -1075,8 +1127,8 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     Rect localBox = Rect(Vec(0.f, 0.f), box.size);
     buildLayout(layout, localBox);
 
-    drawEdges(args.vg, layout);
     drawNodes(args.vg, layout);
+    drawEdges(args.vg, layout);
   }
 
 
@@ -1098,7 +1150,7 @@ struct OutputInterfaceVisualizerWidget : ModuleWidget {
     if (module) {
       auto* display = createWidget<SystemRoutingVisualizerDisplay>(mm2px(Vec(5.5, 15.0)));
       display->box.size = mm2px(Vec(60.0, 60.0));
-      display->snapshot = &module->graphSnapshot;
+      display->module = module;
       addChild(display);
     }
   }
