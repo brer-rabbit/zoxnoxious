@@ -599,7 +599,7 @@ static Vec bottomAnchor(Vec center, Vec size, GraphPort port) {
 
 
 enum class AnchorSide : uint8_t { Left, Right, Top, Bottom };
-enum class EdgeRouteKind : uint8_t { Forward, Feedback, SelfLoop };
+enum class EdgeRouteKind : uint8_t { Forward, SameColumn, Feedback, SelfLoop };
 
 struct EdgeRoute {
   EdgeRouteKind kind = EdgeRouteKind::Forward;
@@ -621,8 +621,12 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop) {
 
   route.fromSide = AnchorSide::Right;
   const float dx = toCenter.x - fromCenter.x;
+  static constexpr float kSameColumnDxTolerance = 2.f;
 
-  if (dx > 0.f) {
+  if (std::fabs(dx) <= kSameColumnDxTolerance) {
+    route.kind = EdgeRouteKind::SameColumn;
+  }
+  else if (dx > 0.f) {
     route.kind = EdgeRouteKind::Forward;
   }
   else {
@@ -1126,6 +1130,9 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
       if (edgeRoute.kind == EdgeRouteKind::Forward && module->displayPrimaryEdges) {
         drawForwardEdge(vg, p1, p2, edge, edgeColor);
+      }
+      else if (edgeRoute.kind == EdgeRouteKind::SameColumn && module->displayPrimaryEdges) {
+        drawFeedbackEdge(vg, p1, p2, edge, edgeColor);
       }
       else if (edgeRoute.kind == EdgeRouteKind::Feedback && module->displaySecondaryEdges) {
         drawFeedbackEdge(vg, p1, p2, edge, edgeColor);

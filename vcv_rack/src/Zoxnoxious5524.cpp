@@ -480,7 +480,7 @@ struct Zoxnoxious5524Widget : ModuleWidget {
     menu->addChild(new MenuSeparator);
     menu->addChild(createIndexPtrSubmenuItem("Pulse Width", {"Allow DC", "Limit"}, &module->pwLimit));
 
-    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add visaulizer (right side)", "");
+    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add visualizer (right side)", "");
     expanderItem->module = module;
     expanderItem->model = modelZoxnoxious5524Visual;
     expanderItem->posit = box.pos;

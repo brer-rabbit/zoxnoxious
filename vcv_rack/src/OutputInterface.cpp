@@ -764,17 +764,23 @@ struct OutputInterfaceWidget : ModuleWidget {
   void appendContextMenu(Menu *menu) override {
     OutputInterface *module = dynamic_cast<OutputInterface*>(this->module);
 
+
     menu->addChild(new MenuSeparator);
+    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add visualizer (right side)", "");
+    expanderItem->module = module;
+    expanderItem->model = modelOutputInterfaceVisualizer;
+    expanderItem->posit = box.pos;
+    expanderItem->posit.x += box.size.x;
+    menu->addChild(expanderItem);
+
     menu->addChild(createSubmenuItem("MIDI Out Device", "",
                                      [=](Menu* menu) {
                                        appendMidiMenu(menu, &module->midiOutput);
                                      }));
-    menu->addChild(new MenuSeparator);
     menu->addChild(createSubmenuItem("MIDI In Device", "",
                                      [=](Menu* menu) {
                                        appendMidiMenu(menu, &module->midiInput);
                                      }));
-    menu->addChild(new MenuSeparator);
     menu->addChild(createSubmenuItem("Audio Device 0", "",
                                      [=](Menu* menu) {
                                        appendAudioMenu(menu, module->audioPorts[0]);

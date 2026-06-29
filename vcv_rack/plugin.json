@@ -25,8 +25,9 @@
       "slug": "OutputInterfaceVisualizer",
       "name": "OutputInterfaceVisualizer",
       "description": "Output Interface Visaulizer",
+      "hidden": true,
       "tags": [
-        "Hardware"
+          "Hardware", "Expander"
       ]
     },
     {
@@ -59,6 +60,7 @@
       "slug": "Zoxnoxious5524Visual",
       "name": "Zoxnoxious5524 Visaulizer",
       "description": "dual VCO voice visualizer",
+      "hidden": true,
       "tags": [
           "Hardware", "Expander"
       ]
