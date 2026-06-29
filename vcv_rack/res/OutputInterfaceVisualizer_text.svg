@@ -25,13 +25,13 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.1011235"
-     inkscape:cx="115.79083"
-     inkscape:cy="230.67349"
+     inkscape:zoom="2.1144716"
+     inkscape:cx="98.133262"
+     inkscape:cy="276.66486"
      inkscape:window-width="1480"
      inkscape:window-height="867"
-     inkscape:window-x="226"
-     inkscape:window-y="118"
+     inkscape:window-x="187"
+     inkscape:window-y="73"
      inkscape:window-maximized="0"
      showguides="true"
      inkscape:current-layer="layer2"
@@ -485,9 +485,7 @@
        y="82.262238"
        id="text138"><tspan
          sodipodi:role="line"
-         id="tspan1-1"
-         x="9.8520432"
-         y="82.262238">PATCH DISPLAY</tspan></text>
+         id="tspan5">DISPLAY LAYER</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
