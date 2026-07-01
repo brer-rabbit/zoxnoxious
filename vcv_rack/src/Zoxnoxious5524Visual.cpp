@@ -60,7 +60,7 @@ struct Zoxnoxious5524Visual : Module {
 struct CoupledVoiceTopologyDisplay : LedDisplay {
   CouplingDisplayState* state = nullptr;
 
-  enum class DisplayColor { Green, Amber };
+  enum class DisplayColor { Green, White };
 
   static constexpr float W = 120.f;
   static constexpr float H = 120.f;
@@ -144,8 +144,8 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
 
   NVGcolor displayTextColor(DisplayColor color, float a = 1.f) const {
     switch (color) {
-    case DisplayColor::Amber:
-      return nvgRGBAf(0.88f, 0.62f, 0.24f, a);
+    case DisplayColor::White:
+      return nvgRGBAf(0.83f, 0.92f, 0.99f, a);
     case DisplayColor::Green:
     default:
       return nvgRGBAf(0.70f, 0.88f, 0.78f, a);
@@ -156,8 +156,8 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     float a = baseAlpha + 0.88f * clamp(activity, 0.f, 1.f);
 
     switch (color) {
-    case DisplayColor::Amber:
-      return nvgRGBAf(0.88f, 0.62f, 0.24f, a);
+    case DisplayColor::White:
+      return nvgRGBAf(0.83f, 0.92f, 0.99f, a);
     case DisplayColor::Green:
     default:
       return nvgRGBAf(0.58f, 1.00f, 0.72f, a);
@@ -299,8 +299,8 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     drawWaveLamp(vg, Vec(52, 110), "PULSE", hasRawPulse(s) || hasShapedPulse(s), a);
     drawWaveLamp(vg, Vec(66, 110), "SAW", hasSaw(s), s.vco2RawToVco1Tzfm);
     drawWaveLamp(vg, Vec(80, 110), "TRI", hasTri(s), s.vco2RawToVco1Tzfm);
-    drawWaveLamp(vg, Vec(94, 110), "½SIN", hasHalfSine(s), s.vco2ShapedToVco1Tzfm, DisplayColor::Amber);
-    drawWaveLamp(vg, Vec(108, 110), "SINE", hasSine(s), s.vco2ShapedToVco1Tzfm, DisplayColor::Amber);
+    drawWaveLamp(vg, Vec(94, 110), "½SIN", hasHalfSine(s), s.vco2ShapedToVco1Tzfm, DisplayColor::White);
+    drawWaveLamp(vg, Vec(108, 110), "SINE", hasSine(s), s.vco2ShapedToVco1Tzfm, DisplayColor::White);
   }
 
   void drawLayer(const DrawArgs& args, int layer) override {
@@ -354,7 +354,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     drawArrowLine(vg, Vec(80, 29.8f), Vec(41, 29.8f),
                   0.75f * tzfmShapedActivity(s),
                   nullptr, -4.0f, false,
-                  DisplayColor::Amber);
+                  DisplayColor::White);
 
     drawArrowLine(vg, Vec(40, 35), Vec(79, 35),
                   s.vco1ToVco2ExpFm, "EXP FM", 4.0f);

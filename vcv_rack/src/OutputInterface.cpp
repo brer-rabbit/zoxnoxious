@@ -245,7 +245,8 @@ void OutputInterface::process(const ProcessArgs& args) {
     message->outputInterfaceInfo.slotNum = slotNum;
     message->outputInterfaceInfo.hardwareId = getHardwareId();
 
-    // call each module to get the module's view of ParticipantGraphInfo
+    // call each module to get the module's view of ParticipantGraphInfo--
+    // this collects all edgges between voice cards (and the external input)
     for (size_t i = 0; i < maxVoiceCards; ++i) {
       const Slot &slot = snap.slots[i];
       if (slot.participant != nullptr && slot.props.isAllocated) {
@@ -259,6 +260,10 @@ void OutputInterface::process(const ProcessArgs& args) {
             info.source1.valid = true;
             info.source1.hardwareId = snap.slots[source1Slot].props.hardwareId;
           }
+          else if (source1Slot == maxVoiceCards && info.source1.port == GraphPort::OUT1) {
+            // external input
+            info.source1.valid = true;
+          }
           else {
             info.source1.valid = false;
             info.source1.hardwareId = invalidCardId;
@@ -270,6 +275,10 @@ void OutputInterface::process(const ProcessArgs& args) {
             info.source2.moduleId = snap.slots[source2Slot].props.moduleId;
             info.source2.valid = true;
             info.source2.hardwareId = snap.slots[source2Slot].props.hardwareId;
+          }
+          else if (source2Slot == maxVoiceCards && info.source1.port == GraphPort::OUT1) {
+            // external input
+            info.source1.valid = true;
           }
           else {
             info.source2.valid = false;
@@ -286,7 +295,7 @@ void OutputInterface::process(const ProcessArgs& args) {
         }
       }
     }
-    // collect all edges to the outputs
+    // collect all edges to the outputs for the output module
     for (int i = 0; i < maxVoiceCards; ++i) {
       if (params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i].getValue()) {
         GraphSource inputToOut1;

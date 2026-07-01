@@ -16,11 +16,6 @@ static constexpr size_t maxGraphEdges = maxVoiceCards * 2 + 2 * 6;
 static constexpr int graphRenderRateHz = 60;
 
 
-enum class RenderNodeKind : uint8_t {
-  VoiceCard,
-  ExternalInput
-};
-
 enum class RenderTargetKind : uint8_t {
   VoiceCard,
   Output1,
@@ -35,7 +30,6 @@ enum class RenderTargetKind : uint8_t {
 struct GraphRenderNode {
   int64_t moduleId = -1; // for Rack-side presence only
   uint8_t hardwareId = invalidCardId;
-  RenderNodeKind kind = RenderNodeKind::VoiceCard;
 
   float output1Weight = 0.5f;
   float output2Weight = 0.5f;
@@ -127,13 +121,12 @@ struct OutputInterfaceVisualizer final : Module {
   }
 
 
-  void addNode(const ParticipantGraphInfo& info, RenderNodeKind kind) {
+  void addNode(const ParticipantGraphInfo& info) {
     if (info.slotNum >= 0 && info.slotNum < maxGraphNodes) {
       if (info.moduleId >= 0) {
         writeSnapshot->nodes[info.slotNum].valid = true;
         writeSnapshot->nodes[info.slotNum].moduleId = info.moduleId;
         writeSnapshot->nodes[info.slotNum].hardwareId = info.hardwareId;
-        writeSnapshot->nodes[info.slotNum].kind = kind;
         writeSnapshot->nodes[info.slotNum].output1Weight = info.output1Weight;
         writeSnapshot->nodes[info.slotNum].output2Weight = info.output2Weight;
       }
@@ -173,7 +166,7 @@ struct OutputInterfaceVisualizer final : Module {
           continue;
       }
 
-      addNode(info, RenderNodeKind::VoiceCard);
+      addNode(info);
       addSource(info, info.source1, RenderTargetKind::VoiceCard);
       addSource(info, info.source2, RenderTargetKind::VoiceCard);
     }
@@ -224,14 +217,6 @@ struct OutputInterfaceVisualizer final : Module {
     return port == GraphPort::OUT1 ? "OUT1" : "OUT2";
   }
 
-  static const char* renderNodeKindName(RenderNodeKind kind) {
-    switch (kind) {
-    case RenderNodeKind::VoiceCard:     return "VoiceCard";
-    case RenderNodeKind::ExternalInput: return "ExternalInput";
-    }
-    return "?";
-  }
-
   static const char* renderTargetKindName(RenderTargetKind kind) {
     switch (kind) {
     case RenderTargetKind::VoiceCard: return "VoiceCard";
@@ -253,11 +238,10 @@ struct OutputInterfaceVisualizer final : Module {
       if (!node.valid)
         continue;
 
-      INFO("  slot=%zu moduleId=%lld hwId=%u kind=%s",
+      INFO("  slot=%zu moduleId=%lld hwId=%u",
            i,
            (long long)node.moduleId,
-           node.hardwareId,
-           renderNodeKindName(node.kind));
+           node.hardwareId);
     }
 
     INFO("Edges: count=%zu", writeSnapshot->edgeCount);

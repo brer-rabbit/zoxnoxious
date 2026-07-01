@@ -10,18 +10,26 @@
 namespace zox {
 
 
-constexpr int hnsMaxModules = 7;
-constexpr int hnsOutputsPerModule = 2;
+constexpr int kOutputsPerModule = 2;
+
+// the "seventh card" on the bus (maxVoiceCards+1) has only it's first
+// input which is hardwired to the external input.  So the number of signals
+// on the bus is 2*maxVoiceCards + 1.
+// Zero-indexed the max is maxVoiceCards*kOutputsPerModule
+constexpr int externalInputIndex = maxVoiceCards * kOutputsPerModule;
 
 // HardwareNameService is string storage for orchestration layer
 class HardwareNameService {
 public:
-  std::array<std::string, hnsMaxModules * hnsOutputsPerModule> names;
-  std::array<std::string, hnsMaxModules * hnsOutputsPerModule> shortNames;
+  std::array<std::string, maxVoiceCards * kOutputsPerModule + 1> names;
+  std::array<std::string, maxVoiceCards * kOutputsPerModule + 1> shortNames;
 
   HardwareNameService() {
+    std::string external = "External";
     names.fill(invalidCardOutputName);
     shortNames.fill(invalidCardOutputName);
+    names[externalInputIndex] = external;
+    shortNames[externalInputIndex] = external;
   }
 
   const std::string* getNamePtr(int index) {
@@ -126,7 +134,7 @@ private:
 //
 
 // graphing / output topology declarations
-enum class GraphPort : uint8_t { OUT1, OUT2 };
+enum class GraphPort : uint8_t { OUT1, OUT2, EXTERNAL };
 
 struct GraphSource {
   int64_t moduleId = -1;
