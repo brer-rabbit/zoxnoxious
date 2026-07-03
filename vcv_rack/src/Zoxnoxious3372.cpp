@@ -328,11 +328,11 @@ struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
 
     info.source1.valid = true;
     info.source1.slotNum = sourceOneSource / 2;
-    info.source1.port = (sourceOneSource % 2 == 0) ? GraphPort::OUT1 : GraphPort::OUT2;
+    info.source1.port = graphPortFromBusSignalSource(sourceOneSource);
     info.source1.inputWeight = input1Weight;
     info.source2.valid = true;
     info.source2.slotNum = sourceTwoSource / 2;
-    info.source2.port = (sourceTwoSource % 2 == 0) ? GraphPort::OUT1 : GraphPort::OUT2;
+    info.source2.port = graphPortFromBusSignalSource(sourceTwoSource);
     info.source2.inputWeight = input2Weight;
     return true;
   }

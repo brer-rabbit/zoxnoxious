@@ -256,17 +256,14 @@ void OutputInterface::process(const ProcessArgs& args) {
           // got the participant graph info, need to get the hardwareId & moduleId
           int8_t source1Slot = info.source1.slotNum;
           if (source1Slot >= 0 && source1Slot < maxVoiceCards) {
-            const Slot* source1SlotPhysical = findSlotBySlotNum(snap, source1Slot);
-            if (source1SlotPhysical != nullptr) {
-              info.source1.moduleId = source1SlotPhysical->props.moduleId;
-              info.source1.hardwareId = source1SlotPhysical->props.hardwareId;
-              info.source1.valid = true;
-            }
+            const Slot* source1SlotPhysical = &snap.slots[source1Slot];
+            info.source1.moduleId = source1SlotPhysical->props.moduleId;
+            info.source1.hardwareId = source1SlotPhysical->props.hardwareId;
+            info.source1.valid = true;
           }
-          else if (source1Slot == maxVoiceCards && info.source1.port == GraphPort::OUT1) {
+          else if (source1Slot == maxVoiceCards) {
             // external input
             info.source1.valid = true;
-            info.source1.port = GraphPort::EXTERNAL;
           }
           else {
             info.source1.valid = false;
@@ -276,18 +273,15 @@ void OutputInterface::process(const ProcessArgs& args) {
 
           int8_t source2Slot = info.source2.slotNum;
           if (source2Slot >= 0 && source2Slot < maxVoiceCards) {
-            const Slot* source2SlotPhysical = findSlotBySlotNum(snap, source2Slot);
-            if (source2SlotPhysical != nullptr) {
-              info.source2.moduleId = source2SlotPhysical->props.moduleId;
-              info.source2.hardwareId = source2SlotPhysical->props.hardwareId;
-              info.source2.valid = true;
-            }
+            const Slot* source2SlotPhysical = &snap.slots[source2Slot];
+            info.source2.moduleId = source2SlotPhysical->props.moduleId;
+            info.source2.hardwareId = source2SlotPhysical->props.hardwareId;
+            info.source2.valid = true;
           }
           // TODO: have voice card method to take slot & port and return GraphPort
-          else if (source2Slot == maxVoiceCards && info.source2.port == GraphPort::OUT1) {
+          else if (source2Slot == maxVoiceCards) {
             // external input
             info.source2.valid = true;
-            info.source2.port = GraphPort::EXTERNAL;
           }
           else {
             info.source2.valid = false;
@@ -309,12 +303,9 @@ void OutputInterface::process(const ProcessArgs& args) {
       if (params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i].getValue()) {
         GraphSource inputToOut1;
         inputToOut1.slotNum = i;
-        const Slot* inputToOut1Physical = findSlotBySlotNum(snap, inputToOut1.slotNum);
-        if (inputToOut1Physical != nullptr) {
-          inputToOut1.moduleId = inputToOut1Physical->props.moduleId;
-          inputToOut1.hardwareId = inputToOut1Physical->props.hardwareId;
-        }
-
+        const Slot* inputToOut1Physical = &snap.slots[i];
+        inputToOut1.moduleId = inputToOut1Physical->props.moduleId;
+        inputToOut1.hardwareId = inputToOut1Physical->props.hardwareId;
         inputToOut1.port = GraphPort::OUT1;
         inputToOut1.valid = inputToOut1.moduleId != -1;
         inputToOut1.inputWeight = input1Weight;
@@ -328,12 +319,9 @@ void OutputInterface::process(const ProcessArgs& args) {
       if (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].getValue()) {
         GraphSource inputToOut2;
         inputToOut2.slotNum = i;
-        const Slot* inputToOut2Physical = findSlotBySlotNum(snap, inputToOut2.slotNum);
-        if (inputToOut2Physical != nullptr) {
-          inputToOut2.moduleId = inputToOut2Physical->props.moduleId;
-          inputToOut2.hardwareId = inputToOut2Physical->props.hardwareId;
-        }
-
+        const Slot* inputToOut2Physical = &snap.slots[i];
+        inputToOut2.moduleId = inputToOut2Physical->props.moduleId;
+        inputToOut2.hardwareId = inputToOut2Physical->props.hardwareId;
         inputToOut2.port = GraphPort::OUT2;
         inputToOut2.valid = inputToOut2.moduleId != -1;
         inputToOut2.inputWeight = input2Weight;
@@ -500,29 +488,31 @@ void OutputInterface::processDiscoveryReport(const midi::Message &msg) {
 void OutputInterface::applyDiscoveryReport(DiscoveredCard *cards) {
   int assignedMidiChannel = 0;
   ParticipantProperty deviceTree[maxVoiceCards] = {};
-  size_t participant_count = 0;
 
   for (int i = 0; i < numReportsCards; ++i) {
-    if (!cards[i].valid) {
+    const DiscoveredCard& card = cards[i];
+
+    if (!card.valid) {
       continue; // ignore it
     }
 
-    if (cards[i].hardwareId == getHardwareId()) {
+    if (card.hardwareId == getHardwareId()) {
       // Backplane
-      cvChannelOffset = cards[i].cvChannelOffset;
-      outputDeviceId = cards[i].outputDeviceId;
+      cvChannelOffset = card.cvChannelOffset;
+      outputDeviceId = card.outputDeviceId;
       midiChannel = assignedMidiChannel++;
-      slotNum = cards[i].slotNum;
+      slotNum = card.slotNum;
     }
-    else if (i < maxVoiceCards) {
+    else if (i < maxVoiceCards &&
+             card.slotNum >= 0 && card.slotNum < maxVoiceCards) {
       // Voice card
-      ParticipantProperty& slot = deviceTree[participant_count++];
+      ParticipantProperty& slot = deviceTree[ card.slotNum ];
       slot.moduleId = -1;
-      slot.hardwareId = cards[i].hardwareId;
-      slot.cvChannelOffset = cards[i].cvChannelOffset;
-      slot.outputDeviceId = cards[i].outputDeviceId;
+      slot.hardwareId = card.hardwareId;
+      slot.cvChannelOffset = card.cvChannelOffset;
+      slot.outputDeviceId = card.outputDeviceId;
       slot.midiChannel = assignedMidiChannel++;
-      slot.slotNum = cards[i].slotNum;
+      slot.slotNum = card.slotNum;
       slot.isAllocated = false;
       INFO("registered hardware id %d midi channel %d", slot.hardwareId, slot.midiChannel);
     }
@@ -532,7 +522,7 @@ void OutputInterface::applyDiscoveryReport(DiscoveredCard *cards) {
 
   }
 
-  broker.registerDevices(deviceTree, participant_count);
+  broker.registerDevices(deviceTree, maxVoiceCards);
 }
 
 
@@ -612,20 +602,6 @@ void OutputInterface::serviceParticipantAttachments() {
   }
 }
 
-
-
-// findModuleIdBySlot: iterate over ParticipantProperty looking for slotNum.
-// return moduleId.  return -1 if not found.
-int64_t OutputInterface::findModuleIdBySlot(const Broker::Snapshot& snap, int8_t slotNum) {
-
-  for (size_t i = 0; i < maxVoiceCards; ++i) {
-    const Slot& slot = snap.slots[i];
-    if (slot.props.isAllocated && slot.props.slotNum == slotNum) {
-      return slot.props.moduleId;
-    }
-  }
-  return -1;
-}
 
 
 

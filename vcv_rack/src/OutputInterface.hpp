@@ -148,7 +148,6 @@ private:
   // graph sources: these will be passed via expander
   ParticipantGraphMessage graphMessages[2];
 
-  int64_t findModuleIdBySlot(const Broker::Snapshot& snap, int8_t slotNum);
   void dumpParticipantGraphs() const;
 
   float input1Weight = 0.f;

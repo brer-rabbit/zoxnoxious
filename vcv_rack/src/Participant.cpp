@@ -138,22 +138,16 @@ const Broker::Snapshot& Broker::snapshot() const {
 }
 
 
-// the snap.slots[] array is not indexed by slot number.  sigh.
-// instead, use this function to return a slot for a slot number.
-const Slot* findSlotBySlotNum(const Broker::Snapshot& snap, int8_t slotNum) {
-  if (slotNum < 0) {
-    return nullptr;
-  }
-  
-  for (int i = 0; i < maxVoiceCards; ++i) {
-    const Slot& slot = snap.slots[i];
 
-    if (slot.props.isAllocated && slot.props.slotNum == slotNum) {
-      return &slot;
-    }
+GraphPort graphPortFromBusSignalSource(int signalSource) {
+  if (signalSource == maxVoiceCards * 2) {
+    return GraphPort::EXTERNAL;
   }
-
-  return nullptr;
+  else if (signalSource >= 0 && signalSource < maxVoiceCards * 2) {
+    return signalSource % 2 ? GraphPort::OUT2 : GraphPort::OUT1;
+  }
+  // consider assert
+  return GraphPort::OUT1;
 }
 
 

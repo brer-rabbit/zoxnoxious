@@ -105,8 +105,7 @@ struct Broker {
   // Violating this invariant results in bad things.
   // -----------------------------------------------------------------------------
 
-// DO NOT INDEX THIS BY SLOT NUMBER!
-// Search the props for slotNum: use findSlotBySlotNum()
+  // this should be able to be indexed by physical slot number
   struct Snapshot {
     Slot slots[maxVoiceCards];
   } storageA, storageB;
@@ -130,8 +129,6 @@ private:
   std::shared_ptr<HardwareNameService> nameService;
 };
 
-
-const Slot* findSlotBySlotNum(const Broker::Snapshot& snap, int8_t slotNum);
 
 //
 // Graph objects are purely for display of module connections
@@ -165,7 +162,7 @@ struct ParticipantGraphInfo {
   GraphSource source2;
 };
 
-//void graphPortAndSlotNumHelper(int signalSource, int &slotNum, GraphPort &port);
+GraphPort graphPortFromBusSignalSource(int signalSource);
 
 // end graph objects
 

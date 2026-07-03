@@ -306,14 +306,8 @@ struct Zoxnoxious3340 final : ParticipantAdapter, Participant {
     info.output2Weight = output2Weight;
     if (extModSelectSwitchValue >= 0 && extModSelectSwitchValue <= 12) {
       info.source1.valid = true;
-      //graphPortAndSlotNumHelper(extModSelectSwitchValue,
-//                                info.source1.slotNum,
-//                                info.source1.port);
-
-      // move this to the implentation:
+      info.source1.port = graphPortFromBusSignalSource(extModSelectSwitchValue);
       info.source1.slotNum = extModSelectSwitchValue / 2;
-      info.source1.port = (extModSelectSwitchValue % 2 == 0) ? GraphPort::OUT1 : GraphPort::OUT2;
-
       info.source1.inputWeight = std::max(inputModWeight, inputSyncWeight);
     }
     else {
