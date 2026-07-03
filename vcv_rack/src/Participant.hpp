@@ -60,7 +60,7 @@ struct ParticipantProperty {
   int8_t outputDeviceId;
   int8_t midiChannel;
   int8_t slotNum = invalidSlot;
-  bool isAllocated;
+  bool isAllocated = false;
 };
 
 struct Slot {
@@ -105,6 +105,8 @@ struct Broker {
   // Violating this invariant results in bad things.
   // -----------------------------------------------------------------------------
 
+// DO NOT INDEX THIS BY SLOT NUMBER!
+// Search the props for slotNum: use findSlotBySlotNum()
   struct Snapshot {
     Slot slots[maxVoiceCards];
   } storageA, storageB;
@@ -129,11 +131,15 @@ private:
 };
 
 
+const Slot* findSlotBySlotNum(const Broker::Snapshot& snap, int8_t slotNum);
+
 //
 // Graph objects are purely for display of module connections
 //
 
 // graphing / output topology declarations
+// OUT1 / OUT2: source is a voice card slot.
+// EXTERNAL: source is outside the rendered graph; slotNum/moduleId are invalid.
 enum class GraphPort : uint8_t { OUT1, OUT2, EXTERNAL };
 
 struct GraphSource {
@@ -158,6 +164,8 @@ struct ParticipantGraphInfo {
   GraphSource source1;
   GraphSource source2;
 };
+
+//void graphPortAndSlotNumHelper(int signalSource, int &slotNum, GraphPort &port);
 
 // end graph objects
 

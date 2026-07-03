@@ -48,7 +48,6 @@ bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
   return true;
 }
 
-
 // register the participant Id.  Double buffer the storage, so UI and audio threads
 // can co-mingle.  Mutation is only to happen on UI thread.  Audio thread gets a
 // pointer to a published stable version.
@@ -112,7 +111,7 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
 }
 
 
-// find a slot that is available for this hardwareId.  If none found return an invalid slot number.
+// find a slot that is available for this hardwareId.  If none found return an invalid slot number.  Do not depend on the index s.slots[i] to be physical slot number i.
 int8_t Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
   uint8_t hardwareId = p->getHardwareId();
 
@@ -138,6 +137,24 @@ const Broker::Snapshot& Broker::snapshot() const {
   return s ? *s : empty;
 }
 
+
+// the snap.slots[] array is not indexed by slot number.  sigh.
+// instead, use this function to return a slot for a slot number.
+const Slot* findSlotBySlotNum(const Broker::Snapshot& snap, int8_t slotNum) {
+  if (slotNum < 0) {
+    return nullptr;
+  }
+  
+  for (int i = 0; i < maxVoiceCards; ++i) {
+    const Slot& slot = snap.slots[i];
+
+    if (slot.props.isAllocated && slot.props.slotNum == slotNum) {
+      return &slot;
+    }
+  }
+
+  return nullptr;
+}
 
 
 const std::shared_ptr<HardwareNameService> Broker::getHardwareNameService() const {

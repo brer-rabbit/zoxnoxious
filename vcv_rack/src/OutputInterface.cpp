@@ -128,7 +128,7 @@ void OutputInterface::process(const ProcessArgs& args) {
     discoReport.bytes[0] = 0xF0;
     discoReport.bytes[1] = 0x7D;
     discoReport.bytes[2] = 0x01;
-    discoReport.bytes[3] = 0x02;
+    discoReport.bytes[3] = 0x00; // change to 0x02 for 3340 VCO
     discoReport.bytes[4] = 0x00;
     discoReport.bytes[5] = 0x00;
     discoReport.bytes[6] = 0x02;
@@ -256,13 +256,17 @@ void OutputInterface::process(const ProcessArgs& args) {
           // got the participant graph info, need to get the hardwareId & moduleId
           int8_t source1Slot = info.source1.slotNum;
           if (source1Slot >= 0 && source1Slot < maxVoiceCards) {
-            info.source1.moduleId = snap.slots[source1Slot].props.moduleId;
-            info.source1.valid = true;
-            info.source1.hardwareId = snap.slots[source1Slot].props.hardwareId;
+            const Slot* source1SlotPhysical = findSlotBySlotNum(snap, source1Slot);
+            if (source1SlotPhysical != nullptr) {
+              info.source1.moduleId = source1SlotPhysical->props.moduleId;
+              info.source1.hardwareId = source1SlotPhysical->props.hardwareId;
+              info.source1.valid = true;
+            }
           }
           else if (source1Slot == maxVoiceCards && info.source1.port == GraphPort::OUT1) {
             // external input
             info.source1.valid = true;
+            info.source1.port = GraphPort::EXTERNAL;
           }
           else {
             info.source1.valid = false;
@@ -272,13 +276,18 @@ void OutputInterface::process(const ProcessArgs& args) {
 
           int8_t source2Slot = info.source2.slotNum;
           if (source2Slot >= 0 && source2Slot < maxVoiceCards) {
-            info.source2.moduleId = snap.slots[source2Slot].props.moduleId;
-            info.source2.valid = true;
-            info.source2.hardwareId = snap.slots[source2Slot].props.hardwareId;
+            const Slot* source2SlotPhysical = findSlotBySlotNum(snap, source2Slot);
+            if (source2SlotPhysical != nullptr) {
+              info.source2.moduleId = source2SlotPhysical->props.moduleId;
+              info.source2.hardwareId = source2SlotPhysical->props.hardwareId;
+              info.source2.valid = true;
+            }
           }
-          else if (source2Slot == maxVoiceCards && info.source1.port == GraphPort::OUT1) {
+          // TODO: have voice card method to take slot & port and return GraphPort
+          else if (source2Slot == maxVoiceCards && info.source2.port == GraphPort::OUT1) {
             // external input
-            info.source1.valid = true;
+            info.source2.valid = true;
+            info.source2.port = GraphPort::EXTERNAL;
           }
           else {
             info.source2.valid = false;
@@ -300,8 +309,12 @@ void OutputInterface::process(const ProcessArgs& args) {
       if (params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i].getValue()) {
         GraphSource inputToOut1;
         inputToOut1.slotNum = i;
-        inputToOut1.moduleId = snap.slots[i].props.moduleId;
-        inputToOut1.hardwareId = snap.slots[i].props.hardwareId;
+        const Slot* inputToOut1Physical = findSlotBySlotNum(snap, inputToOut1.slotNum);
+        if (inputToOut1Physical != nullptr) {
+          inputToOut1.moduleId = inputToOut1Physical->props.moduleId;
+          inputToOut1.hardwareId = inputToOut1Physical->props.hardwareId;
+        }
+
         inputToOut1.port = GraphPort::OUT1;
         inputToOut1.valid = inputToOut1.moduleId != -1;
         inputToOut1.inputWeight = input1Weight;
@@ -315,8 +328,12 @@ void OutputInterface::process(const ProcessArgs& args) {
       if (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].getValue()) {
         GraphSource inputToOut2;
         inputToOut2.slotNum = i;
-        inputToOut2.moduleId = snap.slots[i].props.moduleId;
-        inputToOut2.hardwareId = snap.slots[i].props.hardwareId;
+        const Slot* inputToOut2Physical = findSlotBySlotNum(snap, inputToOut2.slotNum);
+        if (inputToOut2Physical != nullptr) {
+          inputToOut2.moduleId = inputToOut2Physical->props.moduleId;
+          inputToOut2.hardwareId = inputToOut2Physical->props.hardwareId;
+        }
+
         inputToOut2.port = GraphPort::OUT2;
         inputToOut2.valid = inputToOut2.moduleId != -1;
         inputToOut2.inputWeight = input2Weight;
@@ -324,7 +341,7 @@ void OutputInterface::process(const ProcessArgs& args) {
           message->output2Sources[message->output2SourceCount++] = inputToOut2;
         }
         else {
-          WARN("output1Sources: maxVoiceCards reached");
+          WARN("output2Sources: maxVoiceCards reached");
         }
 
       }
@@ -499,7 +516,7 @@ void OutputInterface::applyDiscoveryReport(DiscoveredCard *cards) {
     }
     else if (i < maxVoiceCards) {
       // Voice card
-      ParticipantProperty& slot = deviceTree[participant_count++];      
+      ParticipantProperty& slot = deviceTree[participant_count++];
       slot.moduleId = -1;
       slot.hardwareId = cards[i].hardwareId;
       slot.cvChannelOffset = cards[i].cvChannelOffset;

@@ -11,7 +11,7 @@ namespace zox {
 // maxGraphNodes: number of voice cards + output node.
 // maxGraphEdges: each voice card can have two inputs, then two final outputs with six each
 static constexpr int8_t maxGraphNodes = maxVoiceCards;
-static constexpr size_t maxGraphEdges = maxVoiceCards * 2 + 2 * 6;
+static constexpr size_t maxGraphEdges = maxGraphNodes * 2 + 2 * 6;
 
 static constexpr int graphRenderRateHz = 60;
 
@@ -97,27 +97,38 @@ struct OutputInterfaceVisualizer final : Module {
   void addSource(const ParticipantGraphInfo& participantInfo,
                  const GraphSource source,
                  const RenderTargetKind targetKind) {
+    if (!source.valid) {
+      return;
+    }
+
     // fill in the edges of the graph
     if (writeSnapshot->edgeCount >= maxGraphEdges) {
       WARN("maxGraphEdges exceeded");
       return;
     }
 
-    // this filters to only instantiated/rendered edges by policy
-    if (source.valid && source.moduleId >= 0 &&
-        source.slotNum >= 0 && source.slotNum < maxGraphNodes) {
-      GraphRenderEdge& edge = writeSnapshot->edges[writeSnapshot->edgeCount++];
-      edge.fromSlotNum = source.slotNum;
-      edge.fromHardwareId = source.hardwareId;
-      edge.fromModuleId = source.moduleId;
-      edge.fromPort = source.port;
-      edge.targetKind = targetKind;
-      edge.toSlotNum = participantInfo.slotNum;
-      edge.toHardwareId = participantInfo.hardwareId;
-      edge.toModuleId = participantInfo.moduleId;
-      edge.valid = true;
-      edge.weight = source.inputWeight;
+    const bool isExternal = source.port == GraphPort::EXTERNAL;
+
+    if (!isExternal) {
+      if (source.slotNum == invalidSlot || source.moduleId < 0) {
+        return;
+      }
     }
+
+    GraphRenderEdge& edge = writeSnapshot->edges[writeSnapshot->edgeCount++];
+
+    edge.fromSlotNum = isExternal ? invalidSlot : source.slotNum;
+    edge.fromHardwareId = source.hardwareId;
+    edge.fromModuleId = isExternal ? -1 : source.moduleId;
+    edge.fromPort = source.port;
+
+    edge.targetKind = targetKind;
+    edge.toSlotNum = participantInfo.slotNum;
+    edge.toHardwareId = participantInfo.hardwareId;
+    edge.toModuleId = participantInfo.moduleId;
+
+    edge.valid = true;
+    edge.weight = source.inputWeight;
   }
 
 
@@ -227,7 +238,6 @@ struct OutputInterfaceVisualizer final : Module {
   }
 
 
-# if 0
   // debug
   void dumpGraphRenderSnapshot() const {
     INFO("========== GraphRenderSnapshot ==========");
@@ -268,7 +278,7 @@ struct OutputInterfaceVisualizer final : Module {
            edge.weight);
     }
   }
-#endif
+
 
 
   void process(const ProcessArgs& args) override {
@@ -283,7 +293,6 @@ struct OutputInterfaceVisualizer final : Module {
         lights[DISPLAY_SECONDARY_EDGE_LIGHT].setBrightness(displaySecondaryEdges);
 
         if (message) {
-
           if (writeSnapshot == &snapshotA) {
             buildGraphRenderSnapshot(*message, snapshotA);
             publishedSnapshot.store(&snapshotA, std::memory_order_release);
@@ -990,6 +999,25 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   }
 
 
+  void drawExternalInputEdge(NVGcontext* vg,
+                             const Vec &to,
+                             const GraphRenderEdge& edge,
+                             NVGcolor edgeColor) {
+
+    Vec p1 = to;
+    p1.x -= 14.f;
+
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, p1.x, p1.y);
+    nvgLineTo(vg, to.x, to.y);
+    nvgStrokeColor(vg, edgeColor);
+    //nvgStrokeWidth(vg, edgeWidth(edge.weight));
+    nvgStrokeWidth(vg, 1.f);
+    nvgStroke(vg);
+
+    drawArrowhead(vg, p1, to, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+  }
+
   void drawForwardEdge(NVGcontext* vg, Vec from, Vec to,
                        const GraphRenderEdge& edge, NVGcolor edgeColor) {
     nvgBeginPath(vg);
@@ -1079,8 +1107,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         continue;
       }
 
-      // get the intent of the edge: which way is it going?
-      Vec p1 = layout.nodeCenters[edge.fromSlotNum];
+      // where is the edge going to?
       Vec p2;
       switch (edge.targetKind) {
       case RenderTargetKind::Output1:
@@ -1093,6 +1120,17 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         p2 = layout.nodeCenters[edge.toSlotNum];
         break;
       }
+
+      NVGcolor edgeColor = displayRouteColor(edgeAlpha(edge.weight));
+
+      // before checking where edge is coming from- deal with External
+      if (edge.fromPort == GraphPort::EXTERNAL) {
+        //drawExternalInputEdge(vg, p2, edge, edgeColor);
+        continue;
+      }
+
+      // get the intent of the edge: where is it coming from?
+      Vec p1 = layout.nodeCenters[edge.fromSlotNum];
 
       EdgeRoute edgeRoute = chooseEdgeRoute(p1, p2,
                                             edge.fromSlotNum == edge.toSlotNum);
@@ -1109,8 +1147,6 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         p2 = anchorForSideAndTargetKind(layout.output2Center, edgeRoute.toSide, edge.targetKind);
         break;
       }        
-
-      NVGcolor edgeColor = displayRouteColor(edgeAlpha(edge.weight));
 
       if (edgeRoute.kind == EdgeRouteKind::Forward && module->displayPrimaryEdges) {
         drawForwardEdge(vg, p1, p2, edge, edgeColor);
