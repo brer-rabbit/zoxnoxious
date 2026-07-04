@@ -70,6 +70,7 @@ struct OutputInterfaceVisualizer final : Module {
   enum ParamId {
     DISPLAY_PRIMARY_EDGE_PARAM,
     DISPLAY_SECONDARY_EDGE_PARAM,
+    DISPLAY_EXTERNAL_EDGE_PARAM,
     PARAMS_LEN
   };
   enum InputId {
@@ -81,6 +82,7 @@ struct OutputInterfaceVisualizer final : Module {
   enum LightId {
     DISPLAY_PRIMARY_EDGE_LIGHT,
     DISPLAY_SECONDARY_EDGE_LIGHT,
+    DISPLAY_EXTERNAL_EDGE_LIGHT,
     LIGHTS_LEN
   };
 
@@ -93,6 +95,7 @@ struct OutputInterfaceVisualizer final : Module {
 
   bool displayPrimaryEdges = true;
   bool displaySecondaryEdges = true;
+  bool displayExternalEdges = false;
 
   void addSource(const ParticipantGraphInfo& participantInfo,
                  const GraphSource source,
@@ -203,6 +206,7 @@ struct OutputInterfaceVisualizer final : Module {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     configButton(DISPLAY_PRIMARY_EDGE_PARAM, "Show Primary Connections");
     configButton(DISPLAY_SECONDARY_EDGE_PARAM, "Show Secondary Connections");
+    configButton(DISPLAY_EXTERNAL_EDGE_PARAM, "Show External Input");
 
     int calcClockDivision = std::max(minClockDivision,
                                      (static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
@@ -291,6 +295,9 @@ struct OutputInterfaceVisualizer final : Module {
 
         displaySecondaryEdges = params[DISPLAY_SECONDARY_EDGE_PARAM].getValue();
         lights[DISPLAY_SECONDARY_EDGE_LIGHT].setBrightness(displaySecondaryEdges);
+
+        displayExternalEdges = params[DISPLAY_EXTERNAL_EDGE_PARAM].getValue();
+        lights[DISPLAY_EXTERNAL_EDGE_LIGHT].setBrightness(displayExternalEdges);
 
         if (message) {
           if (writeSnapshot == &snapshotA) {
@@ -750,6 +757,8 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   const GraphRenderSnapshot *snapshot = nullptr;
   const OutputInterfaceVisualizer *module = nullptr;
 
+  enum class DisplayColor { Green, White };
+
   static constexpr float nodeW = 36.f;
   static constexpr float nodeH = 18.f;
   static constexpr float outputW = 20.f;
@@ -840,8 +849,14 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     return nvgRGBAf(0.48f, 0.65f, 0.60f, a);
   }
 
-  NVGcolor displayTextColor(float a = 1.f) const {
-    return nvgRGBAf(0.70f, 0.88f, 0.78f, a);
+  NVGcolor displayTextColor(DisplayColor color, float a = 1.f) const {
+    switch (color) {
+    case DisplayColor::White:
+      return nvgRGBAf(0.83f, 0.92f, 0.99f, a);
+    case DisplayColor::Green:
+    default:
+      return nvgRGBAf(0.70f, 0.88f, 0.78f, a);
+    }
   }
 
   NVGcolor displayRouteColor(float a = 1.f) const {
@@ -859,11 +874,11 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
   void drawText(NVGcontext* vg, Vec p, const char* text, float size,
                 int align = NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
-                float alpha = 1.f) {
+                float alpha = 1.f, DisplayColor color = DisplayColor::Green) {
     nvgFontSize(vg, size);
     nvgFontFaceId(vg, APP->window->uiFont->handle);
     nvgTextAlign(vg, align);
-    nvgFillColor(vg, displayTextColor(alpha));
+    nvgFillColor(vg, displayTextColor(color, alpha));
     nvgText(vg, p.x, p.y, text, NULL);
   }
 
@@ -1003,9 +1018,9 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
                              const Vec &to,
                              const GraphRenderEdge& edge,
                              NVGcolor edgeColor) {
-
+    static const char* extString = "EXT";
     Vec p1 = to;
-    p1.x -= 14.f;
+    p1.y -= 14.f;
 
     nvgBeginPath(vg);
     nvgMoveTo(vg, p1.x, p1.y);
@@ -1016,6 +1031,12 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     nvgStroke(vg);
 
     drawArrowhead(vg, p1, to, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+
+    Vec textLocation = p1;
+    textLocation.x -= 8;
+    textLocation.y += 2;
+    drawText(vg, textLocation, extString, 6.f, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
+             1.f, DisplayColor::White);
   }
 
   void drawForwardEdge(NVGcontext* vg, Vec from, Vec to,
@@ -1125,7 +1146,11 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
       // before checking where edge is coming from- deal with External
       if (edge.fromPort == GraphPort::EXTERNAL) {
-        //drawExternalInputEdge(vg, p2, edge, edgeColor);
+        if (module->displayExternalEdges) {
+          p2.x -= (nodeW / 4.f);
+          p2.y -= (nodeH / 2.f);
+          drawExternalInputEdge(vg, p2, edge, edgeColor);
+        }
         continue;
       }
 
@@ -1154,11 +1179,11 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       else if (edgeRoute.kind == EdgeRouteKind::SameColumn && module->displayPrimaryEdges) {
         drawFeedbackEdge(vg, p1, p2, edge, edgeColor);
       }
+      else if (edgeRoute.kind == EdgeRouteKind::SelfLoop && module->displayPrimaryEdges) {
+        drawSelfLoopEdge(vg, p1, p2, edge, edgeColor);
+      }
       else if (edgeRoute.kind == EdgeRouteKind::Feedback && module->displaySecondaryEdges) {
         drawFeedbackEdge(vg, p1, p2, edge, edgeColor);
-      }
-      else if (edgeRoute.kind == EdgeRouteKind::SelfLoop && module->displaySecondaryEdges) {
-        drawSelfLoopEdge(vg, p1, p2, edge, edgeColor);
       }
     }
   }
@@ -1208,6 +1233,7 @@ struct OutputInterfaceVisualizerWidget : ModuleWidget {
 
     addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 88.272)), module, OutputInterfaceVisualizer::DISPLAY_PRIMARY_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_PRIMARY_EDGE_LIGHT));
     addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 98.272)), module, OutputInterfaceVisualizer::DISPLAY_SECONDARY_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_SECONDARY_EDGE_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 108.272)), module, OutputInterfaceVisualizer::DISPLAY_EXTERNAL_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_EXTERNAL_EDGE_LIGHT));
   }
 };
 

@@ -7,7 +7,7 @@
    viewBox="0 0 71.120001 128.5"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
    sodipodi:docname="OutputInterfaceVisualizer_text.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -25,13 +25,13 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="2.1144716"
-     inkscape:cx="98.133262"
-     inkscape:cy="276.66486"
+     inkscape:zoom="2.4716266"
+     inkscape:cx="73.433423"
+     inkscape:cy="367.36941"
      inkscape:window-width="1480"
      inkscape:window-height="867"
      inkscape:window-x="187"
-     inkscape:window-y="73"
+     inkscape:window-y="45"
      inkscape:window-maximized="0"
      showguides="true"
      inkscape:current-layer="layer2"
@@ -486,6 +486,14 @@
        id="text138"><tspan
          sodipodi:role="line"
          id="tspan5">DISPLAY LAYER</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;line-height:1.25;font-family:Futura;-inkscape-font-specification:'Futura, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;letter-spacing:-0.132292px;text-anchor:start;display:inline;opacity:0.85;fill:#f0e8d8;fill-opacity:1;stroke:#7a3d10;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
+       x="16.645784"
+       y="108.89291"
+       id="text6"><tspan
+         sodipodi:role="line"
+         id="tspan6">EXTERNAL</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -550,6 +558,14 @@
        data-name="Tempo#RoundLargeBlackKnob"
        cx="11.322917"
        cy="88.094551"
+       r="1.3229166"
+       style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
+       inkscape:label="VCO_ONE_TO_VCF" />
+    <circle
+       id="circle6"
+       data-name="Tempo#RoundLargeBlackKnob"
+       cx="11.322917"
+       cy="108.09492"
        r="1.3229166"
        style="display:inline;opacity:0.99;fill:#ff0000;stroke-width:0.264583"
        inkscape:label="VCO_ONE_TO_VCF" />

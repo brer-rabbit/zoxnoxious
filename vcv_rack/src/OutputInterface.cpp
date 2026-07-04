@@ -106,6 +106,49 @@ void OutputInterface::onSampleRateChange(const SampleRateChangeEvent& e) {
 }
 
 
+// internal method for graph processing of source1/source2 edge handlnig
+static void resolveGraphSource(const Broker::Snapshot& snap, GraphSource& source) {
+  if (source.slotNum >= 0 && source.slotNum < maxVoiceCards) {
+    const Slot& physical = snap.slots[source.slotNum];
+    source.moduleId = physical.props.moduleId;
+    source.hardwareId = physical.props.hardwareId;
+    source.valid = true;
+  }
+  else if (source.slotNum == maxVoiceCards) {
+    // External input
+    source.valid = true;
+    source.moduleId = -1;
+    source.hardwareId = invalidCardId;
+  }
+  else {
+    source.valid = false;
+    source.moduleId = -1;
+    source.hardwareId = invalidCardId;
+  }
+}
+
+// similar to previous- a helper for edges to the output
+static GraphSource makeOutputGraphSource(const Broker::Snapshot& snap,
+                                         int8_t slotNum,
+                                         GraphPort port,
+                                         float inputWeight) {
+    GraphSource source;
+
+    source.slotNum = slotNum;
+
+    const Slot& physical = snap.slots[slotNum];
+    source.moduleId = physical.props.moduleId;
+    source.hardwareId = physical.props.hardwareId;
+
+    source.port = port;
+    source.valid = source.moduleId != -1;
+    source.inputWeight = inputWeight;
+
+    return source;
+}
+
+
+
 void OutputInterface::process(const ProcessArgs& args) {
   dsp::Frame<maxAudioChannels> sharedFrames[ audioPorts.size() ];
   bool isMidiClockTick = midiPollClockDivider.process();
@@ -253,41 +296,8 @@ void OutputInterface::process(const ProcessArgs& args) {
         // Business section: call each module
         ParticipantGraphInfo info = ParticipantGraphInfo{};
         if (slot.participant->pullGraphInfo(info)) {
-          // got the participant graph info, need to get the hardwareId & moduleId
-          int8_t source1Slot = info.source1.slotNum;
-          if (source1Slot >= 0 && source1Slot < maxVoiceCards) {
-            const Slot* source1SlotPhysical = &snap.slots[source1Slot];
-            info.source1.moduleId = source1SlotPhysical->props.moduleId;
-            info.source1.hardwareId = source1SlotPhysical->props.hardwareId;
-            info.source1.valid = true;
-          }
-          else if (source1Slot == maxVoiceCards) {
-            // external input
-            info.source1.valid = true;
-          }
-          else {
-            info.source1.valid = false;
-            info.source1.hardwareId = invalidCardId;
-            info.source1.moduleId = -1;
-          }
-
-          int8_t source2Slot = info.source2.slotNum;
-          if (source2Slot >= 0 && source2Slot < maxVoiceCards) {
-            const Slot* source2SlotPhysical = &snap.slots[source2Slot];
-            info.source2.moduleId = source2SlotPhysical->props.moduleId;
-            info.source2.hardwareId = source2SlotPhysical->props.hardwareId;
-            info.source2.valid = true;
-          }
-          // TODO: have voice card method to take slot & port and return GraphPort
-          else if (source2Slot == maxVoiceCards) {
-            // external input
-            info.source2.valid = true;
-          }
-          else {
-            info.source2.valid = false;
-            info.source2.hardwareId = invalidCardId;
-            info.source2.moduleId = -1;
-          }
+          resolveGraphSource(snap, info.source1);
+          resolveGraphSource(snap, info.source2);
 
           if (message->participantInfoCount < maxVoiceCards) {
             message->participantInfos[message->participantInfoCount++] = info;
@@ -296,19 +306,13 @@ void OutputInterface::process(const ProcessArgs& args) {
             WARN("participantInfos: maxVoiceCards reached");
           }
         }
+
       }
     }
     // collect all edges to the outputs for the output module
     for (int i = 0; i < maxVoiceCards; ++i) {
       if (params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i].getValue()) {
-        GraphSource inputToOut1;
-        inputToOut1.slotNum = i;
-        const Slot* inputToOut1Physical = &snap.slots[i];
-        inputToOut1.moduleId = inputToOut1Physical->props.moduleId;
-        inputToOut1.hardwareId = inputToOut1Physical->props.hardwareId;
-        inputToOut1.port = GraphPort::OUT1;
-        inputToOut1.valid = inputToOut1.moduleId != -1;
-        inputToOut1.inputWeight = input1Weight;
+        GraphSource inputToOut1 = makeOutputGraphSource(snap, i, GraphPort::OUT1, input1Weight);
         if (message->output1SourceCount < maxVoiceCards) {
           message->output1Sources[message->output1SourceCount++] = inputToOut1;
         }
@@ -317,14 +321,7 @@ void OutputInterface::process(const ProcessArgs& args) {
         }
       }
       if (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].getValue()) {
-        GraphSource inputToOut2;
-        inputToOut2.slotNum = i;
-        const Slot* inputToOut2Physical = &snap.slots[i];
-        inputToOut2.moduleId = inputToOut2Physical->props.moduleId;
-        inputToOut2.hardwareId = inputToOut2Physical->props.hardwareId;
-        inputToOut2.port = GraphPort::OUT2;
-        inputToOut2.valid = inputToOut2.moduleId != -1;
-        inputToOut2.inputWeight = input2Weight;
+        GraphSource inputToOut2 = makeOutputGraphSource(snap, i, GraphPort::OUT2, input2Weight);
         if (message->output2SourceCount < maxVoiceCards) {
           message->output2Sources[message->output2SourceCount++] = inputToOut2;
         }
