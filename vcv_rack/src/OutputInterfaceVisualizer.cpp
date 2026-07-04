@@ -1232,8 +1232,8 @@ struct OutputInterfaceVisualizerWidget : ModuleWidget {
     }
 
     addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 88.272)), module, OutputInterfaceVisualizer::DISPLAY_PRIMARY_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_PRIMARY_EDGE_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 98.272)), module, OutputInterfaceVisualizer::DISPLAY_SECONDARY_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_SECONDARY_EDGE_LIGHT));
-    addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 108.272)), module, OutputInterfaceVisualizer::DISPLAY_EXTERNAL_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_EXTERNAL_EDGE_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 95.272)), module, OutputInterfaceVisualizer::DISPLAY_SECONDARY_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_SECONDARY_EDGE_LIGHT));
+    addParam(createLightParamCentered<ZPushButtonMediumStatefulLightLatch<SmallSimpleLight<ZoxAmberLight>>>(mm2px(Vec(12.5, 102.272)), module, OutputInterfaceVisualizer::DISPLAY_EXTERNAL_EDGE_PARAM, OutputInterfaceVisualizer::DISPLAY_EXTERNAL_EDGE_LIGHT));
   }
 };
 
