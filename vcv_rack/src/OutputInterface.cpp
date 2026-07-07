@@ -183,15 +183,18 @@ void OutputInterface::process(const ProcessArgs& args) {
     discoReport.bytes[12] = 0x06;
     discoReport.bytes[13] = 0x00;
     discoReport.bytes[14] = 0x00;
-    discoReport.bytes[15] = 0x03;
+    discoReport.bytes[15] = 0x00;
     discoReport.bytes[16] = 0x00;
     discoReport.bytes[17] = 0x00;
-    discoReport.bytes[18] = 0x00;
+    discoReport.bytes[18] = 0x03;
     discoReport.bytes[19] = 0x00;
     discoReport.bytes[20] = 0x00;
-    discoReport.bytes[21] = 0x07;
+    discoReport.bytes[21] = 0x00;
     discoReport.bytes[22] = 0x00;
     discoReport.bytes[23] = 0x00;
+    discoReport.bytes[24] = 0x07;
+    discoReport.bytes[25] = 0x00;
+    discoReport.bytes[26] = 0x00;
     processDiscoveryReport(discoReport);
   }
 

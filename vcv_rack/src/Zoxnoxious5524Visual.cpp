@@ -255,7 +255,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
       drawText(vg,
                Vec(mid.x, mid.y + labelOffsetY),
                label,
-               secondary ? 4.2f : 5.4f,
+               secondary ? 5.f : 6.f,
                NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
                labelAlpha);
     }
@@ -277,7 +277,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     float a = active ? (pathActivity > 0.f ? 1.f : 0.35f) : 0.16f;
 
     nvgBeginPath(vg);
-    nvgRoundedRect(vg, p.x - 6.2f, p.y - 4.0f, 12.4f, 8.0f, 1.8f);
+    nvgRoundedRect(vg, p.x - 7.f, p.y - 4.0f, 14.f, 8.0f, 1.8f);
     nvgFillColor(vg, nvgRGBAf(0.05f, 0.10f, 0.09f, active ? 0.85f : 0.28f));
     nvgFill(vg);
 
@@ -285,21 +285,21 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     nvgStrokeColor(vg, displayTextColor(color, a));
     nvgStroke(vg);
 
-    drawText(vg, p, label, 3.7f, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, a, color);
+    drawText(vg, p, label, 5.f, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, a, color);
   }
 
   void drawWaveBank(NVGcontext* vg, const CouplingDisplayState& s) {
     float a = tzfmPulseActivity(s);
     bool tzfmActive = tzfmRawActivity(s) || tzfmShapedActivity(s);
 
-    drawText(vg, Vec(20, 110), "TZFM SRC:", 4.0f,
+    drawText(vg, Vec(12, 110), "TZFM SRC:", 5.0f,
              NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE,
              tzfmActive ? 0.83f : 0.48f);
 
-    drawWaveLamp(vg, Vec(52, 110), "PULSE", hasRawPulse(s) || hasShapedPulse(s), a);
-    drawWaveLamp(vg, Vec(66, 110), "SAW", hasSaw(s), s.vco2RawToVco1Tzfm);
-    drawWaveLamp(vg, Vec(80, 110), "TRI", hasTri(s), s.vco2RawToVco1Tzfm);
-    drawWaveLamp(vg, Vec(94, 110), "½SIN", hasHalfSine(s), s.vco2ShapedToVco1Tzfm, DisplayColor::White);
+    drawWaveLamp(vg, Vec(44, 110), "PULSE", hasRawPulse(s) || hasShapedPulse(s), a);
+    drawWaveLamp(vg, Vec(60, 110), "SAW", hasSaw(s), s.vco2RawToVco1Tzfm);
+    drawWaveLamp(vg, Vec(76, 110), "TRI", hasTri(s), s.vco2RawToVco1Tzfm);
+    drawWaveLamp(vg, Vec(92, 110), "½SIN", hasHalfSine(s), s.vco2ShapedToVco1Tzfm, DisplayColor::White);
     drawWaveLamp(vg, Vec(108, 110), "SINE", hasSine(s), s.vco2ShapedToVco1Tzfm, DisplayColor::White);
   }
 
@@ -363,7 +363,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     drawArrowLine(vg, Vec(28, 40), Vec(50, 71),
                   s.vco1ToVcfExpFm, nullptr);
 
-    drawText(vg, Vec(31, 57), "EXP", 4.6f,
+    drawText(vg, Vec(31, 57), "EXP", 5.f,
              NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
              s.vco1ToVcfExpFm > 0.f ? 0.94f : 0.34f);
 
@@ -371,7 +371,7 @@ struct CoupledVoiceTopologyDisplay : LedDisplay {
     drawArrowLine(vg, Vec(92, 40), Vec(70, 71),
                   s.vco2ToVcfLinFm, nullptr);
 
-    drawText(vg, Vec(91, 57), "LINEAR", 4.6f,
+    drawText(vg, Vec(91, 57), "LINEAR", 5.f,
              NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE,
              s.vco2ToVcfLinFm > 0.f ? 0.94f : 0.34f);
 
