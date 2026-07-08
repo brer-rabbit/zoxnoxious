@@ -582,7 +582,7 @@ static Vec leftAnchor(Vec center, Vec size) {
 }
 
 static Vec topAnchor(Vec center, Vec size) {
-  return Vec(center.x - 8.f, center.y - size.y * 0.5f);
+  return Vec(center.x, center.y - size.y * 0.5f);
 }
 
 static Vec topAnchor(Vec center, Vec size, GraphPort port) {
@@ -590,7 +590,7 @@ static Vec topAnchor(Vec center, Vec size, GraphPort port) {
 }
 
 static Vec bottomAnchor(Vec center, Vec size) {
-  return Vec(center.x - 8.f, center.y + size.y * 0.5f);
+  return Vec(center.x, center.y + size.y * 0.5f);
 }
 
 static Vec bottomAnchor(Vec center, Vec size, GraphPort port) {
@@ -608,7 +608,7 @@ struct EdgeRoute {
 };
 
 
-static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop) {
+static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, RenderTargetKind targetKind, bool selfLoop) {
   EdgeRoute route;
 
   route.toSide = AnchorSide::Left;
@@ -617,6 +617,13 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, bool selfLoop) {
     route.kind = EdgeRouteKind::SelfLoop;
     route.fromSide = AnchorSide::Bottom;
     return route;
+  }
+
+  if (targetKind == RenderTargetKind::Output1 && fromCenter.y < toCenter.y) {
+    route.toSide = AnchorSide::Top;
+  }
+  else if (targetKind == RenderTargetKind::Output2 && fromCenter.y > toCenter.y) {
+    route.toSide = AnchorSide::Bottom;
   }
 
   route.fromSide = AnchorSide::Right;
@@ -749,7 +756,6 @@ static void assignRowsByBarycenter(const SlotArray& colForSlot,
     }
   }
 }
-
 
 
 
@@ -985,29 +991,38 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     return anchorPoint;
   }
 
+
+  AnchorSide chooseTargetAnchorSide(RenderTargetKind targetKind,
+                                    const Vec& from,
+                                    const Vec& targetCenter) {
+    if (targetKind == RenderTargetKind::Output1 && from.y < targetCenter.y) {
+      return AnchorSide::Top;
+    }
+
+    if (targetKind == RenderTargetKind::Output2 && from.y > targetCenter.y) {
+      return AnchorSide::Bottom;
+    }
+
+    return AnchorSide::Left;
+  }
+
   Vec anchorForSideAndTargetKind(const Vec& nodeCenter, AnchorSide side, RenderTargetKind targetKind) {
     const Vec nodeSize = Vec(nodeW, nodeH);
-    const Vec outputSize = Vec(outputW, outputH);
     Vec anchorPoint;
 
-    if (targetKind == RenderTargetKind::VoiceCard) {
-      switch (side) {
-      case AnchorSide::Left:
-        anchorPoint = leftAnchor(nodeCenter, nodeSize);
-        break;
-      case AnchorSide::Right:
-        anchorPoint = rightAnchor(nodeCenter, nodeSize);
-        break;
-      case AnchorSide::Top:
-        anchorPoint = topAnchor(nodeCenter, nodeSize);
-        break;
-      case AnchorSide::Bottom:
-        anchorPoint = bottomAnchor(nodeCenter, nodeSize);
-        break;
-      }
-    }
-    else {
-      anchorPoint = leftAnchor(nodeCenter, outputSize);
+    switch (side) {
+    case AnchorSide::Left:
+      anchorPoint = leftAnchor(nodeCenter, nodeSize);
+      break;
+    case AnchorSide::Right:
+      anchorPoint = rightAnchor(nodeCenter, nodeSize);
+      break;
+    case AnchorSide::Top:
+      anchorPoint = topAnchor(nodeCenter, nodeSize);
+      break;
+    case AnchorSide::Bottom:
+      anchorPoint = bottomAnchor(nodeCenter, nodeSize);
+      break;
     }
 
     return anchorPoint;
@@ -1039,8 +1054,51 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
              1.f, DisplayColor::White);
   }
 
-  void drawForwardEdge(NVGcontext* vg, Vec from, Vec to,
-                       const GraphRenderEdge& edge, NVGcolor edgeColor) {
+  void drawForwardEdge(NVGcontext* vg,
+                       Vec from,
+                       Vec to,
+                       AnchorSide toSide,
+                       const GraphRenderEdge& edge,
+                       NVGcolor edgeColor) {
+    nvgBeginPath(vg);
+
+    const float laneX =
+      from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) +
+      edge.fromSlotNum;
+
+    nvgMoveTo(vg, from.x, from.y);
+    nvgLineTo(vg, laneX, from.y);
+
+    Vec arrowTail;
+
+    if (toSide == AnchorSide::Top || toSide == AnchorSide::Bottom) {
+      const float approachOffset = 6.f;
+      const float approachY = to.y + (toSide == AnchorSide::Top ? -approachOffset : approachOffset);
+
+      nvgLineTo(vg, to.x, from.y);
+      nvgLineTo(vg, to.x, approachY);
+      nvgLineTo(vg, to.x, to.y);
+
+      arrowTail = Vec(to.x, approachY);
+    }
+    else {
+      nvgLineTo(vg, laneX, to.y);
+      nvgLineTo(vg, to.x, to.y);
+
+      arrowTail = Vec(laneX, to.y);
+    }
+
+    nvgStrokeColor(vg, edgeColor);
+    nvgStrokeWidth(vg, edgeWidth(edge.weight));
+    nvgStroke(vg);
+
+    drawArrowhead(vg, arrowTail, to, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+  }
+
+
+  void drawForwardEdge2(NVGcontext* vg, Vec from, Vec to,
+                       AnchorSide toSide, const GraphRenderEdge& edge,
+                       NVGcolor edgeColor) {
     nvgBeginPath(vg);
     Vec midPoint = from;
     midPoint.x += (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 2.f * edge.fromSlotNum;
@@ -1157,10 +1215,11 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       // get the intent of the edge: where is it coming from?
       Vec p1 = layout.nodeCenters[edge.fromSlotNum];
 
-      EdgeRoute edgeRoute = chooseEdgeRoute(p1, p2,
+      EdgeRoute edgeRoute = chooseEdgeRoute(p1, p2, edge.targetKind,
                                             edge.fromSlotNum == edge.toSlotNum);
 
       p1 = anchorForSideAndPort(layout.nodeCenters[edge.fromSlotNum], edgeRoute.fromSide, edge.fromPort);
+
       switch (edge.targetKind) {
       case RenderTargetKind::VoiceCard:
         p2 = anchorForSideAndTargetKind(layout.nodeCenters[edge.toSlotNum], edgeRoute.toSide, edge.targetKind);
@@ -1174,7 +1233,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       }        
 
       if (edgeRoute.kind == EdgeRouteKind::Forward && module->displayPrimaryEdges) {
-        drawForwardEdge(vg, p1, p2, edge, edgeColor);
+        drawForwardEdge(vg, p1, p2, edgeRoute.toSide, edge, edgeColor);
       }
       else if (edgeRoute.kind == EdgeRouteKind::SameColumn && module->displayPrimaryEdges) {
         drawFeedbackEdge(vg, p1, p2, edge, edgeColor);

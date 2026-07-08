@@ -672,9 +672,6 @@ struct OutputInterfaceWidget : ModuleWidget {
     addInput(createInputCentered<BNCPort>(mm2px(Vec(52.11, 108.604)), module, OutputInterface::OUT2_LEVEL_INPUT));
 
 
-    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 101.184)), module, OutputInterface::OUT1_LEVEL_CLIP_LIGHT));
-    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 114.233)), module, OutputInterface::OUT2_LEVEL_CLIP_LIGHT));
-
     // mm2px(Vec(22.0, 3.636))
     cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 37.603)));
     cardAOutput1TextField->setNumChars(10);
