@@ -204,9 +204,9 @@ struct OutputInterfaceVisualizer final : Module {
 
   OutputInterfaceVisualizer() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-    configButton(DISPLAY_PRIMARY_EDGE_PARAM, "Show Primary Connections");
-    configButton(DISPLAY_SECONDARY_EDGE_PARAM, "Show Secondary Connections");
-    configButton(DISPLAY_EXTERNAL_EDGE_PARAM, "Show External Input");
+    configSwitch(DISPLAY_PRIMARY_EDGE_PARAM, 0.f, 1.f, 1.f, "Show Primary Connections");
+    configSwitch(DISPLAY_SECONDARY_EDGE_PARAM, 0.f, 1.f, 0.f, "Show Secondary Connections");
+    configSwitch(DISPLAY_EXTERNAL_EDGE_PARAM, 0.f, 1.f, 0.f, "Show External Input");
 
     int calcClockDivision = std::max(minClockDivision,
                                      (static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
@@ -610,6 +610,8 @@ struct EdgeRoute {
 
 static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, RenderTargetKind targetKind, bool selfLoop) {
   EdgeRoute route;
+  static constexpr float oneColumnThreshold = 40.f;
+  static constexpr float oneRowThreshold = 60.f;
 
   route.toSide = AnchorSide::Left;
 
@@ -619,11 +621,19 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, RenderTargetKind 
     return route;
   }
 
-  if (targetKind == RenderTargetKind::Output1 && fromCenter.y < toCenter.y) {
+  if (targetKind == RenderTargetKind::Output1 && fromCenter.y < toCenter.y &&
+    toCenter.x - fromCenter.x < oneColumnThreshold) {
     route.toSide = AnchorSide::Top;
   }
-  else if (targetKind == RenderTargetKind::Output2 && fromCenter.y > toCenter.y) {
+  else if (targetKind == RenderTargetKind::Output2 && fromCenter.y > toCenter.y &&
+    toCenter.x - fromCenter.x < oneColumnThreshold) {
     route.toSide = AnchorSide::Bottom;
+  }
+  else if (targetKind != RenderTargetKind::VoiceCard &&
+           toCenter.x - fromCenter.x < oneColumnThreshold &&
+           std::abs(toCenter.y - fromCenter.y) < oneRowThreshold) {
+    route.toSide = toCenter.y - fromCenter.y > 0.f ?
+      AnchorSide::Top : AnchorSide::Bottom;
   }
 
   route.fromSide = AnchorSide::Right;
@@ -1007,7 +1017,8 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   }
 
   Vec anchorForSideAndTargetKind(const Vec& nodeCenter, AnchorSide side, RenderTargetKind targetKind) {
-    const Vec nodeSize = Vec(nodeW, nodeH);
+    const Vec nodeSize =
+      targetKind == RenderTargetKind::VoiceCard ? Vec(nodeW, nodeH) : Vec(outputW, outputH);
     Vec anchorPoint;
 
     switch (side) {
@@ -1064,7 +1075,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
 
     const float laneX =
       from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) +
-      edge.fromSlotNum;
+      edge.fromSlotNum / 2.f;
 
     nvgMoveTo(vg, from.x, from.y);
     nvgLineTo(vg, laneX, from.y);
@@ -1093,24 +1104,6 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     nvgStroke(vg);
 
     drawArrowhead(vg, arrowTail, to, 2.f + 2.f * edge.weight, 5.f, edgeColor);
-  }
-
-
-  void drawForwardEdge2(NVGcontext* vg, Vec from, Vec to,
-                       AnchorSide toSide, const GraphRenderEdge& edge,
-                       NVGcolor edgeColor) {
-    nvgBeginPath(vg);
-    Vec midPoint = from;
-    midPoint.x += (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 2.f * edge.fromSlotNum;
-    midPoint.y = to.y;
-    nvgMoveTo(vg, from.x, from.y);
-    nvgLineTo(vg, midPoint.x, from.y);
-    nvgLineTo(vg, midPoint.x, to.y);
-    nvgLineTo(vg, to.x, to.y);
-    nvgStrokeColor(vg, edgeColor);
-    nvgStrokeWidth(vg, edgeWidth(edge.weight));
-    nvgStroke(vg);
-    drawArrowhead(vg, midPoint, to, 2.f + 2.f * edge.weight, 5.f, edgeColor);
   }
 
 
