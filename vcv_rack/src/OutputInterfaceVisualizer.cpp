@@ -582,7 +582,7 @@ static Vec leftAnchor(Vec center, Vec size) {
 }
 
 static Vec topAnchor(Vec center, Vec size) {
-  return Vec(center.x, center.y - size.y * 0.5f);
+  return Vec(center.x - size.x * 0.25f, center.y - size.y * 0.5f);
 }
 
 static Vec topAnchor(Vec center, Vec size, GraphPort port) {
@@ -590,7 +590,7 @@ static Vec topAnchor(Vec center, Vec size, GraphPort port) {
 }
 
 static Vec bottomAnchor(Vec center, Vec size) {
-  return Vec(center.x, center.y + size.y * 0.5f);
+  return Vec(center.x - size.x * 0.25f, center.y + size.y * 0.5f);
 }
 
 static Vec bottomAnchor(Vec center, Vec size, GraphPort port) {
@@ -642,6 +642,8 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, RenderTargetKind 
 
   if (std::fabs(dx) <= kSameColumnDxTolerance) {
     route.kind = EdgeRouteKind::SameColumn;
+    route.toSide = fromCenter.y > toCenter.y ?
+      AnchorSide::Bottom : AnchorSide::Top;
   }
   else if (dx > 0.f) {
     route.kind = EdgeRouteKind::Forward;
@@ -1147,6 +1149,45 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
   }
 
 
+  void drawSameColumnEdge(NVGcontext* vg, Vec from, Vec to,
+                          const GraphRenderEdge& edge, NVGcolor edgeColor) {
+    Vec leftTerminal;
+    Vec rightGutter;
+    // stagger feedback gutters by slot number so parallel feedback paths
+    // don't overlap.  Gutter starts a 3px growing by 2.5 per slot.
+    float verticalGutterOffset = nodeH + 2.5f * edge.fromSlotNum;
+
+    if (to.y < from.y) {
+      // gutter goes above
+      // forward amount determined by fromPort
+      rightGutter.x = from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 1.f * edge.fromSlotNum;
+      rightGutter.y = to.y + verticalGutterOffset;
+      leftTerminal.x = to.x;
+      leftTerminal.y = rightGutter.y;
+    }
+    else {
+      // gutter goes below
+      // forward amount determined by fromPort
+      rightGutter.x = from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 1.f * edge.fromSlotNum;
+      rightGutter.y = to.y - verticalGutterOffset;
+      leftTerminal.x = to.x;
+      leftTerminal.y = rightGutter.y;
+    }
+
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, from.x, from.y);
+    nvgLineTo(vg, rightGutter.x, from.y);
+    nvgLineTo(vg, rightGutter.x, rightGutter.y);
+    nvgLineTo(vg, leftTerminal.x, leftTerminal.y);
+    nvgLineTo(vg, to.x, to.y);
+    nvgStrokeColor(vg, edgeColor);
+    nvgStrokeWidth(vg, edgeWidth(edge.weight));
+    nvgStroke(vg);
+
+    drawArrowhead(vg, leftTerminal, to, 2.f + 2.f * edge.weight, 5.f, edgeColor);
+  }
+
+
   void drawSelfLoopEdge(NVGcontext* vg, Vec from, Vec to,
                         const GraphRenderEdge& edge, NVGcolor edgeColor) {
     nvgBeginPath(vg);
@@ -1229,7 +1270,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
         drawForwardEdge(vg, p1, p2, edgeRoute.toSide, edge, edgeColor);
       }
       else if (edgeRoute.kind == EdgeRouteKind::SameColumn && module->displayPrimaryEdges) {
-        drawFeedbackEdge(vg, p1, p2, edge, edgeColor);
+        drawSameColumnEdge(vg, p1, p2, edge, edgeColor);
       }
       else if (edgeRoute.kind == EdgeRouteKind::SelfLoop && module->displayPrimaryEdges) {
         drawSelfLoopEdge(vg, p1, p2, edge, edgeColor);
