@@ -8,10 +8,10 @@
 
 namespace zox {
 
-// maxGraphNodes: number of voice cards + output node.
+// maxGraphNodes: number of voice cards
 // maxGraphEdges: each voice card can have two inputs, then two final outputs with six each
 static constexpr int8_t maxGraphNodes = maxVoiceCards;
-static constexpr size_t maxGraphEdges = maxGraphNodes * 2 + 2 * 6;
+static constexpr size_t maxGraphEdges = maxGraphNodes * 2 + 2 * maxVoiceCards;
 
 static constexpr int graphRenderRateHz = 60;
 
@@ -90,14 +90,21 @@ struct OutputInterfaceVisualizer final : Module {
 
   GraphRenderSnapshot snapshotA;
   GraphRenderSnapshot snapshotB;
+  // the atomic publishSnapshot is not truly race-free.  The GUI can end up
+  // holding a pointer the swapped buffer when the audio thread cycles
+  // around and start writing again.  At the display rate intended this is
+  // an acceptable risk.  Note that without the double buffering one _will_
+  // visibly see torn reads in the GUI.  I've not seen any since implementing
+  // double buffering.
   std::atomic<GraphRenderSnapshot*> publishedSnapshot;
   GraphRenderSnapshot* writeSnapshot;
 
-  bool displayPrimaryEdges = true;
-  bool displaySecondaryEdges = true;
-  bool displayExternalEdges = false;
+  std::atomic<bool> displayPrimaryEdges { true };
+  std::atomic<bool> displaySecondaryEdges { true };
+  std::atomic<bool> displayExternalEdges { false };
 
-  void addSource(const ParticipantGraphInfo& participantInfo,
+  void addSource(GraphRenderSnapshot& graphSnapshot,
+                 const ParticipantGraphInfo& participantInfo,
                  const GraphSource source,
                  const RenderTargetKind targetKind) {
     if (!source.valid) {
@@ -105,7 +112,7 @@ struct OutputInterfaceVisualizer final : Module {
     }
 
     // fill in the edges of the graph
-    if (writeSnapshot->edgeCount >= maxGraphEdges) {
+    if (graphSnapshot.edgeCount >= maxGraphEdges) {
       WARN("maxGraphEdges exceeded");
       return;
     }
@@ -118,7 +125,7 @@ struct OutputInterfaceVisualizer final : Module {
       }
     }
 
-    GraphRenderEdge& edge = writeSnapshot->edges[writeSnapshot->edgeCount++];
+    GraphRenderEdge& edge = graphSnapshot.edges[graphSnapshot.edgeCount++];
 
     edge.fromSlotNum = isExternal ? invalidSlot : source.slotNum;
     edge.fromHardwareId = source.hardwareId;
@@ -135,42 +142,44 @@ struct OutputInterfaceVisualizer final : Module {
   }
 
 
-  void addNode(const ParticipantGraphInfo& info) {
+  void addNode(GraphRenderSnapshot& graphSnapshot, const ParticipantGraphInfo& info) {
     if (info.slotNum >= 0 && info.slotNum < maxGraphNodes) {
       if (info.moduleId >= 0) {
-        writeSnapshot->nodes[info.slotNum].valid = true;
-        writeSnapshot->nodes[info.slotNum].moduleId = info.moduleId;
-        writeSnapshot->nodes[info.slotNum].hardwareId = info.hardwareId;
-        writeSnapshot->nodes[info.slotNum].output1Weight = info.output1Weight;
-        writeSnapshot->nodes[info.slotNum].output2Weight = info.output2Weight;
+        graphSnapshot.nodes[info.slotNum].valid = true;
+        graphSnapshot.nodes[info.slotNum].moduleId = info.moduleId;
+        graphSnapshot.nodes[info.slotNum].hardwareId = info.hardwareId;
+        graphSnapshot.nodes[info.slotNum].output1Weight = info.output1Weight;
+        graphSnapshot.nodes[info.slotNum].output2Weight = info.output2Weight;
       }
       else {
-        writeSnapshot->nodes[info.slotNum] = GraphRenderNode{};
+        graphSnapshot.nodes[info.slotNum] = GraphRenderNode{};
       }
     }
   }
 
   // iterate over all the edges:
   // find the "from" slot and incorporate the source weight via simple multiply
-  void calculateEdgeWeights() {
-    for (size_t i = 0; i < writeSnapshot->edgeCount; ++i) {
-      const GraphRenderEdge& edge = writeSnapshot->edges[i];
+  void calculateEdgeWeights(GraphRenderSnapshot& graphSnapshot) {
+    for (size_t i = 0; i < graphSnapshot.edgeCount; ++i) {
+      const GraphRenderEdge& edge = graphSnapshot.edges[i];
 
-      if (edge.valid) {
-        const GraphRenderNode& fromNode = writeSnapshot->nodes[edge.fromSlotNum];
+      if (!edge.valid || edge.fromPort == GraphPort::EXTERNAL) {
+        continue;
+      }
 
-        if (fromNode.moduleId != -1 &&
-            fromNode.hardwareId != invalidCardId) {
-          writeSnapshot->edges[i].weight *= (edge.fromPort == GraphPort::OUT1 ?
-                                            fromNode.output1Weight : fromNode.output2Weight);
-        }
+      const GraphRenderNode& fromNode = graphSnapshot.nodes[edge.fromSlotNum];
+
+      if (fromNode.moduleId != -1 &&
+          fromNode.hardwareId != invalidCardId) {
+        graphSnapshot.edges[i].weight *= (edge.fromPort == GraphPort::OUT1 ?
+                                           fromNode.output1Weight : fromNode.output2Weight);
       }
     }
   }
 
 
-  void buildGraphRenderSnapshot(const ParticipantGraphMessage& message,
-                                GraphRenderSnapshot& graphSnapshot) {
+  void buildGraphRenderSnapshot(GraphRenderSnapshot& graphSnapshot,
+                                const ParticipantGraphMessage& message) {
     graphSnapshot = GraphRenderSnapshot{};
 
     for (size_t i = 0; i < message.participantInfoCount; ++i) {
@@ -180,23 +189,22 @@ struct OutputInterfaceVisualizer final : Module {
           continue;
       }
 
-      addNode(info);
-      addSource(info, info.source1, RenderTargetKind::VoiceCard);
-      addSource(info, info.source2, RenderTargetKind::VoiceCard);
+      addNode(graphSnapshot, info);
+      addSource(graphSnapshot, info, info.source1, RenderTargetKind::VoiceCard);
+      addSource(graphSnapshot, info, info.source2, RenderTargetKind::VoiceCard);
     }
 
     // add Output1 sources
     for (size_t i = 0; i < message.output1SourceCount; ++i) {
-      addSource(message.outputInterfaceInfo, message.output1Sources[i], RenderTargetKind::Output1);
+      addSource(graphSnapshot, message.outputInterfaceInfo, message.output1Sources[i], RenderTargetKind::Output1);
     }
 
     // and Output2 sources
     for (size_t i = 0; i < message.output2SourceCount; ++i) {
-      addSource(message.outputInterfaceInfo, message.output2Sources[i], RenderTargetKind::Output2);
+      addSource(graphSnapshot, message.outputInterfaceInfo, message.output2Sources[i], RenderTargetKind::Output2);
     }
 
-    calculateEdgeWeights();
-
+    calculateEdgeWeights(graphSnapshot);
   }
 
 
@@ -223,14 +231,10 @@ struct OutputInterfaceVisualizer final : Module {
 
   void onSampleRateChange(const SampleRateChangeEvent& e) override {
     int calcClockDivision = std::max(minClockDivision,
-                                     (static_cast<int>(APP->engine->getSampleRate()) / graphRenderRateHz));
+                                     (static_cast<int>(e.sampleRate) / graphRenderRateHz));
     clockDivider.setDivision(calcClockDivision);
   }
 
-
-  static const char* graphPortName(GraphPort port) {
-    return port == GraphPort::OUT1 ? "OUT1" : "OUT2";
-  }
 
   static const char* renderTargetKindName(RenderTargetKind kind) {
     switch (kind) {
@@ -240,49 +244,6 @@ struct OutputInterfaceVisualizer final : Module {
     }
     return "?";
   }
-
-
-  // debug
-  void dumpGraphRenderSnapshot() const {
-    INFO("========== GraphRenderSnapshot ==========");
-    INFO("Nodes:");
-    for (size_t i = 0; i < maxGraphNodes; ++i) {
-      const GraphRenderNode& node = writeSnapshot->nodes[i];
-
-      if (!node.valid)
-        continue;
-
-      INFO("  slot=%zu moduleId=%lld hwId=%u",
-           i,
-           (long long)node.moduleId,
-           node.hardwareId);
-    }
-
-    INFO("Edges: count=%zu", writeSnapshot->edgeCount);
-
-    for (size_t i = 0; i < writeSnapshot->edgeCount; ++i) {
-      const GraphRenderEdge& edge = writeSnapshot->edges[i];
-
-      if (!edge.valid)
-        continue;
-
-      INFO("  [%zu] slot%d:%s(hw=%u mod=%lld) -> %s slot%d(hw=%u mod=%lld) weight=%.2f",
-           i,
-           edge.fromSlotNum,
-           graphPortName(edge.fromPort),
-           edge.fromHardwareId,
-           (long long)edge.fromModuleId,
-
-           renderTargetKindName(edge.targetKind),
-
-           edge.toSlotNum,
-           edge.toHardwareId,
-           (long long)edge.toModuleId,
-
-           edge.weight);
-    }
-  }
-
 
 
   void process(const ProcessArgs& args) override {
@@ -301,22 +262,19 @@ struct OutputInterfaceVisualizer final : Module {
 
         if (message) {
           if (writeSnapshot == &snapshotA) {
-            buildGraphRenderSnapshot(*message, snapshotA);
+            buildGraphRenderSnapshot(snapshotA, *message);
             publishedSnapshot.store(&snapshotA, std::memory_order_release);
             writeSnapshot = &snapshotB;
           }
           else {
-            buildGraphRenderSnapshot(*message, snapshotB);
+            buildGraphRenderSnapshot(snapshotB, *message);
             publishedSnapshot.store(&snapshotB, std::memory_order_release);
             writeSnapshot = &snapshotA;
           }
-
-          //dumpGraphRenderSnapshot();
         }
       }
     }
   }
-
 };
 
 
@@ -377,13 +335,15 @@ struct GraphAnalysis {
 
 // a "forward edge" is from an node that feeds another internal node where the second
 // node is closer to the output.  Most typically this would be a node that feeds the output.
-// in a VCO --> VCF --> Output, analyzing the VCO, it has one forward edge.
+// in a VCO --> VCF --> Output, analyzing the VCO, the VCO has one forward edge.
 static void computeForwardEdgeCounts(const GraphRenderSnapshot& s,
                                      GraphAnalysis analysis[maxGraphNodes]) {
   for (size_t i = 0; i < s.edgeCount; ++i) {
     const GraphRenderEdge& e = s.edges[i];
 
-    if (!e.valid || e.targetKind != RenderTargetKind::VoiceCard) {
+    if (!e.valid ||
+        e.targetKind != RenderTargetKind::VoiceCard ||
+        e.fromPort == GraphPort::EXTERNAL) {
       continue;
     }
 
@@ -465,6 +425,8 @@ static int columnPriority(const GraphAnalysis& a) {
 
 using SlotArray = std::array<int, maxGraphNodes>;
 static constexpr int kNumColumns = 3;
+static constexpr int kNumRows = 3;
+static constexpr int kNodesPerColumn = kNumRows;
 
 static void resolveSingleColumnOverflow(SlotArray& colForSlot,
                                         const GraphAnalysis analysis[maxGraphNodes],
@@ -482,7 +444,7 @@ static void resolveSingleColumnOverflow(SlotArray& colForSlot,
     }
   }
 
-  if (overflowCount <= 3) {
+  if (overflowCount <= kNodesPerColumn) {
     return;
   }
 
@@ -504,14 +466,14 @@ static void resolveSingleColumnOverflow(SlotArray& colForSlot,
   // If column 2 overflows move left
   // If column 0 overflows move right
   // If column 1 overflows, either side will have space
-  for (int i = 3; i < overflowCount; ++i) {
+  for (int i = kNumColumns; i < overflowCount; ++i) {
     int slot = overflowSlots[i];
 
     int targetCol = -1;
-    if (overflowCol > 0 && colCounts[overflowCol - 1] < 3) {
+    if (overflowCol > 0 && colCounts[overflowCol - 1] < kNodesPerColumn) {
       targetCol = overflowCol - 1;
     }
-    else if (overflowCol < kNumColumns - 1 && colCounts[overflowCol + 1] < 3) {
+    else if (overflowCol < kNumColumns - 1 && colCounts[overflowCol + 1] < kNodesPerColumn) {
       targetCol = overflowCol + 1;
     }
 
@@ -610,7 +572,9 @@ struct EdgeRoute {
 
 static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, RenderTargetKind targetKind, bool selfLoop) {
   EdgeRoute route;
+  // nearby output dx
   static constexpr float oneColumnThreshold = 40.f;
+  // nearby output dy
   static constexpr float oneRowThreshold = 60.f;
 
   route.toSide = AnchorSide::Left;
@@ -638,6 +602,7 @@ static EdgeRoute chooseEdgeRoute(Vec fromCenter, Vec toCenter, RenderTargetKind 
 
   route.fromSide = AnchorSide::Right;
   const float dx = toCenter.x - fromCenter.x;
+
   static constexpr float kSameColumnDxTolerance = 2.f;
 
   if (std::fabs(dx) <= kSameColumnDxTolerance) {
@@ -704,11 +669,11 @@ static void assignRowsByBarycenter(const SlotArray& colForSlot,
                                    SlotArray& rowForSlot,
                                    const GraphRenderSnapshot& s) {
   for (int col = 2; col >= 0; --col) {
-    std::array<int, 3> slots;
+    std::array<int, kNodesPerColumn> slots;
     int count = 0;
 
     for (int slot = 0; slot < maxGraphNodes; ++slot) {
-      if (colForSlot[slot] == col && count < 3) {
+      if (colForSlot[slot] == col && count < kNodesPerColumn) {
         slots[count++] = slot;
       }
     }
@@ -717,14 +682,14 @@ static void assignRowsByBarycenter(const SlotArray& colForSlot,
       continue;
     }
 
-    float score[3] = {};
+    float score[kNodesPerColumn] = {};
     for (int i = 0; i < count; ++i) {
       score[i] = barycenterForSlot(slots[i], colForSlot, rowForSlot, s);
     }
 
     // run through all permutations.  For a 3x3 with 6 nodes this isn't much.
     // only first two elements are used for the count=2 use case
-    static const int rowPerms[6][3] = {
+    static const int rowPerms[maxGraphNodes][kNodesPerColumn] = {
       {0, 1, 2},
       {0, 2, 1},
       {1, 0, 2},
@@ -733,10 +698,10 @@ static void assignRowsByBarycenter(const SlotArray& colForSlot,
       {2, 1, 0}
     };
 
-    float bestCost = 1e9f;
-    int bestRows[3] = {1, 1, 1};
+    float bestCost = std::numeric_limits<float>::infinity();
+    int bestRows[kNumColumns] = {1, 1, 1};
 
-    const int permCount = (count == 1) ? 3 : (count == 2 ? 6 : 6);
+    const int permCount = count == 1 ? 3 : 6;
 
     for (int p = 0; p < permCount; ++p) {
       float cost = 0.f;
@@ -817,7 +782,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       int col = distanceToColumn(distToOutput[slot].distance);
       colForSlot[slot] = col;
       colCounts[col]++;
-      if (colCounts[col] > 3) {
+      if (colCounts[col] > kNodesPerColumn) {
         overflowCol = col;
       }
 
@@ -1003,20 +968,6 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     return anchorPoint;
   }
 
-
-  AnchorSide chooseTargetAnchorSide(RenderTargetKind targetKind,
-                                    const Vec& from,
-                                    const Vec& targetCenter) {
-    if (targetKind == RenderTargetKind::Output1 && from.y < targetCenter.y) {
-      return AnchorSide::Top;
-    }
-
-    if (targetKind == RenderTargetKind::Output2 && from.y > targetCenter.y) {
-      return AnchorSide::Bottom;
-    }
-
-    return AnchorSide::Left;
-  }
 
   Vec anchorForSideAndTargetKind(const Vec& nodeCenter, AnchorSide side, RenderTargetKind targetKind) {
     const Vec nodeSize =
@@ -1239,7 +1190,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
       // before checking where edge is coming from- deal with External
       if (edge.fromPort == GraphPort::EXTERNAL) {
         if (module->displayExternalEdges) {
-          p2.x -= (nodeW / 4.f);
+          p2.x -= (nodeW * 0.375f);
           p2.y -= (nodeH / 2.f);
           drawExternalInputEdge(vg, p2, edge, edgeColor);
         }
@@ -1297,8 +1248,8 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     Rect localBox = Rect(Vec(0.f, 0.f), box.size);
     buildLayout(layout, localBox);
 
-    drawNodes(args.vg, layout);
     drawEdges(args.vg, layout);
+    drawNodes(args.vg, layout);
   }
 
 

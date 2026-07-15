@@ -106,13 +106,13 @@ void OutputInterface::onSampleRateChange(const SampleRateChangeEvent& e) {
 }
 
 
-// internal method for graph processing of source1/source2 edge handlnig
+// internal method for graph processing of source1/source2 (output nodes)
 static void resolveGraphSource(const Broker::Snapshot& snap, GraphSource& source) {
   if (source.slotNum >= 0 && source.slotNum < maxVoiceCards) {
     const Slot& physical = snap.slots[source.slotNum];
     source.moduleId = physical.props.moduleId;
     source.hardwareId = physical.props.hardwareId;
-    source.valid = true;
+    source.valid = physical.props.isAllocated && physical.props.moduleId;
   }
   else if (source.slotNum == maxVoiceCards) {
     // External input
@@ -164,8 +164,8 @@ void OutputInterface::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
-//  if (0) {
   if (APP->engine->getFrame() == 40000) {
+//  if (0) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
@@ -282,7 +282,7 @@ void OutputInterface::process(const ProcessArgs& args) {
 
   if (isGraphPollClockTick &&
       rightExpander.module && rightExpander.module->model == modelOutputInterfaceVisualizer) {
-    // Write to Analyzer
+    // Write to visualizer - the expander
     ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(rightExpander.producerMessage);
     message->participantInfoCount = 0;
     message->output1SourceCount = 0;
@@ -503,8 +503,7 @@ void OutputInterface::applyDiscoveryReport(DiscoveredCard *cards) {
       midiChannel = assignedMidiChannel++;
       slotNum = card.slotNum;
     }
-    else if (i < maxVoiceCards &&
-             card.slotNum >= 0 && card.slotNum < maxVoiceCards) {
+    else if (card.slotNum >= 0 && card.slotNum < maxVoiceCards) {
       // Voice card
       ParticipantProperty& slot = deviceTree[ card.slotNum ];
       slot.moduleId = -1;
