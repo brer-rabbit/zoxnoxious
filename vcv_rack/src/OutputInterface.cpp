@@ -164,8 +164,8 @@ void OutputInterface::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
-  if (APP->engine->getFrame() == 40000) {
-//  if (0) {
+//  if (APP->engine->getFrame() == 40000) {
+  if (0) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
