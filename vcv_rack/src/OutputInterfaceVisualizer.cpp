@@ -531,6 +531,14 @@ static float portOffset(GraphPort port) {
   return port == GraphPort::OUT1 ? -kPortAnchorOffset : kPortAnchorOffset;
 }
 
+static float gutterXOffset(float fromX, GraphPort fromPort, int8_t fromSlotNum) {
+//  return fromX + (fromPort == GraphPort::OUT1 ? 1.f : 2.f) + (fromSlotNum);
+  return fromX + (fromPort == GraphPort::OUT1 ? fromSlotNum : 6.5f - fromSlotNum);
+
+  return fromX + (fromPort == GraphPort::OUT1 ? 0.5f : 1.f) * (fromSlotNum);
+}
+
+
 static Vec rightAnchor(Vec center, Vec size) {
   return Vec(center.x + size.x * 0.5f, center.y);
 }
@@ -1018,6 +1026,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
              1.f, DisplayColor::White);
   }
 
+
   void drawForwardEdge(NVGcontext* vg,
                        Vec from,
                        Vec to,
@@ -1026,9 +1035,7 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
                        NVGcolor edgeColor) {
     nvgBeginPath(vg);
 
-    const float laneX =
-      from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) +
-      edge.fromSlotNum / 2.f;
+    const float laneX = gutterXOffset(from.x, edge.fromPort, edge.fromSlotNum);
 
     nvgMoveTo(vg, from.x, from.y);
     nvgLineTo(vg, laneX, from.y);
@@ -1068,10 +1075,11 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     // don't overlap.  Gutter starts a 3px growing by 2.5 per slot.
     float verticalGutterOffset = nodeH + 2.5f * edge.fromSlotNum;
 
+    rightGutter.x = gutterXOffset(from.x, edge.fromPort, edge.fromSlotNum);
+
     if (to.y < from.y) {
       // gutter goes above
       // forward amount determined by fromPort
-      rightGutter.x = from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 1.f * edge.fromSlotNum;
       rightGutter.y = from.y - verticalGutterOffset;
       leftGutter.x = to.x - (4.f + edge.fromSlotNum);
       leftGutter.y = to.y;
@@ -1079,7 +1087,6 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     else {
       // gutter goes below
       // forward amount determined by fromPort
-      rightGutter.x = from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 1.f * edge.fromSlotNum;
       rightGutter.y = from.y + verticalGutterOffset;
       leftGutter.x = to.x - (4.f + edge.fromSlotNum);
       leftGutter.y = to.y;
@@ -1108,10 +1115,11 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     // don't overlap.  Gutter starts a 3px growing by 2.5 per slot.
     float verticalGutterOffset = nodeH + 2.5f * edge.fromSlotNum;
 
+    rightGutter.x = gutterXOffset(from.x, edge.fromPort, edge.fromSlotNum);
+
     if (to.y < from.y) {
       // gutter goes above
       // forward amount determined by fromPort
-      rightGutter.x = from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 1.f * edge.fromSlotNum;
       rightGutter.y = to.y + verticalGutterOffset;
       leftTerminal.x = to.x;
       leftTerminal.y = rightGutter.y;
@@ -1119,7 +1127,6 @@ struct SystemRoutingVisualizerDisplay : LedDisplay {
     else {
       // gutter goes below
       // forward amount determined by fromPort
-      rightGutter.x = from.x + (edge.fromPort == GraphPort::OUT1 ? 2.f : 4.f) + 1.f * edge.fromSlotNum;
       rightGutter.y = to.y - verticalGutterOffset;
       leftTerminal.x = to.x;
       leftTerminal.y = rightGutter.y;
