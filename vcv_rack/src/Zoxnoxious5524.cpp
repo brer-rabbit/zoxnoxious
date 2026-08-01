@@ -134,6 +134,12 @@ void Zoxnoxious5524::pullSamples(const rack::engine::Module::ProcessArgs &args, 
     sharedFrame.samples[offset + VCO_TWO_PW] = 1.f;
   }
 
+  // graph weight info
+  output1Weight = sharedFrame.samples[offset + FINAL_GAIN];
+  output2Weight = std::max(sharedFrame.samples[offset + VCO_ONE_TRIANGLE],
+                           std::max(sharedFrame.samples[offset + VCO_ONE_SAW],
+                                    sharedFrame.samples[offset + VCO_ONE_PULSE]));
+
 }
 
 
@@ -261,6 +267,18 @@ bool Zoxnoxious5524::pullMidi(const rack::engine::Module::ProcessArgs &args, uin
 static const uint8_t hardwareId = 0x04;
 uint8_t Zoxnoxious5524::getHardwareId() const {
   return hardwareId;
+}
+
+
+bool Zoxnoxious5524::pullGraphInfo(ParticipantGraphInfo& info) {
+  info.moduleId = getId();
+  info.hardwareId = hardwareId;
+  info.slotNum = lifecycle.slotNum;
+  info.source1.valid = false;
+  info.source2.valid = false;
+  info.output1Weight = output1Weight;
+  info.output2Weight = output2Weight;
+  return true;
 }
 
   /* Participant interface: return Module identifier */
@@ -462,7 +480,7 @@ struct Zoxnoxious5524Widget : ModuleWidget {
     menu->addChild(new MenuSeparator);
     menu->addChild(createIndexPtrSubmenuItem("Pulse Width", {"Allow DC", "Limit"}, &module->pwLimit));
 
-    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add visaulizer (right side)", "");
+    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add visualizer (right side)", "");
     expanderItem->module = module;
     expanderItem->model = modelZoxnoxious5524Visual;
     expanderItem->posit = box.pos;

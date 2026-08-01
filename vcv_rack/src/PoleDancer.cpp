@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include "plugin.hpp"
 #include "constants.hpp"
@@ -135,6 +136,13 @@ struct PoleDancer final : ParticipantAdapter, Participant {
   PersonalityMessage expanderMessages[2] = {};
   float resonance = 0.f;
 
+  // pullGraphInfo weights
+  float input1Weight = 0.f;
+  float input2Weight = 0.f;
+  float output1Weight = 0.f;
+  static constexpr float output2Weight = 1.f;
+
+
   PoleDancer() :
     source1NameString(invalidCardOutputName),
     source2NameString(invalidCardOutputName),
@@ -247,7 +255,6 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     }
 
 
-
     // pole levels:
     // these are scaled by the Filter VCA, so get that first
     v = params[FILTER_VCA_KNOB_PARAM].getValue() + inputs[FILTER_VCA_INPUT].getVoltage() / 10.f;
@@ -280,6 +287,17 @@ struct PoleDancer final : ParticipantAdapter, Participant {
       sharedFrame.samples[offset + POLE4_LEVEL] = filterVcaGain / mixerGain;
     }
 
+    // graph info to use in pullGraph
+    input1Weight = std::max(sharedFrame.samples[offset + SOURCE_ONE_LEVEL],
+                            sharedFrame.samples[offset + SOURCE_ONE_MOD_AMOUNT]);
+    input2Weight = std::max(sharedFrame.samples[offset + SOURCE_TWO_LEVEL],
+                            sharedFrame.samples[offset + SOURCE_TWO_MOD_AMOUNT]);
+    output1Weight = clamp(mixerGain * std::max({
+            sharedFrame.samples[offset + DRY_LEVEL],
+            sharedFrame.samples[offset + POLE1_LEVEL],
+            sharedFrame.samples[offset + POLE2_LEVEL],
+            sharedFrame.samples[offset + POLE3_LEVEL],
+            sharedFrame.samples[offset + POLE4_LEVEL]}), 0.f, 1.f);
   }
 
 
@@ -504,6 +522,33 @@ struct PoleDancer final : ParticipantAdapter, Participant {
     rezCompModeNameString = rezCompModes[ rezCompModeInt ];
     INFO("poledancer: setting comp mode to %s", rezCompModeNameString.c_str());
   }
+
+
+  bool pullGraphInfo(ParticipantGraphInfo& info) override {
+    info.moduleId = getId();
+    info.hardwareId = hardwareId;
+    info.slotNum = lifecycle.slotNum;
+    info.output1Weight = output1Weight;
+    info.output2Weight = output2Weight;
+
+    int sourceOneIndex = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
+    int sourceOneSource = source1Sources[sourceOneIndex];
+
+    int sourceTwoIndex = static_cast<int>(params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue());
+    int sourceTwoSource = source2Sources[sourceTwoIndex];
+
+    info.source1.valid = true;
+    info.source1.slotNum = sourceOneSource / 2;
+    info.source1.port = graphPortFromBusSignalSource(sourceOneSource);
+    info.source1.inputWeight = input1Weight;
+    info.source2.valid = true;
+    info.source2.slotNum = sourceTwoSource / 2;
+    info.source2.port = graphPortFromBusSignalSource(sourceTwoSource);
+    info.source2.inputWeight = input2Weight;
+    return true;
+  }
+
+
 };
 
 

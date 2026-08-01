@@ -9,6 +9,7 @@ namespace zox {
 std::atomic<OutputInterface*> OutputInterface::instance { nullptr };
 
 static constexpr int midiPollRateHz = 100;
+static constexpr int graphPollRateHz = 30;
 
 enum cvChannel {
     OUT2_CHANNEL = 0,
@@ -57,8 +58,10 @@ OutputInterface::OutputInterface() : out1LevelClipTimer(0.f),
 
   orchestrationClockDivider.setDivision(APP->engine->getSampleRate());  // once per second
   midiPollClockDivider.setDivision(static_cast<int>(APP->engine->getSampleRate()) / midiPollRateHz);
+  graphPollClockDivider.setDivision(static_cast<int>(APP->engine->getSampleRate()) / graphPollRateHz);
 
-
+  rightExpander.producerMessage = &graphMessages[0];
+  rightExpander.consumerMessage = &graphMessages[1];
 }
 
 
@@ -100,15 +103,60 @@ void OutputInterface::onSampleRateChange(const SampleRateChangeEvent& e) {
     (*it)->engineOutputBuffer.clear();
   }
 
+  graphPollClockDivider.setDivision(static_cast<int>(e.sampleRate) / graphPollRateHz);
   midiPollClockDivider.setDivision(static_cast<int>(e.sampleRate) / midiPollRateHz);
   orchestrationClockDivider.setDivision(static_cast<int>(e.sampleRate));
 }
+
+
+// internal method for graph processing of source1/source2 (output nodes)
+static void resolveGraphSource(const Broker::Snapshot& snap, GraphSource& source) {
+  if (source.slotNum >= 0 && source.slotNum < maxVoiceCards) {
+    const Slot& physical = snap.slots[source.slotNum];
+    source.moduleId = physical.props.moduleId;
+    source.hardwareId = physical.props.hardwareId;
+    source.valid = physical.props.isAllocated && physical.props.moduleId;
+  }
+  else if (source.slotNum == maxVoiceCards) {
+    // External input
+    source.valid = true;
+    source.moduleId = -1;
+    source.hardwareId = invalidCardId;
+  }
+  else {
+    source.valid = false;
+    source.moduleId = -1;
+    source.hardwareId = invalidCardId;
+  }
+}
+
+// similar to previous- a helper for edges to the output
+static GraphSource makeOutputGraphSource(const Broker::Snapshot& snap,
+                                         int8_t slotNum,
+                                         GraphPort port,
+                                         float inputWeight) {
+    GraphSource source;
+
+    source.slotNum = slotNum;
+
+    const Slot& physical = snap.slots[slotNum];
+    source.moduleId = physical.props.moduleId;
+    source.hardwareId = physical.props.hardwareId;
+
+    source.port = port;
+    source.valid = source.moduleId != -1;
+    source.inputWeight = inputWeight;
+
+    return source;
+}
+
 
 
 void OutputInterface::process(const ProcessArgs& args) {
   dsp::Frame<maxAudioChannels> sharedFrames[ audioPorts.size() ];
   bool isMidiClockTick = midiPollClockDivider.process();
   bool isOrchestrationClockTick = orchestrationClockDivider.process();
+  bool isGraphPollClockTick = graphPollClockDivider.process();
 
   const Broker::Snapshot snap = broker.snapshot();
 
@@ -119,14 +167,14 @@ void OutputInterface::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
-//  if (0) {
-  if (APP->engine->getFrame() == 80000) {
+#ifdef DEBUG_DISCO_REPORT
+  if (APP->engine->getFrame() == 40000) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
     discoReport.bytes[1] = 0x7D;
     discoReport.bytes[2] = 0x01;
-    discoReport.bytes[3] = 0x02;
+    discoReport.bytes[3] = 0x00; // change to 0x02 for 3340 VCO
     discoReport.bytes[4] = 0x00;
     discoReport.bytes[5] = 0x00;
     discoReport.bytes[6] = 0x02;
@@ -138,17 +186,21 @@ void OutputInterface::process(const ProcessArgs& args) {
     discoReport.bytes[12] = 0x06;
     discoReport.bytes[13] = 0x00;
     discoReport.bytes[14] = 0x00;
-    discoReport.bytes[15] = 0x03;
+    discoReport.bytes[15] = 0x00;
     discoReport.bytes[16] = 0x00;
     discoReport.bytes[17] = 0x00;
-    discoReport.bytes[18] = 0x00;
+    discoReport.bytes[18] = 0x03;
     discoReport.bytes[19] = 0x00;
     discoReport.bytes[20] = 0x00;
-    discoReport.bytes[21] = 0x07;
+    discoReport.bytes[21] = 0x00;
     discoReport.bytes[22] = 0x00;
     discoReport.bytes[23] = 0x00;
+    discoReport.bytes[24] = 0x07;
+    discoReport.bytes[25] = 0x00;
+    discoReport.bytes[26] = 0x00;
     processDiscoveryReport(discoReport);
   }
+#endif
 
   if (discoveryReportReceived == false) {
     if (isOrchestrationClockTick) {
@@ -183,6 +235,10 @@ void OutputInterface::process(const ProcessArgs& args) {
                   sharedFrames[outputDeviceId].samples,
                   params.data(),
                   inputs.data());
+
+  // cache the VCA levels for the GraphSource inputToOut1 and inputToOut2
+  input1Weight = sharedFrames[outputDeviceId].samples[cvChannelOffset + OUT1_CHANNEL];
+  input2Weight = sharedFrames[outputDeviceId].samples[cvChannelOffset + OUT2_CHANNEL];
 
   sendFramesToDevices(sharedFrames, audioPorts.size());
 
@@ -227,17 +283,75 @@ void OutputInterface::process(const ProcessArgs& args) {
     out2LevelClipTimer -= lightTime;
     lights[OUT2_LEVEL_CLIP_LIGHT].setBrightnessSmooth(out2LevelClipTimer > 0.f, brightnessDeltaTime);
   }
+
+  if (isGraphPollClockTick &&
+      rightExpander.module && rightExpander.module->model == modelOutputInterfaceVisualizer) {
+    // Write to visualizer - the expander
+    ParticipantGraphMessage *message = static_cast<ParticipantGraphMessage*>(rightExpander.producerMessage);
+    message->participantInfoCount = 0;
+    message->output1SourceCount = 0;
+    message->output2SourceCount = 0;
+    message->outputInterfaceInfo.moduleId = getId();
+    message->outputInterfaceInfo.slotNum = slotNum;
+    message->outputInterfaceInfo.hardwareId = getHardwareId();
+
+    // call each module to get the module's view of ParticipantGraphInfo--
+    // this collects all edgges between voice cards (and the external input)
+    for (size_t i = 0; i < maxVoiceCards; ++i) {
+      const Slot &slot = snap.slots[i];
+      if (slot.participant != nullptr && slot.props.isAllocated) {
+        // Business section: call each module
+        ParticipantGraphInfo info = ParticipantGraphInfo{};
+        if (slot.participant->pullGraphInfo(info)) {
+          resolveGraphSource(snap, info.source1);
+          resolveGraphSource(snap, info.source2);
+
+          if (message->participantInfoCount < maxVoiceCards) {
+            message->participantInfos[message->participantInfoCount++] = info;
+          }
+          else {
+            WARN("participantInfos: maxVoiceCards reached");
+          }
+        }
+
+      }
+    }
+    // collect all edges to the outputs for the output module
+    for (int i = 0; i < maxVoiceCards; ++i) {
+      if (params[CARD_A_MIX1_OUTPUT_BUTTON_PARAM + i].getValue()) {
+        GraphSource inputToOut1 = makeOutputGraphSource(snap, i, GraphPort::OUT1, input1Weight);
+        if (message->output1SourceCount < maxVoiceCards) {
+          message->output1Sources[message->output1SourceCount++] = inputToOut1;
+        }
+        else {
+          WARN("output1Sources: maxVoiceCards reached");
+        }
+      }
+      if (params[CARD_A_MIX2_OUTPUT_BUTTON_PARAM + i].getValue()) {
+        GraphSource inputToOut2 = makeOutputGraphSource(snap, i, GraphPort::OUT2, input2Weight);
+        if (message->output2SourceCount < maxVoiceCards) {
+          message->output2Sources[message->output2SourceCount++] = inputToOut2;
+        }
+        else {
+          WARN("output2Sources: maxVoiceCards reached");
+        }
+
+      }
+    }
+    rightExpander.messageFlipRequested = true;
+  }
 }
-    
 
 
-  /** getCardHardwareId
-   * return the hardware Id of this card.
-   * This must match the numeric identifier the Pi has in the etc/zoxnoxiousd.cfg file.
-   * If it doesn't match ZoxnoxiousControlMsg will not have a channel assignment for this card.
-   */
+
+
+/** getCardHardwareId
+ * return the hardware Id of this card.
+ * This must match the numeric identifier the Pi has in the etc/zoxnoxiousd.cfg file.
+ * If it doesn't match ZoxnoxiousControlMsg will not have a channel assignment for this card.
+ */
 static const uint8_t hardwareId = 0x07;
-uint8_t OutputInterface::getHardwareId() { // TODO: should this be an interface?
+uint8_t OutputInterface::getHardwareId() {
   return hardwareId;
 }
 
@@ -378,29 +492,30 @@ void OutputInterface::processDiscoveryReport(const midi::Message &msg) {
 void OutputInterface::applyDiscoveryReport(DiscoveredCard *cards) {
   int assignedMidiChannel = 0;
   ParticipantProperty deviceTree[maxVoiceCards] = {};
-  size_t participant_count = 0;
 
   for (int i = 0; i < numReportsCards; ++i) {
-    if (!cards[i].valid) {
+    const DiscoveredCard& card = cards[i];
+
+    if (!card.valid) {
       continue; // ignore it
     }
 
-    if (cards[i].hardwareId == getHardwareId()) {
+    if (card.hardwareId == getHardwareId()) {
       // Backplane
-      cvChannelOffset = cards[i].cvChannelOffset;
-      outputDeviceId = cards[i].outputDeviceId;
+      cvChannelOffset = card.cvChannelOffset;
+      outputDeviceId = card.outputDeviceId;
       midiChannel = assignedMidiChannel++;
-      slotNum = cards[i].slotNum;
+      slotNum = card.slotNum;
     }
-    else if (i < maxVoiceCards) {
+    else if (card.slotNum >= 0 && card.slotNum < maxVoiceCards) {
       // Voice card
-      ParticipantProperty& slot = deviceTree[participant_count++];      
+      ParticipantProperty& slot = deviceTree[ card.slotNum ];
       slot.moduleId = -1;
-      slot.hardwareId = cards[i].hardwareId;
-      slot.cvChannelOffset = cards[i].cvChannelOffset;
-      slot.outputDeviceId = cards[i].outputDeviceId;
+      slot.hardwareId = card.hardwareId;
+      slot.cvChannelOffset = card.cvChannelOffset;
+      slot.outputDeviceId = card.outputDeviceId;
       slot.midiChannel = assignedMidiChannel++;
-      slot.slotNum = cards[i].slotNum;
+      slot.slotNum = card.slotNum;
       slot.isAllocated = false;
       INFO("registered hardware id %d midi channel %d", slot.hardwareId, slot.midiChannel);
     }
@@ -410,7 +525,7 @@ void OutputInterface::applyDiscoveryReport(DiscoveredCard *cards) {
 
   }
 
-  broker.registerDevices(deviceTree, participant_count);
+  broker.registerDevices(deviceTree, maxVoiceCards);
 }
 
 
@@ -507,6 +622,7 @@ void OutputInterface::serviceParticipantAttachments() {
 
 
 
+
 struct OutputInterfaceWidget : ModuleWidget {
   OutputInterfaceWidget(OutputInterface* module) :
     outputA1Text(nullptr), outputA2Text(nullptr),
@@ -573,9 +689,6 @@ struct OutputInterfaceWidget : ModuleWidget {
     addInput(createInputCentered<BNCPort>(mm2px(Vec(17.303, 108.604)), module, OutputInterface::OUT1_LEVEL_INPUT));
     addInput(createInputCentered<BNCPort>(mm2px(Vec(52.11, 108.604)), module, OutputInterface::OUT2_LEVEL_INPUT));
 
-
-    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 101.184)), module, OutputInterface::OUT1_LEVEL_CLIP_LIGHT));
-    //addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(19.361, 114.233)), module, OutputInterface::OUT2_LEVEL_CLIP_LIGHT));
 
     // mm2px(Vec(22.0, 3.636))
     cardAOutput1TextField = createWidget<CardTextDisplay>(mm2px(Vec(8.645, 37.603)));
@@ -671,6 +784,7 @@ struct OutputInterfaceWidget : ModuleWidget {
       return;
     }
 
+
     menu->addChild(new MenuSeparator);
     menu->addChild(createIndexPtrSubmenuItem("Auto Detect HW",
       {"No", "Yes"}, &module->hardwareDiscoveryConfig.autoDetect));
@@ -681,6 +795,13 @@ struct OutputInterfaceWidget : ModuleWidget {
 
     menu->addChild(new MenuSeparator);
 
+    InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add visualizer (right side)", "");
+    expanderItem->module = module;
+    expanderItem->model = modelOutputInterfaceVisualizer;
+    expanderItem->posit = box.pos;
+    expanderItem->posit.x += box.size.x;
+    menu->addChild(expanderItem);
+
     menu->addChild(createSubmenuItem("MIDI Out Device", "",
                                      [=](Menu* menu) {
                                        appendMidiMenu(menu, &module->midiOutput);
@@ -689,11 +810,18 @@ struct OutputInterfaceWidget : ModuleWidget {
                                      [=](Menu* menu) {
                                        appendMidiMenu(menu, &module->midiInput);
                                      }));
-    menu->addChild(createSubmenuItem("Audio Device 0", "",
+
+    if (module->audioPorts.size() == 1) {
+      menu->addChild(createSubmenuItem("Audio Device", "",
                                      [=](Menu* menu) {
                                        appendAudioMenu(menu, module->audioPorts[0]);
                                      }));
-    if (module->audioPorts.size() > 0) {
+    }
+    else {
+      menu->addChild(createSubmenuItem("Audio Device 0", "",
+                                       [=](Menu* menu) {
+                                         appendAudioMenu(menu, module->audioPorts[0]);
+                                       }));
       menu->addChild(createSubmenuItem("Audio Device 1", "",
                                        [=](Menu* menu) {
                                          appendAudioMenu(menu, module->audioPorts[1]);

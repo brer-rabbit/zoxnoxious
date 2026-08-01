@@ -10,18 +10,26 @@
 namespace zox {
 
 
-constexpr int hnsMaxModules = 7;
-constexpr int hnsOutputsPerModule = 2;
+constexpr int kOutputsPerModule = 2;
+
+// the final inputs on the bus (maxVoiceCards*2+1) is a single input
+// hardwired to the external input.  So the number of signals on the
+// bus is 2*maxVoiceCards + 1.  Zero-indexed the max is
+// maxVoiceCards*kOutputsPerModule
+constexpr int externalInputIndex = maxVoiceCards * kOutputsPerModule;
 
 // HardwareNameService is string storage for orchestration layer
 class HardwareNameService {
 public:
-  std::array<std::string, hnsMaxModules * hnsOutputsPerModule> names;
-  std::array<std::string, hnsMaxModules * hnsOutputsPerModule> shortNames;
+  std::array<std::string, maxVoiceCards * kOutputsPerModule + 1> names;
+  std::array<std::string, maxVoiceCards * kOutputsPerModule + 1> shortNames;
 
   HardwareNameService() {
+    std::string external = "External";
     names.fill(invalidCardOutputName);
     shortNames.fill(invalidCardOutputName);
+    names[externalInputIndex] = external;
+    shortNames[externalInputIndex] = external;
   }
 
   const std::string* getNamePtr(int index) {
@@ -46,13 +54,13 @@ public:
 struct Participant;
 
 struct ParticipantProperty {
-  int64_t moduleId;
-  uint8_t hardwareId;
+  int64_t moduleId = -1;
+  uint8_t hardwareId = invalidCardId;
   int8_t cvChannelOffset;
   int8_t outputDeviceId;
   int8_t midiChannel;
-  int8_t slotNum;
-  bool isAllocated;
+  int8_t slotNum = invalidSlot;
+  bool isAllocated = false;
 };
 
 struct Slot {
@@ -97,6 +105,7 @@ struct Broker {
   // Violating this invariant results in bad things.
   // -----------------------------------------------------------------------------
 
+  // this should be able to be indexed by physical slot number
   struct Snapshot {
     Slot slots[maxVoiceCards];
   } storageA, storageB;
@@ -121,6 +130,42 @@ private:
 };
 
 
+//
+// Graph objects are purely for display of module connections
+//
+
+// graphing / output topology declarations
+// OUT1 / OUT2: source is a voice card slot.
+// EXTERNAL: source is outside the rendered graph; slotNum/moduleId are invalid.
+enum class GraphPort : uint8_t { OUT1, OUT2, EXTERNAL };
+
+struct GraphSource {
+  int64_t moduleId = -1;
+  bool valid = false;
+  uint8_t hardwareId = 0;
+  int8_t slotNum = invalidSlot;
+  GraphPort port = GraphPort::OUT1;
+  // inputWeight set by input VCA level or similar
+  float inputWeight = 0.5f;
+};
+
+struct ParticipantGraphInfo {
+  int64_t moduleId = -1;
+  int8_t slotNum = invalidSlot;
+  uint8_t hardwareId = 0;
+  // outputWeight could be set by output VCA levels or
+  // something that makes sense for the module
+  float output1Weight = 0.5f;
+  float output2Weight = 0.5f;
+
+  GraphSource source1;
+  GraphSource source2;
+};
+
+GraphPort graphPortFromBusSignalSource(int signalSource);
+
+// end graph objects
+
 
 struct Participant {
   virtual ~Participant() = default;
@@ -143,6 +188,10 @@ struct Participant {
   // Called at 100-200 Hz (TBD).  Actual frequency can be inferred from clockDivision.
   // This is also a good place to do any module state changes for UI elements such as lights.
   virtual bool pullMidi(const rack::engine::Module::ProcessArgs& args, uint32_t clockDivision, int midiChannel, rack::midi::Message &midiMessage) = 0;
+
+  // method to pull connection info: specify what modules this is connected _from_
+  // at the very least this needs to set slotNum, moduleId, and hardwareId
+  virtual bool pullGraphInfo(ParticipantGraphInfo& info) = 0;
 
 };
 

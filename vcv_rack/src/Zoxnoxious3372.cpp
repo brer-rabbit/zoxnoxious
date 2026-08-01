@@ -126,6 +126,12 @@ struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
 
   std::array<CvRoute,8> routes;
 
+  // pullGraphInfo weights
+  float input1Weight = 0.f;
+  float input2Weight = 0.f;
+  float output1Weight = 0.f;
+  float output2Weight = 0.f;
+
   Zoxnoxious3372() :
     source1NameString(invalidCardOutputName), source2NameString(invalidCardOutputName),
     output1NameString(invalidCardOutputName), output2NameString(invalidCardOutputName),
@@ -191,6 +197,14 @@ struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
                     params.data(),
                     inputs.data());
 
+    // cache for reporting weights.
+    input1Weight = std::max(sharedFrame.samples[offset + SOURCE_ONE_LEVEL],
+                            sharedFrame.samples[offset + MOD_AMOUNT]);
+    input2Weight = sharedFrame.samples[offset + SOURCE_TWO_LEVEL];
+    output1Weight = sharedFrame.samples[offset + FILTER_VCA] *
+      (1.f - sharedFrame.samples[offset + OUTPUT_PAN]);
+    output2Weight = sharedFrame.samples[offset + FILTER_VCA] *
+      sharedFrame.samples[offset + OUTPUT_PAN];
   }
 
   bool pullMidi(const rack::engine::Module::ProcessArgs &args, uint32_t clockDivision, int midiChannel, midi::Message &midiMessage) override {
@@ -298,7 +312,32 @@ struct Zoxnoxious3372 final : ParticipantAdapter, Participant {
     params[SOURCE_TWO_UP_BUTTON_PARAM].setValue(1.f);
   }
 
+
+  bool pullGraphInfo(ParticipantGraphInfo& info) override {
+    info.moduleId = getId();
+    info.hardwareId = hardwareId;
+    info.slotNum = lifecycle.slotNum;
+    info.output1Weight = output1Weight;
+    info.output2Weight = output2Weight;
+
+    int sourceOneIndex = static_cast<int>(params[SOURCE_ONE_VALUE_HIDDEN_PARAM].getValue());
+    int sourceOneSource = source1Sources[sourceOneIndex];
+
+    int sourceTwoIndex = static_cast<int>(params[SOURCE_TWO_VALUE_HIDDEN_PARAM].getValue());
+    int sourceTwoSource = source2Sources[sourceTwoIndex];
+
+    info.source1.valid = true;
+    info.source1.slotNum = sourceOneSource / 2;
+    info.source1.port = graphPortFromBusSignalSource(sourceOneSource);
+    info.source1.inputWeight = input1Weight;
+    info.source2.valid = true;
+    info.source2.slotNum = sourceTwoSource / 2;
+    info.source2.port = graphPortFromBusSignalSource(sourceTwoSource);
+    info.source2.inputWeight = input2Weight;
+    return true;
+  }
 };
+
 
 
 struct Zoxnoxious3372Widget : ModuleWidget {

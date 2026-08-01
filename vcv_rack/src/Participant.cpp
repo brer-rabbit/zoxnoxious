@@ -20,7 +20,7 @@ bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
     std::memcpy(&storageA.slots[i].props, &devices[i], sizeof(ParticipantProperty));
     std::memcpy(&storageB.slots[i].props, &devices[i], sizeof(ParticipantProperty));
     // output table need to be indexed by slot number
-    if (devices[i].slotNum >= 0 && devices[i].slotNum < hnsMaxModules) {
+    if (devices[i].slotNum >= 0 && devices[i].slotNum < maxVoiceCards) {
       nameService->setName(devices[i].slotNum * 2, getCardOutputName(devices[i].hardwareId, 1, devices[i].slotNum));
       nameService->setShortName(devices[i].slotNum * 2, getCardName(devices[i].hardwareId, 1));
       nameService->setName(devices[i].slotNum * 2 + 1, getCardOutputName(devices[i].hardwareId, 2, devices[i].slotNum));
@@ -37,7 +37,9 @@ bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
   // flag anything not specified as invalid
   for (; i < maxVoiceCards; ++i) {
     storageA.slots[i].props.hardwareId = invalidCardId;
+    storageA.slots[i].props.moduleId = -1;
     storageB.slots[i].props.hardwareId = invalidCardId;
+    storageB.slots[i].props.moduleId = -1;
   }
 
   // set published non-null: allow the participant registrations to proceed
@@ -45,7 +47,6 @@ bool Broker::registerDevices(ParticipantProperty *devices, size_t count) {
 
   return true;
 }
-
 
 // register the participant Id.  Double buffer the storage, so UI and audio threads
 // can co-mingle.  Mutation is only to happen on UI thread.  Audio thread gets a
@@ -99,6 +100,7 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
   for (size_t i = 0; i < maxVoiceCards; ++i) {
     if (next.slots[i].props.moduleId == moduleId) {
       next.slots[i].props.isAllocated = false;
+      next.slots[i].props.moduleId = -1;
       removed = true;
       break;
     }
@@ -109,7 +111,7 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
 }
 
 
-// find a slot that is available for this hardwareId.  If none found return an invalid slot number.
+// find a slot that is available for this hardwareId.  If none found return an invalid slot number.  Index should match physical voice card ordering.
 int8_t Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
   uint8_t hardwareId = p->getHardwareId();
 
@@ -137,9 +139,22 @@ const Broker::Snapshot& Broker::snapshot() const {
 
 
 
+GraphPort graphPortFromBusSignalSource(int signalSource) {
+  if (signalSource == maxVoiceCards * 2) {
+    return GraphPort::EXTERNAL;
+  }
+  else if (signalSource >= 0 && signalSource < maxVoiceCards * 2) {
+    return signalSource % 2 ? GraphPort::OUT2 : GraphPort::OUT1;
+  }
+  // consider assert
+  return GraphPort::OUT1;
+}
+
+
 const std::shared_ptr<HardwareNameService> Broker::getHardwareNameService() const {
   return nameService;
 }
+
 
 
 bool ParticipantLifecycle::wantAttach() const {

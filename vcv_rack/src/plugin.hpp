@@ -17,6 +17,7 @@ using namespace rack;
  */
 std::string getCardOutputName(uint8_t cardId, int outputNumber, int slot);
 std::string getCardName(uint8_t cardId, int outputNumber);
+const char* getCardNameByHardwareId(uint8_t cardId);
 
 
 // Declare the Plugin, defined in plugin.cpp
@@ -32,3 +33,4 @@ extern Model* modelZoxnoxious3372;
 extern Model* modelZoxnoxious5524;
 extern Model* modelZoxnoxious5524Visual;
 extern Model* modelOutputInterface;
+extern Model* modelOutputInterfaceVisualizer;

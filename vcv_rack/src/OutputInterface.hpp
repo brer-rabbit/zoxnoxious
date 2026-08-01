@@ -10,7 +10,23 @@
 
 namespace zox {
 
+// primary stuff:
+
 struct DiscoveredCard;
+
+// message that gets passed to expander interface to visualizer
+struct ParticipantGraphMessage {
+  ParticipantGraphInfo participantInfos[maxVoiceCards];
+  size_t participantInfoCount = 0;
+
+  ParticipantGraphInfo outputInterfaceInfo;
+
+  GraphSource output1Sources[maxVoiceCards];
+  size_t output1SourceCount = 0;
+
+  GraphSource output2Sources[maxVoiceCards];
+  size_t output2SourceCount = 0;
+};
 
 struct OutputInterface final : rack::engine::Module {
   enum ParamId {
@@ -120,6 +136,7 @@ private:
   bool discoveryReportReceived = false;
   dsp::ClockDivider orchestrationClockDivider;
   dsp::ClockDivider midiPollClockDivider;
+  dsp::ClockDivider graphPollClockDivider;
 
   void processMidiInMessage(const midi::Message &msg);
   void processDiscoveryReport(const midi::Message &msg);
@@ -130,6 +147,14 @@ private:
   void serviceParticipantAttachments();
 
   std::array<CvRoute,2> routes;
+
+  // graph sources: these will be passed via expander
+  ParticipantGraphMessage graphMessages[2];
+
+  void dumpParticipantGraphs() const;
+
+  float input1Weight = 0.f;
+  float input2Weight = 0.f;
 
   static const std::string audioPortNum;
 };
