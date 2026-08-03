@@ -8,7 +8,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Iinclude
 
 # Library directories
-LIB_DIRS = lib/src/zdk lib/src/poledancer lib/src/z3372 lib/src/z3340 lib/src/audio_out lib/src/z5524
+LIB_DIRS = lib/src/zdk lib/src/poledancer lib/src/z3372 lib/src/z3340 lib/src/audio_io lib/src/z5524
 
 # Library target prefix and suffix
 LIB_TARGET_PREFIX = lib/
