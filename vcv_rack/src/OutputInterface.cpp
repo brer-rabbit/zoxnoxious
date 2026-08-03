@@ -164,8 +164,8 @@ void OutputInterface::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
-//  if (APP->engine->getFrame() == 40000) {
-  if (0) {
+#ifdef DEBUG_DISCO_REPORT
+  if (APP->engine->getFrame() == 40000) {
     midi::Message discoReport;
     discoReport.setSize(28);
     discoReport.bytes[0] = 0xF0;
@@ -197,6 +197,7 @@ void OutputInterface::process(const ProcessArgs& args) {
     discoReport.bytes[26] = 0x00;
     processDiscoveryReport(discoReport);
   }
+#endif
 
   if (discoveryReportReceived == false) {
     if (isOrchestrationClockTick) {
@@ -779,11 +780,18 @@ struct OutputInterfaceWidget : ModuleWidget {
                                      [=](Menu* menu) {
                                        appendMidiMenu(menu, &module->midiInput);
                                      }));
-    menu->addChild(createSubmenuItem("Audio Device 0", "",
+
+    if (module->audioPorts.size() == 1) {
+      menu->addChild(createSubmenuItem("Audio Device", "",
                                      [=](Menu* menu) {
                                        appendAudioMenu(menu, module->audioPorts[0]);
                                      }));
-    if (module->audioPorts.size() > 0) {
+    }
+    else {
+      menu->addChild(createSubmenuItem("Audio Device 0", "",
+                                       [=](Menu* menu) {
+                                         appendAudioMenu(menu, module->audioPorts[0]);
+                                       }));
       menu->addChild(createSubmenuItem("Audio Device 1", "",
                                        [=](Menu* menu) {
                                          appendAudioMenu(menu, module->audioPorts[1]);

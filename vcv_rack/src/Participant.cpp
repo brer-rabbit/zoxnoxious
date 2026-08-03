@@ -111,7 +111,7 @@ bool Broker::unregisterParticipant(int64_t moduleId) {
 }
 
 
-// find a slot that is available for this hardwareId.  If none found return an invalid slot number.  Do not depend on the index s.slots[i] to be physical slot number i.
+// find a slot that is available for this hardwareId.  If none found return an invalid slot number.  Index should match physical voice card ordering.
 int8_t Broker::findSlot(Snapshot& s, int64_t moduleId, Participant* p) {
   uint8_t hardwareId = p->getHardwareId();
 

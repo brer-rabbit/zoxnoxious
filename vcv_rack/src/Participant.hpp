@@ -12,10 +12,10 @@ namespace zox {
 
 constexpr int kOutputsPerModule = 2;
 
-// the "seventh card" on the bus (maxVoiceCards+1) has only it's first
-// input which is hardwired to the external input.  So the number of signals
-// on the bus is 2*maxVoiceCards + 1.
-// Zero-indexed the max is maxVoiceCards*kOutputsPerModule
+// the final inputs on the bus (maxVoiceCards*2+1) is a single input
+// hardwired to the external input.  So the number of signals on the
+// bus is 2*maxVoiceCards + 1.  Zero-indexed the max is
+// maxVoiceCards*kOutputsPerModule
 constexpr int externalInputIndex = maxVoiceCards * kOutputsPerModule;
 
 // HardwareNameService is string storage for orchestration layer
