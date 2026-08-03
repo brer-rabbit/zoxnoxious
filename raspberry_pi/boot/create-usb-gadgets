@@ -9,7 +9,9 @@
 #AUDIO_CHANNEL_MASK=255
 #AUDIO_CHANNEL_MASK=65535
 #AUDIO_CHANNEL_MASK=16777215
-AUDIO_CHANNEL_MASK=0x07ffffff
+#AUDIO_CHANNEL_MASK=0x07ffffff
+AUDIO_CHANNEL_MASK=0
+AUDIO_CHANNELS=72
 
 AUDIO_SAMPLE_RATES=8000
 AUDIO_SAMPLE_SIZE=2
@@ -39,13 +41,20 @@ mkdir -p configs/c.1/strings/0x409
  
 # UAC2 (audio) gadget
 # attributes from: https://www.kernel.org/doc/Documentation/ABI/testing/configfs-usb-gadget-uac2
-for i in 0 1
+#for i in 0 1
+for i in 0
 do
     mkdir -p functions/uac2.usb${i}
     echo $AUDIO_CHANNEL_MASK > functions/uac2.usb${i}/c_chmask
+    echo $AUDIO_CHANNELS > functions/uac2.usb${i}/c_channels
+    echo 0 > functions/uac2.usb${i}/c_mute_present
+    echo 0 > functions/uac2.usb${i}/c_volume_present
     echo $AUDIO_SAMPLE_RATES > functions/uac2.usb${i}/c_srate
     echo $AUDIO_SAMPLE_SIZE > functions/uac2.usb${i}/c_ssize
     echo $AUDIO_CHANNEL_MASK > functions/uac2.usb${i}/p_chmask
+    echo $AUDIO_CHANNELS > functions/uac2.usb${i}/p_channels
+    echo 0 > functions/uac2.usb${i}/p_mute_present
+    echo 0 > functions/uac2.usb${i}/p_volume_present
     echo $AUDIO_SAMPLE_RATES > functions/uac2.usb${i}/p_srate
     echo $AUDIO_SAMPLE_SIZE > functions/uac2.usb${i}/p_ssize
     ln -s functions/uac2.usb${i} configs/c.1/
