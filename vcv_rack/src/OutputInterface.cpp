@@ -779,8 +779,7 @@ struct OutputInterfaceWidget : ModuleWidget {
                              module->hardwareDiscovery.discover(
                                module->midiInput,
                                module->midiOutput,
-                               *module->audioPorts[0],
-                               module->hardwareDiscoveryConfig);
+                               *module->audioPorts[0]);
                            }));
 
           menu->addChild(new MenuSeparator);

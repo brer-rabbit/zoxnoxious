@@ -5,20 +5,6 @@
 
 namespace zox {
 
-struct HardwareDiscoveryConfig {
-  // JSON Save/Restore fields
-  bool autoDetect = true;
-  float sampleRate = 8000.f;
-  int blockSize = 32;
-
-  // Runtime/default behavior
-  bool bindMidi = true;
-  bool bindAudio = true;
-};
-
-
-
-
 enum class HardwareDiscoveryStatus {
   Success,
   MidiInputMissing,
@@ -30,8 +16,7 @@ class HardwareDiscovery {
 public:
   HardwareDiscoveryStatus discover(midi::InputQueue& midiIn,
                                    ZoxnoxiousMidiOutput& midiOut,
-                                   ZoxnoxiousAudioPort& audioPort,
-                                   const HardwareDiscoveryConfig& config);
+                                   ZoxnoxiousAudioPort& audioPort);
 
 
 private:

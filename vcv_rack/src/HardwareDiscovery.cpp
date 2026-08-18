@@ -1,47 +1,73 @@
 #include "HardwareDiscovery.hpp"
+#include "constants.hpp"
 
 namespace zox {
 
 HardwareDiscoveryStatus HardwareDiscovery::discover(midi::InputQueue& midiInput,
                                                     ZoxnoxiousMidiOutput& midiOutput,
-                                                    ZoxnoxiousAudioPort& audioPort,
-                                                    const HardwareDiscoveryConfig& config) {
+                                                    ZoxnoxiousAudioPort& audioPort) {
   HardwareDiscoveryStatus result = HardwareDiscoveryStatus::Success;
 
-  if (!discoverMidiInput(midiInput)) {
-    result = HardwareDiscoveryStatus::MidiInputMissing;
+  bool midiInputFound = discoverMidiInput(midiInput);
+  bool midiOutputFound = discoverMidiOutput(midiOutput);
+  bool audioFound = discoverAudio(audioPort);
+
+  if (!midiInputFound) {
+    return HardwareDiscoveryStatus::MidiInputMissing;
   }
-  else if (!discoverMidiOutput(midiOutput)) {
-    result = HardwareDiscoveryStatus::MidiOutputMissing;
+  if (!midiOutputFound) {
+    return HardwareDiscoveryStatus::MidiOutputMissing;
   }
-  else if (!discoverAudio(audioPort)) {
-    result = HardwareDiscoveryStatus::AudioMissing;
+  if (!audioFound) {
+    return HardwareDiscoveryStatus::AudioMissing;
   }
 
   return result;
 }
 
 
-static bool isZoxnoxiousMidiDevice(const std::string deviceName) {
-// TODO: #ifdef platform string specifics
+static bool isZoxnoxiousMidiDevice(const std::string& deviceName) {
+  // Linux:
+  // MIDI input: driver=2 device=1 name=Zoxnoxious MIDI and Audio:Zoxnoxious MIDI and Audio MIDI  24:0
+  // MIDI output: driver=2 device=1 name=Zoxnoxious MIDI and Audio:Zoxnoxious MIDI and Audio MIDI  24:0
+  //
+  // macOS:
+  // MIDI input: driver=1 device=0 name=Zoxnoxious MIDI and Audio
+  // MIDI output: driver=1 device=0 name=Zoxnoxious MIDI and Audio
   const std::string zoxMidiMatch = "Zoxnoxious";
 
-  if (deviceName.find(zoxMidiMatch)) {
-    return true;
-  }
-  return false;
+  return deviceName.find(zoxMidiMatch) != std::string::npos;
 }
 
-static bool isZoxnoxiousAudioDevice(const std::string driverName,
-                                    const std::string deviceName,
+static bool isZoxnoxiousAudioDevice(const std::string& driverName,
+                                    const std::string& deviceName,
                                     int inputs, int outputs) {
-// TODO: #ifdef platform string specifics
-  const std::string zoxMidiMatch = "Zoxnoxious";
+  // Linux:
+  // Audio: driver=1 (ALSA) device=137 name=Zoxnoxious MIDI and Audio (USB Audio) inputs=96 outputs=96
+  //
+  // macOS:
+  // note macOS appears to split the devices as an input device and an output device:
+  // Audio: driver=5 (Core Audio) device=129 name=Playback Inactive inputs=0 outputs=96
+  // Audio: driver=5 (Core Audio) device=130 name=Capture Inactive inputs=96 outputs=0
+  // we want the "Playback Inactive" device that has output channels.
 
-  if (deviceName.find(zoxMidiMatch)) {
-    return true;
-  }
+#ifdef ARCH_MAC
+  const std::string zoxAudioMatch = "Playback Inactive";
+  const std::string driver = "CoreAudio";
+
+  return driverName == driver &&
+    deviceName.find(zoxAudioMatch) != std::string::npos &&
+    inputs == 0 && outputs >= maxAudioChannels;
+#elif defined(ARCH_LIN)
+  const std::string zoxAudioMatch = "Zoxnoxious";
+  const std::string driver = "ALSA";
+
+  return driverName == driver &&
+    deviceName.find(zoxAudioMatch) != std::string::npos;
+#else
   return false;
+#endif
+
 }
 
 

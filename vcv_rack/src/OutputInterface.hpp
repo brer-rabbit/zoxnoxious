@@ -114,9 +114,7 @@ struct OutputInterface final : rack::engine::Module {
 
   bool isPrimary() const;
 
-  HardwareDiscoveryConfig hardwareDiscoveryConfig;
   HardwareDiscovery hardwareDiscovery;
-  ZoxnoxiousAudioPort *discoveredAudioPort;
 
 private:
   Broker broker;
