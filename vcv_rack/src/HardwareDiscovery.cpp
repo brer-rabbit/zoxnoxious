@@ -81,10 +81,7 @@ bool HardwareDiscovery::discoverMidiInput(midi::InputQueue& midiIn) {
 
     for (int deviceId : driver->getInputDeviceIds()) {
       std::string name = driver->getInputDeviceName(deviceId);
-
-      DEBUG("MIDI input: driver=%d device=%d name=%s",
-            driverId, deviceId, name.c_str());
-
+      //DEBUG("MIDI input: driver=%d device=%d name=%s", driverId, deviceId, name.c_str());
       if (!isZoxnoxiousMidiDevice(name)) {
         continue;
       }
@@ -108,10 +105,7 @@ bool HardwareDiscovery::discoverMidiOutput(ZoxnoxiousMidiOutput& midiOut) {
 
     for (int deviceId : driver->getOutputDeviceIds()) {
       std::string name = driver->getOutputDeviceName(deviceId);
-
-      DEBUG("MIDI output: driver=%d device=%d name=%s",
-            driverId, deviceId, name.c_str());
-
+      //DEBUG("MIDI output: driver=%d device=%d name=%s", driverId, deviceId, name.c_str());
       if (!isZoxnoxiousMidiDevice(name)) {
         continue;
       }
@@ -129,6 +123,7 @@ bool HardwareDiscovery::discoverMidiOutput(ZoxnoxiousMidiOutput& midiOut) {
 bool HardwareDiscovery::discoverAudio(ZoxnoxiousAudioPort& audioPort) {
   for (int driverId : audio::getDriverIds()) {
     audio::Driver* driver = audio::getDriver(driverId);
+
     if (!driver) {
       continue;
     }
