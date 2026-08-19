@@ -177,6 +177,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   int16_t this_sample;
   int i;
   char samples_to_dac[2];
+  int spi_writes = 0;
 
   // dac output samples
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_as3394, SPI_MODE, zcard->slot);
@@ -186,6 +187,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (zcard->previous_samples[spi_channel_as3394][i] != this_sample) {
       zcard->previous_samples[spi_channel_as3394][i] = this_sample;
       dac_write(this_sample, channel_map[i], spi_channel);
+      spi_writes++;
     }
   }
 
@@ -205,6 +207,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         spiWrite(spi_channel, samples_to_dac, 2);
       }
 
+      spi_writes++;
       zcard->previous_samples[spi_channel_as3394][i] = this_sample; // use provided value, not mapped value
     }
   }
@@ -228,6 +231,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         }
 
         zcard->previous_samples[spi_channel_ssi2130][i] = this_sample; // use provided value, not mapped value
+        spi_writes++;
       }
     }
     else {
@@ -235,11 +239,12 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       if (zcard->previous_samples[spi_channel_ssi2130][i] != this_sample) {
         zcard->previous_samples[spi_channel_ssi2130][i] = this_sample;
         dac_write(this_sample, channel_map[i], spi_channel);
+        spi_writes++;
       }
     }
   }
 
-  return 0;
+  return spi_writes;
 }
 
 

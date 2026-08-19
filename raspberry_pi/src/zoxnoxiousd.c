@@ -475,10 +475,11 @@ static void* read_pcm_and_call_plugins(void *arg) {
   uint64_t expirations = 0;
   int frames_to_advance;
 
-  // do a couple dumb things:
-  // compute timer dynamically... but this is really designed
-  // for 4khz.  Even worse, assume that pcm[0] and [1] have
-  // the same sampling rate.
+  // do a couple things:
+  // compute timer dynamically... but this was initially designed
+  // for 4khz.  And two PCM streams.  Now it's 8khz and a single PCM stream.
+  // Maintaining the code for two PCM streams for the time being.
+  // Which assumes both streams are on the same clock.
   struct itimerspec itimerspec_sample_clock = {
     .it_interval.tv_sec = 0,
     .it_interval.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
@@ -487,7 +488,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
   };
   struct itimerspec itimerspec_remaining_time;
   struct timespec accumulated_idle_time = { 0 };
-  int valid_gettime;
+  int valid_gettime = 0;
 
 
   if ( (timerfd_sample_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
@@ -532,9 +533,11 @@ static void* read_pcm_and_call_plugins(void *arg) {
   }
 
 
+  // Business Section
   while (alsa_thread_run) {
+    int spi_writes = 0;
+    uint32_t card_processing_start_us = gpioTick();
 
-    // Business Section
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
       // alias for the deeply nested structure to the plugin card / readability
       struct plugin_card *plugin_card = card_mgr->card_update_order[card_num];
@@ -545,23 +548,18 @@ static void* read_pcm_and_call_plugins(void *arg) {
                                                   pcm_state[0]->samples[channel_offset] : pcm_state[1]->samples[channel_offset] );
 
       // then call the card's plugin with the samples via function pointer
-      if ( (plugin_card->process_samples)(plugin_card->plugin_object, samples) != 0) {
-        INFO("card error");
-      }
-    }
-
-
-    if (system_tune_requested) {
-      system_tune_in_progress = 1;
-      INFO("MIDI tune starting");
-      autotune_all_cards(card_mgr);
-      system_tune_in_progress = 0;
-      system_tune_requested = 0;
+      // track the total number of spi writes done by the voice cards
+      spi_writes += (plugin_card->process_samples)(plugin_card->plugin_object, samples);
     }
 
     // check on remaining time-- though we don't know if it's remaining time until we check the expirations
-    valid_gettime = timerfd_gettime(timerfd_sample_clock, &itimerspec_remaining_time);
+    uint32_t wait_start_us = gpioTick();
+
     read(timerfd_sample_clock, &expirations, sizeof(expirations));
+
+    uint32_t next_cycle_start_us = gpioTick();
+
+
 
     if (expirations == 1) {
       missed_expirations[EXPIRATIONS_ONTIME]++;
@@ -582,7 +580,17 @@ static void* read_pcm_and_call_plugins(void *arg) {
       missed_expirations[NUM_MISSED_EXPIRATIONS_STATS - 1]++;
     }
 
-    // downcast
+    // check for a tune request.  Tuning is offline: system will not
+    // be responsive during the autotune.
+    if (system_tune_requested) {
+      system_tune_in_progress = 1;
+      autotune_all_cards(card_mgr);
+      system_tune_in_progress = 0;
+      system_tune_requested = 0;
+      // after tune: set expirations to a high number, reset stream
+      expirations = 256;
+    }
+
     frames_to_advance = expirations > INT_MAX ? INT_MAX : expirations;
 
     // get new set of frames or advance sample pointers

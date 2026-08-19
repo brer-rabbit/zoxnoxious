@@ -146,12 +146,13 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct z3372_card *zcard = (struct z3372_card*)zcard_plugin;
   char samples_to_dac[2];
   int spi_channel;
+  int spi_writes = 0;
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
 
   for (int i = 0; i < NUM_CHANNELS; ++i) {
     if (zcard->previous_samples[i] != samples[i] ) {
-
+      spi_writes++;
       // DAC write:
       // bits 15-0:
       // 0 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0
@@ -179,7 +180,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     }
   }
 
-  return 0;
+  return spi_writes;
 }
 
 
