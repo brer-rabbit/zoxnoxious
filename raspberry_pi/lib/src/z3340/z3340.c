@@ -227,15 +227,14 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       // Given a 16-bit signed input, write it to a 12-bit signed values.
       // Any negative value clips to zero.
 
+      zcard->previous_samples[dac_channel] = samples[dac_channel];
       if (samples[dac_channel] >= 0) {
         samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) samples[dac_channel]) >> 11;
         samples_to_dac[1] = ((uint16_t) samples[dac_channel]) >> 3;
-        zcard->previous_samples[dac_channel] = samples[dac_channel];
       }
       else {
         samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
         samples_to_dac[1] = 0;
-        zcard->previous_samples[dac_channel] = 0;
       }
 
       spi_writes++;

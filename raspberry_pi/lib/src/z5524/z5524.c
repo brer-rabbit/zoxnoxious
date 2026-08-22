@@ -220,6 +220,8 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (i == 2) { // VCO: use correction table
       this_sample = samples[i + spi_channel_ssi2130 * DAC_CHANNELS] >> 3;
       if (zcard->previous_samples[spi_channel_ssi2130][i] != this_sample) {
+        zcard->previous_samples[spi_channel_ssi2130][i] = this_sample; // use provided value, not mapped value
+        spi_writes++;
         if (this_sample >= 0) {
           int16_t correct_freq_value = zcard->tunables[TUNE_SSI2130_VCO].dac_calibration_table[ this_sample ];
           spiWrite(spi_channel, (char*) &correct_freq_value, 2);
@@ -229,9 +231,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
           samples_to_dac[1] = 0;
           spiWrite(spi_channel, samples_to_dac, 2);
         }
-
-        zcard->previous_samples[spi_channel_ssi2130][i] = this_sample; // use provided value, not mapped value
-        spi_writes++;
       }
     }
     else {
