@@ -55,6 +55,22 @@
 #define EXPIRATIONS_MISSED_GTE_TEN 3
 #define DISCOVERY_REPORT_SIZE_BYTES 28
 
+// stats for timer read return period distribution
+#define PERIOD_HIST_ERROR_US 20
+#define PERIOD_HIST_BINS (PERIOD_HIST_ERROR_US * 2 + 1)
+struct period_timing_stats {
+  uint64_t count;
+  uint64_t sum_us;
+
+  uint32_t min_us;
+  uint32_t max_us;
+
+  uint64_t below_range;
+  uint64_t histogram[PERIOD_HIST_BINS];
+  uint64_t above_range;
+};
+
+
 #define MAX_SPI_WRITE_STATS 96
 struct timing_stats {
   _Atomic uint32_t count;
@@ -103,7 +119,9 @@ static int get_midi_input_fd();
 static int start_pcm(struct alsa_pcm_state *pcm, int *err_var, const char *name);
 static void add_timing_stat(struct timing_stats *stats, uint32_t new_timing);
 static void dump_stats();
-
+static void add_period_timing_stat(struct period_timing_stats *stats,
+                                   uint32_t period_us, uint32_t nominal_period_us);
+static void report_period_timing_stats(const struct period_timing_stats *stats, uint32_t nominal_period_us);
 
 
 int main(int argc, char **argv, char **envp) {
@@ -462,7 +480,6 @@ static void* read_pcm_and_call_plugins(void *arg) {
   int timerfd_sample_clock;
   uint64_t expirations = 0;
   int frames_to_advance;
-
   // do a couple things:
   // compute timer dynamically... but this was initially designed
   // for 4khz.  And two PCM streams.  Now it's 8khz and a single PCM stream.
@@ -473,6 +490,14 @@ static void* read_pcm_and_call_plugins(void *arg) {
     .it_interval.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
     .it_value.tv_sec = 0,
     .it_value.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
+  };
+  const uint32_t nominal_period_us = itimerspec_sample_clock.it_interval.tv_nsec / 1000;
+
+  struct period_timing_stats period_stats = {
+    .count = 0,
+    .sum_us = 0,
+    .min_us = UINT32_MAX,
+    .max_us = 0,
   };
 
   if ( (timerfd_sample_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
@@ -516,10 +541,13 @@ static void* read_pcm_and_call_plugins(void *arg) {
     ERROR("failed to start timer: %s", error);
   }
 
+  // ignore first timing sample
+  int valid_timing_sample = 0;
   uint32_t card_processing_start_us = gpioTick();
   uint32_t wait_start_us;
-  uint32_t alsa_read_start_us;
-
+  uint32_t timer_read_return_us;
+  uint32_t prev_timer_read_return_us = 0;
+  int have_prev_timer_read_return = 0;
 
   // Business Section
   while (alsa_thread_run) {
@@ -543,14 +571,16 @@ static void* read_pcm_and_call_plugins(void *arg) {
       spi_writes = MAX_SPI_WRITE_STATS - 1;
     }
 
+    // card processing done, start the clock on waiting
     wait_start_us = gpioTick();
-    add_timing_stat(&spi_active_time_by_spi_writes[spi_writes], wait_start_us - card_processing_start_us);
 
     // delay (slack time) until the next timer interval
-    read(timerfd_sample_clock, &expirations, sizeof(expirations));
+    ssize_t ret;
+    do {
+      ret = read(timerfd_sample_clock, &expirations, sizeof(expirations));
+    } while (ret < 0 && errno == EINTR);
 
-    alsa_read_start_us = gpioTick();
-    add_timing_stat(&slack_time_by_spi_writes[spi_writes], alsa_read_start_us - wait_start_us);
+    timer_read_return_us = gpioTick();
 
     if (expirations == 1) {
       missed_expirations[EXPIRATIONS_ONTIME]++;
@@ -576,6 +606,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
       INFO("pcm0: alsa_advance_stream_by_frames: %d", pcm0_return);
     }
 
+    uint32_t next_card_processing_start_us = gpioTick();
 
     // check for a tune request.  Tuning is offline: system will not
     // be responsive during the autotune.
@@ -584,11 +615,40 @@ static void* read_pcm_and_call_plugins(void *arg) {
       autotune_all_cards(card_mgr);
       system_tune_in_progress = 0;
       system_tune_requested = 0;
+      valid_timing_sample = 0;
+      have_prev_timer_read_return = 0;
+    }
+    else {
+      if (valid_timing_sample) {
+        add_timing_stat(&spi_active_time_by_spi_writes[spi_writes], wait_start_us - card_processing_start_us);
+        add_timing_stat(&slack_time_by_spi_writes[spi_writes], timer_read_return_us - wait_start_us);
+        add_timing_stat(&alsa_read_time_by_spi_writes[spi_writes], next_card_processing_start_us - timer_read_return_us);
+
+        if (expirations == 1) {
+          // histogram of should only store consecutive valid timer
+          // reads for which exactly one expiration occurred in both cycles
+          if (have_prev_timer_read_return) {
+            uint32_t period_us = timer_read_return_us - prev_timer_read_return_us;
+            add_period_timing_stat(&period_stats, period_us, nominal_period_us);
+          }
+
+          prev_timer_read_return_us = timer_read_return_us;
+          have_prev_timer_read_return = 1;
+        }
+        else {
+          have_prev_timer_read_return = 0;
+        }
+      }
+      else {
+        valid_timing_sample = 1;
+      }
     }
 
-    card_processing_start_us = gpioTick();
-    add_timing_stat(&alsa_read_time_by_spi_writes[spi_writes], card_processing_start_us - alsa_read_start_us);
+    card_processing_start_us = next_card_processing_start_us;
   }
+
+
+  report_period_timing_stats(&period_stats, nominal_period_us);
 
 
   INFO("Exiting PCM Audio thread.");
@@ -907,4 +967,62 @@ static void dump_stats() {
          alsa_read_time_by_spi_writes[i].count != 0 ? (float)alsa_read_time_by_spi_writes[i].sum_us / alsa_read_time_by_spi_writes[i].count : 0.f);
   }
 
+}
+
+
+// add_period_timing_stats
+//
+// the passed in period_us is calculated into stats.  Difference from nominal_period_us is taken as error amount.
+// If the error falls within PERIOD_HIST_ERROR_US the period_us is included in the histogram array.
+
+static void add_period_timing_stat(struct period_timing_stats *stats,
+                                   uint32_t period_us,
+                                   uint32_t nominal_period_us) {
+  stats->count++;
+  stats->sum_us += period_us;
+
+  if (period_us < stats->min_us) {
+    stats->min_us = period_us;
+  }
+  if (period_us > stats->max_us) {
+    stats->max_us = period_us;
+  }
+
+  int32_t error_us = (int32_t)period_us - (int32_t)nominal_period_us;
+
+  if (error_us < -PERIOD_HIST_ERROR_US) {
+    stats->below_range++;
+  }
+  else if (error_us > PERIOD_HIST_ERROR_US) {
+    stats->above_range++;
+  }
+  else {
+    stats->histogram[error_us + PERIOD_HIST_ERROR_US]++;
+  }
+}
+
+// a report based on data accumulated from add_period_timing_stat
+static void report_period_timing_stats(const struct period_timing_stats *stats, uint32_t nominal_period_us) {
+  if (stats->count == 0) {
+    INFO("Timer read return period: no samples");
+    return;
+  }
+
+  uint32_t hist_min_us = nominal_period_us - PERIOD_HIST_ERROR_US;
+  uint32_t hist_max_us = nominal_period_us + PERIOD_HIST_ERROR_US;
+
+  INFO("Timer read return period:");
+  INFO("  samples: %12" PRIu64, stats->count);
+  INFO("  avg:     %12.2f us", (double)stats->sum_us / stats->count);
+  INFO("  min:     %12" PRIu32 " us", stats->min_us);
+  INFO("  max:     %12" PRIu32 " us", stats->max_us);
+  INFO(" ");
+
+  INFO("  <%3" PRIu32 ": %12" PRIu64, hist_min_us, stats->below_range);
+
+  for (int i = 0; i < PERIOD_HIST_BINS; ++i) {
+    INFO("   %3" PRIu32 ": %12" PRIu64, hist_min_us + i, stats->histogram[i]);
+  }
+
+  INFO("  >%3" PRIu32 ": %12" PRIu64, hist_max_us, stats->above_range);
 }
