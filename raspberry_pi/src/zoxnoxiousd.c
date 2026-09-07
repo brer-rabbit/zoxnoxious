@@ -959,12 +959,14 @@ static void dump_stats() {
 
   INFO("SPI writes    samples    active SPI     slack    alsa read");
   for (int i = 0; i < MAX_SPI_WRITE_STATS; ++i) {
-    INFO("   %2u       %10u            %3.2f       %3.2f         %3.2f",
-         i,
-         spi_active_time_by_spi_writes[i].count,
-         spi_active_time_by_spi_writes[i].count != 0 ? (float)spi_active_time_by_spi_writes[i].sum_us / spi_active_time_by_spi_writes[i].count : 0.f,
-         slack_time_by_spi_writes[i].count != 0 ? (float)slack_time_by_spi_writes[i].sum_us / slack_time_by_spi_writes[i].count : 0.f,
-         alsa_read_time_by_spi_writes[i].count != 0 ? (float)alsa_read_time_by_spi_writes[i].sum_us / alsa_read_time_by_spi_writes[i].count : 0.f);
+    if (spi_active_time_by_spi_writes[i].count > 0) {
+      INFO("   %2u    %10u            %3.2f       %3.2f         %3.2f",
+           i,
+           spi_active_time_by_spi_writes[i].count,
+           spi_active_time_by_spi_writes[i].count != 0 ? (float)spi_active_time_by_spi_writes[i].sum_us / spi_active_time_by_spi_writes[i].count : 0.f,
+           slack_time_by_spi_writes[i].count != 0 ? (float)slack_time_by_spi_writes[i].sum_us / slack_time_by_spi_writes[i].count : 0.f,
+           alsa_read_time_by_spi_writes[i].count != 0 ? (float)alsa_read_time_by_spi_writes[i].sum_us / alsa_read_time_by_spi_writes[i].count : 0.f);
+    }
   }
 
 }
