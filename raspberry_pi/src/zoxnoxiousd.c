@@ -28,6 +28,7 @@
 #include <poll.h>
 #include <signal.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -46,13 +47,43 @@
 #include "zcard_plugin.h"
 
 
-// number of stats to track and what they mean
-#define NUM_MISSED_EXPIRATIONS_STATS 1024
-#define EXPIRATIONS_ONTIME 0
-#define EXPIRATIONS_MISSED_ONE 1
-#define EXPIRATIONS_MISSED_LT_TEN 2
-#define EXPIRATIONS_MISSED_GTE_TEN 3
+// stats for deadline events: track when a deadline was completely missed.
+// these are only counted during valid real-time operations.
+struct deadline_stats {
+  uint64_t on_time_events;
+  uint64_t missed_events;
+  uint64_t total_missed_deadlines;
+  uint64_t max_missed_deadlines;
+};
+
+// track period timing.  Distribution here shows how much jitter in scheduling.
+#define PERIOD_HIST_ERROR_US 20
+#define PERIOD_HIST_BINS (PERIOD_HIST_ERROR_US * 2 + 1)
+struct timer_period_stats {
+  uint64_t count;
+  uint64_t sum_us;
+
+  uint32_t min_us;
+  uint32_t max_us;
+
+  uint64_t below_range;
+  uint64_t histogram[PERIOD_HIST_BINS];
+  uint64_t above_range;
+};
+
+
 #define DISCOVERY_REPORT_SIZE_BYTES 28
+
+#define MAX_SPI_WRITE_STATS 96
+struct duration_stats {
+  _Atomic uint32_t count;
+  _Atomic uint64_t sum_us;
+  _Atomic uint32_t min_us;
+  _Atomic uint32_t max_us;
+};
+static struct duration_stats spi_active_time_by_spi_writes[MAX_SPI_WRITE_STATS] = { [0 ... MAX_SPI_WRITE_STATS - 1] = (struct duration_stats) { 0, 0, UINT32_MAX, 0} };
+static struct duration_stats slack_time_by_spi_writes[MAX_SPI_WRITE_STATS] = { [0 ... MAX_SPI_WRITE_STATS - 1] = (struct duration_stats) { 0, 0, UINT32_MAX, 0} };
+static struct duration_stats alsa_read_time_by_spi_writes[MAX_SPI_WRITE_STATS] = { [0 ... MAX_SPI_WRITE_STATS - 1] = (struct duration_stats) { 0, 0, UINT32_MAX, 0} };
 
 // midi thread polls with a timeout to check for thread termination condition
 #define MIDI_TIMEOUT_MS 10
@@ -65,9 +96,6 @@ static snd_rawmidi_t *midi_out = NULL;
 static pthread_mutex_t midi_out_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static _Atomic int alsa_thread_run = 1;
-static _Atomic uint64_t missed_expirations[NUM_MISSED_EXPIRATIONS_STATS] = { 0 };
-static _Atomic time_t sec_pcm_write_idle = 0;
-static _Atomic long nsec_pcm_write_idle = 0;
 
 static _Atomic int system_tune_requested = 0;
 static _Atomic int system_tune_in_progress = 0;
@@ -91,7 +119,12 @@ static void generate_discovery_report(uint8_t discovery_report_sysex[]);
 static int z_midi_write(uint8_t *buffer, int buffer_size);
 static int get_midi_input_fd();
 static int start_pcm(struct alsa_pcm_state *pcm, int *err_var, const char *name);
-
+static void add_duration_stat(struct duration_stats *stats, uint32_t new_timing);
+static void report_duration_stats();
+static void add_timer_period_stat(struct timer_period_stats *stats,
+                                  uint32_t period_us, uint32_t nominal_period_us);
+static void report_timer_period_stats(const struct timer_period_stats *stats, uint32_t nominal_period_us);
+static void report_expiration_timing_stats(const struct deadline_stats *deadline_stats);
 
 
 int main(int argc, char **argv, char **envp) {
@@ -324,22 +357,8 @@ int main(int argc, char **argv, char **envp) {
     }
 
     if (sig_dump_stats_received) {
-      INFO("requested stats: %ld.%.9ld / %" PRId64 "; pcm[0] xrun recovery: %d; pcm[1] xrun recovery: %d",
-           sec_pcm_write_idle, nsec_pcm_write_idle,
-           missed_expirations[EXPIRATIONS_ONTIME],
-           pcm_state[0] ? pcm_state[0]->xrun_recovery_count : -1,
-           pcm_state[1] ? pcm_state[1]->xrun_recovery_count : -1);
-
-      for (int i = 1; i < NUM_MISSED_EXPIRATIONS_STATS; ++i) {
-        if (missed_expirations[i]) {
-          INFO("  missed %d expirations %" PRId64 " times", i, missed_expirations[i]);
-        }
-      }
-
-      if (missed_expirations[NUM_MISSED_EXPIRATIONS_STATS -1]) {
-        INFO("  missed at least %d expirations %" PRId64 " times", NUM_MISSED_EXPIRATIONS_STATS - 1, missed_expirations[NUM_MISSED_EXPIRATIONS_STATS -1]);
-      }
       sig_dump_stats_received = 0;
+      report_duration_stats();
     }
 
     sleep(1);
@@ -349,6 +368,9 @@ int main(int argc, char **argv, char **envp) {
   int retval;
   pthread_join(alsa_pcm_to_plugin_thread, (void**)&retval);
   pthread_join(midi_in_plugin_thread, (void**)&retval);
+
+  // safest time to dump stats after threads have joined
+  report_duration_stats();
 
   // close pcm handles
   if (pcm_state[0] && pcm_state[0]->pcm_handle) {
@@ -406,11 +428,9 @@ static void help() {
 
 
 
-// this isn't a very safe signal handler...
 void sig_cleanup_and_exit(int signum) {
   sig_cleanup_received = 1;
 }
-
 static void sig_dump_stats(int signum) {
   sig_dump_stats_received = 1;
 }
@@ -443,17 +463,6 @@ static int open_midi_device(config_t *cfg) {
 }
 
 
-// add timespec in t1 to accumulator storing in accumulator
-static inline void timespec_accumulate(const struct timespec *t1, struct timespec *accumulator) {
-  accumulator->tv_sec += t1->tv_sec;
-  accumulator->tv_nsec += t1->tv_nsec;
-  if (accumulator->tv_nsec >= 1000000000) {
-    accumulator->tv_nsec -= 1000000000;
-    accumulator->tv_sec++;
-  }
-}
-
-
 // start timer
 // forever:
 // foreach pcm stream
@@ -471,23 +480,28 @@ static inline void timespec_accumulate(const struct timespec *t1, struct timespe
 // } while (running flag)
 
 static void* read_pcm_and_call_plugins(void *arg) {
-  int timerfd_sample_clock;
-  uint64_t expirations = 0;
+  int timerfd_sample_clock = -1;
   int frames_to_advance;
-
-  // do a couple dumb things:
-  // compute timer dynamically... but this is really designed
-  // for 4khz.  Even worse, assume that pcm[0] and [1] have
-  // the same sampling rate.
+  // do a couple things:
+  // compute timer dynamically... but this was initially designed
+  // for 4khz.  And two PCM streams.  Now it's 8khz and a single PCM stream.
+  // Maintaining the code for two PCM streams for the time being.
+  // Which assumes both streams are on the same clock.
   struct itimerspec itimerspec_sample_clock = {
     .it_interval.tv_sec = 0,
     .it_interval.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
     .it_value.tv_sec = 0,
     .it_value.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
   };
-  struct itimerspec itimerspec_remaining_time;
-  struct timespec accumulated_idle_time = { 0 };
-  int valid_gettime;
+  const uint32_t nominal_period_us = itimerspec_sample_clock.it_interval.tv_nsec / 1000;
+
+  struct timer_period_stats period_stats = {
+    .count = 0,
+    .sum_us = 0,
+    .min_us = UINT32_MAX,
+    .max_us = 0,
+  };
+  struct deadline_stats deadline_stats = { 0 };
 
 
   if ( (timerfd_sample_clock = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
@@ -531,10 +545,18 @@ static void* read_pcm_and_call_plugins(void *arg) {
     ERROR("failed to start timer: %s", error);
   }
 
+  // ignore first timing sample
+  int valid_timing_sample = 0;
+  uint32_t card_processing_start_us = gpioTick();
+  uint32_t wait_start_us;
+  uint32_t timer_read_return_us;
+  uint32_t prev_timer_read_return_us = 0;
+  int have_prev_timer_read_return = 0;
 
+  // Business Section
   while (alsa_thread_run) {
+    int spi_writes = 0;
 
-    // Business Section
     for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
       // alias for the deeply nested structure to the plugin card / readability
       struct plugin_card *plugin_card = card_mgr->card_update_order[card_num];
@@ -545,45 +567,39 @@ static void* read_pcm_and_call_plugins(void *arg) {
                                                   pcm_state[0]->samples[channel_offset] : pcm_state[1]->samples[channel_offset] );
 
       // then call the card's plugin with the samples via function pointer
-      if ( (plugin_card->process_samples)(plugin_card->plugin_object, samples) != 0) {
-        INFO("card error");
-      }
+      // track the total number of spi writes done by the voice cards
+      spi_writes += (plugin_card->process_samples)(plugin_card->plugin_object, samples);
     }
 
-
-    if (system_tune_requested) {
-      system_tune_in_progress = 1;
-      INFO("MIDI tune starting");
-      autotune_all_cards(card_mgr);
-      system_tune_in_progress = 0;
-      system_tune_requested = 0;
+    if (spi_writes > MAX_SPI_WRITE_STATS - 1) {
+      spi_writes = MAX_SPI_WRITE_STATS - 1;
+    }
+    else if (spi_writes < 0) {
+      spi_writes = 0;
     }
 
-    // check on remaining time-- though we don't know if it's remaining time until we check the expirations
-    valid_gettime = timerfd_gettime(timerfd_sample_clock, &itimerspec_remaining_time);
-    read(timerfd_sample_clock, &expirations, sizeof(expirations));
+    // card processing done, start the clock on waiting
+    wait_start_us = gpioTick();
 
-    if (expirations == 1) {
-      missed_expirations[EXPIRATIONS_ONTIME]++;
-      // the gettime ended up being remaining time
-      if (valid_gettime == 0) {
-        timespec_accumulate(&itimerspec_remaining_time.it_value, &accumulated_idle_time);
-        sec_pcm_write_idle = accumulated_idle_time.tv_sec;
-        nsec_pcm_write_idle = accumulated_idle_time.tv_nsec;
-      }
-      else {
-        WARN("timerfd_gettime returned %d", valid_gettime);
-      }
-    }
-    else if (expirations < NUM_MISSED_EXPIRATIONS_STATS - 1) {
-      missed_expirations[expirations]++;
+    // delay (slack time) until the next timer interval
+    ssize_t ret;
+    uint64_t expirations = 0;
+    do {
+      ret = read(timerfd_sample_clock, &expirations, sizeof(expirations));
+    } while (ret < 0 && errno == EINTR);
+
+    timer_read_return_us = gpioTick();
+
+    if (ret != sizeof(expirations) || expirations == 0) {
+      // timer read failed unexpectedly.  Advance one frame to keep
+      // the stream moving, but don't include this cycle in timing stats.
+      frames_to_advance = 1;
+      valid_timing_sample = 0;
     }
     else {
-      missed_expirations[NUM_MISSED_EXPIRATIONS_STATS - 1]++;
+      frames_to_advance = expirations > INT_MAX ? INT_MAX : (int)expirations;
     }
 
-    // downcast
-    frames_to_advance = expirations > INT_MAX ? INT_MAX : expirations;
 
     // get new set of frames or advance sample pointers
     if (pcm_state[1]) {
@@ -592,21 +608,66 @@ static void* read_pcm_and_call_plugins(void *arg) {
         INFO("pcm1: alsa_advance_stream_by_frames: %d", pcm1_return);
       }
     }
-
     int pcm0_return = alsa_advance_stream_by_frames(pcm_state[0], frames_to_advance);
     if (pcm0_return) {
       INFO("pcm0: alsa_advance_stream_by_frames: %d", pcm0_return);
     }
 
+    uint32_t next_card_processing_start_us = gpioTick();
+
+    // check for a tune request.  Tuning is offline: system will not
+    // be responsive during the autotune.
+    if (system_tune_requested) {
+      system_tune_in_progress = 1;
+      autotune_all_cards(card_mgr);
+      system_tune_in_progress = 0;
+      system_tune_requested = 0;
+      valid_timing_sample = 0;
+      have_prev_timer_read_return = 0;
+    }
+    else {
+      if (valid_timing_sample) {
+        add_duration_stat(&spi_active_time_by_spi_writes[spi_writes], wait_start_us - card_processing_start_us);
+        add_duration_stat(&slack_time_by_spi_writes[spi_writes], timer_read_return_us - wait_start_us);
+        add_duration_stat(&alsa_read_time_by_spi_writes[spi_writes], next_card_processing_start_us - timer_read_return_us);
+
+        if (expirations == 1) {
+          deadline_stats.on_time_events++;
+
+          // histogram of should only store consecutive valid timer
+          // reads for which exactly one expiration occurred in both cycles
+          if (have_prev_timer_read_return) {
+            uint32_t period_us = timer_read_return_us - prev_timer_read_return_us;
+            add_timer_period_stat(&period_stats, period_us, nominal_period_us);
+          }
+
+          prev_timer_read_return_us = timer_read_return_us;
+          have_prev_timer_read_return = 1;
+        }
+        else {
+          uint64_t num_missed_deadlines = expirations - 1;
+          deadline_stats.missed_events++;
+          deadline_stats.total_missed_deadlines += num_missed_deadlines;
+          if (deadline_stats.max_missed_deadlines < num_missed_deadlines) {
+            deadline_stats.max_missed_deadlines = num_missed_deadlines;
+          }
+          have_prev_timer_read_return = 0;
+        }
+      }
+      else {
+        valid_timing_sample = 1;
+      }
+    }
+
+    card_processing_start_us = next_card_processing_start_us;
   }
 
-  INFO("stats: %" PRId64 " frames @ %" PRId64 " idle usec/frame; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
-       missed_expirations[EXPIRATIONS_ONTIME],
-       (((int64_t)sec_pcm_write_idle * 1000000000LL + nsec_pcm_write_idle) / 1000LL) / ((int64_t)missed_expirations[EXPIRATIONS_ONTIME]),
-       missed_expirations[EXPIRATIONS_MISSED_ONE],
-       missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
-       missed_expirations[EXPIRATIONS_MISSED_GTE_TEN]);
+  if (timerfd_sample_clock != -1) {
+    close(timerfd_sample_clock);
+  }
 
+  report_timer_period_stats(&period_stats, nominal_period_us);
+  report_expiration_timing_stats(&deadline_stats);
   INFO("Exiting PCM Audio thread.");
   return NULL;
 }
@@ -786,7 +847,7 @@ static void* midi_in_to_plugins(void *arg) {
               if (buffer[i] == DISCOVERY_REQUEST) {
                 // no additional data required for a discovery request
                 // action is to send a discovery response
-                INFO("MIDI: discovery sysex request received, sending %d bytes",
+                INFO("MIDI: discovery sysex request received, sending %zu bytes",
                      sizeof(discovery_report_sysex) / sizeof(uint8_t));
                 z_midi_write(discovery_report_sysex, sizeof(discovery_report_sysex) / sizeof(uint8_t));
               }
@@ -882,4 +943,107 @@ static int start_pcm(struct alsa_pcm_state *pcm, int *err_var, const char *name)
     }
   }
   return 0; // Success or still -EAGAIN
+}
+
+
+// include the new_timing into the set of stats
+static void add_duration_stat(struct duration_stats *stats, uint32_t new_timing) {
+  stats->count++;
+  stats->sum_us += new_timing;
+  if (new_timing < stats->min_us) {
+    stats->min_us = new_timing;
+  }
+  if (new_timing > stats->max_us) {
+    stats->max_us = new_timing;
+  }
+}
+
+
+// dump via INFO statements all stats on the runtime
+static void report_duration_stats() {
+  INFO("requested stats: pcm[0] xrun recovery: %d",
+       pcm_state[0] ? pcm_state[0]->xrun_recovery_count : -1);
+
+
+  INFO("SPI writes    samples    active SPI     slack    alsa read");
+  for (int i = 0; i < MAX_SPI_WRITE_STATS; ++i) {
+    if (spi_active_time_by_spi_writes[i].count > 0) {
+      INFO("   %2d    %10" PRIu32 "            %3.2f       %3.2f         %3.2f",
+           i,
+           spi_active_time_by_spi_writes[i].count,
+           spi_active_time_by_spi_writes[i].count != 0 ? (float)spi_active_time_by_spi_writes[i].sum_us / spi_active_time_by_spi_writes[i].count : 0.f,
+           slack_time_by_spi_writes[i].count != 0 ? (float)slack_time_by_spi_writes[i].sum_us / slack_time_by_spi_writes[i].count : 0.f,
+           alsa_read_time_by_spi_writes[i].count != 0 ? (float)alsa_read_time_by_spi_writes[i].sum_us / alsa_read_time_by_spi_writes[i].count : 0.f);
+    }
+  }
+
+}
+
+
+// add_timer_period_stat
+//
+// the passed in period_us is calculated into stats.  Difference from nominal_period_us is taken as error amount.
+// If the error falls within PERIOD_HIST_ERROR_US the period_us is included in the histogram array.
+
+static void add_timer_period_stat(struct timer_period_stats *stats,
+                                  uint32_t period_us,
+                                  uint32_t nominal_period_us) {
+  stats->count++;
+  stats->sum_us += period_us;
+
+  if (period_us < stats->min_us) {
+    stats->min_us = period_us;
+  }
+  if (period_us > stats->max_us) {
+    stats->max_us = period_us;
+  }
+
+  int32_t error_us = (int32_t)period_us - (int32_t)nominal_period_us;
+
+  if (error_us < -PERIOD_HIST_ERROR_US) {
+    stats->below_range++;
+  }
+  else if (error_us > PERIOD_HIST_ERROR_US) {
+    stats->above_range++;
+  }
+  else {
+    stats->histogram[error_us + PERIOD_HIST_ERROR_US]++;
+  }
+}
+
+// a report based on data accumulated from add_period_timing_stat
+static void report_timer_period_stats(const struct timer_period_stats *stats, uint32_t nominal_period_us) {
+  if (stats == NULL || stats->count == 0) {
+    INFO("Timer read return period: no samples");
+    return;
+  }
+
+  uint32_t hist_min_us = nominal_period_us - PERIOD_HIST_ERROR_US;
+  uint32_t hist_max_us = nominal_period_us + PERIOD_HIST_ERROR_US;
+
+  INFO("Timer read return period:");
+  INFO("  samples: %12" PRIu64, stats->count);
+  INFO("  avg:     %12.2f us", (double)stats->sum_us / stats->count);
+  INFO("  min:     %12" PRIu32 " us", stats->min_us);
+  INFO("  max:     %12" PRIu32 " us", stats->max_us);
+
+  INFO("  <%3" PRIu32 ": %12" PRIu64, hist_min_us, stats->below_range);
+
+  for (int i = 0; i < PERIOD_HIST_BINS; ++i) {
+    INFO("   %3" PRIu32 ": %12" PRIu64, hist_min_us + i, stats->histogram[i]);
+  }
+
+  INFO("  >%3" PRIu32 ": %12" PRIu64, hist_max_us, stats->above_range);
+}
+
+
+static void report_expiration_timing_stats(const struct deadline_stats *deadline_stats) {
+  if (deadline_stats == NULL) {
+    return;
+  }
+  INFO("Deadline statistics:");
+  INFO("   on-time events: %" PRIu64, deadline_stats->on_time_events);
+  INFO("   missed-deadline events: %" PRIu64, deadline_stats->missed_events);
+  INFO("   total deadlines missed: %" PRIu64, deadline_stats->total_missed_deadlines);
+  INFO("   max deadlines missed in one event: %" PRIu64, deadline_stats->max_missed_deadlines);
 }

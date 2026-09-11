@@ -55,7 +55,7 @@ struct alsa_pcm_state {
   const char **samples; // pointer per-channel to sample data: allocated during 
 
   // stats
-  int xrun_recovery_count;
+  _Atomic int xrun_recovery_count;
   int skiped_samples;
 };
 

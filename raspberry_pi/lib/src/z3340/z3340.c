@@ -194,6 +194,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   uint8_t samples_to_dac[2];
   int spi_channel;
   int dac_channel = 0;
+  int spi_writes = 0;
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
 
@@ -201,6 +202,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   // to use a correction table
 
   if (zcard->previous_samples[dac_channel] != samples[dac_channel]) {
+    spi_writes++;
     if (samples[dac_channel] >= 0) {
       // samples[dac_channel] is 16 bits.  Shift to the most significant twelve bits
       int16_t correct_freq_value = zcard->freq_tuned[ samples[dac_channel] >> 3];
@@ -225,23 +227,23 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       // Given a 16-bit signed input, write it to a 12-bit signed values.
       // Any negative value clips to zero.
 
+      zcard->previous_samples[dac_channel] = samples[dac_channel];
       if (samples[dac_channel] >= 0) {
         samples_to_dac[0] = channel_map[dac_channel] | ((uint16_t) samples[dac_channel]) >> 11;
         samples_to_dac[1] = ((uint16_t) samples[dac_channel]) >> 3;
-        zcard->previous_samples[dac_channel] = samples[dac_channel];
       }
       else {
         samples_to_dac[0] = channel_map[dac_channel] | (uint16_t) 0;
         samples_to_dac[1] = 0;
-        zcard->previous_samples[dac_channel] = 0;
       }
 
+      spi_writes++;
       spiWrite(spi_channel, (char*)samples_to_dac, 2);
     }
 
   }
 
-  return 0;
+  return spi_writes;
 }
 
 

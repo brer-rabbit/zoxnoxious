@@ -101,6 +101,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct audio_out_card *zcard = (struct audio_out_card*)zcard_plugin;
   char samples_to_dac[2];
   int spi_channel;
+  int spi_writes = 0;
 
   spi_channel = set_spi_interface(zcard->zhost, SPI_CHANNEL, SPI_MODE, zcard->slot);
 
@@ -117,16 +118,11 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         samples_to_dac[1] = ((uint16_t) samples[i]) >> 3;
       }
       spiWrite(spi_channel, samples_to_dac, 2);
-      /*
-      WARN("audio out: channel %d 0x%4X : 0x%2X 0x%2X",
-           i,
-           samples[i],
-           samples_to_dac[0], samples_to_dac[1]);
-      */
+      spi_writes++;
     }
   }
 
-  return 0;
+  return spi_writes;
 }
 
 

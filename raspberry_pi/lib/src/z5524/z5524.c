@@ -177,6 +177,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   int16_t this_sample;
   int i;
   char samples_to_dac[2];
+  int spi_writes = 0;
 
   // dac output samples
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_as3394, SPI_MODE, zcard->slot);
@@ -186,6 +187,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (zcard->previous_samples[spi_channel_as3394][i] != this_sample) {
       zcard->previous_samples[spi_channel_as3394][i] = this_sample;
       dac_write(this_sample, channel_map[i], spi_channel);
+      spi_writes++;
     }
   }
 
@@ -205,6 +207,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         spiWrite(spi_channel, samples_to_dac, 2);
       }
 
+      spi_writes++;
       zcard->previous_samples[spi_channel_as3394][i] = this_sample; // use provided value, not mapped value
     }
   }
@@ -217,6 +220,8 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     if (i == 2) { // VCO: use correction table
       this_sample = samples[i + spi_channel_ssi2130 * DAC_CHANNELS] >> 3;
       if (zcard->previous_samples[spi_channel_ssi2130][i] != this_sample) {
+        zcard->previous_samples[spi_channel_ssi2130][i] = this_sample; // use provided value, not mapped value
+        spi_writes++;
         if (this_sample >= 0) {
           int16_t correct_freq_value = zcard->tunables[TUNE_SSI2130_VCO].dac_calibration_table[ this_sample ];
           spiWrite(spi_channel, (char*) &correct_freq_value, 2);
@@ -226,8 +231,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
           samples_to_dac[1] = 0;
           spiWrite(spi_channel, samples_to_dac, 2);
         }
-
-        zcard->previous_samples[spi_channel_ssi2130][i] = this_sample; // use provided value, not mapped value
       }
     }
     else {
@@ -235,11 +238,12 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
       if (zcard->previous_samples[spi_channel_ssi2130][i] != this_sample) {
         zcard->previous_samples[spi_channel_ssi2130][i] = this_sample;
         dac_write(this_sample, channel_map[i], spi_channel);
+        spi_writes++;
       }
     }
   }
 
-  return 0;
+  return spi_writes;
 }
 
 

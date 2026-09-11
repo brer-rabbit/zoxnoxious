@@ -230,15 +230,15 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct poledancer_card *zcard = (struct poledancer_card*)zcard_plugin;
   char samples_to_dac[2];
   int spi_channel;
-
+  int spi_writes = 0;
 
   spi_channel = set_spi_interface(zcard->zhost, spi_channel_cs0, SPI_MODE, zcard->slot);
 
   for (int i = 0; i < DAC_CHANNELS_CS0; ++i) {
     if (zcard->previous_samples_cs0[i] != samples[i] ) {
+      spi_writes++;
+      zcard->previous_samples_cs0[i] = samples[i];
       if (samples[i] >= 0) {
-        zcard->previous_samples_cs0[i] = samples[i];
-
         if (i == cutoff_cv_channel) {
           spiWrite(spi_channel, (char*) &zcard->tunable.dac_calibration_table[ samples[i] >> 3 ], 2);
         }
@@ -249,7 +249,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
         }
       }
       else {
-        zcard->previous_samples_cs0[i] = 0;
         samples_to_dac[0] = channel_map_cs0[i];
         samples_to_dac[1] = 0;
         spiWrite(spi_channel, samples_to_dac, 2);
@@ -266,15 +265,11 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   // this will handle all the 2190 VCAs
   for (int i = 0; i < DAC_CHANNELS_CS1; ++i) {
     if (zcard->previous_samples_cs1[i] != samples_cs1[i] ) {
+      spi_writes++;
+      zcard->previous_samples_cs1[i] = samples_cs1[i];
       if (samples_cs1[i] >= 0) {
         if (i < NUM_VCA_CHANNEL_DESCRIPTORS - 1) { // exclude ctrl ref
-          zcard->previous_samples_cs1[i] = samples_cs1[i];
 #ifdef USE_VCACALIBRATION
-          /*
-          INFO("channel %d : %hx",
-               i + DAC_CHANNELS_CS0,
-               zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ]);
-          */
           spiWrite(spi_channel,
                    (char*) &zcard->dac_characterization->calibrated_codes[i][ samples_cs1[i] >> 3 ],
                    2);
@@ -295,7 +290,6 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 
       }
       else {
-        zcard->previous_samples_cs1[i] = 0;
         samples_to_dac[0] = channel_map_cs1[i];
         samples_to_dac[1] = 0;
         spiWrite(spi_channel, samples_to_dac, 2);
@@ -304,9 +298,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     }
   }
 
-
-
-  return 0;
+  return spi_writes;
 }
 
 
