@@ -601,7 +601,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
   }
 
   INFO("stats: %" PRId64 " frames @ %" PRId64 " idle usec/frame; %" PRId64 " one-miss; %" PRId64 " less than ten; %" PRId64 " ten or more missed expirations",
-       missed_expirations[EXPIRATIONS_ONTIME],       
+       missed_expirations[EXPIRATIONS_ONTIME],
        (((int64_t)sec_pcm_write_idle * 1000000000LL + nsec_pcm_write_idle) / 1000LL) / ((int64_t)missed_expirations[EXPIRATIONS_ONTIME]),
        missed_expirations[EXPIRATIONS_MISSED_ONE],
        missed_expirations[EXPIRATIONS_MISSED_LT_TEN],
