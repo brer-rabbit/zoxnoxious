@@ -27,7 +27,6 @@ OutputInterface::OutputInterface() : out1LevelClipTimer(0.f),
     {OUT2_LEVEL_KNOB_PARAM, OUT2_LEVEL_INPUT, OUT2_CHANNEL, 10.f, &out2LevelClipTimer, nullptr, CvOperation::Add}
   }}
 {
-
   for(int i = 0; i < maxAudioDevices; ++i) {
     audioPorts.push_back(new ZoxnoxiousAudioPort(this));
   }
@@ -75,6 +74,7 @@ OutputInterface::~OutputInterface() {
 
 void OutputInterface::onAdd(const AddEvent &e) {
   Module::onAdd(e);
+
   OutputInterface *expected = nullptr;
   OutputInterface::instance.compare_exchange_strong(expected, this, std::memory_order_release);
 }
@@ -164,6 +164,7 @@ void OutputInterface::process(const ProcessArgs& args) {
   }
 
   // DEBUG REMOVE THIS
+#define DEBUG_DISCO_REPORT
 #ifdef DEBUG_DISCO_REPORT
   if (APP->engine->getFrame() == 40000) {
     midi::Message discoReport;
@@ -548,6 +549,7 @@ json_t* OutputInterface::dataToJson() {
     std::string thisAudioPortNum = audioPortNum + std::to_string(deviceNum);
     json_object_set_new(rootJ, thisAudioPortNum.c_str(), audioPorts[deviceNum]->toJson());
   }
+
   return rootJ;
 }
 
@@ -569,6 +571,7 @@ void OutputInterface::dataFromJson(json_t* rootJ) {
       audioPorts[deviceNum]->fromJson(audioPortJ);
     }
   }
+
 }
 
 
@@ -602,8 +605,9 @@ void OutputInterface::serviceParticipantAttachments() {
   }
 }
 
-
-
+//--------------------
+// ModuleWidget / UI
+//--------------------
 
 struct OutputInterfaceWidget : ModuleWidget {
   OutputInterfaceWidget(OutputInterface* module) :
@@ -762,41 +766,59 @@ struct OutputInterfaceWidget : ModuleWidget {
 
   void appendContextMenu(Menu *menu) override {
     OutputInterface *module = dynamic_cast<OutputInterface*>(this->module);
-
+    if (!module) {
+      return;
+    }
 
     menu->addChild(new MenuSeparator);
+
+    menu->addChild(createSubmenuItem("Hardware", "",
+        [=](Menu* menu) {
+          menu->addChild(createMenuItem("Scan now", "",
+                           [=]() {
+                             module->hardwareDiscovery.discover(
+                               module->midiInput,
+                               module->midiOutput,
+                               *module->audioPorts[0]);
+                           }));
+
+          menu->addChild(new MenuSeparator);
+
+          menu->addChild(createSubmenuItem("MIDI Out Device", "",
+                                           [=](Menu* menu) {
+                                             appendMidiMenu(menu, &module->midiOutput);
+                                           }));
+          menu->addChild(createSubmenuItem("MIDI In Device", "",
+                                           [=](Menu* menu) {
+                                             appendMidiMenu(menu, &module->midiInput);
+                                           }));
+
+          if (module->audioPorts.size() == 1) {
+            menu->addChild(createSubmenuItem("Audio Device", "",
+                                             [=](Menu* menu) {
+                                               appendAudioMenu(menu, module->audioPorts[0]);
+                                             }));
+          }
+          else {
+            menu->addChild(createSubmenuItem("Audio Device 0", "",
+                                             [=](Menu* menu) {
+                                               appendAudioMenu(menu, module->audioPorts[0]);
+                                             }));
+            menu->addChild(createSubmenuItem("Audio Device 1", "",
+                                             [=](Menu* menu) {
+                                               appendAudioMenu(menu, module->audioPorts[1]);
+                                             }));
+          }
+        }));
+
+    menu->addChild(new MenuSeparator);
+
     InstantiateExpanderItem *expanderItem = createMenuItem<InstantiateExpanderItem>("Add visualizer (right side)", "");
     expanderItem->module = module;
     expanderItem->model = modelOutputInterfaceVisualizer;
     expanderItem->posit = box.pos;
     expanderItem->posit.x += box.size.x;
     menu->addChild(expanderItem);
-
-    menu->addChild(createSubmenuItem("MIDI Out Device", "",
-                                     [=](Menu* menu) {
-                                       appendMidiMenu(menu, &module->midiOutput);
-                                     }));
-    menu->addChild(createSubmenuItem("MIDI In Device", "",
-                                     [=](Menu* menu) {
-                                       appendMidiMenu(menu, &module->midiInput);
-                                     }));
-
-    if (module->audioPorts.size() == 1) {
-      menu->addChild(createSubmenuItem("Audio Device", "",
-                                     [=](Menu* menu) {
-                                       appendAudioMenu(menu, module->audioPorts[0]);
-                                     }));
-    }
-    else {
-      menu->addChild(createSubmenuItem("Audio Device 0", "",
-                                       [=](Menu* menu) {
-                                         appendAudioMenu(menu, module->audioPorts[0]);
-                                       }));
-      menu->addChild(createSubmenuItem("Audio Device 1", "",
-                                       [=](Menu* menu) {
-                                         appendAudioMenu(menu, module->audioPorts[1]);
-                                       }));
-    }
 
     menu->addChild(new MenuSeparator);
 
@@ -806,13 +828,24 @@ struct OutputInterfaceWidget : ModuleWidget {
 
     menu->addChild(new MenuSeparator);
 
-    menu->addChild(createMenuItem("Restart", "", [=]() {
-          module->midiOutput.sendMidiMessage(module->MIDI_RESTART_SYSEX);
-        }));
-    menu->addChild(createMenuItem("Shutdown", "", [=]() {
-          module->midiOutput.sendMidiMessage(module->MIDI_SHUTDOWN_SYSEX);
-        }));
+    menu->addChild(createSubmenuItem("System", "",
+        [=](Menu* menu) {
+          menu->addChild(createSubmenuItem("Restart", "",
+                                           [=](Menu* menu) {
+                                             menu->addChild(createMenuItem("Restart now", "", [=]() {
+                                               module->midiOutput.sendMidiMessage(
+                                                 module->MIDI_RESTART_SYSEX);
+                                             }));
+                                           }));
 
+          menu->addChild(createSubmenuItem("Shutdown", "",
+                                           [=](Menu* menu) {
+                                             menu->addChild(createMenuItem("Shut down now", "", [=]() {
+                                               module->midiOutput.sendMidiMessage(
+                                                 module->MIDI_SHUTDOWN_SYSEX);
+                                             }));
+                                           }));
+        }));
   }
 
   CardTextDisplay *cardAOutput1TextField;
