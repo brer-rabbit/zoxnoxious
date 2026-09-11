@@ -81,9 +81,9 @@ struct duration_stats {
   _Atomic uint32_t min_us;
   _Atomic uint32_t max_us;
 };
-struct duration_stats spi_active_time_by_spi_writes[MAX_SPI_WRITE_STATS] = { [0 ... MAX_SPI_WRITE_STATS - 1] = (struct duration_stats) { 0, 0, UINT32_MAX, 0} };
-struct duration_stats slack_time_by_spi_writes[MAX_SPI_WRITE_STATS] = { [0 ... MAX_SPI_WRITE_STATS - 1] = (struct duration_stats) { 0, 0, UINT32_MAX, 0} };
-struct duration_stats alsa_read_time_by_spi_writes[MAX_SPI_WRITE_STATS] = { [0 ... MAX_SPI_WRITE_STATS - 1] = (struct duration_stats) { 0, 0, UINT32_MAX, 0} };
+static struct duration_stats spi_active_time_by_spi_writes[MAX_SPI_WRITE_STATS] = { [0 ... MAX_SPI_WRITE_STATS - 1] = (struct duration_stats) { 0, 0, UINT32_MAX, 0} };
+static struct duration_stats slack_time_by_spi_writes[MAX_SPI_WRITE_STATS] = { [0 ... MAX_SPI_WRITE_STATS - 1] = (struct duration_stats) { 0, 0, UINT32_MAX, 0} };
+static struct duration_stats alsa_read_time_by_spi_writes[MAX_SPI_WRITE_STATS] = { [0 ... MAX_SPI_WRITE_STATS - 1] = (struct duration_stats) { 0, 0, UINT32_MAX, 0} };
 
 // midi thread polls with a timeout to check for thread termination condition
 #define MIDI_TIMEOUT_MS 10
@@ -574,6 +574,9 @@ static void* read_pcm_and_call_plugins(void *arg) {
     if (spi_writes > MAX_SPI_WRITE_STATS - 1) {
       spi_writes = MAX_SPI_WRITE_STATS - 1;
     }
+    else if (spi_writes < 0) {
+      spi_writes = 0;
+    }
 
     // card processing done, start the clock on waiting
     wait_start_us = gpioTick();
@@ -965,7 +968,7 @@ static void report_duration_stats() {
   INFO("SPI writes    samples    active SPI     slack    alsa read");
   for (int i = 0; i < MAX_SPI_WRITE_STATS; ++i) {
     if (spi_active_time_by_spi_writes[i].count > 0) {
-      INFO("   %2u    %10u            %3.2f       %3.2f         %3.2f",
+      INFO("   %2d    %10" PRIu32 "            %3.2f       %3.2f         %3.2f",
            i,
            spi_active_time_by_spi_writes[i].count,
            spi_active_time_by_spi_writes[i].count != 0 ? (float)spi_active_time_by_spi_writes[i].sum_us / spi_active_time_by_spi_writes[i].count : 0.f,
