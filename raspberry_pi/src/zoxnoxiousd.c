@@ -1026,7 +1026,6 @@ static void report_timer_period_stats(const struct timer_period_stats *stats, ui
   INFO("  avg:     %12.2f us", (double)stats->sum_us / stats->count);
   INFO("  min:     %12" PRIu32 " us", stats->min_us);
   INFO("  max:     %12" PRIu32 " us", stats->max_us);
-  INFO(" ");
 
   INFO("  <%3" PRIu32 ": %12" PRIu64, hist_min_us, stats->below_range);
 
