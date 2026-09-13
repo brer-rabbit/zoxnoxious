@@ -87,44 +87,4 @@ int alsa_start_stream(struct alsa_pcm_state *pcm_state);
 int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames);
 
 
-
-/** alsa_pcm_ensure_ready
- * check the state to make sure the pcm_handle is good then call snd_pcm_avail_update to make sure
- * available frames is updated.
- * This call is required prior to calling snd_pcm_mmap_begin(), and
- * on return the pcm stream should be in a good state.
- */
-int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state);
-
-
-/** alsa_mmap_begin_with_step_calc alsa_mmap_begin
- *
- * call snd_pcm_mmap_begin.  Pre: alsa_pcm_ensure_ready called just previous.
- * Handle any xrun recovery required.
- * alsa_mmap_begin_with_step_calc should be called the first time through; after
- * that alsa_mmap_begin is preferred.
- */
-int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state);
-int alsa_mmap_begin(struct alsa_pcm_state *pcm_state);
-
-
-/** alsa_mmap_end
- *
- * it's called mmap_commit in the alsa API, call the function mmap_end
- * here.  Handle any xrun error.  Return zero for success, non-zero
- * for error.
- */
-int alsa_mmap_end(struct alsa_pcm_state *pcm_state);
-
-
-/** alsa_drop_frames
- *
- * advance internal pointer, dropping the specified number of frames.
- */
-void alsa_drop_frames(struct alsa_pcm_state *pcm_state, unsigned long frames);
-
-
-
-
-
 #endif

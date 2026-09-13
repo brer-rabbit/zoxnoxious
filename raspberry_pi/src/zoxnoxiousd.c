@@ -464,19 +464,12 @@ static int open_midi_device(config_t *cfg) {
 
 
 // start timer
+// start alsa stream
 // forever:
-// foreach pcm stream
-//   alsa_pcm_ensure_ready
-//   snd_pcm_mmap_begin
-//   calc samples[channelnum]
-// 
 // do {
 //   call each plugin on stream 1
-//   if stream 2 call each plugin on stream 1
-//   read timer
-//   advance samples pointer
-//   if (!frames stream 1): commit, ensure ready, mmap
-//   if (!frames stream 2): commit, ensure ready, mmap
+//   sleep til timer fires
+//   advance alsa cursor
 // } while (running flag)
 
 static void* read_pcm_and_call_plugins(void *arg) {
