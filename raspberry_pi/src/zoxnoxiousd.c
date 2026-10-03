@@ -378,9 +378,12 @@ int main(int argc, char **argv, char **envp) {
     snd_pcm_close(pcm_state[0]->pcm_handle);
   }
 
-  if (pcm_state[1] && pcm_state[1]->pcm_handle) {
-    snd_pcm_abort(pcm_state[1]->pcm_handle);
-    snd_pcm_close(pcm_state[1]->pcm_handle);
+  if (midi_in) {
+    snd_rawmidi_close(midi_in);
+  }
+  if (midi_out) {
+    snd_rawmidi_drain(midi_out);
+    snd_rawmidi_close(midi_out);
   }
 
   // card mgr closes all plugins
@@ -475,6 +478,7 @@ static int open_midi_device(config_t *cfg) {
 static void* read_pcm_and_call_plugins(void *arg) {
   int timerfd_sample_clock = -1;
   int frames_to_advance;
+
   // do a couple things:
   // compute timer dynamically... but this was initially designed
   // for 4khz.  And two PCM streams.  Now it's 8khz and a single PCM stream.
@@ -550,25 +554,27 @@ static void* read_pcm_and_call_plugins(void *arg) {
   while (alsa_thread_run) {
     int spi_writes = 0;
 
-    for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
-      // alias for the deeply nested structure to the plugin card / readability
-      struct plugin_card *plugin_card = card_mgr->card_update_order[card_num];
-      int channel_offset = plugin_card->channel_offset;
+    if (!err_pcm0) {
+      for (int card_num = 0; card_num < card_mgr->num_cards; ++card_num) {
+        // alias for the deeply nested structure to the plugin card / readability
+        struct plugin_card *plugin_card = card_mgr->card_update_order[card_num];
+        int channel_offset = plugin_card->channel_offset;
 
-      // the samples relevant for this card are at the channel offset on the approp pcm device
-      const int16_t *samples = (const int16_t*) ( plugin_card->pcm_device_num == 0 ?
-                                                  pcm_state[0]->samples[channel_offset] : pcm_state[1]->samples[channel_offset] );
+        // the samples relevant for this card are at the channel offset on the approp pcm device
+        const int16_t *samples = (const int16_t*) ( plugin_card->pcm_device_num == 0 ?
+                                                    pcm_state[0]->samples[channel_offset] : pcm_state[1]->samples[channel_offset] );
 
-      // then call the card's plugin with the samples via function pointer
-      // track the total number of spi writes done by the voice cards
-      spi_writes += (plugin_card->process_samples)(plugin_card->plugin_object, samples);
-    }
+        // then call the card's plugin with the samples via function pointer
+        // track the total number of spi writes done by the voice cards
+        spi_writes += (plugin_card->process_samples)(plugin_card->plugin_object, samples);
+      }
 
-    if (spi_writes > MAX_SPI_WRITE_STATS - 1) {
-      spi_writes = MAX_SPI_WRITE_STATS - 1;
-    }
-    else if (spi_writes < 0) {
-      spi_writes = 0;
+      if (spi_writes > MAX_SPI_WRITE_STATS - 1) {
+        spi_writes = MAX_SPI_WRITE_STATS - 1;
+      }
+      else if (spi_writes < 0) {
+        spi_writes = 0;
+      }
     }
 
     // card processing done, start the clock on waiting
@@ -601,10 +607,8 @@ static void* read_pcm_and_call_plugins(void *arg) {
         INFO("pcm1: alsa_advance_stream_by_frames: %d", pcm1_return);
       }
     }
-    int pcm0_return = alsa_advance_stream_by_frames(pcm_state[0], frames_to_advance);
-    if (pcm0_return) {
-      INFO("pcm0: alsa_advance_stream_by_frames: %d", pcm0_return);
-    }
+
+    err_pcm0 = alsa_advance_stream_by_frames(pcm_state[0], frames_to_advance);
 
     uint32_t next_card_processing_start_us = gpioTick();
 

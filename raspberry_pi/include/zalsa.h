@@ -40,10 +40,6 @@ struct alsa_pcm_state {
   snd_pcm_format_t format;        // audiobuf format
   unsigned int channels;          // number of channels
 
-  int first_period;               // boolean cleared after first frame processed, set after xrun
-
-  snd_pcm_uframes_t stop_threshold; // for allowing stop/restart
-
   // calculated once processing starts
   int channel_step_size; // step size for each channel in a frame
 
@@ -78,13 +74,13 @@ int alsa_start_stream(struct alsa_pcm_state *pcm_state);
 
 /** alsa_advance_stream_by_frames
  *
- * advance the samples pointers by frames...hopefully one.
+ * advance the samples pointers by frames, nominally should be one.
  * If the request is greater than current period the next
  * period is requested.  There's likely a bug in there.
  * This wraps calls to snd_pcm_mmap_commit, snd_pcm_state, snd_pcm_avail_update, snd_pcm_mmap_begin.
  * Return zero for success, non-zero on failure.
  */
-int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames);
+int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested);
 
 
 #endif

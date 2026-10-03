@@ -22,10 +22,13 @@
 #include "zalsa.h"
 
 #define INVALID_CHANNEL_STEP_SIZE -1
-/* wait up to 100ms timeout for the PCM stream */
-#define SND_PCM_WAIT_TIMEOUT 100
 
+static int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state);
+static int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state);
+static int alsa_mmap_begin(struct alsa_pcm_state *pcm_state);
+static int alsa_mmap_end(struct alsa_pcm_state *pcm_state);
 static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err);
+static void alsa_advance_mmap_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames);
 
 static const snd_pcm_format_t default_snd_pcm_format = SND_PCM_FORMAT_S16_LE;
 
@@ -85,9 +88,6 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
 
   // Hardcoded non-zero defaults:
   pcm_state->format = default_snd_pcm_format;
-  pcm_state->first_period = 1;
-
-
 
   // Now open the actual stream
   if ((err = snd_pcm_open(&pcm_state->pcm_handle, pcm_state->device_name, SND_PCM_STREAM_CAPTURE, 0)) < 0) {
@@ -175,162 +175,182 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
 int alsa_start_stream(struct alsa_pcm_state *pcm_state) {
   int err;
   err = alsa_pcm_ensure_ready(pcm_state);
-  if (err == -EAGAIN) {
-    return -EAGAIN;
-  }
-  else if (err) {
-    ERROR("zalsa: %s alsa_pcm_ensure_ready error", pcm_state->device_name);
-    return 1;
+  if (err) {
+    return err;
   }
 
-  if ( alsa_mmap_begin_with_step_calc(pcm_state) ) {
+  err = alsa_mmap_begin_with_step_calc(pcm_state);
+  if (err) {
     ERROR("zalsa: %s alsa_pcm_mmap_begin error", pcm_state->device_name);
-    return 1;
+    return err;
   }
 
   return 0;
 }
 
-
-int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, int frames) {
-  int retval = 0;
+/*
+ * requested < remaining
+ * --> destination is inside current mmap
+ * --> advance
+ *
+ * requested >= remaining
+ * --> destination is outside current mmap
+ * --> acquire next mmap, calculate a residual advance
+ *
+ * residual < remaining
+ * --> destination is inside next mmap
+ * --> advance
+ *
+ * residual >= remaining
+ * --> destination is outside next mmap
+ * --> abandon residual
+ */
+int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested) {
   int err;
+  snd_pcm_uframes_t residual_advance;
 
-  if (pcm_state->frames_remaining > frames) {
-    // advance sample pointer by frames --
-    // TODO: error handling should use some DSP to smooth this if frames > 1
-    for (int i = 0; i < pcm_state->channels; ++i) {
-      pcm_state->samples[i] += (frames * pcm_state->channel_step_size);
-    }
-    pcm_state->frames_remaining -= frames;
-  }
-  else {
-    if ( alsa_mmap_end(pcm_state) ) {
-      ERROR("alsa_mmap_end returned non-zero");
-      retval = 1;
-    }
 
+  if (pcm_state->frames_provided == 0) {
+    /* No active mmap region. Establish a new cursor at index 0.  The
+     * requested advancement cannot be applied to the old cursor
+     * because it no longer exists.
+     */
     err = alsa_pcm_ensure_ready(pcm_state);
-    if (err == -EAGAIN) {
-      return -EAGAIN;
-    }
-    else if (err) {
-      ERROR("alsa_pcm_ensure_ready returned non-zero");
-      retval += 2;
+    if (err) {
+      return err;
     }
 
-    if ( alsa_mmap_begin(pcm_state) ) {
-      ERROR("alsa_mmap_begin returned non-zero");
-      retval += 4;
+    return alsa_mmap_begin(pcm_state);
+  }
+
+  if (frames_requested < pcm_state->frames_remaining) {
+    alsa_advance_mmap_cursor(pcm_state, frames_requested);
+    return 0;
+  }
+
+  residual_advance = frames_requested - pcm_state->frames_remaining;
+
+  // advancing by frames_requested is more than what is available, get a new mmap
+  if (pcm_state->frames_provided > 0) {
+    err = alsa_mmap_end(pcm_state);
+    if (err) {
+      return err;
     }
   }
 
-  return retval;
+  err = alsa_pcm_ensure_ready(pcm_state);
+  if (err) {
+    return err;
+  }
+
+  err = alsa_mmap_begin(pcm_state);
+  if (err) {
+    return err;
+  }
+
+  if (residual_advance > 0 &&
+      residual_advance < pcm_state->frames_remaining) {
+    alsa_advance_mmap_cursor(pcm_state, residual_advance);
+  }
+  // else start cursor at zero on new mmap region
+
+  return 0;
 }
 
 
 
 /* alsa_pcm_ensure_ready
  * get things ready for a snd_pcm_mmap_begin() call
+ * This function should own set/clear of first_period
+ * Returns:
+ *   0         PCM is ready; snd_pcm_mmap_begin() should succeed.
+ *   -EAGAIN   PCM is not ready yet; caller should try again later.
+ *   < 0       unrecovered ALSA error.
  */
-int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
-  int ret, snd_state;
+static int alsa_pcm_ensure_ready(struct alsa_pcm_state *pcm_state) {
+  int ret;
+  snd_pcm_state_t snd_state;
   snd_pcm_sframes_t avail;
-  int xrun = 0;
 
   while (1) {
     snd_state = snd_pcm_state(pcm_state->pcm_handle);
     switch (snd_state) {
     case SND_PCM_STATE_XRUN:
-    case SND_PCM_STATE_DISCONNECTED:
-      ret = xrun_recovery(pcm_state, EPIPE);
-      xrun = 1;
+      ret = xrun_recovery(pcm_state, -EPIPE);
       if (ret < 0) {
         return ret;
       }
-      break;
+      continue;
     case SND_PCM_STATE_SUSPENDED:
-      ret = xrun_recovery(pcm_state, ESTRPIPE);
-      if (ret < 0)
+      ret = xrun_recovery(pcm_state, -ESTRPIPE);
+      if (ret < 0) { // -EAGAIN or otherwise
         return ret;
-      break;
+      }
+      continue;
+    case SND_PCM_STATE_DISCONNECTED:
+      return -ENODEV;
     case SND_PCM_STATE_PREPARED:
     case SND_PCM_STATE_RUNNING:
-    default:
       break;
+    default:
+      ERROR("Unexpected PCM state: %s", snd_pcm_state_name(snd_state));
+      return -EBADFD;
     }
 
     avail = snd_pcm_avail_update(pcm_state->pcm_handle);
 
-    if (xrun) {
-      WARN("alsa_pcm_ensure_ready: xrun snd_pcm_avail_update returned %ld", avail);
-    }
-
     if (avail < 0) {
-      ret = xrun_recovery(pcm_state, -avail);
+      // handle recoverable errors
+      ret = xrun_recovery(pcm_state, avail);
       if (ret < 0) {
         return ret;
       }
-      pcm_state->first_period = 1;
       continue;
     }
-    else if (avail < pcm_state->period_size) {
-      if (pcm_state->first_period) {
-        pcm_state->first_period = 0;
-        ret = snd_pcm_start(pcm_state->pcm_handle);
-        if (ret < 0) {
-          ERROR("snd_pcm_start: %s", snd_strerror(errno));
-          return ret;
-        }
-      }
-      else {
-        ret = snd_pcm_wait(pcm_state->pcm_handle, SND_PCM_WAIT_TIMEOUT);
-        if (ret == 0) {
-          return -EAGAIN;
-        }
-        else if (ret < 0) {
-          ret = xrun_recovery(pcm_state, -ret);
-          if (ret < 0) {
-            return ret;
-          }
-        }
-        if (xrun) {
-          WARN("alsa_pcm_ensure_ready: setting first period");
-        }
-        pcm_state->first_period = 1;
-      }
-      continue;
-    }
-    else {
-      break;
-    }
-  }
 
-  return 0;
+    if (snd_state == SND_PCM_STATE_PREPARED) {
+      ret = snd_pcm_start(pcm_state->pcm_handle);
+      if (ret < 0) {
+        ERROR("snd_pcm_start: %s", snd_strerror(ret));
+        return ret;
+      }
+      // we are RUNNING
+      continue;
+    }
+
+    // RUNNING
+    // TODO: this check may not be necessary.  Process frame by frame, right?
+    if (avail < pcm_state->period_size) {
+      return -EAGAIN;
+    }
+
+    return 0;
+  }
 }
 
 
 
 
-int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
+static int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
   int ret;
-  // some asserts that ought to happen:
+
   assert(pcm_state != NULL);
 
   // request period_size of frames
   pcm_state->frames_provided = pcm_state->period_size;
   ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_provided);
-  pcm_state->frames_remaining = pcm_state->frames_provided;
-
-  INFO("alsa mmap begin requested %ld frames received %ld frames", pcm_state->period_size, pcm_state->frames_provided);
 
   if (ret < 0) {
-    ret = xrun_recovery(pcm_state, -ret);
+    ret = xrun_recovery(pcm_state, ret);
     if (ret < 0) {
       ERROR("alsa: mmap begin avail error: %s", snd_strerror(ret));
       return ret;
     }
+    return -EAGAIN;
   }
+
+  pcm_state->frames_remaining = pcm_state->frames_provided;
+  INFO("alsa mmap begin requested %ld frames received %ld frames", pcm_state->period_size, pcm_state->frames_provided);
 
   // calculate the base address for each channelnum and step size
   for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
@@ -356,7 +376,7 @@ int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
 
 
 
-int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
+static int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
   int ret;
   // some asserts that ought to happen:
   assert(pcm_state != NULL);
@@ -366,15 +386,15 @@ int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
   ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_provided);
 
   if (ret < 0) {
-    ret = xrun_recovery(pcm_state, -ret);
-    if (ret < 0) {
-      ERROR("alsa: mmap begin avail error: %s", snd_strerror(ret));
-      return ret;
+    int recovery_ret = xrun_recovery(pcm_state, ret);
+    if (recovery_ret < 0) {
+      ERROR("alsa: mmap begin avail error: %s", snd_strerror(recovery_ret));
+      return recovery_ret;
     }
+    return -EAGAIN;
   }
-  else {
-      pcm_state->frames_remaining = pcm_state->frames_provided;
-  }
+
+  pcm_state->frames_remaining = pcm_state->frames_provided;
 
   // calculate samples address for each channel
   for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
@@ -390,18 +410,19 @@ int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
 
 
 
-int alsa_mmap_end(struct alsa_pcm_state *pcm_state) {
+static int alsa_mmap_end(struct alsa_pcm_state *pcm_state) {
   int ret = 0;
   snd_pcm_sframes_t committed;
 
+  // note that snd_pcm_mmap_commit should force a hardware pointer sync
   committed = snd_pcm_mmap_commit(pcm_state->pcm_handle, pcm_state->offset, pcm_state->frames_provided);
   if (committed < 0 || committed != pcm_state->frames_provided) {
     WARN("alsa_mmap_end commit: xrun_recovery");
-    ret = xrun_recovery(pcm_state, committed >= 0 ? EPIPE : -committed);
-    if (ret < 0) {
-      return ret;
-    }
+    ret = xrun_recovery(pcm_state, committed >= 0 ? -EPIPE : committed);
   }
+
+  pcm_state->frames_provided = 0;
+  pcm_state->frames_remaining = 0;
   return ret;
 }
 
@@ -409,39 +430,53 @@ int alsa_mmap_end(struct alsa_pcm_state *pcm_state) {
 
 
 /** xrun_recovery
- * take the error as a positive int
+ * Attempt recovery from an ALSA PCM error.
+ * Return val:
+ *   0   recovery succeeded
+ *   <0  recovery failed, or the error is not recoverable here
  */
 static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err) {
+  int ret;
+  //DEBUG("stream recovery: error (%d) %s", err, snd_strerror(err));
 
-  pcm_state->xrun_recovery_count++;
-
-  INFO("stream recovery: error %d", err);
-
-  if (err == EPIPE) {    /* under-run */
-    err = snd_pcm_prepare(pcm_state->pcm_handle);
-
-    // reset to processing first period
-    pcm_state->first_period = 1;
-
-    if (err < 0) {
-      WARN("Can't recovery from underrun, prepare failed: %s", snd_strerror(err));
+  if (err == -EPIPE) { /* under-run */
+    ret = snd_pcm_prepare(pcm_state->pcm_handle);
+    if (ret < 0) {
+      //WARN("Can't recover from underrun, prepare failed: %s", snd_strerror(ret));
+      return ret;
     }
 
     return 0;
   }
-  else if (err == ESTRPIPE) {
-    while ((err = snd_pcm_resume(pcm_state->pcm_handle)) == -EAGAIN) {
-      sleep(1);   /* wait until the suspend flag is released */
+  else if (err == -ESTRPIPE) { /* suspended */
+    ret = snd_pcm_resume(pcm_state->pcm_handle);
+
+    if (ret == -EAGAIN) {
+      // resume isn't possible yet-- don't block, let the caller deal with it
+      return -EAGAIN;
     }
-    if (err < 0) {
-      err = snd_pcm_prepare(pcm_state->pcm_handle);
-      if (err < 0) {
-        WARN("Can't recover from suspend, prepare failed: %s", snd_strerror(err));
+    else if (ret < 0) {
+      ret = snd_pcm_prepare(pcm_state->pcm_handle);
+      if (ret < 0) {
+        WARN("Can't recover from suspend, prepare failed: %s", snd_strerror(ret));
+        return ret;
       }
     }
 
     return 0;
   }
+
+  // not an error this function can recover from
   return err;
 }
 
+
+// advance the internal samples cursor for each channel by the requested number of frames.
+// No error checking is done; assume the frames argument is within the mmap region.
+static void alsa_advance_mmap_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames) {
+  for (snd_pcm_uframes_t i = 0; i < pcm_state->channels; ++i) {
+    pcm_state->samples[i] += frames * pcm_state->channel_step_size;
+  }
+
+  pcm_state->frames_remaining -= frames;
+}
