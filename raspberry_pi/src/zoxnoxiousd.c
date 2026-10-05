@@ -235,7 +235,7 @@ int main(int argc, char **argv, char **envp) {
 
 
   // init alsa pcm devices
-  pcm_state[0] = init_alsa_device(cfg, 0);
+  pcm_state[0] = alsa_open_device(cfg, 0);
   int num_hw_channels[2] = { 0 };
 
   // only init the second if the first is valid
@@ -243,7 +243,7 @@ int main(int argc, char **argv, char **envp) {
     INFO("pcm initialized for %s", pcm_state[0]->device_name);
     num_hw_channels[0] = pcm_state[0]->channels;
 
-    pcm_state[1] = init_alsa_device(cfg, 1);
+    pcm_state[1] = alsa_open_device(cfg, 1);
 
     if (pcm_state[1]) {
       INFO("pcm initialized for %s", pcm_state[1]->device_name);
@@ -373,10 +373,7 @@ int main(int argc, char **argv, char **envp) {
   report_duration_stats();
 
   // close pcm handles
-  if (pcm_state[0] && pcm_state[0]->pcm_handle) {
-    snd_pcm_abort(pcm_state[0]->pcm_handle);
-    snd_pcm_close(pcm_state[0]->pcm_handle);
-  }
+  alsa_pcm_close(pcm_state[0]);
 
   if (midi_in) {
     snd_rawmidi_close(midi_in);
@@ -602,13 +599,13 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
     // get new set of frames or advance sample pointers
     if (pcm_state[1]) {
-      int pcm1_return = alsa_advance_stream_by_frames(pcm_state[1], frames_to_advance);
+      int pcm1_return = alsa_advance_cursor(pcm_state[1], frames_to_advance);
       if (pcm1_return) {
-        INFO("pcm1: alsa_advance_stream_by_frames: %d", pcm1_return);
+        INFO("pcm1: alsa_advance_cursor: %d", pcm1_return);
       }
     }
 
-    err_pcm0 = alsa_advance_stream_by_frames(pcm_state[0], frames_to_advance);
+    err_pcm0 = alsa_advance_cursor(pcm_state[0], frames_to_advance);
 
     uint32_t next_card_processing_start_us = gpioTick();
 
@@ -930,10 +927,10 @@ static int z_midi_write(uint8_t *buffer, int buffer_size) {
 }
 
 
-// start_pcm: alsa_start_stream helper
+// start_pcm: alsa_pcm_start helper
 static int start_pcm(struct alsa_pcm_state *pcm, int *err_var, const char *name) {
   if (*err_var == -EAGAIN && pcm) {
-    *err_var = alsa_start_stream(pcm);
+    *err_var = alsa_pcm_start(pcm);
     if (*err_var != 0 && *err_var != -EAGAIN) {
       ERROR("%s: error starting stream: %d", name, *err_var);
       return 1; // Indicate an error
@@ -958,9 +955,6 @@ static void add_duration_stat(struct duration_stats *stats, uint32_t new_timing)
 
 // dump via INFO statements all stats on the runtime
 static void report_duration_stats() {
-  INFO("requested stats: pcm[0] xrun recovery: %d",
-       pcm_state[0] ? pcm_state[0]->xrun_recovery_count : -1);
-
 
   INFO("SPI writes    samples    active SPI     slack    alsa read");
   for (int i = 0; i < MAX_SPI_WRITE_STATS; ++i) {

@@ -34,7 +34,7 @@ static const snd_pcm_format_t default_snd_pcm_format = SND_PCM_FORMAT_S16_LE;
 
 
 
-struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
+struct alsa_pcm_state* alsa_open_device(config_t *cfg, int device_num) {
   struct alsa_pcm_state *pcm_state;
   snd_pcm_hw_params_t *hw_params;
   int err;
@@ -172,7 +172,7 @@ struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num) {
 
 
 
-int alsa_start_stream(struct alsa_pcm_state *pcm_state) {
+int alsa_pcm_start(struct alsa_pcm_state *pcm_state) {
   int err;
   err = alsa_pcm_ensure_ready(pcm_state);
   if (err) {
@@ -205,7 +205,7 @@ int alsa_start_stream(struct alsa_pcm_state *pcm_state) {
  * --> destination is outside next mmap
  * --> abandon residual
  */
-int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested) {
+int alsa_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested) {
   int err;
   snd_pcm_uframes_t residual_advance;
 
@@ -256,6 +256,20 @@ int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, snd_pcm_ufra
 
   return 0;
 }
+
+
+
+
+int alsa_pcm_close(struct alsa_pcm_state *pcm) {
+  if (pcm && pcm->handle) {
+    snd_pcm_hw_params_free(pcm->handle);
+
+    snd_pcm_abort(pcm->pcm_handle);
+    return snd_pcm_close(pcm->pcm_handle);
+  }
+  return -EBADF;
+}
+
 
 
 

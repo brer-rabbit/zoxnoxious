@@ -49,30 +49,25 @@ struct alsa_pcm_state {
   snd_pcm_uframes_t offset;
   const snd_pcm_channel_area_t *mmap_area;
   const char **samples; // pointer per-channel to sample data: allocated during 
-
-  // stats
-  _Atomic int xrun_recovery_count;
-  int skiped_samples;
 };
 
 
-/** init_alsa_device
+/** alsa_open_device
  *
  * Initialize an alsa pcm device.  Call with a numeric that
- * indexes to a libconfig file.  Huh, that's kinda a wonky
- * interface.
+ * indexes to a libconfig file.
  */
-struct alsa_pcm_state* init_alsa_device(config_t *cfg, int device_num);
+struct alsa_pcm_state* alsa_open_device(config_t *cfg, int device_num);
 
 
-/** alsa_start_stream
+/** alsa_pcm_start
  *
  * Wrap calls to snd_pcm_state, snd_pcm_avail_update, snd_pcm_mmap_begin.
  * Return zero for success, non-zero on failure.
  */
-int alsa_start_stream(struct alsa_pcm_state *pcm_state);
+int alsa_pcm_start(struct alsa_pcm_state *pcm_state);
 
-/** alsa_advance_stream_by_frames
+/** alsa_advance_cursor
  *
  * advance the samples pointers by frames, nominally should be one.
  * If the request is greater than current period the next
@@ -80,7 +75,14 @@ int alsa_start_stream(struct alsa_pcm_state *pcm_state);
  * This wraps calls to snd_pcm_mmap_commit, snd_pcm_state, snd_pcm_avail_update, snd_pcm_mmap_begin.
  * Return zero for success, non-zero on failure.
  */
-int alsa_advance_stream_by_frames(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested);
+int alsa_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested);
+
+
+/** alsa_pcm_close
+ *
+ * close the pcm stream.
+ */
+int alsa_pcm_close(struct alsa_pcm_state *pcm);
 
 
 #endif
