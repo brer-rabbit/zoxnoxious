@@ -28,7 +28,6 @@ static int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state);
 static int alsa_mmap_begin(struct alsa_pcm_state *pcm_state);
 static int alsa_mmap_end(struct alsa_pcm_state *pcm_state);
 static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err);
-static void alsa_advance_mmap_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames);
 
 static const snd_pcm_format_t default_snd_pcm_format = SND_PCM_FORMAT_S16_LE;
 
@@ -147,9 +146,6 @@ struct alsa_pcm_state* alsa_open_device(config_t *cfg, int device_num) {
   }
   INFO("set %s : maximum %d channels set", pcm_state->device_name, pcm_state->channels);
 
-  pcm_state->samples = (const char**)calloc(pcm_state->channels, sizeof(char*));
-
-
   if ((err = snd_pcm_hw_params(pcm_state->pcm_handle, hw_params)) < 0) {
     ERROR("cannot set parameters (%s)", snd_strerror(err));
     return NULL;
@@ -181,7 +177,9 @@ int alsa_pcm_start(struct alsa_pcm_state *pcm_state) {
 
   err = alsa_mmap_begin_with_step_calc(pcm_state);
   if (err) {
-    ERROR("zalsa: %s alsa_pcm_mmap_begin error", pcm_state->device_name);
+    if (err != -EAGAIN) {
+      ERROR("zalsa: %s alsa_pcm_mmap_begin error", pcm_state->device_name);
+    }
     return err;
   }
 
@@ -205,9 +203,10 @@ int alsa_pcm_start(struct alsa_pcm_state *pcm_state) {
  * --> destination is outside next mmap
  * --> abandon residual
  */
-int alsa_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested) {
+int alsa_pcm_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested) {
   int err;
   snd_pcm_uframes_t residual_advance;
+  snd_pcm_uframes_t frames_remaining;
 
 
   if (pcm_state->frames_provided == 0) {
@@ -220,22 +219,33 @@ int alsa_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t fram
       return err;
     }
 
-    return alsa_mmap_begin(pcm_state);
-  }
-
-  if (frames_requested < pcm_state->frames_remaining) {
-    alsa_advance_mmap_cursor(pcm_state, frames_requested);
-    return 0;
-  }
-
-  residual_advance = frames_requested - pcm_state->frames_remaining;
-
-  // advancing by frames_requested is more than what is available, get a new mmap
-  if (pcm_state->frames_provided > 0) {
-    err = alsa_mmap_end(pcm_state);
+    err = alsa_mmap_begin(pcm_state);
     if (err) {
       return err;
     }
+
+    if (frames_requested < pcm_state->frames_provided) {
+      pcm_state->cursor_offset += frames_requested;
+    }
+    // else frames_requested doesn't fit in the new region either;
+    // same "abandon" behavior as the residual-advance case below.
+
+    return 0;
+  }
+
+  frames_remaining = pcm_state->frames_provided - pcm_state->cursor_offset;
+
+  if (frames_requested < frames_remaining) {
+    pcm_state->cursor_offset += frames_requested;
+    return 0;
+  }
+
+  residual_advance = frames_requested - frames_remaining;
+
+  // advancing by frames_requested is more than what is available, get a new mmap
+  err = alsa_mmap_end(pcm_state);
+  if (err) {
+    return err;
   }
 
   err = alsa_pcm_ensure_ready(pcm_state);
@@ -249,8 +259,8 @@ int alsa_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t fram
   }
 
   if (residual_advance > 0 &&
-      residual_advance < pcm_state->frames_remaining) {
-    alsa_advance_mmap_cursor(pcm_state, residual_advance);
+      residual_advance < pcm_state->frames_provided) {
+    pcm_state->cursor_offset += residual_advance;
   }
   // else start cursor at zero on new mmap region
 
@@ -258,14 +268,22 @@ int alsa_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t fram
 }
 
 
-
-
+/* alsa_pcm_close
+ *
+ * Close the pcm stream and free any resource.  On success the passed
+ * in pointer is no longer valid after this call.
+ */
 int alsa_pcm_close(struct alsa_pcm_state *pcm) {
-  if (pcm && pcm->handle) {
-    snd_pcm_hw_params_free(pcm->handle);
-
+  if (pcm && pcm->pcm_handle) {
+    int ret;
     snd_pcm_abort(pcm->pcm_handle);
-    return snd_pcm_close(pcm->pcm_handle);
+    ret = snd_pcm_close(pcm->pcm_handle);
+    if (ret) {
+      return ret;
+    }
+    free(pcm->device_name);
+    free(pcm);
+    return 0;
   }
   return -EBADF;
 }
@@ -355,18 +373,23 @@ static int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
   ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_provided);
 
   if (ret < 0) {
-    ret = xrun_recovery(pcm_state, ret);
-    if (ret < 0) {
-      ERROR("alsa: mmap begin avail error: %s", snd_strerror(ret));
-      return ret;
+    // mmap failed, no mmap region available
+    pcm_state->frames_provided = 0;
+    pcm_state->cursor_offset = 0;
+
+    int recovery_ret = xrun_recovery(pcm_state, ret);
+    if (recovery_ret < 0) {
+      ERROR("alsa: mmap begin avail error: %s", snd_strerror(recovery_ret));
+      return recovery_ret;
     }
     return -EAGAIN;
   }
 
-  pcm_state->frames_remaining = pcm_state->frames_provided;
+  pcm_state->cursor_offset = 0;
+
   INFO("alsa mmap begin requested %ld frames received %ld frames", pcm_state->period_size, pcm_state->frames_provided);
 
-  // calculate the base address for each channelnum and step size
+  // calculate each channelnum step size
   for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
     if (pcm_state->channel_step_size == INVALID_CHANNEL_STEP_SIZE) {
       pcm_state->channel_step_size = pcm_state->mmap_area[channelnum].step / 8;
@@ -377,11 +400,6 @@ static int alsa_mmap_begin_with_step_calc(struct alsa_pcm_state *pcm_state) {
             pcm_state->mmap_area[channelnum].step / 8);
     }
 
-    // locate samples for this channel
-    pcm_state->samples[channelnum] =
-      pcm_state->mmap_area[channelnum].addr +
-      pcm_state->mmap_area[channelnum].first / 8 +
-      pcm_state->offset * pcm_state->channel_step_size;
   }
 
 
@@ -400,6 +418,10 @@ static int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
   ret = snd_pcm_mmap_begin(pcm_state->pcm_handle, &pcm_state->mmap_area, &pcm_state->offset, &pcm_state->frames_provided);
 
   if (ret < 0) {
+    // mmap failed, no mmap region available
+    pcm_state->frames_provided = 0;
+    pcm_state->cursor_offset = 0;
+
     int recovery_ret = xrun_recovery(pcm_state, ret);
     if (recovery_ret < 0) {
       ERROR("alsa: mmap begin avail error: %s", snd_strerror(recovery_ret));
@@ -408,16 +430,7 @@ static int alsa_mmap_begin(struct alsa_pcm_state *pcm_state) {
     return -EAGAIN;
   }
 
-  pcm_state->frames_remaining = pcm_state->frames_provided;
-
-  // calculate samples address for each channel
-  for (int channelnum = 0; channelnum < pcm_state->channels; ++channelnum) {
-    pcm_state->samples[channelnum] =
-      pcm_state->mmap_area[channelnum].addr +
-      pcm_state->mmap_area[channelnum].first / 8 +
-      pcm_state->offset * pcm_state->channel_step_size;
-  }
-
+  pcm_state->cursor_offset = 0;
   return 0;
 }
 
@@ -436,7 +449,7 @@ static int alsa_mmap_end(struct alsa_pcm_state *pcm_state) {
   }
 
   pcm_state->frames_provided = 0;
-  pcm_state->frames_remaining = 0;
+  pcm_state->cursor_offset = 0;
   return ret;
 }
 
@@ -485,12 +498,3 @@ static int xrun_recovery(struct alsa_pcm_state *pcm_state, int err) {
 }
 
 
-// advance the internal samples cursor for each channel by the requested number of frames.
-// No error checking is done; assume the frames argument is within the mmap region.
-static void alsa_advance_mmap_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames) {
-  for (snd_pcm_uframes_t i = 0; i < pcm_state->channels; ++i) {
-    pcm_state->samples[i] += frames * pcm_state->channel_step_size;
-  }
-
-  pcm_state->frames_remaining -= frames;
-}

@@ -558,8 +558,8 @@ static void* read_pcm_and_call_plugins(void *arg) {
         int channel_offset = plugin_card->channel_offset;
 
         // the samples relevant for this card are at the channel offset on the approp pcm device
-        const int16_t *samples = (const int16_t*) ( plugin_card->pcm_device_num == 0 ?
-                                                    pcm_state[0]->samples[channel_offset] : pcm_state[1]->samples[channel_offset] );
+        const int16_t *samples = alsa_pcm_cursor_sample(plugin_card->pcm_device_num == 0 ?
+                                                        pcm_state[0] : pcm_state[1], channel_offset);
 
         // then call the card's plugin with the samples via function pointer
         // track the total number of spi writes done by the voice cards
@@ -599,13 +599,16 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
     // get new set of frames or advance sample pointers
     if (pcm_state[1]) {
-      int pcm1_return = alsa_advance_cursor(pcm_state[1], frames_to_advance);
+      int pcm1_return = alsa_pcm_advance_cursor(pcm_state[1], frames_to_advance);
       if (pcm1_return) {
-        INFO("pcm1: alsa_advance_cursor: %d", pcm1_return);
+        INFO("pcm1: alsa_pcm_advance_cursor: %d", pcm1_return);
       }
     }
 
-    err_pcm0 = alsa_advance_cursor(pcm_state[0], frames_to_advance);
+    err_pcm0 = alsa_pcm_advance_cursor(pcm_state[0], frames_to_advance);
+    if (err_pcm0 && err_pcm0 != -EAGAIN) {
+      INFO("pcm0: alsa_pcm_advance_cursor: %d", err_pcm0);
+    }
 
     uint32_t next_card_processing_start_us = gpioTick();
 

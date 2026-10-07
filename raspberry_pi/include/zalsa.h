@@ -44,11 +44,11 @@ struct alsa_pcm_state {
   int channel_step_size; // step size for each channel in a frame
 
   // dynamic as we process samples
-  snd_pcm_uframes_t frames_provided;
-  snd_pcm_uframes_t frames_remaining;
-  snd_pcm_uframes_t offset;
+  snd_pcm_uframes_t offset; // ALSA's starting offset for an mmap region
+  snd_pcm_uframes_t frames_provided; // number of contiguous frames from ALSA
+  snd_pcm_uframes_t cursor_offset; // app position from offset to frames_provided
+
   const snd_pcm_channel_area_t *mmap_area;
-  const char **samples; // pointer per-channel to sample data: allocated during 
 };
 
 
@@ -69,13 +69,15 @@ int alsa_pcm_start(struct alsa_pcm_state *pcm_state);
 
 /** alsa_advance_cursor
  *
- * advance the samples pointers by frames, nominally should be one.
+ * Advance the application cursor by the requested number of frames.
+ * If the requested position crosses the current mmap region boundary
+ * commit the current region and acquire the next contiguous region.
  * If the request is greater than current period the next
- * period is requested.  There's likely a bug in there.
- * This wraps calls to snd_pcm_mmap_commit, snd_pcm_state, snd_pcm_avail_update, snd_pcm_mmap_begin.
- * Return zero for success, non-zero on failure.
+ *
+ * Return zero for success, negative errno on failure.
+ *
  */
-int alsa_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested);
+int alsa_pcm_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t frames_requested);
 
 
 /** alsa_pcm_close
@@ -84,5 +86,18 @@ int alsa_advance_cursor(struct alsa_pcm_state *pcm_state, snd_pcm_uframes_t fram
  */
 int alsa_pcm_close(struct alsa_pcm_state *pcm);
 
+
+/** alsa_pcm_cursor_channel
+ *
+ * based on the cursor, return a pointer to the current sample for this channel.
+ * Cursor is not verified as being valid.
+ */
+static inline const int16_t* alsa_pcm_cursor_sample(const struct alsa_pcm_state *pcm_state, unsigned int channel) {
+    return (const int16_t*)(
+                            (const char*) pcm_state->mmap_area[channel].addr +
+                            pcm_state->mmap_area[channel].first / 8 +
+                            (pcm_state->offset + pcm_state->cursor_offset) *
+                            pcm_state->channel_step_size);
+}
 
 #endif
