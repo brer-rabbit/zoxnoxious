@@ -90,7 +90,7 @@ static struct duration_stats alsa_read_time_by_spi_writes[MAX_SPI_WRITE_STATS] =
 
 /* globals-  mainly so they can be accessed by signal handler  */
 static struct card_manager *card_mgr = NULL;
-static struct alsa_pcm_state *pcm_state[2] = { NULL, NULL };
+static struct alsa_pcm_state *pcm_state = NULL;
 static snd_rawmidi_t *midi_in = NULL;
 static snd_rawmidi_t *midi_out = NULL;
 static pthread_mutex_t midi_out_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -232,32 +232,14 @@ int main(int argc, char **argv, char **envp) {
   }
 #endif
 
-
-
   // init alsa pcm devices
-  pcm_state[0] = alsa_open_device(cfg, 0);
-  int num_hw_channels[2] = { 0 };
-
-  // only init the second if the first is valid
-  if (pcm_state[0]) {
-    INFO("pcm initialized for %s", pcm_state[0]->device_name);
-    num_hw_channels[0] = pcm_state[0]->channels;
-
-    pcm_state[1] = alsa_open_device(cfg, 1);
-
-    if (pcm_state[1]) {
-      INFO("pcm initialized for %s", pcm_state[1]->device_name);
-      num_hw_channels[1] = pcm_state[1]->channels;
-    }
-
-    if (pcm_state[1] && pcm_state[0]->channels != pcm_state[1]->channels) {
-      FATAL("devices must have same number of channels: %s (%d) and %s (%d)",
-            pcm_state[0]->device_name, pcm_state[0]->channels,
-            pcm_state[1]->device_name, pcm_state[1]->channels);
-      abort();
-    }
+  pcm_state = alsa_open_device(cfg, 0);
+  if (pcm_state == NULL) {
+    ERROR("fail to open PCM device");
+    abort();
   }
 
+  INFO("pcm initialized for %s", pcm_state->device_name);
 
   // init alsa midi device
   if (open_midi_device(cfg) != 0) {
@@ -267,11 +249,12 @@ int main(int argc, char **argv, char **envp) {
 
   
   // detect installed cards- get the card manager going
+  int num_hw_channels = pcm_state->channels;
   card_mgr = init_card_manager(cfg);
   discover_cards(card_mgr);
   load_card_plugins(card_mgr);
   assign_update_order(card_mgr);
-  assign_hw_audio_channels(card_mgr, num_hw_channels, 2);
+  assign_hw_audio_channels(card_mgr, &num_hw_channels, 1);
 
   struct zhost *zhost;
   if ( (zhost = zhost_create()) == NULL) {
@@ -373,7 +356,7 @@ int main(int argc, char **argv, char **envp) {
   report_duration_stats();
 
   // close pcm handles
-  alsa_pcm_close(pcm_state[0]);
+  alsa_pcm_close(pcm_state);
 
   if (midi_in) {
     snd_rawmidi_close(midi_in);
@@ -483,9 +466,9 @@ static void* read_pcm_and_call_plugins(void *arg) {
   // Which assumes both streams are on the same clock.
   struct itimerspec itimerspec_sample_clock = {
     .it_interval.tv_sec = 0,
-    .it_interval.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
+    .it_interval.tv_nsec = 1000000000 / pcm_state->sampling_rate,
     .it_value.tv_sec = 0,
-    .it_value.tv_nsec = 1000000000 / pcm_state[0]->sampling_rate,
+    .it_value.tv_nsec = 1000000000 / pcm_state->sampling_rate,
   };
   const uint32_t nominal_period_us = itimerspec_sample_clock.it_interval.tv_nsec / 1000;
 
@@ -506,32 +489,25 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
   INFO("starting timer %ld usec for sampling rate %d hz",
        itimerspec_sample_clock.it_interval.tv_nsec / 1000,
-       pcm_state[0]->sampling_rate);
+       pcm_state->sampling_rate);
   // logging from here forward may be tricky / time sensitive
 
-  int err_pcm0 = -EAGAIN, err_pcm1 = -EAGAIN;
-  while (alsa_thread_run && (err_pcm0 == -EAGAIN || err_pcm1 == -EAGAIN)) {
-    if (start_pcm(pcm_state[0], &err_pcm0, "pcm0")) {
+  int err_pcm0 = -EAGAIN;
+  while (alsa_thread_run && err_pcm0 == -EAGAIN) {
+    if (start_pcm(pcm_state, &err_pcm0, "pcm0")) {
       break;
     }
-    if (pcm_state[1]) {
-      if (start_pcm(pcm_state[1], &err_pcm1, "pcm1")) {
-        break;
-      }
-    }
-    else {
-      err_pcm1 = 0;
-    }
 
-    if (err_pcm0 == -EAGAIN || err_pcm1 == -EAGAIN) {
+    if (err_pcm0 == -EAGAIN) {
       usleep(1000); // 1 millisecond, don't get greedy and keep it too busy
     }
   }
 
-  if (err_pcm0) alsa_thread_run = 0;
-  if (err_pcm1 && pcm_state[1]) alsa_thread_run = 0;
+  if (err_pcm0) {
+    alsa_thread_run = 0;
+  }
 
-  // all PCM streams should be good now
+  // PCM stream should be good now
 
   if ( (timerfd_settime(timerfd_sample_clock, 0, &itimerspec_sample_clock, 0) ) == -1) {
     char error[256];
@@ -558,8 +534,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
         int channel_offset = plugin_card->channel_offset;
 
         // the samples relevant for this card are at the channel offset on the approp pcm device
-        const int16_t *samples = alsa_pcm_cursor_sample(plugin_card->pcm_device_num == 0 ?
-                                                        pcm_state[0] : pcm_state[1], channel_offset);
+        const int16_t *samples = alsa_pcm_cursor_sample(pcm_state, channel_offset);
 
         // then call the card's plugin with the samples via function pointer
         // track the total number of spi writes done by the voice cards
@@ -598,14 +573,7 @@ static void* read_pcm_and_call_plugins(void *arg) {
 
 
     // get new set of frames or advance sample pointers
-    if (pcm_state[1]) {
-      int pcm1_return = alsa_pcm_advance_cursor(pcm_state[1], frames_to_advance);
-      if (pcm1_return) {
-        INFO("pcm1: alsa_pcm_advance_cursor: %d", pcm1_return);
-      }
-    }
-
-    err_pcm0 = alsa_pcm_advance_cursor(pcm_state[0], frames_to_advance);
+    err_pcm0 = alsa_pcm_advance_cursor(pcm_state, frames_to_advance);
     if (err_pcm0 && err_pcm0 != -EAGAIN) {
       INFO("pcm0: alsa_pcm_advance_cursor: %d", err_pcm0);
     }
