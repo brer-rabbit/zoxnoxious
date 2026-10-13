@@ -15,18 +15,28 @@
 
 #include <assert.h>
 #include <stdatomic.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
 #include "zcard_plugin.h"
 
 #define SPI_MODE 1
+// Queuee size _must_ be a power of 2 for the bitwise
 #define YM2203_QUEUE_SIZE 256
 #define YM2203_QUEUE_MASK (YM2203_QUEUE_SIZE - 1)
-
+static_assert((YM2203_QUEUE_SIZE & (YM2203_QUEUE_SIZE - 1)) == 0,
+              "YM2203_QUEUE_SIZE must be a power of 2");
 
 static const int spi_channel_cs0 = 0;
+static const int spi_channel_cs1 = 1;
 static const uint32_t spi_ym2203_write_wait = 3; // delay from address to value write
+
+// ym2203 register write modeled as address & value
+struct ym2203_write {
+  char address;
+  char value;
+};
 
 struct ym2203_queue {
   struct ym2203_write entries[YM2203_QUEUE_SIZE];
@@ -48,14 +58,13 @@ struct ym2203_card {
 static void ym2203_queue_init(struct ym2203_queue *q);
 static bool ym2203_queue_pop(struct ym2203_queue *q, struct ym2203_write *write);
 static bool ym2203_queue_push(struct ym2203_queue *q, uint8_t address, uint8_t value);
-static int ym2203_write_register(struct ym2203_card *card, uint8_t address, uint8_t value);
+static int ym2203_write_register(struct ym2203_card *card, char address, char value);
 
 
 
 
 
-void *init_zcard(struct zhost *zhost, int slot)
-{
+void *init_zcard(struct zhost *zhost, int slot) {
     struct ym2203_card *card = calloc(1, sizeof(*card));
     if (!card)
         return NULL;
@@ -72,16 +81,15 @@ void *init_zcard(struct zhost *zhost, int slot)
 }
 
 
-int process_samples(void *zcard_plugin, const int16_t *samples)
-{
+int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct ym2203_card *card = zcard_plugin;
 
   set_spi_interface(card->zhost, spi_channel_cs0, SPI_MODE, card->slot);
 
-  if (!card->hardware_initialized) {
-    ym2203_initialize(card);
-    card->hardware_initialized = true;
-  }
+  //  if (!card->hardware_initialized) {
+  //    ym2203_initialize(card);
+  //    card->hardware_initialized = true;
+  //  }
 
   if (++card->test_counter >= 4000) {
     card->test_counter = 0;
@@ -138,12 +146,12 @@ static bool ym2203_queue_pop(struct ym2203_queue *q, struct ym2203_write *write)
 
 
 // write the 8-bit value to the register at address
-static int ym2203_write_register(struct ym2203_card *card, uint8_t address, uint8_t value) {
+static int ym2203_write_register(struct ym2203_card *card, char address, char value) {
   int spi_channel_a0, spi_channel_data;
-  unsigned char a0_low = 0x00, a0_high = 0x01;
+  char a0_low = 0x00, a0_high = 0x01;
 
-  spi_channel_a0 = set_spi_interface(zhost, spi_channel_cs0, SPI_MODE, card->slot);
-  spi_channel_data = set_spi_interface(zhost, spi_channel_cs1, SPI_MODE, card->slot);
+  spi_channel_a0 = set_spi_interface(card->zhost, spi_channel_cs0, SPI_MODE, card->slot);
+  spi_channel_data = set_spi_interface(card->zhost, spi_channel_cs1, SPI_MODE, card->slot);
   // SPI write A0 low via CS0
   // SPI write address via CVS1
   // delay 3 microseoncds
