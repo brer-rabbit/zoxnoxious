@@ -22,7 +22,7 @@
 #include "zcard_plugin.h"
 
 #define SPI_MODE 1
-// Queuee size _must_ be a power of 2 for the bitwise
+// Queuee size _must_ be a power of 2 for the bitwise operations
 #define YM2203_QUEUE_SIZE 256
 #define YM2203_QUEUE_MASK (YM2203_QUEUE_SIZE - 1)
 static_assert((YM2203_QUEUE_SIZE & (YM2203_QUEUE_SIZE - 1)) == 0,
@@ -40,12 +40,11 @@ struct ym2203_write {
 
 struct ym2203_queue {
   struct ym2203_write entries[YM2203_QUEUE_SIZE];
-
   _Atomic unsigned int head;
   _Atomic unsigned int tail;
 };
 
-struct ym2203_card {
+struct ym2203_zcard {
   struct zhost *zhost;
   int slot;
 
@@ -58,31 +57,54 @@ struct ym2203_card {
 static void ym2203_queue_init(struct ym2203_queue *q);
 static bool ym2203_queue_pop(struct ym2203_queue *q, struct ym2203_write *write);
 static bool ym2203_queue_push(struct ym2203_queue *q, uint8_t address, uint8_t value);
-static int ym2203_write_register(struct ym2203_card *card, char address, char value);
+static int ym2203_write_register(struct ym2203_zcard *card, char address, char value);
 
 
 
 
 
 void *init_zcard(struct zhost *zhost, int slot) {
-    struct ym2203_card *card = calloc(1, sizeof(*card));
-    if (!card)
-        return NULL;
+    struct ym2203_zcard *zcard = calloc(1, sizeof(struct ym2203_zcard));
+    if (!zcard) {
+      return NULL;
+    }
 
-    card->zhost = zhost;
-    card->slot = slot;
+    zcard->zhost = zhost;
+    zcard->slot = slot;
 
-    ym2203_queue_init(&card->queue);
+    ym2203_queue_init(&zcard->queue);
 
-    card->test_counter = 0;
-    card->ioa_value = 0xff;
+    zcard->test_counter = 0;
+    zcard->ioa_value = 0xff;
 
-    return card;
+    return zcard;
+}
+
+
+void free_zcard(void *zcard_plugin) {
+  struct ym2203_zcard *z2203 = (struct ym2203_zcard*)zcard_plugin;
+
+  if (z2203) {
+    free(z2203);
+  }
+}
+
+
+char* get_plugin_name() {
+  return "Zoxnoxious 2203";
+}
+
+
+struct zcard_properties* get_zcard_properties() {
+  struct zcard_properties *props = (struct zcard_properties*) malloc(sizeof(struct zcard_properties));
+  props->num_channels = 0;
+  props->spi_mode = SPI_MODE;
+  return props;
 }
 
 
 int process_samples(void *zcard_plugin, const int16_t *samples) {
-  struct ym2203_card *card = zcard_plugin;
+  struct ym2203_zcard *card = zcard_plugin;
 
   set_spi_interface(card->zhost, spi_channel_cs0, SPI_MODE, card->slot);
 
@@ -99,6 +121,33 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     ym2203_write_register(card, 0x0e, card->ioa_value);
   }
 
+  return 0;
+}
+
+
+int process_midi(void *zcard_plugin, uint8_t *midi_message, size_t size) {
+  return 0;
+}
+
+int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
+  return 0;
+}
+
+
+
+int tunereq_save_state(void *zcard_plugin) {
+  return 0;
+}
+
+tune_status_t tunereq_set_point(void *zcard_plugin) {
+  return TUNE_COMPLETE_SUCCESS;
+}
+
+tune_status_t tunereq_measurement(void *zcard_plugin, struct tuning_measurement *tuning_measurement) {
+  return TUNE_COMPLETE_SUCCESS;
+}
+
+int tunereq_restore_state(void *zcard_plugin) {
   return 0;
 }
 
@@ -146,7 +195,7 @@ static bool ym2203_queue_pop(struct ym2203_queue *q, struct ym2203_write *write)
 
 
 // write the 8-bit value to the register at address
-static int ym2203_write_register(struct ym2203_card *card, char address, char value) {
+static int ym2203_write_register(struct ym2203_zcard *card, char address, char value) {
   int spi_channel_a0, spi_channel_data;
   char a0_low = 0x00, a0_high = 0x01;
 
