@@ -21,7 +21,7 @@
 
 #include "zcard_plugin.h"
 
-#define SPI_MODE 1
+#define SPI_MODE 0
 // Queuee size _must_ be a power of 2 for the bitwise operations
 #define YM2203_QUEUE_SIZE 256
 #define YM2203_QUEUE_MASK (YM2203_QUEUE_SIZE - 1)
@@ -77,6 +77,9 @@ void *init_zcard(struct zhost *zhost, int slot) {
     zcard->test_counter = 0;
     zcard->ioa_value = 0xff;
 
+    // purportedly this sets port B & A to output
+    ym2203_write_register(zcard, 0x07, 0xc0);
+
     return zcard;
 }
 
@@ -106,13 +109,6 @@ struct zcard_properties* get_zcard_properties() {
 int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct ym2203_zcard *card = zcard_plugin;
 
-  set_spi_interface(card->zhost, spi_channel_cs0, SPI_MODE, card->slot);
-
-  //  if (!card->hardware_initialized) {
-  //    ym2203_initialize(card);
-  //    card->hardware_initialized = true;
-  //  }
-
   if (++card->test_counter >= 4000) {
     card->test_counter = 0;
 
@@ -121,7 +117,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
     ym2203_write_register(card, 0x0e, card->ioa_value);
   }
 
-  return 0;
+  return 4;
 }
 
 
@@ -197,7 +193,9 @@ static bool ym2203_queue_pop(struct ym2203_queue *q, struct ym2203_write *write)
 // write the 8-bit value to the register at address
 static int ym2203_write_register(struct ym2203_zcard *card, char address, char value) {
   int spi_channel_a0, spi_channel_data;
-  char a0_low = 0x00, a0_high = 0x01;
+  char a0_low = 0x00, a0_high = 0x80;
+
+  a0_high = a0_high | ((value & 0x02) >> 1); // U7 QA LED mirrors IOA1
 
   spi_channel_a0 = set_spi_interface(card->zhost, spi_channel_cs0, SPI_MODE, card->slot);
   spi_channel_data = set_spi_interface(card->zhost, spi_channel_cs1, SPI_MODE, card->slot);
