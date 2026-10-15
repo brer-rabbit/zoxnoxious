@@ -30,7 +30,8 @@ static_assert((YM2203_QUEUE_SIZE & (YM2203_QUEUE_SIZE - 1)) == 0,
 
 static const int spi_channel_cs0 = 0;
 static const int spi_channel_cs1 = 1;
-static const uint32_t spi_ym2203_write_wait = 3; // delay from address to value write
+static const uint32_t spi_ym2203_write_address_wait = 3; // delay after address writes
+static const uint32_t spi_ym2203_write_data_wait = 25; // delay after data writes
 
 // ym2203 register write modeled as address & value
 struct ym2203_write {
@@ -79,6 +80,25 @@ void *init_zcard(struct zhost *zhost, int slot) {
 
     // purportedly this sets port B & A to output
     ym2203_write_register(zcard, 0x07, 0xc0);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    // Algorithm 7: all operators are carriers
+    ym2203_write_register(zcard, 0xb0, 0x07);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    // Operator 1 attack rate = maximum
+    ym2203_write_register(zcard, 0x50, 0x1f);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    // Set channel 1 frequency
+    ym2203_write_register(zcard, 0xa4, 0x7f);
+    gpioDelay(spi_ym2203_write_data_wait);
+    ym2203_write_register(zcard, 0xa0, 0x7f);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    // Key on operator 1, channel 1
+    ym2203_write_register(zcard, 0x28, 0x10);
+    gpioDelay(spi_ym2203_write_data_wait);
 
     return zcard;
 }
@@ -207,7 +227,7 @@ static int ym2203_write_register(struct ym2203_zcard *card, char address, char v
   spiWrite(spi_channel_a0, &a0_low, 1);
   spiWrite(spi_channel_data, &address, 1);
    
-  gpioDelay(spi_ym2203_write_wait);
+  gpioDelay(spi_ym2203_write_address_wait);
 
   spiWrite(spi_channel_a0, &a0_high, 1);
   spiWrite(spi_channel_data, &value, 1);
