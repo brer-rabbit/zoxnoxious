@@ -163,8 +163,7 @@ void OutputInterface::process(const ProcessArgs& args) {
     processMidiInMessage(midiInMsg);
   }
 
-  // DEBUG REMOVE THIS
-#define DEBUG_DISCO_REPORT
+  // define DEBUG_DISCO_REPORT to test a specific hardware spec
 #ifdef DEBUG_DISCO_REPORT
   if (APP->engine->getFrame() == 40000) {
     midi::Message discoReport;
