@@ -53,6 +53,7 @@ struct ym2203_zcard {
 
   unsigned int test_counter;
   uint8_t ioa_value; // I/O A register on YM2203
+  uint8_t key_on_off;
 };
 
 static void ym2203_queue_init(struct ym2203_queue *q);
@@ -77,27 +78,51 @@ void *init_zcard(struct zhost *zhost, int slot) {
 
     zcard->test_counter = 0;
     zcard->ioa_value = 0xff;
+    zcard->key_on_off = 0x10;
 
+    ym2203_write_register(zcard, 0x00, 0xff);
+    ym2203_write_register(zcard, 0x01, 0x00);
     // purportedly this sets port B & A to output
-    ym2203_write_register(zcard, 0x07, 0xc0);
+    ym2203_write_register(zcard, 0x07, 0xfe); // was: c0
     gpioDelay(spi_ym2203_write_data_wait);
 
-    // Algorithm 7: all operators are carriers
-    ym2203_write_register(zcard, 0xb0, 0x07);
+    /* Channel A fixed volume = maximum */
+    ym2203_write_register(zcard, 0x08, 0x0f);
     gpioDelay(spi_ym2203_write_data_wait);
 
-    // Operator 1 attack rate = maximum
+    /* OP1: DT=0, MULTI=1 */
+    ym2203_write_register(zcard, 0x30, 0x01);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    /* OP1: TL=0, maximum amplitude */
+    ym2203_write_register(zcard, 0x40, 0x00);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    /* OP1: KS=0, AR=31 */
     ym2203_write_register(zcard, 0x50, 0x1f);
     gpioDelay(spi_ym2203_write_data_wait);
 
-    // Set channel 1 frequency
-    ym2203_write_register(zcard, 0xa4, 0x7f);
-    gpioDelay(spi_ym2203_write_data_wait);
-    ym2203_write_register(zcard, 0xa0, 0x7f);
+    /* OP1: DR=0 */
+    ym2203_write_register(zcard, 0x60, 0x00);
     gpioDelay(spi_ym2203_write_data_wait);
 
-    // Key on operator 1, channel 1
-    ym2203_write_register(zcard, 0x28, 0x10);
+    /* OP1: SR=0 */
+    ym2203_write_register(zcard, 0x70, 0x00);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    /* OP1: SL=0, RR=15 */
+    ym2203_write_register(zcard, 0x80, 0x0f);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    /* Channel 1 algorithm 7 */
+    ym2203_write_register(zcard, 0xb0, 0x07);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    /* Frequency */
+    ym2203_write_register(zcard, 0xa4, 0x17);
+    gpioDelay(spi_ym2203_write_data_wait);
+
+    ym2203_write_register(zcard, 0xa0, 0x2f);
     gpioDelay(spi_ym2203_write_data_wait);
 
     return zcard;
@@ -132,11 +157,11 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
   if (++card->test_counter >= 4000) {
     card->test_counter = 0;
 
-    card->ioa_value ^= 0x02;
-
-    ym2203_write_register(card, 0x0e, card->ioa_value);
+    card->key_on_off = card->key_on_off == 0x00 ? 0xf0 : 0x00;
+    ym2203_write_register(card, 0x28, card->key_on_off);
   }
 
+  // return the number of SPI transactions
   return 4;
 }
 
