@@ -16,34 +16,34 @@ to offset which channel to write to for each card.
 
 #  byte  desc
 -- ----  ----
-a  0xF0  sysex
-b  0x7D  test manufacturer
-c  0x01  discovery report
-d  0x??  cardA id
-e  0x??  cardA cv channel offset
-f  0x??  cardA audio interface Id
-g  0x??  cardB id
-h  0x??  cardB cv channel offset
-i  0x??  cardB audio interface Id
-j  0x??  cardC id
-k  0x??  cardC cv channel offset
-l  0x??  cardC audio interface Id
-m  0x??  cardD id
-n  0x??  cardD cv channel offset
-o  0x??  cardD audio interface Id
-p  0x??  cardE id
-q  0x??  cardE cv channel offset
-r  0x??  cardE audio interface Id
-s  0x??  cardF id
-t  0x??  cardF cv channel offset
-u  0x??  cardF audio interface Id
-v  0x??  cardG id
-w  0x??  cardG cv channel offset
-x  0x??  cardG audio interface Id
-y  0x??  cardH id
-z  0x??  cardH cv channel offset
-a  0x??  cardH audio interface Id
-b  0xF7  end sysex
+0  0xF0  sysex
+1  0x7D  test manufacturer
+2  0x01  discovery report
+3  0x??  cardA id
+4  0x??  cardA cv channel offset
+5  0x??  cardA audio interface Id
+6  0x??  cardB id
+7  0x??  cardB cv channel offset
+8  0x??  cardB audio interface Id
+9  0x??  cardC id
+10 0x??  cardC cv channel offset
+11 0x??  cardC audio interface Id
+12 0x??  cardD id
+13 0x??  cardD cv channel offset
+14 0x??  cardD audio interface Id
+15 0x??  cardE id
+16 0x??  cardE cv channel offset
+17 0x??  cardE audio interface Id
+18 0x??  cardF id
+19 0x??  cardF cv channel offset
+20 0x??  cardF audio interface Id
+21 0x??  cardG id
+22 0x??  cardG cv channel offset
+23 0x??  cardG audio interface Id
+24 0x??  cardH id
+25 0x??  cardH cv channel offset
+26 0x??  cardH audio interface Id
+27 0xF7  end sysex
 
 
 
@@ -51,39 +51,70 @@ Receive Data
 ------------
 
 
-Discovery Request
-Client requests the above Discovery Report.
-
-#  byte  desc
--- ----  ----
-a  0xF0  sysex
-b  0x7D  test manufacturer
-c  0x02  discovery ack
-d  0xF7  end sysex
-
-
-
-Autotune Requst
+Autotune Request
 Client requests all cards tune
 #  byte  desc
 -- ----  ----
-a  0xF6  MIDI standard for tune request
+0  0xF6  MIDI standard for tune request
 
 
-Shutdown Requst
+Discovery Request
+Client requests the above Discovery Report.
+#  byte  desc
+-- ----  ----
+0  0xF0  sysex
+1  0x7D  test manufacturer
+2  0x02  discovery ack
+3  0xF7  end sysex
+
+Shutdown Request
 Client requests shutdown of cpu
 #  byte  desc
 -- ----  ----
-a  0xF0  sysex
-b  0x7D  test manufacturer
-c  0x03  shutdown request
-d  0xF7  end sysex
+0  0xF0  sysex
+1  0x7D  test manufacturer
+2  0x03  shutdown request
+3  0xF7  end sysex
 
-Restart Requst
+Restart Request
 Client requests shutdown of cpu
 #  byte  desc
 -- ----  ----
-a  0xF0  sysex
-b  0x7D  test manufacturer
-c  0x04  restart request
-d  0xF7  end sysex
+0  0xF0  sysex
+1  0x7D  test manufacturer
+2  0x04  restart request
+3  0xF7  end sysex
+
+
+Program Change
+Client requests a patch change on a specific card.
+The card is bound to a particular MIDI channel.
+Program change number is card specific.
+#  byte  desc
+-- ----  ----
+0  0xC?  MIDI Program Change / Channel
+1  0x??  Channel 0-127
+
+
+Card Specific Requests
+
+Format of card specific sysex by slot
+#  byte  desc
+-- ----  ----
+0  0xF0  sysex
+1  0x7D  test manufacturer
+2  0x?F  Upper four bits: card slot 0-7 with high bit cleared; lower four set to all 1s
+..
+.  0xF7  end sysex
+
+
+Z2203 Requests
+#  byte  desc
+-- ----  ----
+0  0xF0  sysex
+1  0x7D  test manufacturer
+2  0x?F  Card sysex by slot
+3  0x00  Bulk YM2203 register-write commands
+4..N <variable> Encoded register address/value pairs
+         First transmitted byte contains high bits of the seven original bytes.
+N+1  0xF7  end sysex
