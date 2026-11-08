@@ -47,8 +47,9 @@ enum midi_status_byte {
 
 
 enum midi_message_type {
+  MIDI_MSG_PROGRAM_CHANGE,
   MIDI_MSG_SYSEX,
-  MIDI_MSG_PROGRAM_CHANGE
+  MIDI_MSG_TUNE_REQUEST
 };
 
 struct midi_message {
@@ -77,7 +78,7 @@ struct midi_parser {
 void midi_parser_init(struct midi_parser *parser);
 
 // set buffer to parse, expected post-read from snd_rawmidi_read.
-// The parser internal state is reset.
+// The parser input buffer state is reset.
 void midi_parser_set_input(struct midi_parser *parser, const uint8_t *buffer, size_t length);
 
 // The maintained state of the parser reads from previously set buffer

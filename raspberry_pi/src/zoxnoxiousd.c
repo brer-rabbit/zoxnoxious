@@ -119,6 +119,7 @@ static void* midi_in_to_plugins(void *);
 static void generate_discovery_report(uint8_t discovery_report_sysex[]);
 static int z_midi_write(uint8_t *buffer, int buffer_size);
 static int get_midi_input_fd();
+static void sysex_message_handler(const uint8_t *data, size_t length);
 static int start_pcm(struct alsa_pcm_state *pcm, int *err_var, const char *name);
 static void add_duration_stat(struct duration_stats *stats, uint32_t new_timing);
 static void report_duration_stats();
@@ -126,7 +127,6 @@ static void add_timer_period_stat(struct timer_period_stats *stats,
                                   uint32_t period_us, uint32_t nominal_period_us);
 static void report_timer_period_stats(const struct timer_period_stats *stats, uint32_t nominal_period_us);
 static void report_expiration_timing_stats(const struct deadline_stats *deadline_stats);
-
 
 int main(int argc, char **argv, char **envp) {
   config_t *cfg;
@@ -648,7 +648,7 @@ enum sysex_message_type {
   DISCOVERY_REQUEST = 0x02,
   SHUTDOWN_REQUEST = 0x03,
   RESTART_REQUEST = 0x04,
-  VALID_MANUFACTURER_ID = 0x7D
+  VOICE_CARD_MASK = 0x0F
 };
 
 // Discovered card number maps to MIDI channel number.  Not actual slot number.
@@ -694,6 +694,8 @@ static int get_midi_input_fd() {
 }
 
 
+static uint8_t discovery_report_sysex[DISCOVERY_REPORT_SIZE_BYTES] = { 0 };
+
 // read the midi stream, pass along to cards.  To be called as a thread.
 // Poll the MIDI in stream with a timeout of MIDI_TIMEOUT_MS.  Timeout allows
 // periodic checking of whether the thread should terminate or not.
@@ -701,7 +703,6 @@ static void* midi_in_to_plugins(void *arg) {
   int midi_fd = get_midi_input_fd();
   ssize_t midi_read_bytes = 0;
   uint8_t buffer[256];
-  uint8_t discovery_report_sysex[DISCOVERY_REPORT_SIZE_BYTES] = { 0 };
   struct midi_parser midi_parser;
   struct midi_message midi_message;
 
@@ -742,7 +743,36 @@ static void* midi_in_to_plugins(void *arg) {
           midi_parser_set_input(&midi_parser, buffer, midi_read_bytes);
 
           while (midi_parser_next(&midi_parser, &midi_message)) {
-            // dispatch_midi_message(&message);
+            switch (midi_message.type) {
+            case MIDI_MSG_PROGRAM_CHANGE:
+              INFO("MIDI: channel 0x%X program change: 0x%X",
+                   midi_message.channel, midi_message.program);
+              // card numbering maps to midi channel.  So check we've got a valid
+              // midi channel against how many cards we've got to ensure we can
+              // dispatch the midi message.
+              if (midi_message.channel < card_mgr->num_cards) {
+                struct plugin_card *card = &card_mgr->cards[ midi_message.channel ];
+                // leap of faith into the function
+                card->process_midi_program_change(card->plugin_object, midi_message.program);
+              }
+              else {
+                WARN("Unexpected MIDI: program change 0x%X on channel 0x%X",
+                     midi_message.program, midi_message.channel);
+              }
+
+              break;
+            case MIDI_MSG_SYSEX:
+              sysex_message_handler(midi_message.data, midi_message.length);
+              break;
+            case MIDI_MSG_TUNE_REQUEST:
+              INFO("MIDI tune requested");
+              if (!system_tune_in_progress) {
+                system_tune_requested = 1;
+              }
+              break;
+            default:
+              break;
+            }
           }
 
         }
@@ -751,7 +781,7 @@ static void* midi_in_to_plugins(void *arg) {
           break;
         }
       }
-    } // else - Can do other non-MIDI related tasks here if needed
+    }
   }
   INFO("Exiting MIDI input thread.");
   return NULL;
@@ -799,6 +829,77 @@ static int z_midi_write(uint8_t *buffer, int buffer_size) {
   }
 
   return midi_write_status;
+}
+
+
+// given a sysex message validate it.  If valid, handle internal
+// zoxnoxiousd commands and dispatch out to voice card specific sysex.
+static void sysex_message_handler(const uint8_t *data, size_t length) {
+  static const uint8_t sysex_manufacturer_id = 0x7D;
+
+  if (length < 4 ||
+      data[0] != MIDI_SYSEX_START ||
+      data[length - 1] != MIDI_SYSEX_END)
+    return;
+
+  if (data[1] != sysex_manufacturer_id) {
+    return;
+  }
+
+  uint8_t command = data[2];
+
+  if ((command & VOICE_CARD_MASK) == VOICE_CARD_MASK) {
+    int card_num = command >> 4;
+
+    if (card_num >= card_mgr->num_cards) {
+      WARN("Invalid SysEx card number %d", card_num);
+      return;
+    }
+
+    struct plugin_card *card = &card_mgr->cards[card_num];
+
+    INFO("Dispatch MIDI SysEx for card %d", card_num);
+    card->process_midi(card->plugin_object, data, length);
+    return;
+  }
+
+  switch (command) {
+
+  case DISCOVERY_REQUEST:
+    if (length != 4) {
+      ERROR("Invalid Discovery Request sysex");
+      return;
+    }
+    // no additional data required for a discovery request
+    // action is to send a discovery response
+    INFO("MIDI: Discovery Request sysex received, sending %zu byte Discovery Response",
+         sizeof(discovery_report_sysex) / sizeof(uint8_t));
+    z_midi_write(discovery_report_sysex, sizeof(discovery_report_sysex) / sizeof(uint8_t));
+    break;
+
+  case SHUTDOWN_REQUEST:
+    if (length != 4) {
+      ERROR("Invalid Shutdown request sysex");
+      return;
+    }
+    INFO("Shutdown request received");
+    midi_request_shutdown = 1;
+    alsa_thread_run = 0;
+    break;
+
+  case RESTART_REQUEST:
+    if (length != 4) {
+      ERROR("Invalid Restart request sysex");
+      return;
+    }
+    midi_request_restart = 1;
+    alsa_thread_run = 0;
+    break;
+
+  default:
+    ERROR("Invalid sysex");
+    break;
+  }
 }
 
 

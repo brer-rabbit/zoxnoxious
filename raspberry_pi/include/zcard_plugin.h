@@ -115,7 +115,7 @@ typedef int (*process_samples_f)(void *zcard_plugin, const int16_t *samples);
  * process a midi message for the card.  Message is filtered to be for this plugin.
  * This interface is for non-program change messages.
  */
-typedef int (*process_midi_f)(void *zcard_plugin, uint8_t *midi_message, size_t size);
+typedef int (*process_midi_f)(void *zcard_plugin, const uint8_t *midi_message, size_t size);
 
 
 /** process_midi_program_change

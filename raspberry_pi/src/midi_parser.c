@@ -78,6 +78,12 @@ int midi_parser_next(struct midi_parser *parser, struct midi_message *message) {
         parser->state = MIDI_PROGRAM_DATA;
         parser->channel = b & 0x0F;
       }
+      else if (b == MIDI_TUNE_REQUEST) {
+        *message = (struct midi_message) {
+          .type = MIDI_MSG_TUNE_REQUEST
+        };
+        return 1;
+      }
 
       continue;
     }
@@ -112,7 +118,6 @@ int midi_parser_next(struct midi_parser *parser, struct midi_message *message) {
     }
   }
 
-  // Input exhausted, but preserve message state.
-  parser->input_offset = 0;
+  // input exhausted, but preserve message state.
   return 0;
 }
