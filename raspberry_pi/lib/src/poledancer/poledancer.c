@@ -302,7 +302,7 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 }
 
 
-int process_midi(void *zcard_plugin, uint8_t *midi_message, size_t size) {
+int process_midi(void *zcard_plugin, const uint8_t *midi_message, size_t size) {
   return 0;
 }
 

@@ -55,7 +55,7 @@ int create_correction_table(struct tunable *tunable, double initial_frequency) {
   tunable->tune_points[0].expected_dac = 0.0; // user expects dac 0 for initial frequency target
   tunable->tune_points[0].actual_dac = 0.5 + low_freq_dac_value;
 
-  int tuned_index;
+  int tuned_index = 0;
   for (int i = 0; i < tunable->tune_points_size - 1; ++i) {
     // y = mx + b; we have b as zcard->tune_points[i].actual_dac
     // compute m and x
