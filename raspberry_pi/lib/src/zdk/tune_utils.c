@@ -30,7 +30,7 @@ double octave_delta(double f1, double f2) {
 int16_t dac_value_for_freq(double target_freq, double dac_delta_per_octave, double ref_freq) {
   double freq_ratio = target_freq / ref_freq;
   double dac_value = log(freq_ratio) * inv_log2 * dac_delta_per_octave;
-  return dac_value + 0.5;
+  return (int16_t)(dac_value + (double)0.5);
 }
 
 
@@ -53,7 +53,7 @@ int create_correction_table(struct tunable *tunable, double initial_frequency) {
   // overwrite the expected_dac and actual_dac values of the initial entry--
   // basically do a linear interp and move the y-intercept
   tunable->tune_points[0].expected_dac = 0.0; // user expects dac 0 for initial frequency target
-  tunable->tune_points[0].actual_dac = 0.5 + low_freq_dac_value;
+  tunable->tune_points[0].actual_dac = (int)(0.5 + low_freq_dac_value);
 
   int tuned_index = 0;
   for (int i = 0; i < tunable->tune_points_size - 1; ++i) {

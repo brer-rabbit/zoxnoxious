@@ -18,15 +18,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "zcard_plugin.h"
 
 #define SPI_MODE 0
-// Queuee size _must_ be a power of 2 for the bitwise operations
-#define YM2203_QUEUE_SIZE 256
+// Queue size _must_ be a power of 2 for the bitwise operations
+#define YM2203_QUEUE_SIZE 512
 #define YM2203_QUEUE_MASK (YM2203_QUEUE_SIZE - 1)
 static_assert((YM2203_QUEUE_SIZE & (YM2203_QUEUE_SIZE - 1)) == 0,
               "YM2203_QUEUE_SIZE must be a power of 2");
+
+#define Z2203_SYSEX_HEADER_LEN 4
+#define Z2203_SYSEX_OVERHEAD (Z2203_SYSEX_HEADER_LEN + 1)
+#define SYSEX7_GROUP_DATA_BYTES  7
 
 static const int spi_channel_cs0 = 0;
 static const int spi_channel_cs1 = 1;
@@ -35,8 +40,8 @@ static const uint32_t spi_ym2203_write_data_wait = 25; // delay after data write
 
 // ym2203 register write modeled as address & value
 struct ym2203_write {
-  char address;
-  char value;
+  uint8_t address;
+  uint8_t value;
 };
 
 struct ym2203_queue {
@@ -58,8 +63,8 @@ struct ym2203_zcard {
 
 static void ym2203_queue_init(struct ym2203_queue *q);
 static bool ym2203_queue_pop(struct ym2203_queue *q, struct ym2203_write *write);
-static bool ym2203_queue_push(struct ym2203_queue *q, uint8_t address, uint8_t value);
-static int ym2203_write_register(struct ym2203_zcard *card, char address, char value);
+static int process_bulk_register_load_message(struct ym2203_zcard *card, const uint8_t *midi_message, size_t size);
+static int ym2203_write_register(struct ym2203_zcard *card, uint8_t address, uint8_t value);
 
 
 
@@ -166,9 +171,33 @@ int process_samples(void *zcard_plugin, const int16_t *samples) {
 }
 
 
+// process_midi
+//
+// read message containing address, value combinations.  Enqueue in a
+// thread safe manner: this is the single producer, with process_samples()
+// being the single consumer.
+// The message data needs to decode 8-bit data from the 7-bit stream.
+// packing format discussed: each group begins with a 7-bit MSB mask
+// followed by up to seven low-7-bit data bytes. Bit 0 of the mask
+// corresponds to the first data byte, bit 1 to the second, and so
+// forth.
+
 int process_midi(void *zcard_plugin, const uint8_t *midi_message, size_t size) {
-  return 0;
+  struct ym2203_zcard *card = zcard_plugin;
+
+  // Header bytes 0-2 have already been checked by the MIDI dispatcher.
+  // Byte 3 is the Z2203 command; the final byte terminates the SysEx.
+  if (!card || !midi_message) {
+    return -EINVAL;
+  }
+
+  if (midi_message[3] == 0x00) {
+    return process_bulk_register_load_message(card, midi_message, size);
+  }
+
+  return -EINVAL;
 }
+
 
 int process_midi_program_change(void *zcard_plugin, uint8_t program_number) {
   return 0;
@@ -202,6 +231,8 @@ static void ym2203_queue_init(struct ym2203_queue *q) {
 }
 
 
+#if 0
+// no longer needed-- bulk handler writes directly and publishes head
 static bool ym2203_queue_push(struct ym2203_queue *q, uint8_t address, uint8_t value) {
   unsigned int head = atomic_load_explicit(&q->head, memory_order_relaxed);
   unsigned int next = (head + 1) & YM2203_QUEUE_MASK;
@@ -217,6 +248,88 @@ static bool ym2203_queue_push(struct ym2203_queue *q, uint8_t address, uint8_t v
   atomic_store_explicit(&q->head, next, memory_order_release);
   return true;
 }
+#endif
+
+
+static int process_bulk_register_load_message(struct ym2203_zcard *card, const uint8_t *midi_message, size_t size) {
+  struct ym2203_queue *q;
+  size_t packed_payload_size, decoded_size, group_count, write_count;
+  size_t read_pos, decoded_count;
+  unsigned int head, tail;
+  uint8_t address = 0;
+
+
+  // size must be at least 8 bytes:
+  // sysex, manufacturer, card slot, command, MSB mask byte, *two* values, end sysex
+  if (size < 8) {
+    return -EINVAL;
+  }
+
+  // Message content: groups of 8 bytes.  Each group contains one MSB
+  // mask followed by 1-7 low-7-bit bytes.  The decoded bytes
+  // alternate register address, register value.
+  packed_payload_size = size - 5;  // remove 4 header/command bytes and final F7.
+  group_count = packed_payload_size / 8 + (packed_payload_size % 8 != 0); // number of groups
+  decoded_size = packed_payload_size - group_count;
+
+  if (packed_payload_size % 8 == 1 || decoded_size == 0 || decoded_size % 2 != 0) {
+    return -EINVAL;  // Incomplete group or unmatched address/value.
+  }
+
+  write_count = decoded_size / 2;
+  if (write_count > YM2203_QUEUE_MASK) {
+    return -EMSGSIZE; // this message could never fit, do not retry
+  }
+
+  q = &card->queue;
+  head = atomic_load_explicit(&q->head, memory_order_relaxed);
+  tail = atomic_load_explicit(&q->tail, memory_order_acquire);
+
+  // Check for available space: one slot is reserved to distinguish full from empty
+  // It is less than queue size, so it may fit on retry
+  if (write_count > ((tail - head - 1) & YM2203_QUEUE_MASK)) {
+    return -ENOSPC;
+  }
+
+  // Write into the reserved, unpublished slots. Publish the head once,
+  // after the entire message has been successfully decoded
+  read_pos = 4;
+  decoded_count = 0;
+  while (decoded_count < decoded_size) {
+    uint8_t msbs = midi_message[read_pos++];
+    size_t group_size = decoded_size - decoded_count;
+
+    if (group_size > SYSEX7_GROUP_DATA_BYTES) {
+      group_size = SYSEX7_GROUP_DATA_BYTES;
+    }
+    if ((msbs & 0x80) || (msbs >> group_size)) {
+      return -EINVAL;
+    }
+
+    for (size_t bit = 0; bit < group_size; ++bit) {
+      uint8_t low7 = midi_message[read_pos++];
+      uint8_t value;
+
+      if (low7 & 0x80) {
+        return -EINVAL;
+      }
+      value = low7 | (((msbs >> bit) & 1u) << 7);
+
+      if ((decoded_count & 1u) == 0) {
+        address = value;
+      } else {
+        q->entries[head].address = address;
+        q->entries[head].value = value;
+        head = (head + 1) & YM2203_QUEUE_MASK;
+      }
+      ++decoded_count;
+    }
+  }
+
+  atomic_store_explicit(&q->head, head, memory_order_release);
+  return 0;
+}
+
 
 static bool ym2203_queue_pop(struct ym2203_queue *q, struct ym2203_write *write) {
   unsigned int tail = atomic_load_explicit(&q->tail, memory_order_relaxed);
@@ -236,9 +349,9 @@ static bool ym2203_queue_pop(struct ym2203_queue *q, struct ym2203_write *write)
 
 
 // write the 8-bit value to the register at address
-static int ym2203_write_register(struct ym2203_zcard *card, char address, char value) {
-  int spi_channel_a0, spi_channel_data;
-  char a0_low = 0x00, a0_high = 0x80;
+static int ym2203_write_register(struct ym2203_zcard *card, uint8_t address, uint8_t value) {
+  unsigned int spi_channel_a0, spi_channel_data;
+  uint8_t a0_low = 0x00, a0_high = 0x80;
 
   a0_high = a0_high | ((value & 0x02) >> 1); // U7 QA LED mirrors IOA1
 
@@ -249,13 +362,13 @@ static int ym2203_write_register(struct ym2203_zcard *card, char address, char v
   // delay 3 microseoncds
   // SPI write A0 high via CS0
   // SPI write data via CVS1
-  spiWrite(spi_channel_a0, &a0_low, 1);
-  spiWrite(spi_channel_data, &address, 1);
+  spiWrite(spi_channel_a0, (char*) &a0_low, 1);
+  spiWrite(spi_channel_data, (char*) &address, 1);
    
   gpioDelay(spi_ym2203_write_address_wait);
 
-  spiWrite(spi_channel_a0, &a0_high, 1);
-  spiWrite(spi_channel_data, &value, 1);
+  spiWrite(spi_channel_a0, (char*) &a0_high, 1);
+  spiWrite(spi_channel_data, (char*) &value, 1);
 
   return 0;
 }

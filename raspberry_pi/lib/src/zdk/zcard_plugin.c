@@ -35,7 +35,7 @@ zlog_category_t *zlog_c = NULL;
 
 struct spi_device {
     int spi_flags;
-    int spi_handle;
+    unsigned int spi_handle;
 };
 
 struct zhost {
@@ -111,7 +111,7 @@ struct zhost* zhost_create() {
 }
 
 
-int set_spi_interface(struct zhost *zhost, unsigned int spi_channel, unsigned int spi_flags, int slot) {
+unsigned int set_spi_interface(struct zhost *zhost, unsigned int spi_channel, unsigned int spi_flags, int slot) {
     int retval;
     assert(spi_channel < NUM_SPI_CHIP_SELECTS);
 
