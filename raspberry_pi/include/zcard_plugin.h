@@ -55,12 +55,18 @@ struct zhost* zhost_create();
 unsigned int set_spi_interface(struct zhost *zhost, unsigned int spi_channel, unsigned int spi_mode, int slot);
 
 
+// Callback functions -- each voice card implements the functions below
+// which will implement voice card functionality.
+
 /** init the plugin.
  * Input: slot number for the card (0-7).
  * Any setup/state should be done here (constructor).  Return a
  * pointer to an object that will be used for subsequent calls
  * (zcard_plugin in other calls).
  * Any i2cOpen calls should be done here with the handle cached.
+ * This is called in a single threaded manner: the function
+ * may access SPI, I2C, other GPIOs without concern.  Short
+ * sleep calls can be used if required.
  */
 typedef void* (*init_zcard_f)(struct zhost *zhost, int slot);
 
@@ -103,8 +109,14 @@ typedef struct zcard_properties* (*get_zcard_properties_f)();
  * Plugin interface to receives samples and a spi handle.
  * Take a handle to the SPI channel and an array of samples to send to
  * card.  Card is responsible for sending the samples down the SPI
- * channel.  This method should call set_spi_interface() prior to sending
- * any samples or changing spi mode.
+ * channel.
+ * Threading:
+ * All process_samples() calls are serialized across cards; they may
+ * be in parallel to any of the MIDI calls.  During a tune routine
+ * process_samples() is skipped.  The call may manipulate the SPI
+ * bus.  This method should call set_spi_interface() prior to sending
+ * any samples, which will route SPI to the correct voice card.
+ * Other GPIO manipulation or I2C calls should be avoided.
  */
 typedef int (*process_samples_f)(void *zcard_plugin, const int16_t *samples);
 
@@ -113,7 +125,10 @@ typedef int (*process_samples_f)(void *zcard_plugin, const int16_t *samples);
 /** process_midi
  *
  * process a midi message for the card.  Message is filtered to be for this plugin.
- * This interface is for non-program change messages.
+ * This interface is for non-program change messages, mainly sysex.
+ * All MIDI calls (process_midi(), process_midi_program_change()) are serialized
+ * across cards.  They may be in parallel with process_samples().  The MIDI
+ * handlers may access I2C functions.
  */
 typedef int (*process_midi_f)(void *zcard_plugin, const uint8_t *midi_message, size_t size);
 
@@ -121,6 +136,8 @@ typedef int (*process_midi_f)(void *zcard_plugin, const uint8_t *midi_message, s
 /** process_midi_program_change
  *
  * process a midi message program change for this plugin.
+ * See note above for process_midi().  This may use I2C calls.  Calling
+ * a SPI function or other GPIO handling should be avoided.
  */
 typedef int (*process_midi_program_change_f)(void *zcard_plugin, uint8_t program_number);
 
@@ -137,6 +154,9 @@ typedef int (*process_midi_program_change_f)(void *zcard_plugin, uint8_t program
  *
  * Steps 3 and 4 are repeated until all cards report tuning complete.
  * A maximum of 32 iterations is allowed.
+ *
+ * All process_samples() and MIDI handlers are not invoked during a
+ * tune routine: processing is serialized.
  */
 
 /* return a TUNE_COMPLETE_* when done with measurements.
@@ -161,7 +181,8 @@ struct tuning_measurement {
  * (1) save any state that may be manipulated during tuning
  * (2) mute any outputs if applicable
  * Set any state to avoid any MIDI updates so they can be queued.  Anything
- * coming in via USB Audio PCM shouldn't need to be saved.
+ * coming in via USB Audio PCM shouldn't need to be saved.  Calling
+ * I2C, SPI functions is allowed.  A short sleeps may be used if required.
  *
  * Return zero on success, non-zero on failure.
  */
@@ -171,6 +192,7 @@ typedef tune_status_t (*tunereq_save_state_f)(void *zcard_plugin);
  *
  * Setup call for setting the next calibration point.
  * Set any DAC states or whatever for the next calibration point.
+ * I2C and SPI calls are allowed.
  */
 typedef tune_status_t (*tunereq_set_point_f)(void *zcard_plugin);
 
@@ -178,6 +200,7 @@ typedef tune_status_t (*tunereq_set_point_f)(void *zcard_plugin);
  *
  * Receive the results of the tune point.  The card can
  * consider storing tuning results to restore on the next boot.
+ * I2C and SPI calls are allowed.
  */
 typedef tune_status_t (*tunereq_measurement_f)(void *zcard_plugin, struct tuning_measurement *tuning_measurement);
 
@@ -187,6 +210,7 @@ typedef tune_status_t (*tunereq_measurement_f)(void *zcard_plugin, struct tuning
  * for a different card.  Either way, the card is expected to restore
  * state to where it was at the beginning of the tune request when
  * tunereq_save_state_f was called.
+ * I2C and SPI calls are allowed.
  */
 typedef tune_status_t (*tunereq_restore_state_f)(void *zcard_plugin);
 

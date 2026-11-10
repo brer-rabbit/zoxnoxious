@@ -32,6 +32,7 @@ static_assert((YM2203_QUEUE_SIZE & (YM2203_QUEUE_SIZE - 1)) == 0,
 #define Z2203_SYSEX_HEADER_LEN 4
 #define Z2203_SYSEX_OVERHEAD (Z2203_SYSEX_HEADER_LEN + 1)
 #define SYSEX7_GROUP_DATA_BYTES  7
+#define SYSEX7_GROUP_SIZE (SYSEX7_GROUP_DATA_BYTES + 1)
 
 static const int spi_channel_cs0 = 0;
 static const int spi_channel_cs1 = 1;
@@ -63,7 +64,7 @@ struct ym2203_zcard {
 
 static void ym2203_queue_init(struct ym2203_queue *q);
 static bool ym2203_queue_pop(struct ym2203_queue *q, struct ym2203_write *write);
-static int process_bulk_register_load_message(struct ym2203_zcard *card, const uint8_t *midi_message, size_t size);
+static int process_bulk_register_write(struct ym2203_zcard *card, const uint8_t *midi_message, size_t size);
 static int ym2203_write_register(struct ym2203_zcard *card, uint8_t address, uint8_t value);
 
 
@@ -187,15 +188,16 @@ int process_midi(void *zcard_plugin, const uint8_t *midi_message, size_t size) {
 
   // Header bytes 0-2 have already been checked by the MIDI dispatcher.
   // Byte 3 is the Z2203 command; the final byte terminates the SysEx.
-  if (!card || !midi_message) {
+  if (!card || !midi_message || size < Z2203_SYSEX_HEADER_LEN) {
     return -EINVAL;
   }
 
-  if (midi_message[3] == 0x00) {
-    return process_bulk_register_load_message(card, midi_message, size);
+  switch (midi_message[3]) {
+  case 0x00:
+    return process_bulk_register_write(card, midi_message, size);
+  default:
+    return -EINVAL;
   }
-
-  return -EINVAL;
 }
 
 
@@ -251,28 +253,30 @@ static bool ym2203_queue_push(struct ym2203_queue *q, uint8_t address, uint8_t v
 #endif
 
 
-static int process_bulk_register_load_message(struct ym2203_zcard *card, const uint8_t *midi_message, size_t size) {
+static int process_bulk_register_write(struct ym2203_zcard *card, const uint8_t *midi_message, size_t size) {
   struct ym2203_queue *q;
-  size_t packed_payload_size, decoded_size, group_count, write_count;
-  size_t read_pos, decoded_count;
+  size_t encoded_size, decoded_size, packing_group_count, write_count;
+  size_t encoded_pos, decoded_pos;
   unsigned int head, tail;
   uint8_t address = 0;
 
 
   // size must be at least 8 bytes:
   // sysex, manufacturer, card slot, command, MSB mask byte, *two* values, end sysex
-  if (size < 8) {
+  if (size < Z2203_SYSEX_OVERHEAD + 3) {
     return -EINVAL;
   }
 
   // Message content: groups of 8 bytes.  Each group contains one MSB
   // mask followed by 1-7 low-7-bit bytes.  The decoded bytes
   // alternate register address, register value.
-  packed_payload_size = size - 5;  // remove 4 header/command bytes and final F7.
-  group_count = packed_payload_size / 8 + (packed_payload_size % 8 != 0); // number of groups
-  decoded_size = packed_payload_size - group_count;
+  encoded_size = size - Z2203_SYSEX_OVERHEAD; // accounts for header/command, final F7
+  packing_group_count = encoded_size / SYSEX7_GROUP_SIZE +
+    (encoded_size % SYSEX7_GROUP_SIZE != 0);
+  decoded_size = encoded_size - packing_group_count;
 
-  if (packed_payload_size % 8 == 1 || decoded_size == 0 || decoded_size % 2 != 0) {
+  if (encoded_size % SYSEX7_GROUP_SIZE == 1 ||
+      decoded_size == 0 || decoded_size % 2 != 0) {
     return -EINVAL;  // Incomplete group or unmatched address/value.
   }
 
@@ -293,36 +297,36 @@ static int process_bulk_register_load_message(struct ym2203_zcard *card, const u
 
   // Write into the reserved, unpublished slots. Publish the head once,
   // after the entire message has been successfully decoded
-  read_pos = 4;
-  decoded_count = 0;
-  while (decoded_count < decoded_size) {
-    uint8_t msbs = midi_message[read_pos++];
-    size_t group_size = decoded_size - decoded_count;
+  encoded_pos = 4;
+  decoded_pos = 0;
+  while (decoded_pos < decoded_size) {
+    uint8_t msb_mask = midi_message[encoded_pos++];
+    size_t group_data_size = decoded_size - decoded_pos;
 
-    if (group_size > SYSEX7_GROUP_DATA_BYTES) {
-      group_size = SYSEX7_GROUP_DATA_BYTES;
+    if (group_data_size > SYSEX7_GROUP_DATA_BYTES) {
+      group_data_size = SYSEX7_GROUP_DATA_BYTES;
     }
-    if ((msbs & 0x80) || (msbs >> group_size)) {
+    if ((msb_mask & 0x80) || (msb_mask >> group_data_size)) {
       return -EINVAL;
     }
 
-    for (size_t bit = 0; bit < group_size; ++bit) {
-      uint8_t low7 = midi_message[read_pos++];
-      uint8_t value;
+    for (size_t bit_index = 0; bit_index < group_data_size; ++bit_index) {
+      uint8_t low7_bits = midi_message[encoded_pos++];
+      uint8_t decoded_byte;
 
-      if (low7 & 0x80) {
+      if (low7_bits & 0x80) {
         return -EINVAL;
       }
-      value = low7 | (((msbs >> bit) & 1u) << 7);
+      decoded_byte = low7_bits | (((msb_mask >> bit_index) & 1u) << 7);
 
-      if ((decoded_count & 1u) == 0) {
-        address = value;
+      if ((decoded_pos & 1u) == 0) {
+        address = decoded_byte;
       } else {
         q->entries[head].address = address;
-        q->entries[head].value = value;
+        q->entries[head].value = decoded_byte;
         head = (head + 1) & YM2203_QUEUE_MASK;
       }
-      ++decoded_count;
+      ++decoded_pos;
     }
   }
 
