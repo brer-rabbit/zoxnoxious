@@ -68,9 +68,6 @@ static int process_bulk_register_write(struct ym2203_zcard *card, const uint8_t 
 static int ym2203_write_register(struct ym2203_zcard *card, uint8_t address, uint8_t value);
 
 
-
-
-
 void *init_zcard(struct zhost *zhost, int slot) {
     struct ym2203_zcard *zcard = calloc(1, sizeof(struct ym2203_zcard));
     if (!zcard) {
@@ -159,16 +156,16 @@ struct zcard_properties* get_zcard_properties() {
 
 int process_samples(void *zcard_plugin, const int16_t *samples) {
   struct ym2203_zcard *card = zcard_plugin;
+  struct ym2203_write entry;
 
-  if (++card->test_counter >= 4000) {
-    card->test_counter = 0;
-
-    card->key_on_off = card->key_on_off == 0x00 ? 0xf0 : 0x00;
-    ym2203_write_register(card, 0x28, card->key_on_off);
+  if (ym2203_queue_pop(&card->queue, &entry)) {
+    INFO("z2203: process samples pop address 0x%X data 0x%X", entry.address, entry.value);
+    ym2203_write_register(card, entry.address, entry.value);
+    // return the number of SPI transactions
+    return 4;
   }
 
-  // return the number of SPI transactions
-  return 4;
+  return 0;
 }
 
 
@@ -322,6 +319,7 @@ static int process_bulk_register_write(struct ym2203_zcard *card, const uint8_t 
       if ((decoded_pos & 1u) == 0) {
         address = decoded_byte;
       } else {
+        INFO("z2203: enqueue address 0x%X data 0x%X", address, decoded_byte);
         q->entries[head].address = address;
         q->entries[head].value = decoded_byte;
         head = (head + 1) & YM2203_QUEUE_MASK;

@@ -19,7 +19,7 @@
 // my scope shows 24000000 to be 28MHz
 #define SPI_RATE 24000000
 
-#define INITIAL_SPI_FLAGS 1
+#define INITIAL_SPI_FLAGS 1u
 #define INITIAL_SLOT 5
 
 // GPIOs to mux the SPI chip selects to the different cards
@@ -34,8 +34,8 @@
 zlog_category_t *zlog_c = NULL;
 
 struct spi_device {
-    int spi_flags;
-    unsigned int spi_handle;
+  unsigned int spi_flags;
+  unsigned int spi_handle;
 };
 
 struct zhost {
@@ -97,13 +97,18 @@ struct zhost* zhost_create() {
 
 
   zhost->active_slot = INITIAL_SLOT;
-  for (int i = 0; i < NUM_SPI_CHIP_SELECTS; ++i) {
-      zhost->spi_devices[i].spi_flags = INITIAL_SPI_FLAGS;
-      if ((zhost->spi_devices[i].spi_handle = spiOpen(i, SPI_RATE, zhost->spi_devices[i].spi_flags)) < 0) {
-          ERROR("failed to open SPI channel %d", i);
-          free(zhost);
-          return NULL;
-      }
+  for (unsigned int i = 0; i < NUM_SPI_CHIP_SELECTS; ++i) {
+    int spi_handle;
+    zhost->spi_devices[i].spi_flags = INITIAL_SPI_FLAGS;
+    spi_handle = spiOpen(i, SPI_RATE, zhost->spi_devices[i].spi_flags);
+    if (spi_handle < 0) {
+      ERROR("failed to open SPI channel %u", i);
+      free(zhost);
+      return NULL;
+    }
+
+    // pigpio handles are unsigned, but errors are signed
+    zhost->spi_devices[i].spi_handle = spi_handle;
   }
 
 
