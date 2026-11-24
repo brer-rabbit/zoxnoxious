@@ -27,6 +27,7 @@ std::string getCardName(uint8_t cardId, int outputNumber) {
   if (cardId == 0x04) return outputNumber == 1 ? "5524!VOICE" : "5524!VCO1";
   if (cardId == 0x06) return outputNumber == 1 ? "PoleDancer" : "4P!LOWPASS";
   if (cardId == 0x07) return "Audio IO";
+  if (cardId == 0x08) return outputNumber == 1 ? "2203!FM" : "2203!SSG";
   return "----";
 }
 
@@ -42,6 +43,7 @@ const char* getCardNameByHardwareId(uint8_t cardId) {
   if (cardId == 0x04) return "5524 Voice";
   if (cardId == 0x06) return "PoleDancer";
   if (cardId == 0x07) return "Audio IO";
+  if (cardId == 0x08) return "2203 FM";
   return "----";
 }
 
@@ -54,6 +56,7 @@ void init(Plugin* p) {
         p->addModel(modelPoleDancerPersonality);
         p->addModel(modelPoleDancerWorkbenchForPersonality);
         p->addModel(modelPoleDancerWorkbenchForPoleDancer);
+        p->addModel(modelZoxnoxious2203SSG);
         p->addModel(modelZoxnoxious3372);
         p->addModel(modelZoxnoxious5524);
         p->addModel(modelZoxnoxious5524Visual);
